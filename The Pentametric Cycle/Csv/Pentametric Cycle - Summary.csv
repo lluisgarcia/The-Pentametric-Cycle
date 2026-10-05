@@ -1,0 +1,33 @@
+Ὁ Πενταμετρικὸς Κύκλος
+The Pentametric Cycle
+
+Formula:
+s(n)² = (n² + 4C(m))/5
+m = 4n² mod 10
+C(m) = (26m − 5m²)/24
+
+Structure:
+Fundamental period: 25 terms = 5²
+Transitions: 24 = 4!
+Axis: 1 (n=25)
+Consonance skeleton: 16 = 4²
+	Silence skeleton: 9 = 3²
+Pythagorean triple: 3² + 4² = 5²
+Palindrome: 51 terms = 2×5² + 1 
+Structure: P + Axis + P
+Axis: position 25 (self-mirroring)
+"Consonances: 4 (unison, octave, fifth, fourth)"
+"Each appears 4× in the Vertebra, 8× in the Palindrome"
+
+Names:
+Ὁ Πενταμετρικὸς Κύκλος — The Pentametric Cycle
+Ὁ Πενταμετρικὸς Παλίνδρομος — The Pentametric Palindrome
+Ὁ Πεντάμετρος Σπόνδυλος — The Pentametric Vertebra
+ἱ Εἴκοσι Τέσσαρες Μεταβάσεις — The Twenty-Four Transitions
+Ὁ Ἄξων — The Axis
+Τὸ Τετράγωνον Σπέρμα — The Square Seed
+Ἡ Τριάδικη Σιγή — The Triadic Silence
+Αἱ Τέσσαρες Συμφωνίαι — The Four Consonances
+Ἡ Πυθαγόρειος Τριάς — The Pythagorean Triple
+Ὁ Πενταμετρικὸς Τύπος — The Pentametric Formula
+Ὁ Διαστηματικὸς Χάρτης — The Interval Map

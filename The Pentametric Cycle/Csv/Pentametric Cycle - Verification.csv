@@ -1,0 +1,13 @@
+Interval,Digit,Greek name ,Vertebra count (25 terms),Count in Palindrome (51),Frequency
+Origin (silence),0,—,9,19,36%
+Unison (1:1),1,ὁμώνυμον,4,8,16%
+Octave (2:1),2,διὰ πασῶν,4,8,16%
+Fifth (3:2),3,διὰ πέντε,4,8,16%
+Fourth (4:3),4,διὰ τεσσάρων,4,8,16%
+TOTAL,,,25,51,100%
+,,,,,
+Structural Note,,,,,
+Vertebra: 25 terms = 5²,,,,,
+Transitions: 24 = 4!,,,,,
+Axis: 1 (n=25),,,,,
+Pythagorean triple: 9 + 16 = 25,,,,,

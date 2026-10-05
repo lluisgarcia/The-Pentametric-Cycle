@@ -1,0 +1,17 @@
+Structure,Count,Square / Factorial,Greek Name,English Name
+Terms in Vertebra,25,5^2,Ὁ Πεντάμετρος Σπόνδυλος,The Pentametric Vertebra
+Transitions in Vertebra,24,4!,Αἱ Εἴκοσι Τέσσαρες Μεταβάσεις,The Twenty-Four Transitions
+Axis,1,—,Ὁ Ἄξων,The Axis
+Silence Skeleton,9,3^2,Ἡ Τριάδικη Σιγή,The Triadic Silence
+Consonance Skeleton,16,4^2,Τὸ Τετράγωνον Σπέρμα,The Square Seed
+Consonances,4,2^2,Αἱ Τέσσαρες Συμφωνίαι,The Four Consonances
+,,,,
+Structure,Count,Formula,Greek Name,English Name
+Palindrome,51,2×5²+1,Ὁ Πενταμετρικὸς Παλίνδρομος,The Pentametric Palindrome
+Part 1,25,5^2,—,First half
+Axis,1,—,Ὁ Ἄξων,The Axis
+Part 2,25,5^2,—,Second half
+,,,,
+Identity,Expression,Greek Name,English Name,
+Pythagorean Triple,(3^2)+(4^2) = 5^2,Ἡ Πυθαγόρειος Τριάς,The Pythagorean Triple,
+Silence + Consonance,9+16=25,—,Triadic Silence + Square Seed = Vertebra,
