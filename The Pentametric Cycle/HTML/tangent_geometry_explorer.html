@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tangent Geometry Explorer</title>
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#080d1a; --glow:rgba(110,140,255,.17); --glow2:rgba(232,121,249,.07);
+  --panel:rgba(255,255,255,.05); --panel-2:rgba(255,255,255,.035); --line:rgba(255,255,255,.11);
+  --ink:#e9edf9; --ink-2:#a8b2cc; --ink-3:#7380a1;
+  --accent:#8fa8ff; --accent-soft:rgba(143,168,255,.14);
+  --circle:#7384bb; --circle-fill:rgba(120,140,220,.07);
+  --axis:rgba(190,205,255,.26); --guide:rgba(190,205,255,.30);
+  --halo:#0e1630;
+  --ok:#4ade80; --warn:#fbbf24; --bad:#fb7185;
+  --c-radius:#818cf8; --c-adjacent:#38bdf8; --c-opposite:#fb923c; --c-hypotenuse:#e5e9f7;
+  --c-tangent:#fb7185; --c-secant:#34d399; --c-cosecant:#e879f9; --c-cotangent:#a3e635; --c-angle:#fde047;
+  --c-sine:var(--c-opposite); --c-cosine:var(--c-adjacent);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","Cambria Math",Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --bg:#f2f4fb; --glow:rgba(90,110,230,.13); --glow2:rgba(217,70,239,.06);
+  --panel:rgba(255,255,255,.74); --panel-2:rgba(255,255,255,.55); --line:rgba(20,30,70,.11);
+  --ink:#141a33; --ink-2:#4a5476; --ink-3:#7a84a3;
+  --accent:#4458d8; --accent-soft:rgba(68,88,216,.10);
+  --circle:#6270b0; --circle-fill:rgba(90,110,220,.06);
+  --axis:rgba(30,40,90,.22); --guide:rgba(30,40,90,.30);
+  --halo:#ffffff;
+  --ok:#16a34a; --warn:#b45309; --bad:#e11d48;
+  --c-radius:#4f46e5; --c-adjacent:#0284c7; --c-opposite:#ea580c; --c-hypotenuse:#111a36;
+  --c-tangent:#e11d48; --c-secant:#059669; --c-cosecant:#c026d3; --c-cotangent:#5f9a0e; --c-angle:#c78d04;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--ink); font:15px/1.55 var(--sans);
+  background:
+    radial-gradient(1100px 560px at 12% -8%, var(--glow), transparent 62%),
+    radial-gradient(900px 480px at 100% 0%, var(--glow2), transparent 58%),
+    var(--bg);
+  min-height:100vh;
+}
+.app{max-width:1280px; margin:0 auto; padding:clamp(14px,3vw,34px)}
+header.top{display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap}
+h1{font:600 clamp(1.7rem,3.6vw,2.5rem)/1.1 var(--serif); letter-spacing:-.015em; margin:0}
+.sub{margin:.45rem 0 0; color:var(--ink-2); max-width:62ch}
+h2{font:600 1.35rem/1.2 var(--serif); letter-spacing:-.01em; margin:0 0 .35rem}
+h3{font:600 1.05rem/1.25 var(--serif); margin:0}
+button{font:inherit; color:inherit}
+.ghost{background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:.45rem .95rem; cursor:pointer; color:var(--ink-2); transition:background .15s,color .15s,border-color .15s}
+.ghost:hover{color:var(--ink); border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+
+.panel{background:var(--panel); border:1px solid var(--line); border-radius:20px; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 24px 60px -36px rgba(0,0,0,.65)}
+.section{margin-top:22px; padding:clamp(16px,2.4vw,26px)}
+.lede{color:var(--ink-2); margin:0 0 1rem; max-width:75ch}
+
+.stage{display:grid; grid-template-columns:minmax(0,1fr) 350px; gap:18px; align-items:start; margin-top:20px}
+.stage > *{min-width:0}
+.diagram-panel{padding:10px 10px 14px}
+.controls{padding:20px; position:sticky; top:14px}
+@media (max-width:1000px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .controls{order:-1; position:static}
+}
+svg#svg{display:block; width:100%; height:auto; border-radius:14px; touch-action:manipulation}
+.infobar{margin:10px 8px 0; min-height:3.1em; padding:.6rem .85rem; border-radius:12px; background:var(--panel-2); border:1px solid var(--line); color:var(--ink-2); font-size:.93rem}
+.infobar b{color:var(--ink); font-weight:650}
+.infobar .dot{display:inline-block; width:.7em; height:.7em; border-radius:50%; margin-right:.5em; vertical-align:baseline}
+.infobar code{font-family:var(--mono); color:var(--ink)}
+.legend{display:flex; flex-wrap:wrap; gap:7px; margin:12px 8px 0}
+.chip{display:inline-flex; align-items:center; gap:.45em; padding:.28rem .7rem; border-radius:999px; border:1px solid var(--line); background:var(--panel-2); font-size:.85rem; cursor:pointer; user-select:none; transition:border-color .15s, background .15s}
+.chip::before{content:""; width:.62em; height:.62em; border-radius:50%; background:var(--kc,var(--accent))}
+.chip.hl{border-color:var(--kc); background:color-mix(in srgb,var(--kc) 16%,transparent)}
+.note{margin:12px 8px 0; font-size:.86rem; color:var(--ink-2); line-height:1.5}
+.note strong{color:var(--ink)}
+
+/* controls */
+.field{margin-bottom:18px}
+.field > label, .lab{display:block; font-weight:600; font-size:.92rem; margin-bottom:.4rem}
+.tbox{display:flex; align-items:center; gap:.6rem; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:.35rem .9rem; transition:border-color .15s, box-shadow .15s}
+.tbox:focus-within{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.tbox.bad{border-color:var(--bad)}
+.tsym{font:italic 600 1.35rem var(--serif); color:var(--c-tangent)}
+#tIn{flex:1; min-width:0; background:none; border:0; outline:0; color:var(--ink); font:600 1.75rem/1.3 var(--mono); letter-spacing:.01em; padding:.1rem 0}
+input[type=range]{width:100%; accent-color:var(--accent); margin:.7rem 0 0; height:1.4rem}
+.rl{display:flex; justify-content:space-between; font:.76rem var(--mono); color:var(--ink-3)}
+.msg{min-height:1.3em; margin:.35rem 0 0; font-size:.83rem; color:var(--ink-3)}
+.msg.err{color:var(--bad)}
+.presets{display:grid; grid-template-columns:repeat(3,1fr); gap:7px}
+.presets button{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:.42rem 0; cursor:pointer; font:600 .9rem var(--mono); transition:border-color .15s, background .15s}
+.presets button:hover{border-color:var(--accent)}
+.presets button[aria-pressed=true]{background:var(--accent-soft); border-color:var(--accent); color:var(--ink)}
+.prow{display:flex; align-items:center; gap:.8rem}
+.prow output{font:600 1rem var(--mono); min-width:2.2em; text-align:right}
+.hint{font-size:.8rem; color:var(--ink-3); margin:.3rem 0 0}
+.switch{display:flex; gap:.6rem; align-items:flex-start; font-size:.88rem; color:var(--ink-2); cursor:pointer}
+.switch input{margin-top:.2rem; accent-color:var(--accent)}
+.readout{margin:4px 0 18px; padding:.85rem 1rem; border-radius:14px; background:var(--panel-2); border:1px solid var(--line)}
+.readout .deg{font:600 1.9rem/1.1 var(--mono); color:var(--c-angle); letter-spacing:-.01em}
+.readout .rad{font:.95rem var(--mono); color:var(--ink-2); margin-top:.2rem}
+.btnrow{display:flex; gap:8px; align-items:center; margin-top:16px}
+.primary{background:var(--accent); color:#0a1030; border:0; border-radius:10px; padding:.5rem 1.1rem; font-weight:650; cursor:pointer}
+:root[data-theme="light"] .primary{color:#fff}
+
+/* svg */
+.circle{fill:var(--circle-fill); stroke:var(--circle); stroke-width:1.6}
+.axis{stroke:var(--axis); stroke-width:1.2}
+.guide{stroke:var(--guide); stroke-width:1.2; stroke-dasharray:3 7; fill:none}
+.guide.tg{stroke:var(--c-tangent); opacity:.35}
+.guide.ray{stroke:var(--c-hypotenuse); opacity:.35}
+.dim{transition:opacity .18s; cursor:pointer}
+svg.has-focus .dim:not(.hl){opacity:.17}
+.seg{color:var(--hc,var(--ink))}
+.seg .vis{stroke:currentColor; stroke-linecap:round; fill:none; stroke-width:var(--w,4); transition:stroke-width .15s}
+.seg .hit{stroke:transparent; stroke-width:20; stroke-linecap:round; pointer-events:stroke; fill:none}
+.seg .tick{stroke:currentColor; stroke-width:2; stroke-linecap:round}
+.seg .arr{fill:currentColor}
+.seg.hl .vis{stroke-width:calc(var(--w,4) * 1.7)}
+.seg.hl{filter:drop-shadow(0 0 5px currentColor)}
+.s-adjacent{--hc:var(--c-adjacent)} .s-opposite{--hc:var(--c-opposite)} .s-hypotenuse{--hc:var(--c-hypotenuse)}
+.s-tangent{--hc:var(--c-tangent)} .s-secant{--hc:var(--c-secant)} .s-cosecant{--hc:var(--c-cosecant)}
+.s-cotangent{--hc:var(--c-cotangent)} .s-radius{--hc:var(--c-radius)}
+.inner .vis{fill:none; stroke:var(--c-radius); stroke-width:2.2; stroke-dasharray:7 6}
+.inner .hit{fill:none; stroke:transparent; stroke-width:16; pointer-events:stroke}
+.inner.hl .vis{stroke-width:4}
+.wedge{fill:var(--c-angle); fill-opacity:.15; stroke:none}
+.arcline{fill:none; stroke:var(--c-angle); stroke-width:3.2; stroke-linecap:round}
+.arcgrp.hl .arcline{stroke-width:5.5}
+.arcgrp.hl .wedge{fill-opacity:.32}
+.rightangle{fill:none; stroke:var(--ink-2); stroke-width:1.4}
+.pt circle{fill:var(--ink); stroke:var(--halo); stroke-width:2}
+.pt text{fill:var(--ink); font:italic 600 15px var(--serif); paint-order:stroke; stroke:var(--halo); stroke-width:4px; stroke-linejoin:round}
+.leader{stroke:var(--c-opposite); stroke-width:1.6; stroke-dasharray:3 4}
+.pill rect{fill:var(--halo); fill-opacity:.9; stroke:var(--lc); stroke-width:1.3}
+.pill text{fill:var(--ink); font:600 12.5px var(--mono); font-variant-numeric:tabular-nums}
+.pill.hl rect{stroke-width:2.4; fill-opacity:1}
+.hud rect{fill:var(--halo); fill-opacity:.72; stroke:var(--line)}
+.hud text{fill:var(--ink); font:600 13px var(--mono)}
+.hud .y{fill:var(--c-angle)}
+
+/* table */
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:14px; background:var(--panel-2)}
+table{border-collapse:collapse; width:100%; min-width:780px; font-size:.92rem}
+th{font-weight:650; text-align:left; color:var(--ink-2); font-size:.84rem; padding:.7rem .9rem; border-bottom:1px solid var(--line); background:var(--panel)}
+td{padding:.55rem .9rem; border-bottom:1px solid var(--line); vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.sym{font:italic 600 1.05rem var(--serif); white-space:nowrap}
+td.val{font:600 .98rem var(--mono); text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums}
+td.val small{color:var(--ink-3); font-weight:500; margin-left:.3em}
+td.def{color:var(--ink-2)}
+td.fm{font-family:var(--serif); font-size:1.02rem; white-space:nowrap}
+tbody tr{cursor:pointer; transition:background .15s}
+tbody tr td:first-child{box-shadow:inset 3px 0 0 var(--kc,transparent)}
+tbody tr.cur td{background:var(--accent-soft)}
+tbody tr.cur td.val{color:var(--c-tangent); font-size:1.08rem}
+tbody tr.hl td{background:color-mix(in srgb,var(--kc) 17%,transparent)}
+.qname{display:flex; align-items:center; gap:.5rem; font-weight:600}
+.badge{font-size:.72rem; font-weight:600; padding:.05rem .45rem; border-radius:999px; background:var(--c-tangent); color:#fff}
+
+/* math */
+.math{font-family:var(--serif); font-size:1.12rem}
+.frac{display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 .2em; line-height:1.2}
+.frac > .n{border-bottom:1.3px solid currentColor; padding:0 .3em .06em}
+.frac > .d{padding:.06em .3em 0}
+.sqrt{display:inline-flex; align-items:stretch}
+.sqrt > span{border-top:1.3px solid currentColor; padding:0 .15em 0 .1em; margin-left:-.02em}
+.eqgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr)); gap:16px}
+.eqcol h3{margin-bottom:.6rem}
+.eq{display:flex; align-items:center; gap:.65em; flex-wrap:wrap; padding:.5rem .8rem; margin-bottom:6px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); cursor:pointer; transition:border-color .15s, background .15s; box-shadow:inset 3px 0 0 var(--kc,transparent)}
+.eq .lhs{font-style:italic; min-width:5.2em}
+.eq .eqs{color:var(--ink-3)}
+.eq .ev{margin-left:auto; font:600 .86rem var(--mono); color:var(--ink-2)}
+.eq.hl{border-color:var(--kc); background:color-mix(in srgb,var(--kc) 14%,transparent)}
+
+details.derive{margin-top:22px; padding:0}
+details.derive summary{cursor:pointer; padding:clamp(14px,2vw,20px) clamp(16px,2.4vw,26px); font:600 1.25rem var(--serif); list-style:none; display:flex; align-items:center; gap:.7rem}
+details.derive summary::-webkit-details-marker{display:none}
+details.derive summary::before{content:"+"; display:inline-grid; place-items:center; width:1.5em; height:1.5em; border-radius:50%; border:1px solid var(--line); font:600 1rem var(--mono); transition:transform .2s}
+details.derive[open] summary::before{content:"–"}
+.derive .body{padding:0 clamp(16px,2.4vw,26px) clamp(16px,2.4vw,26px)}
+.derive ol{margin:0; padding-left:1.4rem}
+.derive li{margin:.7rem 0; padding-left:.3rem}
+.derive li .why{display:block; color:var(--ink-2); font-size:.88rem; font-family:var(--sans); margin-bottom:.15rem}
+.derive li .calc{font-family:var(--serif); font-size:1.1rem}
+.derive .num{font:600 .95rem var(--mono); color:var(--accent)}
+
+/* checks */
+.checks{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr)); gap:12px}
+.check{padding:.9rem 1rem; border-radius:14px; border:1px solid var(--line); background:var(--panel-2)}
+.check .t{font:600 1.02rem var(--serif); margin-bottom:.35rem}
+.check .line{font:.88rem var(--mono); color:var(--ink-2); word-break:break-word}
+.check .res{margin-top:.45rem; font-size:.82rem; display:flex; align-items:center; gap:.45rem}
+.status{display:inline-grid; place-items:center; width:1.35em; height:1.35em; border-radius:50%; font-weight:700; font-size:.82rem; color:#08101e; background:var(--ok)}
+.status.warn{background:var(--warn)} .status.bad{background:var(--bad)}
+.selftest{margin-top:12px; font-size:.86rem; color:var(--ink-2); display:flex; gap:.5rem; align-items:center; flex-wrap:wrap}
+
+/* glossary */
+.cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(285px,100%),1fr)); gap:14px}
+.card{padding:1rem 1.05rem 1.05rem; border-radius:16px; border:1px solid var(--line); background:var(--panel-2); cursor:pointer; transition:border-color .15s, background .15s; box-shadow:inset 0 3px 0 var(--kc,transparent)}
+.card.hl{border-color:var(--kc); background:color-mix(in srgb,var(--kc) 11%,transparent)}
+.card h3{margin-bottom:.3rem}
+.card .f{font-family:var(--serif); font-size:1.1rem; margin:.5rem 0; padding:.35rem .6rem; border-radius:10px; background:var(--panel); display:flex; flex-wrap:wrap; align-items:center; gap:.3em .5em}
+.card .f .lv{margin-left:auto; font:600 .82rem var(--mono); color:var(--ink-2)}
+.card p{margin:.3rem 0; color:var(--ink-2); font-size:.92rem}
+.card p.where{font-size:.86rem; color:var(--ink-3)}
+
+.tip{position:fixed; z-index:50; pointer-events:none; padding:.4rem .7rem; border-radius:10px; font:600 .86rem var(--mono); background:var(--halo); color:var(--ink); border:1px solid var(--kc,var(--accent)); box-shadow:0 10px 30px -10px rgba(0,0,0,.6); opacity:0; transform:translateY(4px); transition:opacity .12s, transform .12s; max-width:min(90vw,360px)}
+.tip.on{opacity:1; transform:none}
+footer{margin:26px 0 8px; color:var(--ink-3); font-size:.82rem; text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="top">
+  <div>
+    <h1>Tangent geometry explorer</h1>
+    <p class="sub">Choose a tangent value T. The unit circle stays put while the triangle, the angle and every trig segment rebuild around it.</p>
+  </div>
+  <button id="themeBtn" class="ghost" type="button" aria-label="Switch between light and dark theme">Switch theme</button>
+</header>
+<noscript><p>This explorer needs JavaScript to run.</p></noscript>
+
+<section class="stage">
+  <div class="panel diagram-panel">
+    <svg id="svg" viewBox="0 0 860 680" role="img" aria-label="Unit circle with the right triangle, tangent line, secant, cosecant and cotangent for the chosen tangent value"></svg>
+    <div id="infobar" class="infobar" aria-live="polite"></div>
+    <div id="legend" class="legend" role="group" aria-label="Highlight a part of the diagram"></div>
+    <p class="note"><strong>Normalization.</strong> All lengths shown here are normalized so that the hypotenuse is 1. In this construction, the radius/adjacent length is therefore cos(θ), and the opposite length is sin(θ).</p>
+    <p class="note">The large circle is drawn at radius 1, which is the hypotenuse. The dashed violet circle has radius cos(θ): that is the “Radius” of this model, and it ends at the foot A of the triangle. Bars drawn beside the ray (secant, cosecant, radius) are offset dimension lines, so they never hide the geometry.</p>
+  </div>
+
+  <aside class="panel controls" aria-label="Controls">
+    <div class="field">
+      <label for="tIn">Tangent T</label>
+      <div class="tbox" id="tbox"><span class="tsym">T =</span><input id="tIn" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="1.000000" aria-describedby="tMsg"></div>
+      <input id="tRange" type="range" min="0.01" max="10" step="0.01" value="1" aria-label="Tangent value slider">
+      <div class="rl"><span>0.01</span><span>10</span></div>
+      <p class="msg" id="tMsg" role="status"></p>
+    </div>
+
+    <div class="readout" aria-live="off">
+      <div class="deg" id="roDeg">45°</div>
+      <div class="rad" id="roRad">θ = 0.785 rad</div>
+    </div>
+
+    <div class="field">
+      <span class="lab">Presets</span>
+      <div class="presets" id="presets"></div>
+    </div>
+
+    <div class="field">
+      <label for="pRange">Decimal precision</label>
+      <div class="prow"><input id="pRange" type="range" min="0" max="15" step="1" value="10"><output id="pOut" for="pRange">10</output></div>
+      <p class="hint">0–15 decimal places. Only the display is rounded; every calculation keeps full floating-point precision.</p>
+    </div>
+
+    <label class="switch"><input type="checkbox" id="fit"><span>Zoom out to fit long tangents. This shrinks the circle, so it is off by default.</span></label>
+
+    <div class="btnrow"><button id="reset" class="primary" type="button">Reset</button><span class="hint" style="margin:0">T = 1, precision 10</span></div>
+  </aside>
+</section>
+
+<section class="panel section" aria-labelledby="tblH">
+  <h2 id="tblH">Live values</h2>
+  <p class="lede">Every number below comes from the same T. Hover or click a row to light up its segment in the diagram.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Quantity</th><th>Symbol</th><th style="text-align:right">Value</th><th>Definition / Meaning</th><th>Formula</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel section" aria-labelledby="chkH">
+  <h2 id="chkH">Geometry check</h2>
+  <p class="lede">These use the raw JavaScript values for sin θ, cos θ and the triangle sides, not the rounded display.</p>
+  <div class="checks" id="checks"></div>
+  <div class="selftest" id="selftest"></div>
+</section>
+
+<section class="panel section" aria-labelledby="conH">
+  <h2 id="conH">How everything is connected</h2>
+  <p class="lede">With the hypotenuse fixed at 1, the triangle’s two legs are exactly cos θ and sin θ. Everything else is a ratio of those.</p>
+  <div class="eqgrid math">
+    <div class="eqcol"><h3>From the angle θ</h3><div id="eqTheta"></div></div>
+    <div class="eqcol"><h3>Directly from T</h3><div id="eqT"></div></div>
+  </div>
+</section>
+
+<details class="panel derive" id="derive">
+  <summary>Derive everything from T</summary>
+  <div class="body"><ol id="deriveList"></ol></div>
+</details>
+
+<section class="panel section" aria-labelledby="glH">
+  <h2 id="glH">What is what?</h2>
+  <p class="lede">Hover or click a card to find that quantity in the diagram.</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<footer>Everything runs locally in your browser. Angles use radians internally; Math.atan, Math.sin, Math.cos and Math.tan do the work.</footer>
+</div>
+<div id="tip" class="tip" role="tooltip"></div>
+
+<script>
+/*MATH-START*/
+function calc(T){
+  const theta = Math.atan(T);
+  const cos = Math.cos(theta), sin = Math.sin(theta), tan = Math.tan(theta);
+  return {
+    T, theta, deg: theta*180/Math.PI,
+    R: cos, A: cos, O: sin, H: 1,
+    sin, cos, tan,
+    sec: cos === 0 ? Infinity : 1/cos,
+    csc: sin === 0 ? Infinity : 1/sin,
+    cot: tan === 0 ? Infinity : 1/tan
+  };
+}
+function fmtNum(x,p){
+  if(x === Infinity) return '∞';
+  if(x === -Infinity) return '−∞';
+  if(!Number.isFinite(x)) return 'undefined';
+  return x.toFixed(p);
+}
+function selfTest(){
+  const spec = {
+    1:{deg:45, R:0.7071067812, O:0.7071067812, sec:1.4142135624, csc:1.4142135624, cot:1},
+    2:{deg:63.4349488229, R:0.4472135955, O:0.8944271910, sec:2.2360679775, csc:1.1180339887, cot:0.5}
+  };
+  const res = [];
+  for(const T of [1,2,0.5,5]){
+    const o = calc(T), d = Math.sqrt(1+T*T), probs = [];
+    const chk = (n,a,b,tol)=>{ if(!(Math.abs(a-b) <= tol*Math.max(1,Math.abs(b)))) probs.push(n+': '+a+' vs '+b); };
+    chk('θ',o.theta,Math.atan(T),0);
+    chk('radius',o.R,1/d,1e-12); chk('adjacent',o.A,1/d,1e-12); chk('opposite',o.O,T/d,1e-12);
+    chk('hypotenuse',o.H,1,0); chk('tan',o.tan,T,1e-12);
+    chk('sec',o.sec,d,1e-12); chk('csc',o.csc,d/T,1e-12); chk('cot',o.cot,1/T,1e-12);
+    chk('sin²+cos²',o.sin*o.sin+o.cos*o.cos,1,1e-12);
+    chk('opposite/adjacent',o.O/o.A,T,1e-12);
+    chk('adjacent²+opposite²',o.A*o.A+o.O*o.O,1,1e-12);
+    const s = spec[T];
+    if(s){
+      chk('deg',o.deg,s.deg,1e-9); chk('R (spec)',o.R,s.R,1e-9); chk('O (spec)',o.O,s.O,1e-9);
+      chk('sec (spec)',o.sec,s.sec,1e-9); chk('csc (spec)',o.csc,s.csc,1e-9); chk('cot (spec)',o.cot,s.cot,1e-9);
+    }
+    res.push({T, ok: probs.length===0, probs});
+  }
+  return res;
+}
+/* Liang–Barsky segment clipping against the SVG viewport */
+function clipSeg(x1,y1,x2,y2,xmin,ymin,xmax,ymax){
+  let t0 = 0, t1 = 1;
+  const dx = x2-x1, dy = y2-y1;
+  const p = [-dx,dx,-dy,dy], q = [x1-xmin,xmax-x1,y1-ymin,ymax-y1];
+  for(let i=0;i<4;i++){
+    if(p[i] === 0){ if(q[i] < 0) return null; }
+    else{
+      const r = q[i]/p[i];
+      if(p[i] < 0){ if(r > t1) return null; if(r > t0) t0 = r; }
+      else { if(r < t0) return null; if(r < t1) t1 = r; }
+    }
+  }
+  return {x1:x1+t0*dx, y1:y1+t0*dy, x2:x1+t1*dx, y2:y1+t1*dy, cutStart:t0>0, cutEnd:t1<1};
+}
+/*MATH-END*/
+
+(function(){
+'use strict';
+const $ = s => document.querySelector(s);
+const NS = 'http://www.w3.org/2000/svg';
+const W = 860, H = 680, OX = 250, OY = 450, R0 = 220;
+const state = {T:1, prec:10, th:Math.atan(1), fit:false};
+const reduceMotion = () => window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const f = (x,p) => fmtNum(x, p===undefined ? state.prec : p);
+
+/* ---------- small math markup helpers ---------- */
+const FR = (n,d) => `<span class="frac"><span class="n">${n}</span><span class="d">${d}</span></span>`;
+const SQ = x => `<span class="sqrt">√<span>${x}</span></span>`;
+
+/* ---------- keys, colours, copy ---------- */
+const KEYS = ['radius','adjacent','opposite','hypotenuse','sine','cosine','tangent','secant','cosecant','cotangent','angle'];
+const INFO = {
+  radius:{name:'Radius', tip:'R = cos(θ)', val:o=>o.R, where:'Dashed violet circle through A, and the violet bar under the x-axis. Its length equals the adjacent.'},
+  adjacent:{name:'Adjacent', tip:'Adjacent = cos(θ)', val:o=>o.A, where:'Blue segment on the x-axis from the centre O to the foot A.'},
+  opposite:{name:'Opposite', tip:'Opposite = sin(θ)', val:o=>o.O, where:'Orange vertical segment from A up to the point P on the circle.'},
+  hypotenuse:{name:'Hypotenuse', tip:'H = 1', val:o=>o.H, where:'The line from O to P. It is also the radius of the large circle.'},
+  sine:{name:'Sine', tip:'sin(θ) = opposite / hypotenuse', val:o=>o.sin, where:'The orange segment again: with H = 1, sin θ is the opposite.'},
+  cosine:{name:'Cosine', tip:'cos(θ) = adjacent / hypotenuse', val:o=>o.cos, where:'The blue segment again: with H = 1, cos θ is the adjacent.'},
+  tangent:{name:'Tangent', tip:'tan(θ) = opposite / adjacent', val:o=>o.tan, where:'Rose segment on the tangent line, from B up to Q. It is also the ratio of the orange segment to the blue one.'},
+  secant:{name:'Secant', tip:'sec(θ) = 1 / cos(θ)', val:o=>o.sec, where:'Green bar from O to Q along the ray through P, drawn slightly offset.'},
+  cosecant:{name:'Cosecant', tip:'csc(θ) = 1 / sin(θ)', val:o=>o.csc, where:'Pink bar from O to C, where the ray meets the horizontal tangent line at the top of the circle.'},
+  cotangent:{name:'Cotangent', tip:'cot(θ) = adjacent / opposite', val:o=>o.cot, where:'Lime segment on the top tangent line, from D to C.'},
+  angle:{name:'Angle θ', tip:'θ = atan(T)', val:o=>o.deg, unit:'°', where:'Yellow arc at O between the x-axis and the hypotenuse.'}
+};
+
+/* ---------- state for focus (hover / pin) ---------- */
+let hoverKeys = null, pinKeys = null;
+
+/* ---------- SVG building ---------- */
+const svg = $('#svg');
+function mk(tag, attrs, parent){
+  const e = document.createElementNS(NS, tag);
+  if(attrs) for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(e);
+  return e;
+}
+const L = {};
+['axes','guides','circle','arc','segs','marks','pts','labels','hud'].forEach(n => L[n] = mk('g', {}, svg));
+
+mk('line', {class:'axis', x1:12, y1:OY, x2:W-12, y2:OY}, L.axes);
+mk('line', {class:'axis', x1:OX, y1:12, x2:OX, y2:H-6}, L.axes);
+
+const circ = mk('circle', {class:'circle', cx:OX, cy:OY, r:R0}, L.circle);
+const innerG = mk('g', {class:'inner dim', 'data-k':'radius'}, L.circle);
+const innerHit = mk('circle', {class:'hit', cx:OX, cy:OY}, innerG);
+const innerVis = mk('circle', {class:'vis', cx:OX, cy:OY}, innerG);
+
+const gTan = mk('line', {class:'guide tg'}, L.guides);
+const gTop = mk('line', {class:'guide'}, L.guides);
+const gRay = mk('line', {class:'guide ray'}, L.guides);
+
+const arcG = mk('g', {class:'arcgrp dim', 'data-k':'angle'}, L.arc);
+const wedge = mk('path', {class:'wedge'}, arcG);
+const arcHit = mk('path', {fill:'none', stroke:'transparent', 'stroke-width':18, 'pointer-events':'stroke'}, arcG);
+const arcLine = mk('path', {class:'arcline'}, arcG);
+
+const segs = {};
+function addSeg(id, keys, opts){
+  opts = opts || {};
+  const g = mk('g', {class:'seg dim s-'+id, 'data-k':keys}, L.segs);
+  g.style.setProperty('--w', opts.w || 4);
+  const hit = mk('line', {class:'hit'}, g);
+  const vis = mk('line', {class:'vis'}, g);
+  const s = {g, hit, vis};
+  if(opts.tick){ s.t1 = mk('line', {class:'tick'}, g); s.t2 = mk('line', {class:'tick'}, g); }
+  s.a1 = mk('polygon', {class:'arr'}, g); s.a2 = mk('polygon', {class:'arr'}, g);
+  segs[id] = s;
+}
+addSeg('adjacent','adjacent cosine',{w:5});
+addSeg('opposite','opposite sine',{w:5});
+addSeg('hypotenuse','hypotenuse',{w:4});
+addSeg('tangent','tangent',{w:5});
+addSeg('cotangent','cotangent',{w:4});
+addSeg('secant','secant',{w:3.2, tick:true});
+addSeg('cosecant','cosecant',{w:3.2, tick:true});
+addSeg('radius','radius',{w:3.2, tick:true});
+
+function setSeg(id, x1, y1, x2, y2){
+  const s = segs[id];
+  const c = clipSeg(x1,y1,x2,y2, 6,6, W-6,H-6);
+  if(!c){ s.g.style.display = 'none'; return null; }
+  s.g.style.display = '';
+  for(const l of [s.hit, s.vis]){
+    l.setAttribute('x1',c.x1); l.setAttribute('y1',c.y1); l.setAttribute('x2',c.x2); l.setAttribute('y2',c.y2);
+  }
+  const len = Math.hypot(c.x2-c.x1, c.y2-c.y1) || 1;
+  const ux = (c.x2-c.x1)/len, uy = (c.y2-c.y1)/len, nx = -uy, ny = ux;
+  if(s.t1){
+    const tk = (l, x, y, show) => {
+      l.style.display = show ? '' : 'none';
+      l.setAttribute('x1', x+nx*6); l.setAttribute('y1', y+ny*6); l.setAttribute('x2', x-nx*6); l.setAttribute('y2', y-ny*6);
+    };
+    tk(s.t1, c.x1, c.y1, !c.cutStart); tk(s.t2, c.x2, c.y2, !c.cutEnd);
+  }
+  const ar = (p, x, y, dx, dy, show) => {
+    p.style.display = show ? '' : 'none';
+    if(!show) return;
+    const px = -dy, py = dx;
+    p.setAttribute('points', `${x+dx*11},${y+dy*11} ${x+px*6.5-dx*2},${y+py*6.5-dy*2} ${x-px*6.5-dx*2},${y-py*6.5-dy*2}`);
+  };
+  ar(s.a1, c.x1, c.y1, -ux, -uy, c.cutStart); ar(s.a2, c.x2, c.y2, ux, uy, c.cutEnd);
+  return c;
+}
+
+const raB = mk('path', {class:'rightangle'}, L.marks);
+const raA = mk('path', {class:'rightangle'}, L.marks);
+
+const pts = {};
+function addPt(id, label){
+  const g = mk('g', {class:'pt'}, L.pts);
+  const c = mk('circle', {r:4.6}, g);
+  const t = mk('text', {}, g); t.textContent = label;
+  pts[id] = {g, c, t};
+}
+['O','A','P','B','Q','D','C'].forEach(n => addPt(n, n));
+function setPt(id, x, y, dx, dy){
+  const p = pts[id];
+  if(x < 2 || x > W-2 || y < 2 || y > H-2){ p.g.style.display = 'none'; return; }
+  p.g.style.display = '';
+  p.c.setAttribute('cx', x); p.c.setAttribute('cy', y);
+  p.t.setAttribute('x', x+dx); p.t.setAttribute('y', y+dy);
+}
+
+const oppLead = mk('line', {class:'leader dim', 'data-k':'opposite sine'}, L.labels);
+const lab = {};
+function addLabel(id, keys, colorVar){
+  const g = mk('g', {class:'pill dim', 'data-k':keys}, L.labels);
+  g.style.setProperty('--lc', colorVar);
+  const r = mk('rect', {rx:8, ry:8, height:22}, g);
+  const t = mk('text', {}, g);
+  lab[id] = {g, r, t};
+}
+addLabel('hyp','hypotenuse','var(--c-hypotenuse)');
+addLabel('adj','adjacent cosine','var(--c-adjacent)');
+addLabel('opp','opposite sine','var(--c-opposite)');
+addLabel('rad','radius','var(--c-radius)');
+addLabel('tan','tangent','var(--c-tangent)');
+addLabel('sec','secant','var(--c-secant)');
+addLabel('csc','cosecant','var(--c-cosecant)');
+addLabel('cot','cotangent','var(--c-cotangent)');
+addLabel('ang','angle','var(--c-angle)');
+function setLabel(id, x, y, text, anchor, rot){
+  const l = lab[id];
+  if(x == null){ l.g.style.display = 'none'; return; }
+  const w = text.length*7.55 + 18;
+  let cx, cy;
+  if(rot){ cx = x; cy = y; }
+  else{
+    let left = anchor === 'start' ? x : anchor === 'end' ? x - w : x - w/2;
+    left = Math.max(4, Math.min(W - w - 4, left));
+    cx = left + w/2; cy = Math.max(15, Math.min(H - 15, y));
+  }
+  l.g.style.display = '';
+  l.g.setAttribute('transform', `translate(${cx} ${cy}) rotate(${rot||0})`);
+  l.r.setAttribute('x', -w/2); l.r.setAttribute('y', -11); l.r.setAttribute('width', w);
+  l.t.setAttribute('x', -w/2 + 9); l.t.setAttribute('y', 4.5);
+  l.t.textContent = text;
+}
+
+const hudG = mk('g', {class:'hud dim', 'data-k':'angle'}, L.hud);
+const hudR = mk('rect', {x:14, y:14, rx:12, ry:12, height:74}, hudG);
+const hudT = mk('text', {x:28, y:36}, hudG);
+const hudA = mk('text', {x:28, y:57, class:'y'}, hudG);
+const hudB = mk('text', {x:28, y:78, class:'y'}, hudG);
+
+/* ---------- drawing ---------- */
+function draw(){
+  const th = state.th;
+  const c = Math.cos(th), s = Math.sin(th), t = Math.tan(th);
+  const tv = Math.min(t, 1e9);
+  const cotv = s > 1e-12 ? Math.min(c/s, 1e9) : 1e9;
+
+  let u = R0;
+  if(state.fit){
+    const extY = Math.max(1, tv), extX = Math.max(1, cotv);
+    u = Math.max(10, Math.min(R0, (OY-34)/extY, (W-70-OX)/extX));
+  }
+  const X = x => OX + u*x, Y = y => OY - u*y;
+  const Op = [X(0),Y(0)], Ap = [X(c),Y(0)], Pp = [X(c),Y(s)], Bp = [X(1),Y(0)];
+  const Qp = [X(1),Y(tv)], Dp = [X(0),Y(1)], Cp = [X(cotv),Y(1)];
+
+  circ.setAttribute('r', u);
+  innerHit.setAttribute('r', Math.max(0.1,u*c)); innerVis.setAttribute('r', Math.max(0.1,u*c));
+
+  gTan.setAttribute('x1',Bp[0]); gTan.setAttribute('x2',Bp[0]); gTan.setAttribute('y1',0); gTan.setAttribute('y2',H);
+  gTop.setAttribute('x1',0); gTop.setAttribute('x2',W); gTop.setAttribute('y1',Dp[1]); gTop.setAttribute('y2',Dp[1]);
+  const rc = clipSeg(OX,OY,OX+c*6000,OY-s*6000,0,0,W,H);
+  if(rc){ gRay.style.display=''; gRay.setAttribute('x1',rc.x1); gRay.setAttribute('y1',rc.y1); gRay.setAttribute('x2',rc.x2); gRay.setAttribute('y2',rc.y2); }
+  else gRay.style.display = 'none';
+
+  // angle arc
+  const ra = 0.3*u;
+  if(th > 1e-4){
+    arcG.style.display = '';
+    const ex = OX + ra*c, ey = OY - ra*s;
+    const dArc = `M ${OX+ra} ${OY} A ${ra} ${ra} 0 0 0 ${ex} ${ey}`;
+    arcLine.setAttribute('d', dArc); arcHit.setAttribute('d', dArc);
+    wedge.setAttribute('d', `M ${OX} ${OY} L ${OX+ra} ${OY} A ${ra} ${ra} 0 0 0 ${ex} ${ey} Z`);
+  } else arcG.style.display = 'none';
+
+  // segments
+  const nx = s, ny = c;                 // unit normal, below/right of the ray (screen coords)
+  setSeg('adjacent', Op[0],Op[1], Ap[0],Ap[1]);
+  setSeg('opposite', Ap[0],Ap[1], Pp[0],Pp[1]);
+  setSeg('hypotenuse', Op[0],Op[1], Pp[0],Pp[1]);
+  const cT = setSeg('tangent', Bp[0],Bp[1], Qp[0],Qp[1]);
+  const cC = setSeg('cotangent', Dp[0],Dp[1], Cp[0],Cp[1]);
+  const cS = setSeg('secant', Op[0]+nx*15,Op[1]+ny*15, Qp[0]+nx*15,Qp[1]+ny*15);
+  const cK = setSeg('cosecant', Op[0]-nx*15,Op[1]-ny*15, Cp[0]-nx*15,Cp[1]-ny*15);
+  setSeg('radius', Op[0],Op[1]+17, Ap[0],Op[1]+17);
+
+  // right-angle markers
+  const ka = Math.min(12, u*c*0.5, u*s*0.5);
+  if(ka > 3){ raA.style.display=''; raA.setAttribute('d', `M ${Ap[0]-ka} ${Ap[1]} L ${Ap[0]-ka} ${Ap[1]-ka} L ${Ap[0]} ${Ap[1]-ka}`); }
+  else raA.style.display = 'none';
+  const kb = Math.min(12, u*Math.min(tv,1)*0.5, u*0.5);
+  if(kb > 3){ raB.style.display=''; raB.setAttribute('d', `M ${Bp[0]-kb} ${Bp[1]} L ${Bp[0]-kb} ${Bp[1]-kb} L ${Bp[0]} ${Bp[1]-kb}`); }
+  else raB.style.display = 'none';
+
+  // points
+  setPt('O',Op[0],Op[1],-19,21); setPt('A',Ap[0],Ap[1],8,34); setPt('P',Pp[0],Pp[1],10,-15);
+  setPt('B',Bp[0],Bp[1],9,22); setPt('Q',Qp[0],Qp[1],10,-9); setPt('D',Dp[0],Dp[1],-20,-9); setPt('C',Cp[0],Cp[1],8,-11);
+
+  // labels
+  const midx = (a,b) => (a+b)/2;
+  const rotDeg = -th*180/Math.PI;
+  const dxu = c, dyu = -s;                      // unit direction of the ray in screen coordinates
+  // labels that run parallel to the ray sit just beyond the end of their bar (or just inside if the end is off-screen)
+  const rayLabel = (id, cl, sign, text) => {
+    if(!cl){ setLabel(id, null); return; }
+    const w = text.length*7.55 + 18;
+    const hx = Math.abs(c)*w/2 + Math.abs(s)*11, hy = Math.abs(s)*w/2 + Math.abs(c)*11;
+    let cx = cl.x2 + dxu*(w/2+16), cy = cl.y2 + dyu*(w/2+16);
+    const fits = !cl.cutEnd && cx-hx > 2 && cx+hx < W-2 && cy-hy > 2 && cy+hy < H-2;
+    if(!fits){ cx = cl.x2 - dxu*(w/2+18) + sign*nx*26; cy = cl.y2 - dyu*(w/2+18) + sign*ny*26; }
+    setLabel(id, cx, cy, text, 'middle', rotDeg || 1e-9);
+  };
+  setLabel('hyp', midx(Op[0],Pp[0])-nx*36, midx(Op[1],Pp[1])-ny*36, 'Hypotenuse = '+f(1), 'middle', rotDeg || 1e-9);
+  setLabel('adj', midx(Op[0],Ap[0]), OY+44, 'Adjacent = '+f(c), 'middle');
+  setLabel('rad', midx(Op[0],Ap[0]), OY+72, 'Radius = '+f(c), 'middle');
+  const oppMidY = midx(Ap[1],Pp[1]);
+  if((1-c)*u >= 44){                                   // room beside the segment: vertical label
+    oppLead.style.display = 'none';
+    setLabel('opp', Ap[0]+20, oppMidY, 'Opposite '+f(s), 'middle', -90);
+  } else {                                             // A is too close to the tangent line: label below the axis with a leader
+    oppLead.style.display = '';
+    oppLead.setAttribute('x1', Ap[0]); oppLead.setAttribute('x2', Ap[0]);
+    oppLead.setAttribute('y1', OY+26); oppLead.setAttribute('y2', OY+89);
+    setLabel('opp', Ap[0], OY+100, 'Opposite = '+f(s), 'middle');
+  }
+  if(cT) setLabel('tan', cT.x1+16, midx(cT.y1,cT.y2), 'Tangent = '+f(t), 'start'); else setLabel('tan', null);
+  rayLabel('sec', cS, 1, 'Secant = '+f(c===0?Infinity:1/c));
+  rayLabel('csc', cK, -1, 'Cosecant = '+f(s===0?Infinity:1/s));
+  if(cC) setLabel('cot', midx(cC.x1,cC.x2), Dp[1]-20, 'Cotangent = '+f(s===0?Infinity:c/s), 'middle'); else setLabel('cot', null);
+  const ma = Math.max(th/2, 0.14);
+  if(th > 1e-4) setLabel('ang', OX+(ra+17)*Math.cos(ma), OY-(ra+17)*Math.sin(ma), 'θ', 'middle'); else setLabel('ang', null);
+
+  // HUD
+  const l1 = 'T = tan θ = '+f(t), l2 = 'θ = '+f(th)+' rad', l3 = 'θ = '+f(th*180/Math.PI)+'°';
+  hudT.textContent = l1; hudA.textContent = l2; hudB.textContent = l3;
+  hudR.setAttribute('width', Math.max(l1.length,l2.length,l3.length)*7.9 + 30);
+}
+
+/* ---------- animation ---------- */
+let raf = 0;
+function animateTo(target, instant){
+  cancelAnimationFrame(raf);
+  const from = state.th;
+  if(instant || reduceMotion() || Math.abs(target-from) < 1e-9){ state.th = target; draw(); return; }
+  const t0 = performance.now(), dur = 320;
+  const step = now => {
+    const k = Math.min(1, (now-t0)/dur), e = 1 - Math.pow(1-k, 3);
+    state.th = k >= 1 ? target : from + (target-from)*e;
+    draw();
+    if(k < 1) raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+}
+
+/* ---------- table, equations, checks, derivation, glossary ---------- */
+const ROWS = [
+  {k:'tangent', n:'Tangent', s:'T', v:o=>o.T, d:'Opposite / Adjacent — the value you chose', f:'T = tan θ', cur:true},
+  {k:'angle', n:'Angle', s:'θ', v:o=>o.theta, u:' rad', d:'The angle whose tangent is T', f:'atan(T)'},
+  {k:'angle', n:'Angle', s:'θ', v:o=>o.deg, u:'°', d:'The same angle in degrees', f:'atan(T) × 180 / π'},
+  {k:'radius', n:'Radius', s:'R', v:o=>o.R, d:'cos θ — radius of the dashed circle; equals the horizontal projection', f:FR('1',SQ('1 + T²'))},
+  {k:'adjacent', n:'Adjacent', s:'A', v:o=>o.A, d:'Radius / horizontal projection of the hypotenuse', f:FR('1',SQ('1 + T²'))},
+  {k:'opposite', n:'Opposite', s:'O', v:o=>o.O, d:'sin θ — the vertical component', f:FR('T',SQ('1 + T²'))},
+  {k:'hypotenuse', n:'Hypotenuse', s:'H', v:o=>o.H, d:'Normalized radius of the large circle', f:'H = 1'},
+  {k:'sine', n:'Sine', s:'sin θ', v:o=>o.sin, d:'Opposite / Hypotenuse', f:FR('T',SQ('1 + T²'))},
+  {k:'cosine', n:'Cosine', s:'cos θ', v:o=>o.cos, d:'Adjacent / Hypotenuse', f:FR('1',SQ('1 + T²'))},
+  {k:'tangent', n:'Tangent', s:'tan θ', v:o=>o.tan, d:'Opposite / Adjacent', f:'tan(atan T) = T'},
+  {k:'secant', n:'Secant', s:'sec θ', v:o=>o.sec, d:'Hypotenuse / Adjacent', f:SQ('1 + T²')},
+  {k:'cosecant', n:'Cosecant', s:'csc θ', v:o=>o.csc, d:'Hypotenuse / Opposite', f:FR(SQ('1 + T²'),'T')},
+  {k:'cotangent', n:'Cotangent', s:'cot θ', v:o=>o.cot, d:'Adjacent / Opposite', f:FR('1','T')}
+];
+const tbody = $('#tbody');
+const rowCells = [];
+ROWS.forEach(r => {
+  const tr = document.createElement('tr');
+  tr.setAttribute('data-k', r.k); tr.tabIndex = 0;
+  if(r.cur) tr.classList.add('cur');
+  tr.innerHTML = `<td><div class="qname">${r.n}${r.cur?' <span class="badge">input</span>':''}</div></td><td class="sym">${r.s}</td><td class="val"></td><td class="def">${r.d}</td><td class="fm math">${r.f}</td>`;
+  tbody.appendChild(tr);
+  rowCells.push(tr.children[2]);
+});
+function renderTable(o){
+  ROWS.forEach((r,i) => {
+    const x = r.v(o);
+    const txt = f(x);
+    rowCells[i].innerHTML = txt + (r.u ? `<small>${r.u.trim()}</small>` : '');
+    rowCells[i].title = Number.isFinite(x) ? '' : 'Undefined at T = 0 (division by zero)';
+  });
+}
+
+const EQ_THETA = [
+  ['angle','θ','atan(T)','deg','°'],
+  ['radius','Radius','cos θ','R'],
+  ['adjacent','Adjacent','cos θ','A'],
+  ['opposite','Opposite','sin θ','O'],
+  ['hypotenuse','Hypotenuse','1','H'],
+  ['sine','sin θ',FR('Opposite','Hypotenuse'),'sin'],
+  ['cosine','cos θ',FR('Adjacent','Hypotenuse'),'cos'],
+  ['tangent','tan θ',FR('Opposite','Adjacent'),'tan'],
+  ['secant','sec θ',FR('1','cos θ'),'sec'],
+  ['cosecant','csc θ',FR('1','sin θ'),'csc'],
+  ['cotangent','cot θ',FR('1','tan θ')+'<span class="eqs">=</span>'+FR('Adjacent','Opposite'),'cot']
+];
+const EQ_T = [
+  ['radius','Radius',FR('1',SQ('1 + T²')),'R'],
+  ['adjacent','Adjacent',FR('1',SQ('1 + T²')),'A'],
+  ['opposite','Opposite',FR('T',SQ('1 + T²')),'O'],
+  ['hypotenuse','Hypotenuse','1','H'],
+  ['secant','Secant',SQ('1 + T²'),'sec'],
+  ['cosecant','Cosecant',FR(SQ('1 + T²'),'T'),'csc'],
+  ['cotangent','Cotangent',FR('1','T'),'cot']
+];
+function buildEq(list, host){
+  host.innerHTML = list.map(e => `<div class="eq" data-k="${e[0]}" tabindex="0"><span class="lhs">${e[1]}</span><span class="eqs">=</span><span class="rhs">${e[2]}</span><span class="ev" data-val="${e[3]}" data-unit="${e[4]||''}"></span></div>`).join('');
+}
+buildEq(EQ_THETA, $('#eqTheta')); buildEq(EQ_T, $('#eqT'));
+function renderEq(o){
+  document.querySelectorAll('[data-val]').forEach(el => {
+    const x = o[el.dataset.val];
+    el.textContent = f(x) + (el.dataset.unit || '');
+  });
+}
+
+function relErr(a,b){ return Math.abs(a-b)/Math.max(1,Math.abs(b)); }
+function statusOf(err, T){
+  if(err <= 1e-9) return 'ok';
+  return T > 1e8 ? 'warn' : 'bad';
+}
+function renderChecks(o){
+  const T = o.T;
+  const sum = o.sin*o.sin + o.cos*o.cos;
+  const ratio = o.A === 0 ? Infinity : o.O / o.A;
+  const pyth = o.A*o.A + o.O*o.O;
+  const secId = o.sec*o.sec - o.tan*o.tan;
+  const items = [
+    {t:'sin²(θ) + cos²(θ) = 1', line:`${f(o.sin)}² + ${f(o.cos)}² = ${f(o.sin*o.sin)} + ${f(o.cos*o.cos)} = ${f(sum)}`, err:relErr(sum,1)},
+    {t:'Opposite / Adjacent = T', line:`${f(o.O)} / ${f(o.A)} = ${f(ratio)}   (T = ${f(T)})`, err:relErr(ratio,T)},
+    {t:'Adjacent² + Opposite² = Hypotenuse²', line:`${f(o.A)}² + ${f(o.O)}² = ${f(pyth)}   (1² = ${f(1)})`, err:relErr(pyth,1)},
+    {t:'sec²(θ) − tan²(θ) = 1', line:`${f(o.sec)}² − ${f(o.tan)}² = ${f(secId)}`, err:Number.isFinite(secId) ? Math.abs(secId-1)/Math.max(1,o.sec*o.sec) : Infinity}
+  ];
+  $('#checks').innerHTML = items.map(it => {
+    const st = statusOf(it.err, T);
+    const sym = st === 'ok' ? '✓' : st === 'warn' ? '≈' : '!';
+    const msg = st === 'ok' ? 'Consistent' : st === 'warn' ? 'Floating-point limit near 90°' : 'Mismatch';
+    return `<div class="check"><div class="t">${it.t}</div><div class="line">${it.line}</div><div class="res"><span class="status ${st==='ok'?'':st}">${sym}</span>${msg}<span style="color:var(--ink-3)"> · error ${Number.isFinite(it.err)?it.err.toExponential(1):'n/a'}</span></div></div>`;
+  }).join('');
+}
+function renderSelfTest(){
+  const r = selfTest();
+  const pass = r.filter(x => x.ok).length;
+  const list = r.map(x => `T = ${x.T}`).join(', ');
+  $('#selftest').innerHTML = `<span class="status ${pass===r.length?'':'bad'}">${pass===r.length?'✓':'!'}</span><span>Built-in test: ${pass} of ${r.length} reference cases pass (${list}), including the exact values for T = 1 and T = 2 from the specification.</span>`;
+  if(pass !== r.length) console.warn('Self-test failures', r.filter(x => !x.ok));
+}
+
+function renderDerive(o){
+  const T = o.T, d = Math.sqrt(1+T*T);
+  const n = x => `<span class="num">${f(x)}</span>`;
+  const steps = [
+    ['Start with the definition. T is the ratio of the two legs.', `T = tan θ = ${FR('Opposite','Adjacent')} = ${n(T)}`],
+    ['Undo the tangent with its inverse.', `θ = atan(T) = ${n(o.theta)} rad = ${n(o.deg)}°`],
+    ['Since tan θ = sin θ / cos θ, we have sin θ = T · cos θ. Put that into sin²θ + cos²θ = 1.', `cos²θ (1 + T²) = 1 &nbsp;⟹&nbsp; cos θ = ${FR('1',SQ('1 + T²'))} = ${FR('1',SQ('1 + '+n(T*T)))} = ${n(1/d)}`],
+    ['Multiply by T to get the vertical leg.', `sin θ = ${FR('T',SQ('1 + T²'))} = ${n(T/d)}`],
+    ['The secant is the reciprocal of the cosine.', `sec θ = ${FR('1','cos θ')} = ${SQ('1 + T²')} = ${n(d)}`],
+    ['The other reciprocals follow the same way.', `csc θ = ${FR(SQ('1 + T²'),'T')} = ${n(T===0?Infinity:d/T)} &nbsp;&nbsp; cot θ = ${FR('1','T')} = ${n(T===0?Infinity:1/T)}`],
+    ['Read off the triangle. The hypotenuse is 1, so the legs are the cosine and the sine.', `Radius = Adjacent = cos θ = ${n(1/d)} &nbsp;&nbsp; Opposite = sin θ = ${n(T/d)} &nbsp;&nbsp; H = 1`]
+  ];
+  $('#deriveList').innerHTML = steps.map(s => `<li><span class="why">${s[0]}</span><span class="calc">${s[1]}</span></li>`).join('');
+}
+
+const GLOSS = [
+  ['radius','Radius','R = cos(θ)','In this model the radius is the horizontal projection of the hypotenuse, so it has the same length as the adjacent. It is the radius of the dashed violet circle centred at O that passes through the foot A.','Dashed violet circle and the violet bar under the x-axis.','R'],
+  ['adjacent','Adjacent','Adjacent = cos(θ)','The adjacent side is the horizontal component of the radius in this normalized geometry.','Blue segment on the x-axis, from O to A.','A'],
+  ['opposite','Opposite','Opposite = sin(θ)','The opposite side is the vertical component.','Orange segment from A up to P.','O'],
+  ['hypotenuse','Hypotenuse','H = 1','The hypotenuse is normalized to 1. It is also the radius of the large circle, which is why the circle never changes size.','The line from O to P.','H'],
+  ['sine','Sine','sin(θ) = Opposite / Hypotenuse','Because the hypotenuse is 1, the sine is simply the length of the opposite side.','Same orange segment as the opposite.','sin'],
+  ['cosine','Cosine','cos(θ) = Adjacent / Hypotenuse','Because the hypotenuse is 1, the cosine is simply the length of the adjacent side.','Same blue segment as the adjacent.','cos'],
+  ['tangent','Tangent',`tan(θ) = Opposite / Adjacent`,'Tangent is the ratio of the opposite side to the adjacent side. Geometrically it is also a length: the piece of the tangent line at B that the extended hypotenuse cuts off, because the triangles OAP and OBQ are similar and OB = 1.','Rose segment from B up to Q on the vertical tangent line.','tan'],
+  ['secant','Secant','sec(θ) = 1 / cos(θ)','Secant is the reciprocal of cosine. Geometrically it is the distance from O to Q along the ray. From the similar triangles, OQ / OP = OB / OA, so OQ = 1 / cos θ.','Green bar from O to Q, drawn just beside the ray.','sec'],
+  ['cosecant','Cosecant','csc(θ) = 1 / sin(θ)','Cosecant is the reciprocal of sine. Geometrically it is the distance from O to C, where the ray meets the horizontal tangent line at the top of the circle. There OC / OP = OD / PA, so OC = 1 / sin θ.','Pink bar from O to C, drawn on the other side of the ray.','csc'],
+  ['cotangent','Cotangent','cot(θ) = Adjacent / Opposite','Cotangent is the reciprocal of tangent. Geometrically it is the length DC along the top tangent line, measured from the top of the circle D to where the ray crosses it.','Lime segment from D to C.','cot']
+];
+$('#cards').innerHTML = GLOSS.map(g => `<article class="card" data-k="${g[0]}" tabindex="0"><h3>${g[1]}</h3><div class="f math"><span>${g[2]}</span><span class="lv" data-val="${g[5]}"></span></div><p>${g[3]}</p><p class="where">In the diagram: ${g[4]}</p></article>`).join('');
+
+/* ---------- legend chips ---------- */
+const LEG = ['radius','adjacent','opposite','hypotenuse','sine','cosine','tangent','secant','cosecant','cotangent','angle'];
+$('#legend').innerHTML = LEG.map(k => `<span class="chip" data-k="${k}" tabindex="0" role="button">${INFO[k].name}</span>`).join('');
+
+/* ---------- colour var on every interactive element ---------- */
+const interactive = Array.from(document.querySelectorAll('[data-k]'));
+interactive.forEach(el => {
+  const first = el.getAttribute('data-k').split(' ')[0];
+  el.style.setProperty('--kc', `var(--c-${first})`);
+});
+
+/* ---------- focus / tooltip logic ---------- */
+const tip = $('#tip'), infobar = $('#infobar');
+const IDLE = 'Hover or tap any segment, row, chip or card to see what it means. Click to keep it highlighted; click the diagram background or press Esc to clear.';
+function keysOf(el){ return el.getAttribute('data-k').split(' '); }
+function applyFocus(){
+  const act = hoverKeys || pinKeys;
+  interactive.forEach(el => {
+    const on = !!act && keysOf(el).some(k => act.includes(k));
+    el.classList.toggle('hl', on);
+  });
+  svg.classList.toggle('has-focus', !!act);
+  renderInfobar();
+}
+function renderInfobar(){
+  const act = hoverKeys || pinKeys;
+  if(!act){ infobar.textContent = IDLE; return; }
+  const o = calc(state.T);
+  infobar.innerHTML = act.map(k => {
+    const i = INFO[k];
+    return `<div><span class="dot" style="background:var(--c-${k})"></span><b>${i.name}</b> &nbsp;<code>${i.tip}</code> &nbsp;=&nbsp; <code>${f(i.val(o))}${i.unit||''}</code><br><span>${i.where}</span></div>`;
+  }).join('');
+}
+function showTip(el, x, y){
+  const k = keysOf(el)[0];
+  tip.textContent = INFO[k].tip;
+  tip.style.setProperty('--kc', `var(--c-${k})`);
+  tip.classList.add('on');
+  moveTip(x, y);
+}
+function moveTip(x, y){
+  const w = tip.offsetWidth || 160, h = tip.offsetHeight || 30;
+  let tx = x + 14, ty = y - h - 12;
+  if(tx + w > window.innerWidth - 8) tx = window.innerWidth - w - 8;
+  if(tx < 8) tx = 8;
+  if(ty < 8) ty = y + 18;
+  tip.style.left = tx + 'px'; tip.style.top = ty + 'px';
+}
+function hideTip(){ tip.classList.remove('on'); }
+
+document.addEventListener('pointerover', e => {
+  const el = e.target.closest && e.target.closest('[data-k]');
+  if(!el) return;
+  hoverKeys = keysOf(el); applyFocus();
+  if(e.pointerType !== 'touch') showTip(el, e.clientX, e.clientY);
+});
+document.addEventListener('pointerout', e => {
+  const el = e.target.closest && e.target.closest('[data-k]');
+  if(!el) return;
+  if(e.relatedTarget && el.contains(e.relatedTarget)) return;
+  hoverKeys = null; applyFocus(); hideTip();
+});
+document.addEventListener('pointermove', e => { if(tip.classList.contains('on')) moveTip(e.clientX, e.clientY); });
+document.addEventListener('focusin', e => {
+  const el = e.target.closest && e.target.closest('[data-k]');
+  if(!el) return;
+  hoverKeys = keysOf(el); applyFocus();
+  const r = el.getBoundingClientRect(); showTip(el, r.left + 20, r.top);
+});
+document.addEventListener('focusout', e => {
+  if(e.target.closest && e.target.closest('[data-k]')){ hoverKeys = null; applyFocus(); hideTip(); }
+});
+document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest('[data-k]');
+  if(el){
+    const ks = keysOf(el);
+    pinKeys = (pinKeys && pinKeys.join() === ks.join()) ? null : ks;
+    applyFocus();
+  } else if(e.target === svg || (e.target.closest && e.target.closest('#svg') && !e.target.closest('[data-k]'))){
+    pinKeys = null; applyFocus();
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ pinKeys = null; hoverKeys = null; applyFocus(); hideTip(); }
+  if((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('tr[data-k],.card,.eq,.chip')){
+    e.preventDefault(); e.target.click();
+  }
+});
+
+/* ---------- controls ---------- */
+const tIn = $('#tIn'), tRange = $('#tRange'), tMsg = $('#tMsg'), tbox = $('#tbox');
+const pRange = $('#pRange'), pOut = $('#pOut'), fitBox = $('#fit');
+const PRESETS = [0.25, 0.5, 1, 2, 3, 5];
+$('#presets').innerHTML = PRESETS.map(p => `<button type="button" data-t="${p}" aria-pressed="false">T = ${p}</button>`).join('');
+
+function parseT(str){
+  const s = str.trim().replace(/,/g, '.');
+  if(s === '') return {err:'Enter a value for T.'};
+  if(!/^\+?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(s)){
+    return {err: /^-/.test(s) ? 'T must be positive. Try a value of 0 or more.' : 'That is not a number. Use digits and a decimal point, for example 2.5.'};
+  }
+  const T = Number(s);
+  if(!Number.isFinite(T)) return {err:'That number is too large.'};
+  return {T};
+}
+function setMsg(text, kind){
+  tMsg.textContent = text || '';
+  tMsg.classList.toggle('err', kind === 'err');
+  tbox.classList.toggle('bad', kind === 'err');
+}
+function syncPresets(){
+  document.querySelectorAll('#presets button').forEach(b => b.setAttribute('aria-pressed', Math.abs(parseFloat(b.dataset.t) - state.T) < 1e-12 ? 'true' : 'false'));
+}
+function syncSlider(){ tRange.value = Math.min(10, Math.max(0.01, state.T)); }
+
+function renderAll(){
+  const o = calc(state.T);
+  renderTable(o); renderEq(o); renderChecks(o); renderDerive(o); renderInfobar();
+  $('#roDeg').textContent = f(o.deg) + '°';
+  $('#roRad').textContent = 'θ = ' + f(o.theta) + ' rad';
+  syncPresets();
+  if(state.T === 0) setMsg('T = 0 gives θ = 0. Cosecant and cotangent are undefined (∞) there.', 'note');
+}
+function setT(T, instant){
+  state.T = T;
+  renderAll();
+  animateTo(Math.atan(T), instant);
+}
+
+tIn.addEventListener('input', () => {
+  const r = parseT(tIn.value);
+  if(r.err){ setMsg(r.err, 'err'); return; }
+  setMsg('');
+  state.T = r.T; syncSlider();
+  setT(r.T);
+});
+tRange.addEventListener('input', () => {
+  const T = parseFloat(tRange.value);
+  tIn.value = T.toFixed(6);
+  setMsg('');
+  setT(T);
+});
+$('#presets').addEventListener('click', e => {
+  const b = e.target.closest('button'); if(!b) return;
+  const T = parseFloat(b.dataset.t);
+  tIn.value = T.toFixed(6); setMsg(''); syncSlider(); setT(T);
+});
+pRange.addEventListener('input', () => {
+  state.prec = parseInt(pRange.value, 10);
+  pOut.textContent = state.prec;
+  renderAll(); draw();
+});
+fitBox.addEventListener('change', () => { state.fit = fitBox.checked; draw(); });
+$('#reset').addEventListener('click', () => {
+  state.prec = 10; pRange.value = 10; pOut.textContent = 10;
+  tIn.value = (1).toFixed(6); setMsg(''); pinKeys = null; hoverKeys = null; applyFocus();
+  syncSlider(); setT(1);
+});
+$('#themeBtn').addEventListener('click', () => {
+  const root = document.documentElement;
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+});
+if(window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'light';
+
+/* ---------- init ---------- */
+renderSelfTest();
+renderAll();
+applyFocus();
+draw();
+window.__explorer = {state, calc, setT, draw};   // handy for poking around in the console
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pythagorean Mosaic Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#e7eae6; --panel:#f5f6f3; --ink:#1c2326; --muted:#58656a; --line:#c6cdc8;
+  --accent:#1f5f6b; --accent-ink:#f2fbfc; --chip:#dde2dd; --focus:#c0711f;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1417; --panel:#182025; --ink:#e6ecea; --muted:#9aa8ab; --line:#2c383e;
+    --accent:#58b4c2; --accent-ink:#071418; --chip:#222d33; --focus:#e5a24d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1417; --panel:#182025; --ink:#e6ecea; --muted:#9aa8ab; --line:#2c383e;
+  --accent:#58b4c2; --accent-ink:#071418; --chip:#222d33; --focus:#e5a24d;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Public Sans",system-ui,sans-serif;line-height:1.5}
+main{max-width:1180px;margin:0 auto;padding:22px 16px 40px}
+h1{font-family:"Cinzel",Georgia,serif;font-weight:700;font-size:clamp(1.5rem,3.6vw,2.3rem);letter-spacing:.04em;margin:0 0 6px}
+h2{font-size:1rem;margin:0;font-weight:600}
+.sub{margin:0 0 18px;color:var(--muted);max-width:68ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;margin-bottom:12px}
+button,select,input{font:inherit;color:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:8px 14px;cursor:pointer;font-weight:500}
+.tabs button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tabdesc{margin:10px 0 0;color:var(--muted);max-width:80ch}
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+#selinfo{color:var(--muted);font-size:.9rem}
+.quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.quick button,.btn{background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 11px;cursor:pointer;font-size:.88rem}
+.quick button:hover,.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{color:var(--accent-ink);opacity:.9}
+.quick .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.quick label{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.quick input[type=range]{width:120px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px}
+.chip{background:var(--chip);border:1px solid var(--line);border-radius:4px;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.15}
+.chip b{font-size:1rem;font-weight:600}
+.chip i{font-style:normal;font-size:.7rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip[aria-pressed="true"] i{color:var(--accent-ink);opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 16px;align-items:end}
+.grid label{display:flex;flex-direction:column;gap:5px;font-size:.84rem;color:var(--muted)}
+.grid label.chk{flex-direction:row;align-items:center;gap:8px;color:var(--ink);padding-bottom:6px}
+.grid select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:6px}
+.grid input[type=range]{width:100%}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.swatches label{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.swatches input{width:44px;height:30px;padding:0;border:1px solid var(--line);border-radius:3px;background:none;cursor:pointer}
+.canvaswrap{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#0c0f10}
+canvas{display:block;width:100%;height:auto}
+.actions{display:flex;gap:8px;align-items:center;margin:10px 0 0;flex-wrap:wrap}
+.stats{display:flex;flex-wrap:wrap;gap:6px 22px;margin:12px 0 6px;font-size:.92rem}
+.stats b{font-weight:600}
+.note{color:var(--muted);max-width:85ch;margin:6px 0 0;font-size:.92rem}
+.ltname{font-family:"Cinzel",Georgia,serif;font-weight:500;font-size:.95rem;color:var(--accent)}
+.lt{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;background:var(--bg)}
+.lt label{display:flex;align-items:center;gap:8px;font-size:.88rem}
+.lt input[type=range]{width:200px}
+.lt input[type=number]{width:84px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:5px 7px}
+.lt .ltf{flex-basis:100%;margin:0;font-size:.84rem}
+.custom{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.custom label.chk{display:flex;align-items:center;gap:8px;font-size:.9rem}
+.custom input[type=text]{flex:1 1 260px;min-width:200px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px}
+.custom .btn,.custom .filebtn{background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 11px;cursor:pointer;font-size:.88rem}
+.custom .btn:hover,.custom .filebtn:hover{border-color:var(--accent);color:var(--accent)}
+.custom .cmsg{flex-basis:100%;margin:0}
+.hide{display:none !important}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Pythagorean Mosaic Studio</h1>
+    <p class="sub">Every tile comes from your list of areas: a square has side √area, a circle has radius √(area/π). Choose which tiles to use, pick a pattern, a shape and a palette, then repeat the result as a mosaic and save it as an image.</p>
+  </header>
+
+  <section class="card">
+    <div class="tabs" id="tabs" role="group" aria-label="Pattern">
+      <button type="button" data-m="pyth" aria-pressed="true">Pythagorean tessellation</button>
+      <button type="button" data-m="whirl" aria-pressed="false">Concentric whirl</button>
+      <button type="button" data-m="pack" aria-pressed="false">Fit into a shape</button>
+      <button type="button" data-m="fib" aria-pressed="false">Exact tiling</button>
+      <button type="button" data-m="gallery" aria-pressed="false">Pattern gallery</button>
+    </div>
+    <p class="tabdesc" id="tabdesc"></p>
+  </section>
+
+  <section class="card">
+    <div class="head"><h2>Tiles to include</h2><span class="ltname" id="ltname">Lluís' Tesserae (LT) - (The Tessera Sequence)</span><span id="selinfo"></span></div>
+    <div class="lt" id="ltbox">
+      <label>Terms of the sequence: <output id="ltv">n = 0 to 26</output>
+        <input type="range" id="ltS" min="2" max="100" step="1" value="27" aria-label="Number of terms of the sequence"></label>
+      <label>or type any number <input type="number" id="ltN" min="2" max="400" step="1" value="27" aria-label="Number of terms, typed"></label>
+      <p class="note ltf">LT(n) = ( n² + 4·(26m − 5m²)/24 ) / 5, where m = (4n²) mod 10 and n starts at 0. Repeated values appear once, and an area of 0 is shown as nothing.</p>
+    </div>
+    <div class="quick">
+      <button type="button" id="qAll">All</button>
+      <button type="button" id="qNone">None</button>
+      <button type="button" id="qInv">Invert</button>
+      <span class="sep"></span>
+      <label>How many: <output id="cntv">24</output><input type="range" id="cnt" min="1" max="47" value="24" aria-label="How many tiles"></label>
+      <button type="button" id="qSmall">Smallest</button>
+      <button type="button" id="qLarge">Largest</button>
+      <button type="button" id="qRand">Random</button>
+      <span class="sep"></span>
+      <button type="button" id="qPerf">Whole-number sides</button>
+      <button type="button" id="qFive">√5 family</button>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="custom">
+      <label class="chk"><input type="checkbox" id="useCustom"> Use my own areas</label>
+      <input type="text" id="customText" placeholder="e.g. 2, 3, 7, 10.5, 50" aria-label="Custom areas separated by commas">
+      <button type="button" class="btn" id="cApply">Apply</button>
+      <label class="filebtn">Load from file<input type="file" id="cFile" accept=".txt,.csv" hidden></label>
+      <button type="button" class="btn" id="gSq">Perfect squares</button>
+      <button type="button" class="btn" id="gDbl">Double squares</button>
+      <button type="button" class="btn" id="gRnd">Random irrational</button>
+      <p class="note cmsg" id="cmsg">Type any numbers separated by commas (decimals use a dot; 0 is shown as nothing), or load a .txt or .csv file. They replace the Tessera Sequence while the box is ticked.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="grid">
+      <label>Tile type
+        <select id="kind"><option value="sq">Squares (area = side²)</option><option value="circ">Circles (area = π r²)</option></select>
+      </label>
+
+      <label data-for="pyth gallery" data-pat="theorem">Area A (leg square / large square)<select id="pa"></select></label>
+      <label data-for="pyth gallery" data-pat="theorem">Area B (leg square / small square)<select id="pb"></select></label>
+      <label class="chk" data-for="pyth"><input type="checkbox" id="tilt" checked> Roman tilt</label>
+
+      <label data-for="whirl"><span>Twist per layer: <output id="twistv">7°</output></span><input type="range" id="twist" min="0" max="45" step="0.5" value="7"></label>
+
+      <label data-for="pack">Shape
+        <select id="shape">
+          <optgroup label="Flat shapes">
+            <option value="square">Square</option>
+            <option value="rect">Rectangle</option>
+            <option value="rhomb">Rhomboid</option>
+            <option value="diamond">Diamond (rhombus)</option>
+            <option value="tri">Triangle</option>
+            <option value="rtri">Right triangle</option>
+            <option value="pent">Pentagon</option>
+            <option value="hex">Hexagon</option>
+            <option value="oct">Octagon</option>
+            <option value="circle">Circle</option>
+            <option value="ellipse">Ellipse</option>
+            <option value="cross">Greek cross</option>
+            <option value="star">Star</option>
+            <option value="arch">Arch</option>
+            <option value="ring">Ring</option>
+            <option value="heart">Heart</option>
+          </optgroup>
+          <optgroup label="Solids">
+            <option value="cube3d">Cube (3D view)</option>
+            <option value="cubenet">Cube, unfolded</option>
+            <option value="tetra">Tetrahedron faces</option>
+            <option value="octa">Octahedron faces</option>
+            <option value="dodeca">Dodecahedron faces</option>
+          </optgroup>
+        </select>
+      </label>
+      <label id="lblAsp" data-for="pack"><span>Width to height: <output id="aspv">1.5</output></span><input type="range" id="aspect" min="1" max="3" step="0.1" value="1.5"></label>
+      <label id="lblShr" data-for="pack"><span>Slant: <output id="shrv">20°</output></span><input type="range" id="shear" min="5" max="40" step="1" value="20"></label>
+
+      <label data-for="fib">Family
+        <select id="fam">
+          <option value="1">Whole-number sides: 1, 4, 9, 25, 64, 169, 441</option>
+          <option value="5">√5 sides: 5, 20, 45, 125, 320</option>
+        </select>
+      </label>
+
+      <label data-for="gallery">Pattern
+        <select id="pat">
+          <option value="keyframe">Greek key frame around a mosaic</option>
+          <option value="keyband">Greek key (greca) band</option>
+          <option value="frieze">Frieze</option>
+          <option value="courses">Courses (rows)</option>
+          <option value="stack">Step pyramid</option>
+          <option value="pyramid2">Double step pyramid (up and inverted)</option>
+          <option value="rosette">Rosette</option>
+          <option value="sunflower">Sunflower spiral</option>
+          <option value="wreath">Wreath</option>
+          <option value="tree">Pythagoras tree</option>
+          <option value="theorem">Pythagorean theorem figure</option>
+        </select>
+      </label>
+      <label data-for="gallery" data-pat="frieze">Order
+        <select id="ord"><option value="mountain">Mountain (big in the middle)</option><option value="asc">Small to large</option><option value="rand">Shuffled</option></select>
+      </label>
+      <label data-for="gallery" data-pat="pyramid2">Pyramid edges
+        <select id="palign"><option value="stair">Staircase (steps interlock)</option><option value="center">Centered (symmetric)</option></select>
+      </label>
+      <label data-for="gallery" data-pat="pyramid2">View
+        <select id="porient"><option value="v">Vertical (standing up)</option><option value="h">Horizontal (lying on its side)</option></select>
+      </label>
+      <label data-for="gallery" data-pat="rosette"><span>Arms: <output id="symv">8</output></span><input type="range" id="sym" min="3" max="16" step="1" value="8"></label>
+      <label data-for="gallery" data-pat="sunflower"><span>Spread: <output id="spv">1.6</output></span><input type="range" id="sp" min="0.8" max="3" step="0.1" value="1.6"></label>
+      <label data-for="gallery" data-pat="tree"><span>Branch angle: <output id="tangv">45°</output></span><input type="range" id="tang" min="15" max="75" step="1" value="45"></label>
+      <label data-for="gallery" data-pat="tree"><span>Depth: <output id="tdepv">9</output></span><input type="range" id="tdep" min="1" max="11" step="1" value="9"></label>
+
+      <label class="chk" data-for="pack whirl gallery"><input type="checkbox" id="field" checked> Fill gaps with tesserae</label>
+      <label data-for="pack whirl gallery"><span>Tessera size: <output id="tsv">0.5</output></span><input type="range" id="ts" min="0.25" max="1.5" step="0.05" value="0.5"></label>
+      <label data-for="pack whirl fib gallery">Repeat as a mosaic
+        <select id="rep"><option value="1">Single panel</option><option value="2">2 × 2 panels</option><option value="3">3 × 3 panels</option></select>
+      </label>
+      <label class="chk"><input type="checkbox" id="lab"> Show area labels</label>
+
+      <label>Palette
+        <select id="pal">
+          <option value="roman">Roman (terracotta and ochre)</option>
+          <option value="greek">Greek (blue and white)</option>
+          <option value="pompeii">Pompeii (red and green)</option>
+          <option value="byzantine">Byzantine (gold and lapis)</option>
+          <option value="moorish">Moorish (zellige tiles)</option>
+          <option value="marine">Mediterranean (sea blues)</option>
+          <option value="custom">Custom</option>
+        </select>
+      </label>
+      <label><span>Grout: <output id="gapv">2</output> px</span><input type="range" id="gap" min="0" max="6" step="0.5" value="2"></label>
+      <div><button type="button" class="btn" id="shuf">Shuffle colors</button></div>
+    </div>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <div class="canvaswrap"><canvas id="cv" width="1500" height="1000" aria-label="Generated mosaic"></canvas></div>
+  <div class="actions">
+    <button type="button" class="btn primary hide" id="dl">Download as PNG</button>
+    <span id="dlmsg" class="note"></span>
+  </div>
+  <div class="stats" id="stats"></div>
+  <p class="note" id="note"></p>
+</main>
+
+<script>
+(function(){
+  var LTN={};
+  function LTterm(n){var m=(4*n*n)%10;return Math.round((n*n+(26*m-5*m*m)/6)/5)}
+  function ltPool(N){
+    var seen={},list=[];
+    LTN={};
+    for(var n=0;n<N;n++){
+      var v=LTterm(n);
+      if(!seen[v]){seen[v]=1;list.push(v);LTN[v]=[n]}else LTN[v].push(n);
+    }
+    list.sort(function(a,b){return a-b});
+    return list;
+  }
+  var AREAS=ltPool(27);
+  var PRESETS={
+    roman:{ground:'#1a1410',field:'#efe3c8',acc:['#b5532f','#d9a441','#2b2622','#8c3b24','#6e7f5b']},
+    greek:{ground:'#0f1a2a',field:'#f2efe6',acc:['#1f4e8c','#c1572b','#16365f','#d8b46a','#2e2e2e']},
+    pompeii:{ground:'#14100f',field:'#f0e6d2',acc:['#9b2d30','#e8c872','#3c5a4a','#20201f','#c97b3c']},
+    byzantine:{ground:'#10101c',field:'#e3c76a',acc:['#2a3a8c','#8e1b3a','#1d6b5a','#f2ead3','#5a2a6e']},
+    moorish:{ground:'#102426',field:'#f5f1e6',acc:['#0f7b82','#1d4ea0','#e0a21b','#2a8f4e','#b8392c']},
+    marine:{ground:'#0d1b24',field:'#e9f0ee',acc:['#1b6a8a','#2c9ab0','#d88a3a','#274c5e','#7aa6a1']}
+  };
+  var SW_NAMES=['Grout','Background','Tile 1','Tile 2','Tile 3','Tile 4','Tile 5'];
+  var TABS={
+    pyth:'The classic Roman and Greek Pythagorean tiling: one large and one small tile lock together and cover the plane. Pick any two of your tiles.',
+    whirl:'Your tiles stacked from largest to smallest around one centre. Set the twist to 0 and every layer lines up.',
+    pack:'Fit the chosen tiles inside a flat shape or onto the faces of a solid, then fill what is left with small stone tesserae so the whole panel is a finished piece you can repeat.',
+    fib:'A true tiling with no gaps. Sides 1, 2, 3, 5, 8, 13 and 21 (areas 1, 4, 9, 25, 64, 169 and 441, all in your list) fit exactly into one rectangle.',
+    gallery:'Eleven more designs built from your tiles: Greek key borders, rosettes, spirals, a Pythagoras tree and more.'
+  };
+  var NOTES={
+    pyth:'Each repeating cell holds one large and one small tile. For squares the cell area is the sum of the two areas, which is the picture behind the Pythagorean theorem. Circles are drawn inside squares whose side equals their diameter.',
+    whirl:'For squares the twist is the extra turn of each layer. For circles it sets how far each circle drifts off-centre, and at 0 they are concentric rings.',
+    pack:'An exact tiling that uses all of your tiles is not possible in general. Squares whose sides are not commensurable (for example \u221A5 and \u221A8) can never fill a rectangle together (Dehn, 1903), so the tiles are packed as tightly as possible and the leftover is filled with small cut tesserae, the way Roman mosaic makers worked. The Exact tiling tab shows the families that really do fit.',
+    fib:'Consecutive Fibonacci squares close up into a rectangle because F1\u00B2 + F2\u00B2 + \u2026 + Fn\u00B2 = Fn \u00D7 F(n+1). The spiral needs the 1 \u00D7 1 tile twice, so one extra unit tile appears. Tiles the spiral needs but you did not select are drawn as plain filler.'
+  };
+  var PATS={
+    keyframe:'A meander border in the Greek key style around a packed panel of your tiles, with a medallion in each corner.',
+    keyband:'Two mirrored bands of the Greek key (greca), built from unit tesserae. Repeat it to stack bands.',
+    frieze:'Your tiles side by side along one line, centered on a common axis.',
+    courses:'Tiles laid in horizontal courses like a masonry wall. Shuffle colors to reorder them.',
+    pyramid2:'A step pyramid and its clone turned 180\u00B0, pushed together until they touch. With staircase edges the steps interlock, so the smallest tile of the first pyramid sits beside the largest tile of the second.',
+    stack:'The largest tile at the base and the smallest at the top, all centered, like a stepped pyramid.',
+    rosette:'Tiles run outward along evenly spaced arms, largest nearest the centre. Change the number of arms to change the symmetry.',
+    sunflower:'Tiles placed at the golden angle of 137.5\u00B0, the same rule sunflower seeds follow. Spread changes how open it is.',
+    wreath:'Alternating small and large tiles close up into a single ring.',
+    tree:'The Pythagoras tree: on top of the biggest tile sit two tiles whose areas add up to the parent\u2019s area. At 45\u00B0 they are equal.',
+    theorem:'The classic figure: squares on the two legs and on the hypotenuse of a right triangle. Areas A and B add up to the area on the hypotenuse.'
+  };
+  var $=function(id){return document.getElementById(id)};
+  var cv=$('cv'),ctx=cv.getContext('2d'),CW=cv.width,CH=cv.height;
+  var state={mode:'pyth',sel:new Set(AREAS),seed:0,pat:'keyframe'};
+  var pal=clonePal(PRESETS.roman);
+  var pyA=20,pyB=5;
+  var memoKey=null,memoVal=null;
+
+  function clonePal(p){return {ground:p.ground,field:p.field,acc:p.acc.slice()}}
+  function mod(n,m){return((n%m)+m)%m}
+  function isSq(a){return Number.isInteger(Math.sqrt(a))}
+  function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;var t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  function hex2rgb(h){h=h.replace('#','');var n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]}
+  function jitter(h,amt,r){var c=hex2rgb(h),k=1+(r()*2-1)*amt;return'rgb('+c.map(function(v){return Math.max(0,Math.min(255,Math.round(v*k)))}).join(',')+')'}
+  function accs(){
+    var a=pal.acc.slice();
+    if(!state.seed)return a;
+    var r=rng(state.seed);
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}
+    return a;
+  }
+  function gap(){return +$('gap').value}
+  function lv(px){return px>190?4:px>105?3:px>58?2:px>28?1:0}
+  function cols(n,A){return[A[mod(n,5)],pal.field,A[mod(n+2,5)],A[mod(n+3,5)],A[mod(n+4,5)]]}
+  function K(){return $('kind').value}
+  function sz(a){return K()==='circ'?2*Math.sqrt(a/Math.PI):Math.sqrt(a)}
+  function minArea(){for(var i=0;i<AREAS.length;i++)if(AREAS[i]>0)return AREAS[i];return 1}
+  function pos(){return AREAS.filter(function(a){return a>0})}
+  function selPos(){return Array.from(state.sel).filter(function(a){return a>0})}
+  function rn(x){return Math.round(x*1e4)/1e4}
+  function inPool(v){return AREAS.some(function(x){return Math.abs(x-v)<1e-9})}
+  function fmt(a){return isSq(a)?String(Math.sqrt(a)):'\u221A'+a}
+  function selKey(){return Array.from(state.sel).sort(function(x,y){return x-y}).join(',')}
+  function memo(key,fn){if(memoKey===key)return memoVal;var v=fn();memoKey=key;memoVal=v;return v}
+  function asc(){return selPos().sort(function(x,y){return x-y}).map(function(a){return{a:a,s:sz(a)}})}
+  function desc(){return asc().reverse()}
+  function stat(l,v){return'<span><b>'+l+':</b> '+v+'</span>'}
+  function shuffleIn(arr,r){for(var i=arr.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t}return arr}
+
+  /* ---------- drawing helpers ---------- */
+  function nested(c,cx,cy,s,ang,cl,levels,lwO,lwI){
+    c.save();c.translate(cx,cy);c.rotate(ang);
+    var side=s;
+    for(var k=0;k<=levels;k++){
+      c.save();
+      if(k%2===1)c.rotate(Math.PI/4);
+      c.fillStyle=cl[k];c.fillRect(-side/2,-side/2,side,side);
+      var lw=k===0?lwO:lwI;
+      if(lw>0){c.strokeStyle=pal.ground;c.lineWidth=lw;c.strokeRect(-side/2,-side/2,side,side)}
+      c.restore();
+      side=side/Math.SQRT2;
+    }
+    c.restore();
+  }
+  function drawPiece(c,cx,cy,s,ang,cl,levels,lwO,lwI){
+    if(K()==='sq'){nested(c,cx,cy,s,ang,cl,levels,lwO,lwI);return}
+    var r=s/2;
+    for(var k=0;k<=levels;k++){
+      c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fillStyle=cl[k];c.fill();
+      var lw=k===0?lwO:lwI;
+      if(lw>0){c.strokeStyle=pal.ground;c.lineWidth=lw;c.stroke()}
+      r=r/Math.SQRT2;
+    }
+  }
+  function labelAt(c,u,v,txt,sPx,force){
+    if(!force&&(!$('lab').checked||sPx<34))return;
+    var m=c.getTransform();
+    var X=m.a*u+m.c*v+m.e,Y=m.b*u+m.d*v+m.f;
+    c.save();c.setTransform(1,0,0,1,0,0);
+    var fs=Math.max(10,Math.min(force?34:26,sPx*0.26));
+    c.font='600 '+fs+'px "Public Sans",sans-serif';
+    c.textAlign='center';c.textBaseline='middle';
+    c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.7)';c.strokeText(String(txt),X,Y);
+    c.fillStyle='#fff';c.fillText(String(txt),X,Y);
+    c.restore();
+  }
+  function tesserae(c,x0,y0,W,H,ts,ppu){
+    ts=Math.max(ts*Math.sqrt(minArea()),3/ppu,Math.sqrt(W*H/40000));
+    var r=rng(7+state.seed),A=accs(),lw=Math.max(0.5,gap()*0.5)/ppu;
+    var nx=Math.ceil(W/ts),ny=Math.ceil(H/ts);
+    c.strokeStyle=pal.ground;c.lineWidth=lw;
+    for(var i=0;i<nx;i++)for(var j=0;j<ny;j++){
+      c.fillStyle=r()<0.07?A[Math.floor(r()*5)]:jitter(pal.field,0.10,r);
+      c.fillRect(x0+i*ts,y0+j*ts,ts,ts);c.strokeRect(x0+i*ts,y0+j*ts,ts,ts);
+    }
+  }
+  function bgField(c,x0,y0,W,H,ppu){
+    c.fillStyle=pal.ground;c.fillRect(x0,y0,W,H);
+    if($('field').checked)tesserae(c,x0,y0,W,H,+$('ts').value,ppu);
+  }
+  function msg(t){
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle=pal.ground;ctx.fillRect(0,0,CW,CH);
+    ctx.fillStyle=pal.field;ctx.font='28px "Public Sans",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(t,CW/2,CH/2);
+    $('stats').innerHTML='';
+  }
+
+  /* ---------- masks and generic packing ---------- */
+  function regPoly(n,rot,r){var a=[];for(var i=0;i<n;i++){var t=rot+2*Math.PI*i/n;a.push([r*Math.cos(t),r*Math.sin(t)])}return a}
+  function rectRings(r){return[[[-r,-1],[r,-1],[r,1],[-r,1]]]}
+  function shapeRings(name){
+    var P=Math.PI,i,a,t;
+    switch(name){
+      case 'square':return rectRings(1);
+      case 'rect':case 'rhomb':return rectRings(+$('aspect').value);
+      case 'diamond':return[[[0,-1],[1,0],[0,1],[-1,0]]];
+      case 'tri':return[regPoly(3,-P/2,1)];
+      case 'rtri':return[[[-1,-1],[-1,1],[1,1]]];
+      case 'pent':return[regPoly(5,-P/2,1)];
+      case 'hex':return[regPoly(6,0,1)];
+      case 'oct':return[regPoly(8,P/8,1)];
+      case 'circle':return[regPoly(96,0,1)];
+      case 'ellipse':return[regPoly(96,0,1).map(function(p){return[p[0]*1.45,p[1]]})];
+      case 'cross':return[[[-1/3,-1],[1/3,-1],[1/3,-1/3],[1,-1/3],[1,1/3],[1/3,1/3],[1/3,1],[-1/3,1],[-1/3,1/3],[-1,1/3],[-1,-1/3],[-1/3,-1/3]]];
+      case 'star':a=[];for(i=0;i<10;i++){t=-P/2+i*P/5;var rr=i%2?0.5:1;a.push([rr*Math.cos(t),rr*Math.sin(t)])}return[a];
+      case 'arch':
+        a=[[-0.75,1],[0.75,1],[0.75,-0.25]];
+        for(i=1;i<=32;i++){t=-P*i/32;a.push([0.75*Math.cos(t),-0.25+0.75*Math.sin(t)])}
+        a.push([-0.75,-0.25]);return[a];
+      case 'ring':return[regPoly(96,0,1),regPoly(72,0,0.42)];
+      case 'heart':
+        a=[];for(i=0;i<96;i++){t=2*P*i/96;a.push([16*Math.pow(Math.sin(t),3)/17,-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/17])}
+        return[a];
+    }
+    return rectRings(1);
+  }
+  var MASKS={};
+  function getMask(key,rings){
+    if(MASKS[key])return MASKS[key];
+    var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+    rings.forEach(function(r){r.forEach(function(p){minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1])})});
+    var w=maxx-minx,h=maxy-miny,cell=Math.max(w,h)/640;
+    var nx=Math.ceil(w/cell),ny=Math.ceil(h/cell);
+    var mask=new Uint8Array(nx*ny),edges=[];
+    rings.forEach(function(r){
+      for(var i=0;i<r.length;i++){
+        var a=r[i],b=r[(i+1)%r.length];
+        if(a[1]===b[1])continue;
+        edges.push(a[1]<b[1]?[a[0],a[1],b[0],b[1]]:[b[0],b[1],a[0],a[1]]);
+      }
+    });
+    for(var j=0;j<ny;j++){
+      var y=miny+(j+0.5)*cell,xs=[];
+      for(var e=0;e<edges.length;e++){
+        var ed=edges[e];
+        if(y>=ed[1]&&y<ed[3])xs.push(ed[0]+(y-ed[1])*(ed[2]-ed[0])/(ed[3]-ed[1]));
+      }
+      xs.sort(function(p,q){return p-q});
+      for(var k=0;k+1<xs.length;k+=2){
+        var i0=Math.max(0,Math.ceil((xs[k]-minx)/cell-0.5)),i1=Math.min(nx-1,Math.floor((xs[k+1]-minx)/cell-0.5));
+        for(var i=i0;i<=i1;i++)mask[j*nx+i]=1;
+      }
+    }
+    var W1=nx+1,ii=new Int32Array(W1*(ny+1));
+    for(var jj=0;jj<ny;jj++)for(var i2=0;i2<nx;i2++){
+      ii[(jj+1)*W1+i2+1]=mask[jj*nx+i2]+ii[jj*W1+i2+1]+ii[(jj+1)*W1+i2]-ii[jj*W1+i2];
+    }
+    function pa(r){var s=0;for(var q=0;q<r.length;q++){var u=r[q],v=r[(q+1)%r.length];s+=u[0]*v[1]-v[0]*u[1]}return Math.abs(s)/2}
+    var area=pa(rings[0]);for(var h2=1;h2<rings.length;h2++)area-=pa(rings[h2]);
+    var m={nx:nx,ny:ny,x0:minx,y0:miny,cell:cell,mask:mask,ii:ii,bb:[minx,miny,maxx,maxy],area:area,rings:rings};
+    MASKS[key]=m;return m;
+  }
+  function mSum(M,i0,j0,i1,j1){var w=M.nx+1;return M.ii[j1*w+i1]-M.ii[j0*w+i1]-M.ii[j1*w+i0]+M.ii[j0*w+i0]}
+  function sqFits(M,S,x,y,d){
+    var i0=Math.floor((x/S-M.x0)/M.cell),i1=Math.ceil(((x+d)/S-M.x0)/M.cell);
+    var j0=Math.floor((y/S-M.y0)/M.cell),j1=Math.ceil(((y+d)/S-M.y0)/M.cell);
+    if(i0<0||j0<0||i1>M.nx||j1>M.ny)return false;
+    return mSum(M,i0,j0,i1,j1)===(i1-i0)*(j1-j0);
+  }
+  function ptIn(M,S,x,y){
+    var i=Math.floor((x/S-M.x0)/M.cell),j=Math.floor((y/S-M.y0)/M.cell);
+    return i>=0&&j>=0&&i<M.nx&&j<M.ny&&M.mask[j*M.nx+i]===1;
+  }
+  function circFits(M,S,cx,cy,r){
+    if(!ptIn(M,S,cx,cy))return false;
+    var k,t;
+    for(k=0;k<16;k++){t=k*Math.PI/8;if(!ptIn(M,S,cx+r*Math.cos(t),cy+r*Math.sin(t)))return false}
+    for(k=0;k<8;k++){t=k*Math.PI/4;if(!ptIn(M,S,cx+0.5*r*Math.cos(t),cy+0.5*r*Math.sin(t)))return false}
+    return true;
+  }
+  function tryPack(M,S,pieces,circ){
+    var bx0=M.bb[0]*S,by0=M.bb[1]*S,bx1=M.bb[2]*S,by1=M.bb[3]*S,cxm=(bx0+bx1)/2;
+    var placed=[],ext=Math.max(bx1-bx0,by1-by0);
+    function ok(x,y,d){
+      var q,i;
+      if(circ){
+        var cx=x+d/2,cy=y+d/2;
+        if(!circFits(M,S,cx,cy,d/2))return false;
+        for(i=0;i<placed.length;i++){
+          q=placed[i];
+          var dx=q.x+q.s/2-cx,dy=q.y+q.s/2-cy,rr=(d+q.s)/2-1e-6;
+          if(dx*dx+dy*dy<rr*rr)return false;
+        }
+        return true;
+      }
+      if(!sqFits(M,S,x,y,d))return false;
+      for(i=0;i<placed.length;i++){
+        q=placed[i];
+        if(x<q.x+q.s-1e-6&&x+d>q.x+1e-6&&y<q.y+q.s-1e-6&&y+d>q.y+1e-6)return false;
+      }
+      return true;
+    }
+    for(var n=0;n<pieces.length;n++){
+      var p=pieces[n],d=p.s,step=Math.max(d/8,ext/240),fx=null,fy=null;
+      for(var y=by0;y<=by1-d+1e-9;y+=step){
+        var bestx=null,bd=1e18;
+        for(var x=bx0;x<=bx1-d+1e-9;x+=step){
+          if(ok(x,y,d)){var dd=Math.abs(x+d/2-cxm);if(dd<bd){bd=dd;bestx=x}}
+        }
+        if(bestx!==null){fx=bestx;fy=y;break}
+      }
+      if(fx===null)return null;
+      var dl=step/4,it;
+      for(it=0;it<60;it++){if(ok(fx,fy-dl,d))fy-=dl;else break}
+      for(it=0;it<60;it++){var dir=cxm>fx+d/2?1:-1;if(ok(fx+dir*dl,fy,d))fx+=dir*dl;else break}
+      placed.push({a:p.a,s:d,x:fx,y:fy});
+    }
+    return placed;
+  }
+  function searchScale(M,groups,circ){
+    var maxA=0,maxD=0,cnt=0;
+    groups.forEach(function(g){var s=0;g.forEach(function(p){s+=p.a;cnt++;maxD=Math.max(maxD,p.s)});maxA=Math.max(maxA,s)});
+    if(cnt>100)circ=false;
+    var S=Math.max(Math.sqrt(maxA/M.area),maxD/Math.min(M.bb[2]-M.bb[0],M.bb[3]-M.bb[1])*0.5);
+    for(var it=0;it<90;it++){
+      var res=[],all=true;
+      for(var g=0;g<groups.length;g++){
+        if(!groups[g].length){res.push([]);continue}
+        var r=tryPack(M,S,groups[g],circ);
+        if(!r){all=false;break}
+        res.push(r);
+      }
+      if(all)return{S:S,res:res};
+      S*=1.035;
+    }
+    return null;
+  }
+  function ringsPath(c,rings,S){
+    c.beginPath();
+    rings.forEach(function(r){
+      r.forEach(function(p,i){if(i)c.lineTo(p[0]*S,p[1]*S);else c.moveTo(p[0]*S,p[1]*S)});
+      c.closePath();
+    });
+  }
+  function paintFace(c,M,S,placed,ppu,A,lw,off){
+    c.save();
+    ringsPath(c,M.rings,S);c.clip('evenodd');
+    if($('field').checked)tesserae(c,M.bb[0]*S,M.bb[1]*S,(M.bb[2]-M.bb[0])*S,(M.bb[3]-M.bb[1])*S,+$('ts').value,ppu);
+    placed.forEach(function(o,n){
+      drawPiece(c,o.x+o.s/2,o.y+o.s/2,o.s,0,cols(n+off,A),lv(o.s*ppu),lw,lw*0.6);
+      labelAt(c,o.x+o.s/2,o.y+o.s/2,o.a,o.s*ppu);
+    });
+    c.restore();
+    ringsPath(c,M.rings,S);c.strokeStyle=pal.ground;c.lineWidth=Math.max(lw,1.5/ppu)*1.5;c.stroke();
+  }
+
+  /* ---------- exact rectangle layout (squares) ---------- */
+  function skyline(items,Wc){
+    var EPS=1e-9,sky=[{x:0,y:0,w:Wc}],out=[],hMax=0;
+    for(var n=0;n<items.length;n++){
+      var s=items[n].s,best=null;
+      for(var i=0;i<sky.length;i++){
+        var x=sky[i].x;
+        if(x+s>Wc+EPS)break;
+        var y=0,wl=s,j=i,ok=true;
+        while(wl>EPS){
+          if(j>=sky.length){ok=false;break}
+          y=Math.max(y,sky[j].y);wl-=sky[j].w;j++;
+        }
+        if(!ok)continue;
+        if(!best||y<best.y-EPS)best={i:i,x:x,y:y};
+      }
+      if(!best)return null;
+      out.push({a:items[n].a,s:s,x:best.x,y:best.y});
+      hMax=Math.max(hMax,best.y+s);
+      sky.splice(best.i,0,{x:best.x,y:best.y+s,w:s});
+      for(var k=best.i+1;k<sky.length;k++){
+        var pe=sky[k-1].x+sky[k-1].w;
+        if(sky[k].x<pe-EPS){
+          var sh=pe-sky[k].x;sky[k].x+=sh;sky[k].w-=sh;
+          if(sky[k].w<=EPS){sky.splice(k,1);k--}else break;
+        }else break;
+      }
+      for(var m=0;m<sky.length-1;m++){
+        if(Math.abs(sky[m].y-sky[m+1].y)<EPS){sky[m].w+=sky[m+1].w;sky.splice(m+1,1);m--}
+      }
+    }
+    return {items:out,h:hMax};
+  }
+  function rectLayout(pieces,r){
+    var key='rl|'+K()+'|'+r+'|'+selKey();
+    return memo(key,function(){
+      if(K()==='sq'){
+        var total=pieces.reduce(function(t,o){return t+o.a},0),maxS=0;
+        pieces.forEach(function(o){maxS=Math.max(maxS,o.s)});
+        var H=Math.max(maxS,Math.sqrt(total/r)),W=r*H,p=null,stepH=maxS/200;
+        for(var it=0;it<4000;it++,H+=stepH){
+          W=r*H;
+          if(W<maxS-1e-9)continue;
+          var q=skyline(pieces,W);
+          if(q&&q.h<=H+1e-9){p=q;break}
+        }
+        if(!p){W=Math.sqrt(total)*3;H=W;p=skyline(pieces,W)}
+        return{W:W,H:H,items:p.items};
+      }
+      var M=getMask('rectfix'+r,rectRings(r));
+      var sr=searchScale(M,[pieces],true);
+      if(!sr)return null;
+      var S=sr.S;
+      return{W:2*r*S,H:2*S,items:sr.res[0].map(function(o){return{a:o.a,s:o.s,x:o.x+r*S,y:o.y+S}})};
+    });
+  }
+
+  /* ---------- tiles: whirl ---------- */
+  function whirlTile(){
+    var items=selPos().sort(function(x,y){return y-x});
+    if(!items.length)return null;
+    var tw=+$('twist').value,step=tw*Math.PI/180,circ=K()==='circ';
+    var d0=sz(items[0]),F=d0*1.2;
+    return {W:F,H:F,t:0,
+      stats:stat('Layers',items.length)+stat(circ?'Drift':'Twist per layer',circ?(tw/45*100).toFixed(0)+'%':tw+'\u00B0')+(circ?'':stat('Total twist',(items.length*tw).toFixed(0)+'\u00B0')),
+      paint:function(c,ppu){
+        bgField(c,0,0,F,F,ppu);
+        var A=accs(),lw=gap()/ppu,cx=F/2,cy=F/2,prevR=0;
+        items.forEach(function(o,i){
+          var s=sz(o);
+          c.fillStyle=A[i%5];
+          if(circ){
+            var r=s/2;
+            if(i>0){var f=tw/45*(prevR-r),ga=i*2.39996;cx+=f*Math.cos(ga);cy+=f*Math.sin(ga)}
+            prevR=r;
+            c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fill();
+            if(lw>0){c.strokeStyle=pal.ground;c.lineWidth=lw;c.stroke()}
+          }else{
+            c.save();c.translate(F/2,F/2);c.rotate(i*step);
+            c.fillRect(-s/2,-s/2,s,s);
+            if(lw>0){c.strokeStyle=pal.ground;c.lineWidth=lw;c.strokeRect(-s/2,-s/2,s,s)}
+            c.restore();
+          }
+        });
+      }};
+  }
+
+  /* ---------- tiles: fit into a shape ---------- */
+  function rectTile(pieces,shape){
+    var r=shape==='square'?1:+$('aspect').value;
+    var L=rectLayout(pieces,r);
+    if(!L)return null;
+    var W=L.W,H=L.H;
+    var t=shape==='rhomb'?Math.tan((+$('shear').value)*Math.PI/180):0;
+    var total=pieces.reduce(function(s,o){return s+o.a},0),cov=total/(W*H)*100;
+    return {W:W,H:H,t:t,
+      stats:stat('Panel',W.toFixed(2)+' \u00D7 '+H.toFixed(2))+stat('Tiles used',pieces.length)+
+        stat('Covered by your tiles',cov.toFixed(1)+'%')+stat('Filled with tesserae',(100-cov).toFixed(1)+'%'),
+      paint:function(c,ppu){
+        bgField(c,0,0,W,H,ppu);
+        var A=accs(),lw=gap()/ppu;
+        L.items.forEach(function(o,n){
+          drawPiece(c,o.x+o.s/2,o.y+o.s/2,o.s,0,cols(n,A),lv(o.s*ppu),lw,lw*0.6);
+          labelAt(c,o.x+o.s/2,o.y+o.s/2,o.a,o.s*ppu);
+        });
+      }};
+  }
+  function flatTile(name,pieces,circ){
+    var asp=(name==='rect'||name==='rhomb')?$('aspect').value:'';
+    var key='flat|'+name+asp+'|'+K()+'|'+selKey();
+    var M=getMask(name+asp,shapeRings(name));
+    var sr=memo(key,function(){return searchScale(M,[pieces],circ)});
+    if(!sr)return null;
+    var S=sr.S,placed=sr.res[0];
+    var bx0=M.bb[0]*S,by0=M.bb[1]*S,W=(M.bb[2]-M.bb[0])*S,H=(M.bb[3]-M.bb[1])*S;
+    var t=name==='rhomb'?Math.tan((+$('shear').value)*Math.PI/180):0;
+    var total=pieces.reduce(function(s,o){return s+o.a},0),cov=total/(M.area*S*S)*100;
+    return {W:W,H:H,t:t,
+      stats:stat('Tiles used',pieces.length)+stat('Covered by your tiles',cov.toFixed(1)+'%')+stat('Filled with tesserae',(100-cov).toFixed(1)+'%'),
+      paint:function(c,ppu){
+        c.fillStyle=pal.ground;c.fillRect(0,0,W,H);
+        c.save();c.translate(-bx0,-by0);
+        paintFace(c,M,S,placed,ppu,accs(),gap()/ppu,0);
+        c.restore();
+      }};
+  }
+  function netLayout(name){
+    var n=name==='cubenet'?4:name==='dodeca'?5:3,ap=Math.cos(Math.PI/n),base0=n===4?-Math.PI/4:-Math.PI/2;
+    function ang(f,j){return base0+Math.PI/n+2*Math.PI*j/n+f.rot}
+    function nb(f,j){var al=ang(f,j);return{cx:f.cx+2*ap*Math.cos(al),cy:f.cy+2*ap*Math.sin(al),rot:f.rot+Math.PI}}
+    var a,f,j,i;
+    if(name==='cubenet'){
+      var s=2*ap;
+      return[[0,0],[0,1],[0,2],[0,3],[-1,1],[1,1]].map(function(p){return{cx:p[0]*s,cy:p[1]*s,rot:0}});
+    }
+    if(name==='tetra'){
+      f={cx:0,cy:0,rot:0};a=[f];
+      for(j=0;j<3;j++)a.push(nb(f,j));
+      return a;
+    }
+    if(name==='octa'){
+      f={cx:0,cy:0,rot:0};a=[f];
+      for(i=0;i<7;i++){
+        var best=0,bx=-9;
+        for(j=0;j<3;j++){var x=Math.cos(ang(f,j));if(x>bx+1e-9){bx=x;best=j}}
+        f=nb(f,best);a.push(f);
+      }
+      return a;
+    }
+    f={cx:0,cy:0,rot:0};a=[f];
+    for(j=0;j<5;j++)a.push(nb(f,j));
+    var first=a.slice();
+    first.forEach(function(g){a.push({cx:g.cx+5.8,cy:g.cy,rot:g.rot})});
+    return a;
+  }
+  function partition(pieces,F){
+    var g=[],sums=[],i;
+    for(i=0;i<F;i++){g.push([]);sums.push(0)}
+    pieces.forEach(function(p){
+      var k=0;
+      for(i=1;i<F;i++)if(sums[i]<sums[k])k=i;
+      g[k].push(p);sums[k]+=p.a;
+    });
+    return g;
+  }
+  function solidTile(name,pieces,circ){
+    var iso=name==='cube3d',n=(name==='cube3d'||name==='cubenet')?4:name==='dodeca'?5:3;
+    var faces=iso?null:netLayout(name),F=iso?3:faces.length;
+    var groups=partition(pieces,F);
+    var M=getMask('poly'+n,[regPoly(n,n===4?-Math.PI/4:-Math.PI/2,1)]);
+    var key='solid|'+name+'|'+K()+'|'+selKey();
+    var sr=memo(key,function(){return searchScale(M,groups,circ)});
+    if(!sr)return null;
+    var S=sr.S,total=pieces.reduce(function(s,o){return s+o.a},0);
+    var cov=total/(F*M.area*S*S)*100;
+    var stats=stat('Faces',F)+stat('Tiles used',pieces.length)+stat('Covered by your tiles',cov.toFixed(1)+'%');
+    if(iso){
+      var h=Math.SQRT1_2*S,L=2*h,c30=Math.sqrt(3)/2,s30=0.5,mg=0.06*S;
+      var ox=L*c30+mg,oy=L+mg;
+      return {W:2*L*c30+2*mg,H:2*L+2*mg,t:0,stats:stats,
+        paint:function(c,ppu){
+          c.fillStyle=pal.ground;c.fillRect(0,0,2*L*c30+2*mg,2*L+2*mg);
+          var A=accs(),lw=gap()/ppu;
+          var defs=[[c30,-s30,-c30,-s30,0],[-c30,-s30,0,1,0.3],[c30,-s30,0,1,0.5]];
+          defs.forEach(function(d,fi){
+            c.save();
+            c.transform(d[0],d[1],d[2],d[3],ox,oy);
+            c.translate(h,h);
+            paintFace(c,M,S,sr.res[fi],ppu,A,lw,fi*3);
+            if(d[4]>0){c.fillStyle='rgba(0,0,0,'+d[4]+')';c.fillRect(-h,-h,L,L)}
+            c.restore();
+          });
+        }};
+    }
+    var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9,base0=n===4?-Math.PI/4:-Math.PI/2;
+    faces.forEach(function(f){
+      for(var i=0;i<n;i++){
+        var t=base0+2*Math.PI*i/n+f.rot,x=f.cx+Math.cos(t),y=f.cy+Math.sin(t);
+        minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y);
+      }
+    });
+    var mg2=0.08*S,W=(maxx-minx)*S+2*mg2,H=(maxy-miny)*S+2*mg2;
+    return {W:W,H:H,t:0,stats:stats,
+      paint:function(c,ppu){
+        c.fillStyle=pal.ground;c.fillRect(0,0,W,H);
+        var A=accs(),lw=gap()/ppu;
+        faces.forEach(function(f,fi){
+          c.save();
+          c.translate((f.cx-minx)*S+mg2,(f.cy-miny)*S+mg2);
+          c.rotate(f.rot);
+          paintFace(c,M,S,sr.res[fi],ppu,A,lw,fi*3);
+          c.restore();
+        });
+      }};
+  }
+  function packTile(){
+    var pieces=desc();
+    if(!pieces.length)return null;
+    var shape=$('shape').value,circ=K()==='circ';
+    if(!circ&&(shape==='square'||shape==='rect'||shape==='rhomb'))return rectTile(pieces,shape);
+    if(shape==='cube3d'||shape==='cubenet'||shape==='tetra'||shape==='octa'||shape==='dodeca')return solidTile(shape,pieces,circ);
+    return flatTile(shape,pieces,circ);
+  }
+
+  /* ---------- tiles: exact (Fibonacci) ---------- */
+  var KS=[1,2,3,5,8,13,21];
+  function fibTile(){
+    var fam=+$('fam').value,q=sz(fam);
+    var avail=[];
+    KS.forEach(function(k,i){if(inPool(fam*k*k))avail.push({idx:i,k:k,a:fam*k*k})});
+    var selIdx=avail.filter(function(o){return state.sel.has(o.a)}).map(function(o){return o.idx});
+    if(!selIdx.length)return null;
+    var m=Math.max.apply(null,selIdx);
+    var ks=[1,1,2,3,5,8,13,21].slice(0,m+2);
+    var R={x0:0,y0:0,x1:ks[0],y1:ks[0]};
+    var rects=[{x:0,y:0,k:ks[0]}];
+    for(var i=1;i<ks.length;i++){
+      var s=ks[i],d=(i-1)%4,x,y;
+      if(d===0){x=R.x1;y=R.y0;R.x1+=s}
+      else if(d===1){x=R.x0;y=R.y1;R.y1+=s}
+      else if(d===2){x=R.x0-s;y=R.y0;R.x0-=s}
+      else{x=R.x0;y=R.y0-s;R.y0-=s}
+      rects.push({x:x,y:y,k:s});
+    }
+    var W=(R.x1-R.x0)*q,H=(R.y1-R.y0)*q,seen1=false;
+    rects.forEach(function(o){
+      o.area=fam*o.k*o.k;
+      var dup=(o.k===1&&seen1);
+      if(o.k===1)seen1=true;
+      o.on=!dup&&state.sel.has(o.area);
+    });
+    var nOn=rects.filter(function(o){return o.on}).length,circ=K()==='circ';
+    var rw=(R.x1-R.x0)+(fam===5?'\u221A5':''),rh=(R.y1-R.y0)+(fam===5?'\u221A5':'');
+    return {W:W,H:H,t:0,
+      stats:stat('Rectangle (in units of the smallest side)',rw+' \u00D7 '+rh)+stat('Your tiles',nOn)+stat('Filler',rects.length-nOn)+stat('Coverage','100%, exact'),
+      paint:function(c,ppu){
+        c.fillStyle=pal.ground;c.fillRect(0,0,W,H);
+        var A=accs(),lw=gap()/ppu,rr=rng(3+state.seed);
+        rects.forEach(function(o,n){
+          var s=o.k*q,u=(o.x-R.x0)*q,v=(R.y1-(o.y+o.k))*q;
+          if(circ||!o.on){
+            c.fillStyle=jitter(pal.field,0.08,rr);c.fillRect(u,v,s,s);
+            if(lw>0){c.strokeStyle=pal.ground;c.lineWidth=lw;c.strokeRect(u,v,s,s)}
+          }
+          if(o.on)drawPiece(c,u+s/2,v+s/2,s,0,cols(n,A),lv(s*ppu),lw,lw*0.6);
+          labelAt(c,u+s/2,v+s/2,o.area,s*ppu);
+        });
+      }};
+  }
+
+  /* ---------- tiles: pattern gallery ---------- */
+  var KEY=['#####.','#...#.','#.#.#.','#.###.','#.....','######'];
+  function keyCell(side,cx,cy){
+    // returns {on,idx} for a cell in a strip; side: 0 top,1 bottom,2 left,3 right
+    var br,bc,idx;
+    if(side===0){br=5-cy;bc=(cx-6)%6;idx=Math.floor((cx-6)/6)}
+    else if(side===1){br=cy-18;bc=(cx-6)%6;idx=Math.floor((cx-6)/6)}
+    else if(side===2){br=5-cx;bc=(cy-6)%6;idx=Math.floor((cy-6)/6)}
+    else{br=cx-24;bc=(cy-6)%6;idx=Math.floor((cy-6)/6)}
+    return{on:KEY[br].charAt(bc)==='#',idx:idx};
+  }
+  function keyframeTile(){
+    var pieces=desc();
+    if(!pieces.length)return null;
+    var L=rectLayout(pieces,1.5);
+    if(!L)return null;
+    var W=30,H=24;
+    return {W:W,H:H,t:0,
+      stats:stat('Frame',W+' \u00D7 '+H+' tesserae')+stat('Tiles in the panel',pieces.length)+stat('Key motifs',14),
+      paint:function(c,ppu){
+        var A=accs(),r=rng(5+state.seed),lw=Math.max(0.5,gap()*0.5)/ppu,cx,cy;
+        c.strokeStyle=pal.ground;c.lineWidth=lw;
+        for(cy=0;cy<H;cy++)for(cx=0;cx<W;cx++){
+          if(cx>=6&&cx<24&&cy>=6&&cy<18)continue;
+          var on=false,idx=0,side=-1;
+          if(cy<6&&cx>=6&&cx<24)side=0;
+          else if(cy>=18&&cx>=6&&cx<24)side=1;
+          else if(cx<6&&cy>=6&&cy<18)side=2;
+          else if(cx>=24&&cy>=6&&cy<18)side=3;
+          if(side>=0){var kc=keyCell(side,cx,cy);on=kc.on;idx=kc.idx+side}
+          c.fillStyle=on?jitter(A[mod(idx,5)],0.08,r):jitter(pal.field,0.08,r);
+          c.fillRect(cx,cy,1,1);c.strokeRect(cx,cy,1,1);
+        }
+        [[0,0],[24,0],[0,18],[24,18]].forEach(function(p,i){
+          drawPiece(c,p[0]+3,p[1]+3,5,Math.PI/4*0,cols(i+1,A),3,lw*1.4,lw);
+        });
+        // inner panel
+        var k=18/L.W;
+        bgField(c,6,6,18,12,ppu);
+        L.items.forEach(function(o,n){
+          var s=o.s*k;
+          drawPiece(c,6+o.x*k+s/2,6+o.y*k+s/2,s,0,cols(n,A),lv(s*ppu),lw,lw*0.6);
+          labelAt(c,6+o.x*k+s/2,6+o.y*k+s/2,o.a,s*ppu);
+        });
+        c.strokeStyle=pal.ground;c.lineWidth=lw*3;c.strokeRect(6,6,18,12);
+      }};
+  }
+  function keybandTile(){
+    var W=36,H=12;
+    return {W:W,H:H,t:0,
+      stats:stat('Band',W+' \u00D7 '+H+' tesserae')+stat('Motifs','12'),
+      paint:function(c,ppu){
+        var A=accs(),r=rng(9+state.seed),lw=Math.max(0.5,gap()*0.5)/ppu;
+        c.strokeStyle=pal.ground;c.lineWidth=lw;
+        for(var band=0;band<2;band++)for(var cy=0;cy<6;cy++)for(var cx=0;cx<W;cx++){
+          var br=band===0?5-cy:cy,idx=Math.floor(cx/6)+band*2;
+          var on=KEY[br].charAt(cx%6)==='#';
+          c.fillStyle=on?jitter(A[mod(idx,5)],0.08,r):jitter(pal.field,0.08,r);
+          c.fillRect(cx,band*6+cy,1,1);c.strokeRect(cx,band*6+cy,1,1);
+        }
+      }};
+  }
+  function friezeTile(){
+    var arr=asc();
+    if(!arr.length)return null;
+    var ord=$('ord').value,seq;
+    if(ord==='asc')seq=arr;
+    else if(ord==='mountain'){
+      var Lf=[],Rt=[];
+      arr.forEach(function(p,i){if(i%2===0)Lf.push(p);else Rt.unshift(p)});
+      seq=Lf.concat(Rt);
+    }else seq=shuffleIn(arr.slice(),rng(11+state.seed));
+    var W=0,H=0;
+    seq.forEach(function(p){W+=p.s;H=Math.max(H,p.s)});
+    return {W:W,H:H,t:0,
+      stats:stat('Tiles',seq.length)+stat('Length',W.toFixed(2))+stat('Height',H.toFixed(2)),
+      paint:function(c,ppu){
+        bgField(c,0,0,W,H,ppu);
+        var A=accs(),lw=gap()/ppu,x=0;
+        seq.forEach(function(p,n){
+          drawPiece(c,x+p.s/2,H/2,p.s,0,cols(n,A),lv(p.s*ppu),lw,lw*0.6);
+          labelAt(c,x+p.s/2,H/2,p.a,p.s*ppu);
+          x+=p.s;
+        });
+      }};
+  }
+  function coursesTile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    if(state.seed)shuffleIn(arr,rng(21+state.seed));
+    var total=0,maxS=0;
+    arr.forEach(function(p){total+=p.a;maxS=Math.max(maxS,p.s)});
+    var Wt=Math.max(maxS,Math.sqrt(total)*1.7),rows=[],cur=[],w=0;
+    arr.forEach(function(p){
+      if(w+p.s>Wt&&cur.length){rows.push(cur);cur=[];w=0}
+      cur.push(p);w+=p.s;
+    });
+    if(cur.length)rows.push(cur);
+    var H=0;
+    rows=rows.map(function(rw){
+      var h=0,ww=0;rw.forEach(function(p){h=Math.max(h,p.s);ww+=p.s});
+      H+=h;return{items:rw,h:h,w:ww};
+    });
+    return {W:Wt,H:H,t:0,
+      stats:stat('Courses',rows.length)+stat('Tiles',arr.length)+stat('Panel',Wt.toFixed(2)+' \u00D7 '+H.toFixed(2)),
+      paint:function(c,ppu){
+        bgField(c,0,0,Wt,H,ppu);
+        var A=accs(),lw=gap()/ppu,y=0,n=0;
+        rows.forEach(function(rw){
+          var x=(Wt-rw.w)/2;
+          rw.items.forEach(function(p){
+            drawPiece(c,x+p.s/2,y+rw.h/2,p.s,0,cols(n,A),lv(p.s*ppu),lw,lw*0.6);
+            labelAt(c,x+p.s/2,y+rw.h/2,p.a,p.s*ppu);
+            x+=p.s;n++;
+          });
+          y+=rw.h;
+        });
+      }};
+  }
+  function stackTile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    var W=arr[0].s,H=0;
+    arr.forEach(function(p){H+=p.s});
+    return {W:W,H:H,t:0,
+      stats:stat('Tiles',arr.length)+stat('Height',H.toFixed(2))+stat('Base',W.toFixed(2)),
+      paint:function(c,ppu){
+        bgField(c,0,0,W,H,ppu);
+        var A=accs(),lw=gap()/ppu,y=H;
+        arr.forEach(function(p,n){
+          y-=p.s;
+          drawPiece(c,W/2,y+p.s/2,p.s,0,cols(n,A),lv(p.s*ppu),lw,lw*0.6);
+          labelAt(c,W/2,y+p.s/2,p.a,p.s*ppu);
+        });
+      }};
+  }
+  function pyramid2Tile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    var Wm=arr[0].s,H=0;
+    arr.forEach(function(p){H+=p.s});
+    var center=$('palign').value==='center',up=[],y=H;
+    arr.forEach(function(p,n){y-=p.s;up.push({p:p,n:n,x:center?(Wm-p.s)/2:0,y:y})});
+    var dn=up.map(function(o){return{p:o.p,n:o.n,x:Wm-o.x-o.p.s,y:H-o.y-o.p.s}});
+    var D=-1e18;
+    up.forEach(function(u){dn.forEach(function(d){
+      if(u.y<d.y+d.p.s-1e-9&&d.y<u.y+u.p.s-1e-9)D=Math.max(D,u.x+u.p.s-d.x);
+    })});
+    dn.forEach(function(d){d.x+=D});
+    var minx=1e18,maxx=-1e18;
+    up.concat(dn).forEach(function(o){minx=Math.min(minx,o.x);maxx=Math.max(maxx,o.x+o.p.s)});
+    var W=maxx-minx,horiz=$('porient').value==='h';
+    var items=up.concat(dn).map(function(o){
+      var x=o.x-minx,y=o.y;
+      return horiz?{p:o.p,n:o.n,x:H-y-o.p.s,y:x}:{p:o.p,n:o.n,x:x,y:y};
+    });
+    var TW=horiz?H:W,TH=horiz?W:H;
+    return {W:TW,H:TH,t:0,
+      stats:stat('Tiles per pyramid',arr.length)+stat('Pair size',TW.toFixed(2)+' \u00D7 '+TH.toFixed(2))+stat('View',horiz?'horizontal':'vertical'),
+      paint:function(c,ppu){
+        bgField(c,0,0,TW,TH,ppu);
+        var A=accs(),lw=gap()/ppu;
+        items.forEach(function(o){
+          drawPiece(c,o.x+o.p.s/2,o.y+o.p.s/2,o.p.s,0,cols(o.n,A),lv(o.p.s*ppu),lw,lw*0.6);
+          labelAt(c,o.x+o.p.s/2,o.y+o.p.s/2,o.p.a,o.p.s*ppu);
+        });
+      }};
+  }
+  function polarTile(placements,Rmax,statsHtml){
+    var F=2*Rmax*1.04;
+    return {W:F,H:F,t:0,stats:statsHtml,
+      paint:function(c,ppu){
+        bgField(c,0,0,F,F,ppu);
+        var A=accs(),lw=gap()/ppu;
+        placements.forEach(function(o,n){
+          var x=F/2+o.rho*Math.cos(o.th),y=F/2+o.rho*Math.sin(o.th);
+          drawPiece(c,x,y,o.p.s,o.rot,cols(n,A),lv(o.p.s*ppu),lw,lw*0.6);
+          labelAt(c,x,y,o.p.a,o.p.s*ppu);
+        });
+      }};
+  }
+  function rosetteTile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    var k=+$('sym').value,s0=arr[0].s;
+    var R0=Math.min(Math.max(s0*0.75/Math.sin(Math.PI/k),s0/2),s0*6),cum=[],pl=[],Rmax=0,m;
+    for(m=0;m<k;m++)cum.push(R0);
+    arr.forEach(function(p,i){
+      m=i%k;
+      var rho=cum[m]+p.s/2,th=2*Math.PI*m/k;
+      cum[m]+=p.s;
+      pl.push({p:p,rho:rho,th:th,rot:th});
+      Rmax=Math.max(Rmax,rho+p.s*0.71);
+    });
+    return polarTile(pl,Rmax,stat('Arms',k)+stat('Tiles',arr.length)+stat('Radius',Rmax.toFixed(2)));
+  }
+  function sunflowerTile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    var sp=+$('sp').value,C=0,pl=[],Rmax=0;
+    arr.forEach(function(p,i){
+      C+=p.s*p.s;
+      var rho=i===0?0:sp*Math.sqrt((C-p.s*p.s/2)/Math.PI),th=i*2.39996;
+      pl.push({p:p,rho:rho,th:th,rot:th});
+      Rmax=Math.max(Rmax,rho+p.s*0.71);
+    });
+    return polarTile(pl,Rmax,stat('Tiles',arr.length)+stat('Angle step','137.5\u00B0')+stat('Radius',Rmax.toFixed(2)));
+  }
+  function wreathTile(){
+    var arr=asc();
+    if(!arr.length)return null;
+    var seq=[],l=0,r=arr.length-1;
+    while(l<=r){seq.push(arr[l++]);if(l<=r)seq.push(arr[r--])}
+    var maxS=0,sum=0;
+    seq.forEach(function(p){maxS=Math.max(maxS,p.s);sum+=p.s});
+    function f(R){var t=0;seq.forEach(function(p){t+=2*Math.atan((p.s/2)/(R-p.s/2))});return t}
+    var lo=maxS/2*1.0001+1e-6,hi=sum*3+maxS,R=lo;
+    if(f(lo)>2*Math.PI){
+      for(var it=0;it<80;it++){var mid=(lo+hi)/2;if(f(mid)>2*Math.PI)lo=mid;else hi=mid}
+      R=hi;
+    }
+    var gp=Math.max(0,(2*Math.PI-f(R))/seq.length),th=0,pl=[];
+    seq.forEach(function(p){
+      var a=2*Math.atan((p.s/2)/(R-p.s/2));
+      pl.push({p:p,rho:R,th:th+a/2+gp/2,rot:th+a/2+gp/2});
+      th+=a+gp;
+    });
+    return polarTile(pl,R+maxS*0.71,stat('Tiles',seq.length)+stat('Ring radius',R.toFixed(2)));
+  }
+  function treeTile(){
+    var arr=desc();
+    if(!arr.length)return null;
+    var s=arr[0].s,alpha=(+$('tang').value)*Math.PI/180,depth=+$('tdep').value;
+    var ca=Math.cos(alpha),out=[];
+    function rec(bx,by,ex,ey,d){
+      out.push({bx:bx,by:by,ex:ex,ey:ey,d:d});
+      if(d>=depth)return;
+      var nx=-ey,ny=ex,t0x=bx+nx,t0y=by+ny;
+      var sa=Math.sin(alpha);
+      var lx=ca*(ca*ex-sa*ey),ly=ca*(sa*ex+ca*ey);
+      rec(t0x,t0y,lx,ly,d+1);
+      var px=t0x+lx,py=t0y+ly,t1x=bx+ex+nx,t1y=by+ey+ny;
+      rec(px,py,t1x-px,t1y-py,d+1);
+    }
+    rec(0,0,s,0,0);
+    var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+    out.forEach(function(q){
+      var nx=-q.ey,ny=q.ex;
+      [[0,0],[q.ex,q.ey],[nx,ny],[q.ex+nx,q.ey+ny]].forEach(function(v){
+        var x=q.bx+v[0],y=q.by+v[1];
+        minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y);
+      });
+    });
+    var mg=s*0.04,W=maxx-minx+2*mg,H=maxy-miny+2*mg,A1=arr[0].a;
+    return {W:W,H:H,t:0,
+      stats:stat('Trunk area',A1)+stat('Child areas',(A1*ca*ca).toFixed(1)+' + '+(A1*Math.sin(alpha)*Math.sin(alpha)).toFixed(1))+stat('Squares',out.length),
+      paint:function(c,ppu){
+        bgField(c,0,0,W,H,ppu);
+        var A=accs(),lw=Math.max(0.4,gap()*0.5)/ppu;
+        out.forEach(function(q){
+          var side=Math.hypot(q.ex,q.ey);
+          if(side*ppu<1.5)return;
+          var nx=-q.ey,ny=q.ex,cx=q.bx+(q.ex+nx)/2-minx+mg,cy=maxy-(q.by+(q.ey+ny)/2)+mg;
+          drawPiece(c,cx,cy,side,Math.atan2(-q.ey,q.ex),cols(q.d,A),lv(side*ppu),lw,lw*0.6);
+        });
+        labelAt(c,s/2-minx+mg,maxy-s/2+mg,arr[0].a,s*ppu);
+      }};
+  }
+  function theoremTile(){
+    var A1=+$('pa').value,B1=+$('pb').value;
+    if(!A1||!B1)return null;
+    var a=Math.sqrt(A1),b=Math.sqrt(B1),cc=Math.sqrt(A1+B1);
+    var W=a+2*b,H=2*a+b;
+    return {W:W,H:H,t:0,
+      stats:stat('Leg squares',A1+' and '+B1)+stat('Hypotenuse square',A1+' + '+B1+' = '+rn(A1+B1))+stat('Hypotenuse',cc.toFixed(3)),
+      paint:function(c,ppu){
+        bgField(c,0,0,W,H,ppu);
+        var A=accs(),lw=gap()/ppu;
+        c.save();c.translate(b,a+b);
+        // triangle
+        c.beginPath();c.moveTo(0,0);c.lineTo(a,0);c.lineTo(0,-b);c.closePath();
+        c.fillStyle=pal.field;c.fill();c.strokeStyle=pal.ground;c.lineWidth=Math.max(lw,2/ppu);c.stroke();
+        drawPiece(c,a/2,a/2,a,0,cols(0,A),lv(a*ppu),lw,lw*0.6);
+        drawPiece(c,-b/2,-b/2,b,0,cols(1,A),lv(b*ppu),lw,lw*0.6);
+        drawPiece(c,(a+b)/2,-(a+b)/2,cc,Math.atan2(-b,-a),cols(2,A),lv(cc*ppu),lw,lw*0.6);
+        labelAt(c,a/2,a/2,A1,a*ppu,true);
+        labelAt(c,-b/2,-b/2,B1,b*ppu,true);
+        labelAt(c,(a+b)/2,-(a+b)/2,rn(A1+B1),cc*ppu,true);
+        c.restore();
+      }};
+  }
+  function galTile(){
+    switch(state.pat){
+      case 'keyframe':return keyframeTile();
+      case 'keyband':return keybandTile();
+      case 'frieze':return friezeTile();
+      case 'courses':return coursesTile();
+      case 'stack':return stackTile();
+      case 'pyramid2':return pyramid2Tile();
+      case 'rosette':return rosetteTile();
+      case 'sunflower':return sunflowerTile();
+      case 'wreath':return wreathTile();
+      case 'tree':return treeTile();
+      case 'theorem':return theoremTile();
+    }
+    return null;
+  }
+
+  /* ---------- Pythagorean tessellation (direct) ---------- */
+  function drawPyth(){
+    var arr=selPos().sort(function(x,y){return x-y});
+    if(!arr.length){msg('Select at least one tile above.');return}
+    var A1=+$('pa').value,B1=+$('pb').value;
+    var bigA=Math.max(A1,B1),smallA=Math.min(A1,B1);
+    var a=sz(bigA),b=sz(smallA),cell=Math.hypot(a,b);
+    var ppu=Math.min(Math.max(250/cell,9/b),520/a);
+    var th=$('tilt').checked?-Math.atan2(b,a):0;
+    ctx.save();
+    ctx.translate(CW/2,CH/2);ctx.rotate(th);ctx.scale(ppu,ppu);
+    var R=Math.hypot(CW,CH)/2/ppu+a+b,N=Math.ceil(R/cell)+2;
+    var lw=gap()/ppu,A=accs();
+    for(var i=-N;i<=N;i++)for(var j=-N;j<=N;j++){
+      var px=i*a-j*b,py=i*b+j*a;
+      if(Math.hypot(px,py)>R+a)continue;
+      drawPiece(ctx,px+a/2,py+a/2,a,0,cols(i+2*j,A),lv(a*ppu),lw,lw*0.6);
+      drawPiece(ctx,px+a+b/2,py+b/2,b,0,cols(2*i+3*j+1,A),lv(b*ppu),lw,lw*0.6);
+      labelAt(ctx,px+a/2,py+a/2,bigA,a*ppu);
+      labelAt(ctx,px+a+b/2,py+b/2,smallA,b*ppu);
+    }
+    ctx.restore();
+    if(K()==='sq'){
+      var sum=rn(A1+B1);
+      $('stats').innerHTML=stat('Large side',a.toFixed(3))+stat('Small side',b.toFixed(3))+
+        stat('Cell area',bigA+' + '+smallA+' = '+sum+(inPool(sum)?' (also in your list)':''))+stat('Coverage','100%, no gaps');
+    }else{
+      $('stats').innerHTML=stat('Large diameter',a.toFixed(3))+stat('Small diameter',b.toFixed(3))+stat('Lattice cell',cell.toFixed(3));
+    }
+  }
+
+  /* ---------- render ---------- */
+  function renderTile(T){
+    var n=state.mode==='gallery'||state.mode==='pack'||state.mode==='whirl'||state.mode==='fib'?+$('rep').value:1,mrg=20;
+    var ppu=Math.min((CW-2*mrg)/(n*(T.W+T.H*T.t)),(CH-2*mrg)/(n*T.H));
+    var off=document.createElement('canvas');
+    off.width=Math.ceil((T.W+T.H*T.t)*ppu)+2;off.height=Math.ceil(T.H*ppu)+2;
+    var c=off.getContext('2d');
+    c.setTransform(ppu,0,-T.t*ppu,ppu,T.H*T.t*ppu,0);
+    c.save();c.beginPath();c.rect(0,0,T.W,T.H);c.clip();
+    T.paint(c,ppu);
+    c.restore();
+    var a1x=T.W*ppu,a2x=-T.H*T.t*ppu,a2y=T.H*ppu;
+    var totW=n*(T.W+T.H*T.t)*ppu,totH=n*T.H*ppu;
+    var x0=(CW-totW)/2+(n-1)*T.H*T.t*ppu,y0=(CH-totH)/2;
+    for(var j=0;j<n;j++)for(var i=0;i<n;i++){
+      ctx.drawImage(off,Math.round(x0+i*a1x+j*a2x),Math.round(y0+j*a2y));
+    }
+    $('stats').innerHTML=T.stats;
+  }
+  function toggleControls(){
+    var m=state.mode;
+    document.querySelectorAll('[data-for]').forEach(function(e){
+      var ok=e.getAttribute('data-for').split(' ').indexOf(m)>=0;
+      if(ok&&m==='gallery'&&e.hasAttribute('data-pat'))ok=e.getAttribute('data-pat').split(' ').indexOf(state.pat)>=0;
+      e.classList.toggle('hide',!ok);
+    });
+    if(m==='pack'){
+      var sh=$('shape').value;
+      $('lblAsp').classList.toggle('hide',!(sh==='rect'||sh==='rhomb'));
+      $('lblShr').classList.toggle('hide',sh!=='rhomb');
+    }
+    $('tabdesc').textContent=TABS[m];
+    var note=m==='gallery'?PATS[state.pat]:NOTES[m];
+    if(K()==='circ')note+=' Circle mode: each area is the area of a circle, so its diameter is 2\u221A(area/\u03C0), about 13% wider than the side of a square with the same area.';
+    $('note').textContent=note;
+  }
+  function render(){
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle=pal.ground;ctx.fillRect(0,0,CW,CH);
+    toggleControls();
+    var m=state.mode;
+    if(m==='pyth'){drawPyth();return}
+    var T=m==='whirl'?whirlTile():m==='pack'?packTile():m==='fib'?fibTile():galTile();
+    if(!T){
+      msg(m==='fib'?'Select at least one tile from this family above.':m==='pack'?'These tiles do not fit this shape. Try another selection.':'Select at least one tile above.');
+      return;
+    }
+    renderTile(T);
+  }
+  var pending=false;
+  function schedule(){if(pending)return;pending=true;requestAnimationFrame(function(){pending=false;render()})}
+
+  /* ---------- selection UI ---------- */
+  var chipsEl=$('chips');
+  function buildChips(){
+    chipsEl.innerHTML='';
+    AREAS.forEach(function(a,i){
+      var b=document.createElement('button');
+      b.type='button';b.className='chip';b.setAttribute('data-i',i);
+      var nTxt=(!$('useCustom').checked&&LTN[a])?', n = '+LTN[a].join(' and '):'';
+      b.title=a===0?'Area 0: shown as nothing'+nTxt:'Area '+a+', side '+(isSq(a)?Math.sqrt(a):'\u221A'+a+' \u2248 '+Math.sqrt(a).toFixed(3))+nTxt;
+      b.innerHTML=a===0?'<b>0</b><i>nothing</i>':'<b>'+a+'</b><i>'+(isSq(a)?'side '+Math.sqrt(a):'\u221A'+a)+'</i>';
+      b.addEventListener('click',function(){
+        if(state.sel.has(a))state.sel.delete(a);else state.sel.add(a);
+        refresh();
+      });
+      chipsEl.appendChild(b);
+    });
+  }
+  buildChips();
+  function fillPyth(){
+    var arr=selPos().sort(function(x,y){return x-y});
+    var pa=$('pa'),pb=$('pb');
+    pa.innerHTML='';pb.innerHTML='';
+    arr.forEach(function(a){
+      pa.add(new Option(a+' (side '+fmt(a)+')',a));
+      pb.add(new Option(a+' (side '+fmt(a)+')',a));
+    });
+    if(!arr.length)return;
+    pa.value=arr.indexOf(pyA)>=0?pyA:arr[arr.length-1];
+    pb.value=arr.indexOf(pyB)>=0?pyB:arr[0];
+    pyA=+pa.value;pyB=+pb.value;
+  }
+  function refresh(){
+    document.querySelectorAll('.chip').forEach(function(ch){
+      ch.setAttribute('aria-pressed',state.sel.has(AREAS[+ch.getAttribute('data-i')])?'true':'false');
+    });
+    var tot=0;state.sel.forEach(function(a){tot+=a});
+    $('selinfo').textContent=state.sel.size+' of '+AREAS.length+' selected, total area '+tot;
+    fillPyth();
+    schedule();
+  }
+  function setSel(arr){state.sel=new Set(arr);refresh()}
+  function N(){return +$('cnt').value}
+  $('qAll').addEventListener('click',function(){setSel(AREAS)});
+  $('qNone').addEventListener('click',function(){setSel([])});
+  $('qInv').addEventListener('click',function(){setSel(AREAS.filter(function(a){return!state.sel.has(a)}))});
+  $('qSmall').addEventListener('click',function(){setSel(pos().slice(0,N()))});
+  $('qLarge').addEventListener('click',function(){var p=pos();setSel(p.slice(Math.max(0,p.length-N())))});
+  $('qRand').addEventListener('click',function(){
+    var a=pos();
+    for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}
+    setSel(a.slice(0,N()));
+  });
+  $('qPerf').addEventListener('click',function(){setSel(AREAS.filter(isSq))});
+  $('qFive').addEventListener('click',function(){setSel(AREAS.filter(function(a){return a%5===0&&isSq(a/5)}))});
+  $('cnt').addEventListener('input',function(){$('cntv').textContent=this.value});
+
+  /* ---------- tabs, controls, palette ---------- */
+  document.querySelectorAll('#tabs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      state.mode=b.getAttribute('data-m');
+      document.querySelectorAll('#tabs button').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+      render();
+    });
+  });
+  $('pa').addEventListener('change',function(){pyA=+this.value;schedule()});
+  $('pb').addEventListener('change',function(){pyB=+this.value;schedule()});
+  [['twist','twistv','\u00B0'],['aspect','aspv',''],['shear','shrv','\u00B0'],['ts','tsv',''],['gap','gapv',''],
+   ['sym','symv',''],['sp','spv',''],['tang','tangv','\u00B0'],['tdep','tdepv','']].forEach(function(p){
+    $(p[0]).addEventListener('input',function(){$(p[1]).textContent=this.value+p[2];schedule()});
+  });
+  ['tilt','shape','fam','field','rep','lab','kind','ord','palign','porient'].forEach(function(id){$(id).addEventListener('change',schedule)});
+  $('pat').addEventListener('change',function(){state.pat=this.value;schedule()});
+  $('shuf').addEventListener('click',function(){state.seed=Math.floor(Math.random()*100000)+1;schedule()});
+
+  var swEl=$('swatches'),swIn=[];
+  SW_NAMES.forEach(function(nm,i){
+    var l=document.createElement('label'),inp=document.createElement('input');
+    inp.type='color';inp.setAttribute('aria-label',nm+' color');
+    l.appendChild(inp);l.appendChild(document.createTextNode(nm));
+    swEl.appendChild(l);swIn.push(inp);
+    inp.addEventListener('input',function(){
+      if(i===0)pal.ground=inp.value;else if(i===1)pal.field=inp.value;else pal.acc[i-2]=inp.value;
+      $('pal').value='custom';schedule();
+    });
+  });
+  function syncSwatches(){
+    swIn[0].value=pal.ground;swIn[1].value=pal.field;
+    for(var i=0;i<5;i++)swIn[i+2].value=pal.acc[i];
+  }
+  $('pal').addEventListener('change',function(){
+    if(PRESETS[this.value]){pal=clonePal(PRESETS[this.value]);syncSwatches();schedule()}
+  });
+
+  /* ---------- custom areas ---------- */
+  function parseAreas(txt){
+    var parts=txt.split(/[\s,;]+/).filter(Boolean),seen={},list=[],bad=[];
+    parts.forEach(function(t){
+      var v=Number(t);
+      if(!isFinite(v)||v<0||v>100000){bad.push(t);return}
+      v=Math.round(v*1e4)/1e4;
+      if(!seen[v]){seen[v]=1;list.push(v)}
+    });
+    list.sort(function(a,b){return a-b});
+    if(list.length>120){bad.push('(only the first 120 kept)');list=list.slice(0,120)}
+    return{list:list,bad:bad};
+  }
+  function clampN(v){v=Math.round(v);if(!isFinite(v)||v<2)v=2;return Math.min(400,v)}
+  function showMode(){
+    var c=$('useCustom').checked;
+    $('ltbox').classList.toggle('hide',c);
+    $('ltname').textContent=c?'Custom areas':"Lluís' Tesserae (LT) - (The Tessera Sequence)";
+  }
+  function ltApply(N){
+    N=clampN(N);
+    $('ltN').value=N;$('ltS').value=Math.min(100,N);
+    $('ltv').textContent='n = 0 to '+(N-1);
+    AREAS=ltPool(N);
+    state.sel=new Set(AREAS);pyA=20;pyB=5;
+    afterPool();
+  }
+  $('ltS').addEventListener('input',function(){ltApply(+this.value)});
+  $('ltN').addEventListener('change',function(){ltApply(+this.value)});
+  $('ltN').addEventListener('keydown',function(e){if(e.key==='Enter')ltApply(+this.value)});
+  function afterPool(){
+    buildChips();
+    $('cnt').max=AREAS.length;
+    if(+$('cnt').value>AREAS.length)$('cnt').value=AREAS.length;
+    $('cntv').textContent=$('cnt').value;
+    memoKey=null;
+    refresh();
+  }
+  function applyCustom(){
+    var r=parseAreas($('customText').value);
+    if(!r.list.length){
+      $('cmsg').textContent='Enter at least one number, separated by commas.';
+      $('useCustom').checked=false;
+      return;
+    }
+    AREAS=r.list;$('useCustom').checked=true;
+    state.sel=new Set(AREAS.slice(0,30));pyA=-1;pyB=-1;
+    showMode();
+    afterPool();
+    $('cmsg').textContent=r.list.length+' areas loaded'+(r.bad.length?'. Ignored: '+r.bad.slice(0,6).join(', '):'')+'.';
+  }
+  function useBuiltin(){
+    AREAS=ltPool(clampN(+$('ltN').value));
+    state.sel=new Set(AREAS);pyA=20;pyB=5;
+    $('cmsg').textContent='Using the Tessera Sequence.';
+    showMode();
+    afterPool();
+  }
+  $('useCustom').addEventListener('change',function(){if(this.checked)applyCustom();else useBuiltin()});
+  $('cApply').addEventListener('click',applyCustom);
+  $('customText').addEventListener('keydown',function(e){if(e.key==='Enter')applyCustom()});
+  $('cFile').addEventListener('change',function(){
+    var f=this.files&&this.files[0];
+    if(!f)return;
+    var rd=new FileReader();
+    rd.onload=function(){$('customText').value=String(rd.result).slice(0,20000);applyCustom()};
+    rd.readAsText(f);
+  });
+  function setGen(list){$('customText').value=list.join(', ');applyCustom()}
+  $('gSq').addEventListener('click',function(){var a=[];for(var n=1;n<=12;n++)a.push(n*n);setGen(a)});
+  $('gDbl').addEventListener('click',function(){var a=[];for(var n=1;n<=12;n++)a.push(2*n*n);setGen(a)});
+  $('gRnd').addEventListener('click',function(){
+    var a=[],seen={};
+    while(a.length<16){var v=2+Math.floor(Math.random()*399);if(!seen[v]&&!isSq(v)){seen[v]=1;a.push(v)}}
+    a.sort(function(x,y){return x-y});setGen(a);
+  });
+
+  /* ---------- download ---------- */
+  var dlNS=null;
+  function showDl(){$('dl').classList.remove('hide')}
+  if(window.claude&&typeof window.claude.use==='function'){
+    window.claude.use('downloads').then(function(d){if(d){dlNS=d;showDl()}}).catch(function(){});
+  }else{showDl()}
+  $('dl').addEventListener('click',function(){
+    $('dlmsg').textContent='';
+    cv.toBlob(function(blob){
+      if(!blob){$('dlmsg').textContent='Could not create the image.';return}
+      if(dlNS){
+        dlNS.save({filename:'pythagorean-mosaic.png',data:blob}).then(function(){
+          $('dlmsg').textContent='Saved.';
+        }).catch(function(e){
+          $('dlmsg').textContent=(e&&e.code==='declined')?'Download cancelled.':'Download is not available here.';
+        });
+      }else{
+        var a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);a.download='pythagorean-mosaic.png';
+        document.body.appendChild(a);a.click();document.body.removeChild(a);
+      }
+    },'image/png');
+  });
+
+  syncSwatches();
+  refresh();
+  if(window.__mosaicTest)window.__mosaicTest({state:state,render:render,$:$,K:K,setMode:function(m){state.mode=m}});
+})();
+</script>
+</body>
+</html>

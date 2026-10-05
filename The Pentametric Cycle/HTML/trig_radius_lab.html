@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trig Radius Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font-ui:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --bg:#f3f4fb; --bg2:#e6e9f7; --panel:rgba(255,255,255,.74); --panel-b:rgba(30,40,110,.12);
+  --text:#151a35; --muted:#586088; --grid:rgba(30,40,110,.07); --axis:rgba(30,40,110,.38);
+  --adj:#0d8fb3; --opp:#c026d3; --hyp:#d97706; --accent:#4f46e5;
+  --c-sin:#c026d3; --c-cos:#0d8fb3; --c-tan:#15935a; --c-sec:#d97706; --c-csc:#e0581a; --c-cot:#7c3aed;
+  --shadow:0 10px 40px -12px rgba(40,50,130,.25); --field:rgba(255,255,255,.9); --orb:.35;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#060913; --bg2:#0c1230; --panel:rgba(16,22,50,.62); --panel-b:rgba(140,160,255,.17);
+    --text:#e9edff; --muted:#929bcb; --grid:rgba(140,160,255,.07); --axis:rgba(170,188,255,.38);
+    --adj:#22e5ff; --opp:#ff4fd8; --hyp:#ffd24a; --accent:#8b7bff;
+    --c-sin:#ff4fd8; --c-cos:#22e5ff; --c-tan:#5dff9a; --c-sec:#ffd24a; --c-csc:#ff9a4a; --c-cot:#b79bff;
+    --shadow:0 18px 50px -18px rgba(0,0,0,.8); --field:rgba(8,12,34,.7); --orb:.55;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#060913; --bg2:#0c1230; --panel:rgba(16,22,50,.62); --panel-b:rgba(140,160,255,.17);
+  --text:#e9edff; --muted:#929bcb; --grid:rgba(140,160,255,.07); --axis:rgba(170,188,255,.38);
+  --adj:#22e5ff; --opp:#ff4fd8; --hyp:#ffd24a; --accent:#8b7bff;
+  --c-sin:#ff4fd8; --c-cos:#22e5ff; --c-tan:#5dff9a; --c-sec:#ffd24a; --c-csc:#ff9a4a; --c-cot:#b79bff;
+  --shadow:0 18px 50px -18px rgba(0,0,0,.8); --field:rgba(8,12,34,.7); --orb:.55;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);min-height:100vh;overflow-x:hidden;
+  background-image:radial-gradient(1200px 700px at 10% -10%,var(--bg2),transparent 60%),radial-gradient(900px 600px at 100% 10%,var(--bg2),transparent 55%);
+  background-attachment:fixed;}
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:var(--orb);animation:drift 22s ease-in-out infinite alternate}
+.o1{width:420px;height:420px;background:var(--adj);left:-120px;top:20vh}
+.o2{width:380px;height:380px;background:var(--opp);right:-100px;top:5vh;animation-delay:-7s}
+.o3{width:340px;height:340px;background:var(--hyp);left:40vw;bottom:-160px;animation-delay:-13s;opacity:calc(var(--orb)*.6)}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(60px,-40px,0) scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+
+.top{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:22px 18px 6px;display:flex;gap:16px;align-items:flex-start;justify-content:space-between}
+h1{margin:0;font-size:clamp(26px,4.6vw,46px);letter-spacing:.04em;font-weight:700;line-height:1}
+h1 span{background:linear-gradient(90deg,var(--adj),var(--opp),var(--hyp));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:8px 0 0;color:var(--muted);max-width:760px;font-size:14.5px;line-height:1.45}
+.icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--panel-b);background:var(--panel);color:var(--text);font-size:19px;cursor:pointer;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);flex:none}
+.icon-btn:hover{border-color:var(--accent)}
+
+.layout{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:12px 18px 40px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:1020px){.layout{grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr)}.wide{grid-column:1/-1}.stage-panel{position:sticky;top:12px;align-self:start}}
+.panel{background:var(--panel);border:1px solid var(--panel-b);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:16px}
+.side{display:flex;flex-direction:column;gap:16px;min-width:0}
+h2{margin:0 0 12px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stage-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--panel-b);background:var(--bg)}
+#stage{display:block;width:100%;aspect-ratio:1/1;max-height:78vh;cursor:crosshair;touch-action:none;outline:none}
+#stage:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+.stage-foot{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-top:12px}
+.chk{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer;user-select:none}
+.chk input{accent-color:var(--accent);width:16px;height:16px}
+.zoomrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);flex:1;min-width:170px}
+.zoomrow input{flex:1}
+
+label.l{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;letter-spacing:.04em}
+.row{margin-bottom:12px}
+select,input[type=text]{width:100%;background:var(--field);color:var(--text);border:1px solid var(--panel-b);border-radius:12px;padding:11px 12px;font:500 15px var(--font-ui);outline:none}
+select:focus,input[type=text]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,123,255,.25)}
+input[type=text]{font-family:var(--font-mono);text-align:center;font-size:17px}
+input[type=text].bad{border-color:#ff5b6e;box-shadow:0 0 0 3px rgba(255,91,110,.25)}
+.ig{display:flex;gap:8px}
+.ig button,.btn{background:var(--field);color:var(--text);border:1px solid var(--panel-b);border-radius:12px;font:600 16px var(--font-ui);cursor:pointer;padding:0 15px;min-height:44px}
+.ig button:hover,.btn:hover{border-color:var(--accent)}
+.btn.on{border-color:var(--accent);box-shadow:0 0 18px -4px var(--accent)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;background:transparent;margin:2px 0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--adj),var(--opp),var(--hyp))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;margin-top:-8px;background:var(--text);border:3px solid var(--accent);box-shadow:0 0 14px var(--accent)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--adj),var(--opp),var(--hyp))}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--text);border:3px solid var(--accent);box-shadow:0 0 14px var(--accent)}
+input[type=range]:disabled{opacity:.35}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 12.5px var(--font-mono);padding:7px 10px;border-radius:999px;border:1px solid var(--panel-b);background:var(--field);color:var(--text);cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.play{display:flex;gap:10px;align-items:center;margin-top:12px}
+.play .grow{flex:1;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+
+.pills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pill{--pc:var(--accent);text-align:left;border:1px solid var(--panel-b);background:var(--field);color:var(--text);border-radius:14px;padding:10px 11px;cursor:pointer;display:flex;flex-direction:column;gap:2px;font-family:var(--font-ui);min-width:0}
+.pill b{font-size:15px;letter-spacing:.06em}
+.pill small{font-size:11px;color:var(--muted);line-height:1.25}
+.pill em{font-style:normal;font-size:10.5px;color:var(--pc);font-family:var(--font-mono)}
+.pill:hover{border-color:var(--pc)}
+.pill.act{border-color:var(--pc);box-shadow:inset 0 0 0 1px var(--pc),0 0 22px -6px var(--pc)}
+.pill.act b{color:var(--pc)}
+
+.kv{display:grid;grid-template-columns:1fr auto;gap:7px 12px;font-size:14px;align-items:baseline}
+.kv .k{color:var(--muted)}
+.kv .v{font-family:var(--font-mono);font-weight:600;text-align:right}
+.big{font-family:var(--font-mono);font-size:30px;font-weight:600;line-height:1.1}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11.5px;padding:4px 9px;border-radius:999px;border:1px solid var(--panel-b);color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;box-shadow:0 0 10px currentColor;background:currentColor}
+.rad-row .k,.rad-row .v{font-weight:700}
+.mono{font-family:var(--font-mono)}
+.hr{height:1px;background:var(--panel-b);margin:12px 0}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:720px;font-size:13.5px}
+th,td{padding:9px 10px;text-align:center;border-bottom:1px solid var(--panel-b);white-space:nowrap}
+th:first-child,td:first-child{text-align:right;color:var(--muted);position:sticky;left:0;background:var(--bg);z-index:1}
+thead th{cursor:pointer;font-size:12px;letter-spacing:.06em}
+td{font-family:var(--font-mono);cursor:pointer}
+th.sel,td.sel{background:rgba(139,123,255,.12)}
+td.radadj{color:var(--adj);font-weight:700;box-shadow:inset 0 0 0 1px var(--adj)}
+td.radopp{color:var(--opp);font-weight:700;box-shadow:inset 0 0 0 1px var(--opp)}
+td.radhyp{color:var(--hyp);font-weight:700;box-shadow:inset 0 0 0 1px var(--hyp)}
+td.radrow{font-weight:700}
+.graphhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+#graph{display:block;width:100%;height:300px;border-radius:12px;border:1px solid var(--panel-b);background:var(--bg);cursor:ew-resize;touch-action:none}
+.fchip{display:inline-flex;gap:7px;align-items:center;font:600 12.5px var(--font-mono);padding:6px 11px;border-radius:999px;border:1px solid var(--panel-b);background:var(--field);color:var(--muted);cursor:pointer}
+.fchip i{width:9px;height:9px;border-radius:50%;background:var(--fc);opacity:.35}
+.fchip.on{color:var(--text);border-color:var(--fc)}
+.fchip.on i{opacity:1;box-shadow:0 0 10px var(--fc)}
+.note p{margin:0 0 9px;font-size:14px;line-height:1.55;color:var(--text)}
+.note p:last-child{margin:0}
+.note b{color:var(--accent)}
+@media (max-width:560px){.pills{grid-template-columns:repeat(2,minmax(0,1fr))}.big{font-size:26px}}
+</style>
+</head>
+<body>
+<div class="bg"><i class="orb o1"></i><i class="orb o2"></i><i class="orb o3"></i></div>
+
+<header class="top">
+  <div>
+    <h1>TRIG <span>RADIUS</span> LAB</h1>
+    <p class="sub">Choose which trig function plays the <b>Radius</b> and watch the whole triangle re-derive itself — Adjacent, Opposite, Hypotenuse, all six functions — anywhere around the full circle.</p>
+  </div>
+  <button class="icon-btn" id="themeBtn" aria-label="Toggle light / dark theme" title="Toggle theme">◐</button>
+</header>
+
+<main class="layout">
+  <section class="panel stage-panel">
+    <div class="stage-wrap"><canvas id="stage" tabindex="0" aria-label="Interactive trigonometry circle. Drag to set the angle, arrow keys to nudge it."></canvas></div>
+    <div class="stage-foot">
+      <label class="chk"><input type="checkbox" id="optOverlay"> Classic overlay (all 3 normalizations)</label>
+      <label class="chk"><input type="checkbox" id="optTicks" checked> Angle ticks</label>
+      <label class="chk"><input type="checkbox" id="optAuto" checked> Auto-zoom</label>
+      <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="-0.7" max="3.2" step="0.01" value="1.1" disabled aria-label="Manual zoom"></div>
+    </div>
+    <p class="small" style="margin:10px 0 0">Drag on the circle to set θ · arrow keys nudge (Shift = 15°) · values beyond the view are clipped.</p>
+  </section>
+
+  <aside class="side">
+    <section class="panel">
+      <h2>Input</h2>
+      <div class="row">
+        <label class="l" for="mode">Input type</label>
+        <select id="mode">
+          <option value="tan">Tangent value T  →  θ = ATAN(T)</option>
+          <option value="deg">Angle in degrees</option>
+          <option value="rad">Angle in radians</option>
+        </select>
+      </div>
+      <div class="row" id="branchRow">
+        <label class="l" for="branch">Half-turn (ATAN only reaches −90° … 90°)</label>
+        <select id="branch">
+          <option value="0">θ = ATAN(T)  ·  right half (−90° … 90°)</option>
+          <option value="1">θ = ATAN(T) + 180°  ·  left half (90° … 270°)</option>
+        </select>
+      </div>
+      <div class="row">
+        <label class="l" id="valLabel" for="num">T</label>
+        <div class="ig"><button id="dec" aria-label="Decrease">−</button><input id="num" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="e.g. 1/3" aria-label="Manual value"><button id="inc" aria-label="Increase">+</button></div>
+        <p class="small mono" id="numHint" style="margin:8px 0 0"></p>
+        <p class="small" style="margin:4px 0 0">Type decimals, <b>fractions</b> (<span class="mono">1/3</span>, <span class="mono">4/5</span>, <span class="mono">1 1/2</span>, <span class="mono">½</span>) or expressions (<span class="mono">pi/4</span>, <span class="mono">3pi/2</span>, <span class="mono">sqrt(3)</span>). A fraction is evaluated exactly, so there is no decimal rounding.</p>
+      </div>
+      <input type="range" id="slider" aria-label="Input slider">
+      <div class="hr"></div>
+      <label class="l">Special angles</label>
+      <div class="chips" id="chips"></div>
+      <div class="play">
+        <button class="btn" id="playBtn">▶ Play</button>
+        <div class="grow"><span>Speed</span><input type="range" id="speed" min="5" max="180" step="1" value="40" aria-label="Animation speed"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>What is the Radius?</h2>
+      <div class="pills" id="pills"></div>
+    </section>
+
+    <section class="panel" id="readPanel">
+      <h2>Angle</h2>
+      <div class="big" id="angDeg">45°</div>
+      <div class="small mono" id="angSub">0.785398 rad · 0.125 turn</div>
+      <div class="tags"><span class="tag" id="tagQuad">Quadrant I</span><span class="tag" id="tagRef">reference 45°</span><span class="tag" id="tagMod">≡ 45° (mod 360°)</span></div>
+      <div class="hr"></div>
+      <h2 id="modelTitle">Model</h2>
+      <div class="kv" id="modelKV"></div>
+      <p class="small" id="modelNote" style="margin:10px 0 0"></p>
+      <div class="hr"></div>
+      <h2>Trig functions</h2>
+      <div class="kv" id="fnKV"></div>
+      <p class="small mono" id="checks" style="margin:10px 0 0"></p>
+    </section>
+  </aside>
+
+  <section class="panel wide">
+    <h2>All six conventions side by side (signed values)</h2>
+    <div class="tablewrap"><table id="cmp"></table></div>
+    <p class="small" style="margin:10px 0 0">Click a column to make it the active convention. The outlined cell in each column is the segment that equals the Radius. Negative values mean the segment points the other way (θ outside the first quadrant).</p>
+  </section>
+
+  <section class="panel wide">
+    <div class="graphhead">
+      <h2 style="margin:0">Unwrapped around the circle (0° … 360°)</h2>
+      <div class="chips" id="fchips"></div>
+    </div>
+    <canvas id="graph" aria-label="Graph of trig functions from 0 to 360 degrees. Drag to set the angle."></canvas>
+  </section>
+
+  <section class="panel wide note">
+    <h2>How to read this</h2>
+    <p>In this lab, <b>Radius</b> is a custom geometric label: it is whichever trig value you choose, and that value is the length of one side of the right triangle. Standard definitions never change: SIN = Opp/Hyp, COS = Adj/Hyp, TAN = Opp/Adj, SEC = 1/COS, CSC = 1/SIN, COT = 1/TAN.</p>
+    <p>There are only three ways to normalize a triangle: <b>Hypotenuse = 1</b> (Radius = SIN → Opposite, or COS → Adjacent), <b>Adjacent = 1</b> (Radius = SEC → Hypotenuse, or TAN → Opposite) and <b>Opposite = 1</b> (Radius = CSC → Hypotenuse, or COT → Adjacent). The scale factor k is 1, 1/COS(θ) or 1/SIN(θ), and every side is simply k × (Adj, Opp, Hyp) of the unit-circle triangle — which keeps everything consistent in all four quadrants.</p>
+    <p>With Hypotenuse = 1 and Radius = SIN(θ), the Radius and the Opposite side coincide <em>because Radius was defined that way</em> — it is not the conventional unit-circle radius, which is the hypotenuse.</p>
+  </section>
+</main>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s);
+const TAU=Math.PI*2, D2R=Math.PI/180, R2D=180/Math.PI;
+const MONO="'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace";
+const cl=v=>Math.max(-1e4,Math.min(1e4,v));
+const clean=x=>Math.abs(x)<1e-12?0:x;
+
+const CONV={
+  cos:{fn:'COS',norm:'hyp',seg:'adj'},
+  sin:{fn:'SIN',norm:'hyp',seg:'opp'},
+  sec:{fn:'SEC',norm:'adj',seg:'hyp'},
+  csc:{fn:'CSC',norm:'opp',seg:'hyp'},
+  tan:{fn:'TAN',norm:'adj',seg:'opp'},
+  cot:{fn:'COT',norm:'opp',seg:'adj'}
+};
+const ORDER=['cos','sin','sec','csc','tan','cot'];
+const SEGNAME={adj:'Adjacent',opp:'Opposite',hyp:'Hypotenuse'};
+const SEGSHORT={adj:'Adj',opp:'Opp',hyp:'Hyp'};
+const NORMTXT={hyp:'Hypotenuse = 1',adj:'Adjacent = 1',opp:'Opposite = 1'};
+const KTXT={hyp:'k = 1',adj:'k = 1/COS(θ)',opp:'k = 1/SIN(θ)'};
+const GHOSTNAMES={hyp:{adj:'cos',opp:'sin',hyp:'1'},adj:{adj:'1',opp:'tan',hyp:'sec'},opp:{adj:'cot',opp:'1',hyp:'csc'}};
+const FNS=['sin','cos','tan','sec','csc','cot'];
+const FNDEF={sin:'Opp / Hyp',cos:'Adj / Hyp',tan:'Opp / Adj',sec:'1 / COS = Hyp / Adj',csc:'1 / SIN = Hyp / Opp',cot:'1 / TAN = Adj / Opp'};
+
+const S={theta:Math.PI/4,mode:'tan',branch:0,conv:'sin',playing:false,speed:40,auto:true,zoom:3,overlay:false,ticks:true,
+  fns:{sin:true,cos:true,tan:true,sec:false,csc:false,cot:false}};
+const view={half:3};
+let dirty=true;
+
+/* ---------- math ---------- */
+function trig(th){
+  const s=clean(Math.sin(th)), c=clean(Math.cos(th));
+  return {s,c,t:c===0?NaN:s/c,sec:c===0?NaN:1/c,csc:s===0?NaN:1/s,cot:s===0?NaN:c/s};
+}
+function kOf(norm,tr){return norm==='hyp'?1:norm==='adj'?(tr.c===0?NaN:1/tr.c):(tr.s===0?NaN:1/tr.s);}
+function model(key,tr){
+  const cv=CONV[key],k=kOf(cv.norm,tr);
+  if(!Number.isFinite(k))return {ok:false,k:NaN,adj:NaN,opp:NaN,hyp:NaN,R:NaN};
+  const adj=k*tr.c,opp=k*tr.s,hyp=k;
+  return {ok:true,k,adj,opp,hyp,R:cv.seg==='adj'?adj:cv.seg==='opp'?opp:hyp};
+}
+function fmt(x,d=6){
+  if(x===null||x===undefined||Number.isNaN(x))return 'undefined';
+  if(!Number.isFinite(x))return x>0?'+∞':'−∞';
+  if(Math.abs(x)<5e-13)x=0;
+  const s=Math.abs(x)>=1e7?x.toExponential(3):x.toFixed(d);
+  return s.replace('-','−');
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function hexA(h,a){h=h.replace('#','').trim();if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';}
+const UFRAC={'½':'(1/2)','⅓':'(1/3)','⅔':'(2/3)','¼':'(1/4)','¾':'(3/4)','⅕':'(1/5)','⅖':'(2/5)','⅗':'(3/5)','⅘':'(4/5)','⅙':'(1/6)','⅚':'(5/6)','⅛':'(1/8)','⅜':'(3/8)','⅝':'(5/8)','⅞':'(7/8)'};
+function parseExpr(str){
+  let raw=String(str).trim();
+  const mixed=raw.match(/^([+\-−]?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if(mixed){const d=+mixed[4];if(d===0)return NaN;const v=(+mixed[2])+(+mixed[3])/d;return mixed[1]==='-'||mixed[1]==='−'?-v:v;}
+  raw=raw.replace(/(\d)([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/g,'$1+$2').replace(/[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]/g,c=>UFRAC[c]);
+  let s=raw.toLowerCase().replace(/,/g,'.').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/−/g,'-').replace(/×/g,'*').replace(/÷/g,'/');
+  if(!s)return NaN;
+  s=s.replace(/sqrt/g,'S').replace(/pi/g,'P').replace(/\^/g,'**');
+  if(!/^[0-9+\-*\/().eSP\s]+$/.test(s))return NaN;
+  s=s.replace(/([0-9.)P])\s*([SP(])/g,'$1*$2').replace(/S/g,'Math.sqrt').replace(/P/g,'Math.PI');
+  try{const v=Function('"use strict";return ('+s+')')();return typeof v==='number'?v:NaN;}catch(e){return NaN;}
+}
+function toFrac(x){
+  if(!Number.isFinite(x)||Number.isInteger(x))return null;
+  const sg=x<0?-1:1,y=Math.abs(x);
+  let h1=1,h0=0,k1=0,k0=1,b=y;
+  for(let i=0;i<24;i++){
+    const a=Math.floor(b),h2=a*h1+h0,k2=a*k1+k0;h0=h1;h1=h2;k0=k1;k1=k2;
+    if(k1>1000)return null;
+    if(Math.abs(y-h1/k1)<1e-9*Math.max(1,y))return k1>1?[sg*h1,k1]:null;
+    const fr=b-a;if(fr<1e-12)break;b=1/fr;
+  }
+  return null;
+}
+function quadrant(tr){
+  if(tr.s===0&&tr.c>0)return '+x axis (0°)';
+  if(tr.s===0&&tr.c<0)return '−x axis (180°)';
+  if(tr.c===0&&tr.s>0)return '+y axis (90°)';
+  if(tr.c===0&&tr.s<0)return '−y axis (270°)';
+  return tr.c>0?(tr.s>0?'Quadrant I':'Quadrant IV'):(tr.s>0?'Quadrant II':'Quadrant III');
+}
+
+/* ---------- DOM refs ---------- */
+const el={mode:$('#mode'),branch:$('#branch'),branchRow:$('#branchRow'),num:$('#num'),slider:$('#slider'),valLabel:$('#valLabel'),
+  dec:$('#dec'),inc:$('#inc'),play:$('#playBtn'),speed:$('#speed'),zoom:$('#zoom'),optAuto:$('#optAuto'),optOverlay:$('#optOverlay'),optTicks:$('#optTicks'),
+  stage:$('#stage'),graph:$('#graph')};
+const MODES={
+  tan:{label:'T = tan(θ)   (θ = ATAN(T) + half-turn)',min:-10,max:10,step:0.01,inc:0.1},
+  deg:{label:'θ in degrees',min:-360,max:360,step:0.1,inc:1},
+  rad:{label:'θ in radians',min:-6.283185,max:6.283185,step:0.001,inc:0.05}
+};
+function fromValue(v){return S.mode==='tan'?Math.atan(v)+S.branch*Math.PI:S.mode==='deg'?v*D2R:v;}
+function currentValue(){const tr=trig(S.theta);return S.mode==='tan'?(Number.isNaN(tr.t)?0:tr.t):S.mode==='deg'?S.theta*R2D:S.theta;}
+function pretty(v){return String(Number(v.toPrecision(8)));}
+
+function updateHint(){
+  const typed=parseExpr(el.num.value);
+  const v=Number.isFinite(typed)?typed:currentValue();
+  const f=toFrac(v);
+  const unit=S.mode==='deg'?'°':S.mode==='rad'?' rad':'';
+  const th=Number.isFinite(typed)?fromValue(typed):S.theta;
+  $('#numHint').textContent='= '+pretty(v)+unit+(f?'  ≈  '+String(f[0]).replace('-','−')+'/'+f[1]+unit:'')+'   →   θ = '+fmt(th*R2D,3)+'°';
+}
+function sync(src){
+  const tr=trig(S.theta);
+  if(S.mode==='tan'&&tr.c!==0){S.branch=tr.c>0?0:1;el.branch.value=String(S.branch);}
+  if(src!=='input'){
+    el.num.value=S.mode==='tan'?(Number.isNaN(tr.t)?'undefined':pretty(tr.t)):pretty(currentValue());
+    el.num.classList.remove('bad');
+  }
+  if(src!=='slider'){el.slider.value=clamp(currentValue(),+el.slider.min,+el.slider.max);}
+  updateHint();
+  dirty=true;
+}
+function applyMode(){
+  const m=MODES[S.mode];
+  el.slider.min=m.min;el.slider.max=m.max;el.slider.step=m.step;
+  el.valLabel.textContent=m.label;
+  el.branchRow.style.display=S.mode==='tan'?'':'none';
+  sync();
+}
+function setTheta(th,src){S.theta=th;sync(src);}
+
+/* ---------- build UI ---------- */
+(function build(){
+  const pills=$('#pills');
+  pills.innerHTML=ORDER.map(k=>{
+    const c=CONV[k];
+    return '<button class="pill" data-conv="'+k+'" style="--pc:var(--'+c.seg+')"><b>'+c.fn+'</b><small>Radius = '+SEGNAME[c.seg]+'</small><em>'+NORMTXT[c.norm]+'</em></button>';
+  }).join('');
+  const chips=$('#chips');
+  const specials=[0,30,45,60,90,120,135,150,180,210,225,240,270,300,315,330,360];
+  chips.innerHTML=specials.map(d=>'<button class="chip" data-deg="'+d+'">'+d+'°</button>').join('');
+  $('#fchips').innerHTML=FNS.map(f=>'<button class="fchip'+(S.fns[f]?' on':'')+'" data-fn="'+f+'" style="--fc:var(--c-'+f+')"><i></i>'+f.toUpperCase()+'</button>').join('');
+})();
+document.addEventListener('click',e=>{
+  const p=e.target.closest('[data-conv]');if(p){S.conv=p.dataset.conv;dirty=true;return;}
+  const c=e.target.closest('[data-deg]');if(c){S.theta=(+c.dataset.deg)*D2R;sync();return;}
+  const f=e.target.closest('[data-fn]');if(f){S.fns[f.dataset.fn]=!S.fns[f.dataset.fn];f.classList.toggle('on',S.fns[f.dataset.fn]);dirty=true;}
+});
+el.mode.addEventListener('change',()=>{S.mode=el.mode.value;applyMode();});
+el.branch.addEventListener('change',()=>{
+  S.branch=+el.branch.value;const tr=trig(S.theta);
+  if(S.mode==='tan'&&tr.c!==0){S.theta=Math.atan(tr.t)+S.branch*Math.PI;}
+  else if(S.mode==='tan'){S.theta=S.theta+Math.PI;}
+  sync('branch');
+});
+let badTimer=0;
+el.num.addEventListener('input',()=>{
+  const v=parseExpr(el.num.value);
+  clearTimeout(badTimer);
+  if(Number.isFinite(v)){el.num.classList.remove('bad');S.theta=fromValue(v);sync('input');}
+  else badTimer=setTimeout(()=>el.num.classList.add('bad'),700);
+});
+el.num.addEventListener('blur',()=>{
+  clearTimeout(badTimer);
+  const v=parseExpr(el.num.value);
+  /* keep the fraction / expression exactly as typed when it matches the current value */
+  if(Number.isFinite(v)&&Math.abs(v-currentValue())<=1e-9*Math.max(1,Math.abs(v)))return;
+  sync();
+});
+el.num.addEventListener('keydown',e=>{if(e.key==='Enter')el.num.blur();});
+el.slider.addEventListener('input',()=>{S.theta=fromValue(+el.slider.value);sync('slider');});
+function stepBy(dir){
+  const m=MODES[S.mode];
+  const v=Math.round((currentValue()+dir*m.inc)*1e6)/1e6;
+  S.theta=fromValue(v);sync();
+}
+el.dec.addEventListener('click',()=>stepBy(-1));
+el.inc.addEventListener('click',()=>stepBy(1));
+el.play.addEventListener('click',()=>{S.playing=!S.playing;el.play.textContent=S.playing?'⏸ Pause':'▶ Play';el.play.classList.toggle('on',S.playing);});
+el.speed.addEventListener('input',()=>{S.speed=+el.speed.value;});
+el.optAuto.addEventListener('change',()=>{
+  S.auto=el.optAuto.checked;el.zoom.disabled=S.auto;
+  if(!S.auto){S.zoom=view.half;el.zoom.value=Math.log(view.half);}
+});
+el.zoom.addEventListener('input',()=>{S.zoom=Math.exp(+el.zoom.value);});
+el.optOverlay.addEventListener('change',()=>{S.overlay=el.optOverlay.checked;dirty=true;});
+el.optTicks.addEventListener('change',()=>{S.ticks=el.optTicks.checked;dirty=true;});
+
+/* ---------- colors / theme ---------- */
+let COL={};
+function readColors(){
+  const cs=getComputedStyle(document.documentElement);
+  const g=n=>cs.getPropertyValue(n).trim();
+  COL={bg:g('--bg'),text:g('--text'),muted:g('--muted'),grid:g('--grid'),axis:g('--axis'),adj:g('--adj'),opp:g('--opp'),hyp:g('--hyp'),accent:g('--accent'),
+    sin:g('--c-sin'),cos:g('--c-cos'),tan:g('--c-tan'),sec:g('--c-sec'),csc:g('--c-csc'),cot:g('--c-cot')};
+  dirty=true;
+}
+$('#themeBtn').addEventListener('click',()=>{
+  const root=document.documentElement;
+  const cur=root.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  root.dataset.theme=cur==='dark'?'light':'dark';readColors();
+});
+if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');(mq.addEventListener?mq.addEventListener.bind(mq,'change'):mq.addListener.bind(mq))(readColors);}
+
+/* ---------- canvases ---------- */
+const ctx=el.stage.getContext('2d'), gctx=el.graph.getContext('2d');
+let W=0,H=0,GW=0,GH=0,DPR=1,lastSc=1;
+function resize(){
+  DPR=Math.min(window.devicePixelRatio||1,2.5);
+  let r=el.stage.getBoundingClientRect();W=Math.max(10,r.width);H=Math.max(10,r.height);
+  el.stage.width=Math.round(W*DPR);el.stage.height=Math.round(H*DPR);
+  r=el.graph.getBoundingClientRect();GW=Math.max(10,r.width);GH=Math.max(10,r.height);
+  el.graph.width=Math.round(GW*DPR);el.graph.height=Math.round(GH*DPR);
+  dirty=true;
+}
+if(window.ResizeObserver){const ro=new ResizeObserver(resize);ro.observe(el.stage);ro.observe(el.graph);}
+window.addEventListener('resize',resize);
+
+function niceStep(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;return (n<1.5?1:n<3.5?2:n<7.5?5:10)*p;}
+function lineP(x1,y1,x2,y2,col,w,glow,dash){
+  ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';
+  if(glow){ctx.shadowColor=col;ctx.shadowBlur=glow;}
+  if(dash)ctx.setLineDash(dash);
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();
+}
+function txt(t,x,y,col,size,align,weight){
+  ctx.save();ctx.font=(weight||500)+' '+(size||11)+'px '+MONO;ctx.textAlign=align||'center';ctx.textBaseline='middle';
+  ctx.lineJoin='round';ctx.lineWidth=3.5;ctx.strokeStyle=COL.bg;ctx.strokeText(t,x,y);ctx.fillStyle=col;ctx.fillText(t,x,y);ctx.restore();
+}
+function targetHalf(){
+  const tr=trig(S.theta);let ext=1.1;
+  const norms=S.overlay?['hyp','adj','opp']:[CONV[S.conv].norm];
+  norms.forEach(n=>{const k=kOf(n,tr);if(Number.isFinite(k)){ext=Math.max(ext,Math.abs(k*tr.c),Math.abs(k*tr.s),Math.abs(k));}});
+  return clamp(ext*1.22,1.4,25);
+}
+
+function draw(ts){
+  const tr=trig(S.theta),cv=CONV[S.conv],m=model(S.conv,tr);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  const cx=W/2,cy=H/2,sc=Math.min(W,H)/2/view.half;lastSc=sc;
+  const X=x=>cx+cl(x)*sc,Y=y=>cy-cl(y)*sc;
+  const segCol=COL[cv.seg];
+
+  /* grid */
+  const step=niceStep(view.half/3.2);
+  const xr=(W/2)/sc,yr=(H/2)/sc;
+  ctx.lineWidth=1;ctx.strokeStyle=COL.grid;ctx.beginPath();
+  for(let i=Math.ceil(-xr/step);i<=Math.floor(xr/step);i++){const x=cx+i*step*sc;ctx.moveTo(x,0);ctx.lineTo(x,H);}
+  for(let i=Math.ceil(-yr/step);i<=Math.floor(yr/step);i++){const y=cy-i*step*sc;ctx.moveTo(0,y);ctx.lineTo(W,y);}
+  ctx.stroke();
+  /* quadrant numerals */
+  ctx.save();ctx.globalAlpha=.07;ctx.fillStyle=COL.text;ctx.font='700 '+Math.round(Math.min(W,H)*.2)+'px '+MONO;ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('I',cx+W*.25,cy-H*.25);ctx.fillText('II',cx-W*.25,cy-H*.25);ctx.fillText('III',cx-W*.25,cy+H*.25);ctx.fillText('IV',cx+W*.25,cy+H*.25);ctx.restore();
+  /* axes */
+  lineP(0,cy,W,cy,COL.axis,1.2);lineP(cx,0,cx,H,COL.axis,1.2);
+  ctx.save();ctx.fillStyle=COL.muted;ctx.font='500 10px '+MONO;ctx.textAlign='center';ctx.textBaseline='top';
+  for(let i=Math.ceil(-xr/step);i<=Math.floor(xr/step);i++){if(i===0)continue;const v=i*step;ctx.fillText(+v.toPrecision(3),cx+v*sc,cy+4);}
+  ctx.textAlign='left';ctx.textBaseline='middle';
+  for(let i=Math.ceil(-yr/step);i<=Math.floor(yr/step);i++){if(i===0)continue;const v=i*step;ctx.fillText(+v.toPrecision(3),cx+5,cy-v*sc);}
+  ctx.restore();
+
+  /* unit circle + ticks */
+  ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle=COL.muted;ctx.globalAlpha=.65;ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(cx,cy,sc,0,TAU);ctx.stroke();ctx.restore();
+  if(S.ticks&&sc>60){
+    for(let d=0;d<360;d+=15){
+      const a=d*D2R,major=d%30===0,r1=sc,r2=sc+(major?9:5);
+      lineP(cx+Math.cos(a)*r1,cy-Math.sin(a)*r1,cx+Math.cos(a)*r2,cy-Math.sin(a)*r2,COL.muted,major?1.4:1);
+      if(major&&sc>90)txt(d+'°',cx+Math.cos(a)*(sc+22),cy-Math.sin(a)*(sc+22),COL.muted,10,'center',500);
+    }
+  }
+  /* ray */
+  const ux=Math.cos(S.theta),uy=Math.sin(S.theta),far=Math.max(W,H)*2;
+  ctx.save();ctx.globalAlpha=.35;lineP(cx,cy,cx+ux*far,cy-uy*far,COL.accent,1.2,0,[2,6]);ctx.restore();
+
+  /* ghost triangles (overlay) */
+  if(S.overlay){
+    ['hyp','adj','opp'].forEach(n=>{if(n!==cv.norm||false)drawTri(n,false);});
+  }
+  /* radius circle */
+  if(m.ok){
+    const rpx=Math.abs(m.R)*sc;
+    if(rpx>0.5&&rpx<6e4){
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,rpx);
+      g.addColorStop(0,hexA(segCol,.02));g.addColorStop(1,hexA(segCol,.16));
+      ctx.save();ctx.beginPath();ctx.arc(cx,cy,rpx,0,TAU);ctx.fillStyle=g;ctx.fill();
+      ctx.shadowColor=segCol;ctx.shadowBlur=22;ctx.strokeStyle=segCol;ctx.lineWidth=2.6;ctx.stroke();ctx.restore();
+    }
+  }
+  /* main triangle */
+  if(m.ok)drawTri(cv.norm,true);
+
+  /* radius spoke at angle theta */
+  if(m.ok){
+    const rr=Math.abs(m.R)*sc,px=cx+ux*rr,py=cy-uy*rr;
+    if(rr>1&&rr<6e4){
+      lineP(cx,cy,px,py,segCol,1.6,8,[4,4]);
+      const pulse=4+Math.sin((ts||0)/260)*1.4;
+      ctx.save();ctx.fillStyle=segCol;ctx.shadowColor=segCol;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(px,py,pulse,0,TAU);ctx.fill();ctx.restore();
+    }
+  }
+  /* unit-circle point */
+  {
+    const px=cx+tr.c*sc,py=cy-tr.s*sc;
+    ctx.save();ctx.fillStyle=COL.text;ctx.shadowColor=COL.accent;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(px,py,4.5,0,TAU);ctx.fill();ctx.restore();
+  }
+  /* angle arc */
+  {
+    const r=Math.min(44,Math.max(22,sc*.3)),th=clamp(S.theta,-TAU,TAU);
+    if(Math.abs(th)>1e-6){
+      ctx.save();ctx.strokeStyle=COL.accent;ctx.lineWidth=2.4;ctx.shadowColor=COL.accent;ctx.shadowBlur=10;
+      ctx.beginPath();ctx.arc(cx,cy,r,0,-th,th>0);ctx.stroke();ctx.restore();
+    }
+    const mid=-th/2;
+    txt('θ = '+fmt(S.theta*R2D,2)+'°',cx+Math.cos(mid)*(r+34),cy+Math.sin(mid)*(r+34),COL.accent,12,'center',700);
+    ctx.save();ctx.fillStyle=COL.text;ctx.beginPath();ctx.arc(cx,cy,3.5,0,TAU);ctx.fill();ctx.restore();
+  }
+  /* caption */
+  ctx.save();ctx.textAlign='left';ctx.textBaseline='top';
+  ctx.font='700 14px '+MONO;ctx.fillStyle=segCol;ctx.shadowColor=segCol;ctx.shadowBlur=10;
+  ctx.fillText(cv.fn+' as Radius',14,12);ctx.shadowBlur=0;
+  ctx.font='500 11.5px '+MONO;ctx.fillStyle=COL.muted;
+  ctx.fillText(NORMTXT[cv.norm]+'  ·  Radius = '+SEGNAME[cv.seg],14,32);
+  ctx.textAlign='right';ctx.fillText('view ±'+view.half.toFixed(2),W-12,12);
+  ctx.restore();
+  if(!m.ok){
+    txt('undefined — '+cv.fn+' as Radius has no finite triangle at this angle',cx,cy-H*.32,COL.hyp,13,'center',700);
+  }
+
+  /* --- inner: triangle drawer --- */
+  function drawTri(norm,main){
+    const k=kOf(norm,tr);if(!Number.isFinite(k))return;
+    const ax=k*tr.c,py=k*tr.s;
+    const O=[cx,cy],A=[X(ax),cy],P=[X(ax),Y(py)];
+    const seg=main?cv.seg:null,names=GHOSTNAMES[norm];
+    ctx.save();
+    ctx.globalAlpha=main?.14:.06;ctx.fillStyle=COL.accent;
+    ctx.beginPath();ctx.moveTo(O[0],O[1]);ctx.lineTo(A[0],A[1]);ctx.lineTo(P[0],P[1]);ctx.closePath();ctx.fill();
+    ctx.restore();
+    const dash=main?null:[5,5],w=main?2.4:1.3,al=main?1:.7;
+    const legs=[['adj',O,A],['opp',A,P],['hyp',O,P]];
+    ctx.save();ctx.globalAlpha=al;
+    legs.forEach(l=>{
+      const col=COL[l[0]],hi=main&&seg===l[0];
+      if(hi){lineP(l[1][0],l[1][1],l[2][0],l[2][1],col,6.5,22);lineP(l[1][0],l[1][1],l[2][0],l[2][1],'rgba(255,255,255,.85)',1.6);}
+      else lineP(l[1][0],l[1][1],l[2][0],l[2][1],col,w,main?8:0,dash);
+    });
+    ctx.restore();
+    /* right-angle mark */
+    if(Math.abs(A[0]-O[0])>14&&Math.abs(P[1]-A[1])>14){
+      const sx=Math.sign(O[0]-A[0])*9,sy=Math.sign(P[1]-A[1])*9;
+      ctx.save();ctx.globalAlpha=al;ctx.strokeStyle=COL.muted;ctx.lineWidth=1.2;ctx.beginPath();
+      ctx.moveTo(A[0]+sx,A[1]);ctx.lineTo(A[0]+sx,A[1]+sy);ctx.lineTo(A[0],A[1]+sy);ctx.stroke();ctx.restore();
+    }
+    /* vertex dots */
+    if(main){[A,P].forEach((p,i)=>{ctx.save();ctx.fillStyle=i?COL.hyp:COL.adj;ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(p[0],p[1],4,0,TAU);ctx.fill();ctx.restore();});}
+    /* labels */
+    const G=[(O[0]+A[0]+P[0])/3,(O[1]+A[1]+P[1])/3];
+    const vals={adj:ax,opp:py,hyp:k};
+    legs.forEach(l=>{
+      const len=Math.hypot(l[2][0]-l[1][0],l[2][1]-l[1][1]);if(len<26)return;
+      const M=[(l[1][0]+l[2][0])/2,(l[1][1]+l[2][1])/2];
+      let dx=M[0]-G[0],dy=M[1]-G[1],dl=Math.hypot(dx,dy);if(dl<1){dx=0;dy=-1;dl=1;}
+      const lx=M[0]+dx/dl*20,ly=M[1]+dy/dl*20;
+      if(lx<-40||lx>W+40||ly<-40||ly>H+40)return;
+      if(S.overlay){
+        const nm=names[l[0]];const col=nm==='1'?COL.muted:COL[nm];
+        txt(nm==='1'?'1':nm.toUpperCase(),lx,ly,col,main?12:11,'center',700);
+      }else if(main){
+        const isR=seg===l[0];
+        txt((isR?'R = ':'')+SEGSHORT[l[0]]+' '+fmt(vals[l[0]],4),lx,ly,COL[l[0]],isR?12.5:11.5,'center',isR?700:600);
+      }
+    });
+  }
+}
+
+/* ---------- readouts ---------- */
+function setText(sel,t){const e=$(sel);if(e)e.textContent=t;}
+function updateReadouts(){
+  const th=S.theta,tr=trig(th),cv=CONV[S.conv],m=model(S.conv,tr);
+  document.querySelectorAll('.pill').forEach(p=>p.classList.toggle('act',p.dataset.conv===S.conv));
+  setText('#angDeg',fmt(th*R2D,4)+'°');
+  setText('#angSub',fmt(th,6)+' rad · '+fmt(th/TAU,4)+' turn');
+  setText('#tagQuad',quadrant(tr));
+  setText('#tagRef','reference '+fmt(Math.atan2(Math.abs(tr.s),Math.abs(tr.c))*R2D,2)+'°');
+  const modDeg=((th*R2D)%360+360)%360;
+  setText('#tagMod','≡ '+fmt(modDeg,2)+'° (mod 360°)');
+  setText('#modelTitle',cv.fn+' as Radius — spreadsheet model');
+  const rows=[
+    ['Radius = '+cv.fn+'(θ)',m.R,cv.seg,true],
+    ['Adjacent'+(cv.seg==='adj'?' = Radius':''),m.adj,'adj',false],
+    ['Opposite'+(cv.seg==='opp'?' = Radius':''),m.opp,'opp',false],
+    ['Hypotenuse'+(cv.seg==='hyp'?' = Radius':''),m.hyp,'hyp',false]
+  ];
+  $('#modelKV').innerHTML=rows.map(r=>'<span class="k'+(r[3]?' rad-row':'')+'" style="color:var(--'+r[2]+')"><i class="dot" style="color:var(--'+r[2]+')"></i>'+r[0]+'</span><span class="v'+(r[3]?' rad-row':'')+'" style="color:var(--'+r[2]+')">'+fmt(r[1])+'</span>').join('')
+    +'<span class="k">Scale factor</span><span class="v">'+cv.norm.toUpperCase().replace('HYP','Hyp').replace('ADJ','Adj').replace('OPP','Opp')+' = 1 · '+(m.ok?fmt(m.k,6):'undefined')+'</span>';
+  setText('#modelNote',m.ok?
+    ('Every side = k × (unit-circle value). Here '+KTXT[cv.norm]+'. The Radius coincides with the '+SEGNAME[cv.seg]+' by definition — it is a custom label, not the conventional unit-circle radius.'):
+    ('This triangle is degenerate at this angle: '+(cv.norm==='adj'?'COS(θ) = 0':'SIN(θ) = 0')+', so k = '+(cv.norm==='adj'?'1/COS(θ)':'1/SIN(θ)')+' is undefined.'));
+  const fv={sin:tr.s,cos:tr.c,tan:tr.t,sec:tr.sec,csc:tr.csc,cot:tr.cot};
+  $('#fnKV').innerHTML=FNS.map(f=>'<span class="k"><i class="dot" style="color:var(--c-'+f+')"></i><b style="color:var(--c-'+f+')">'+f.toUpperCase()+'</b> <span class="small">= '+FNDEF[f]+'</span></span><span class="v">'+fmt(fv[f])+'</span>').join('');
+  const id=tr.s*tr.s+tr.c*tr.c;
+  setText('#checks','SIN² + COS² = '+id.toFixed(9)+'   '+(Math.abs(id-1)<1e-12?'✓':'✗')+
+    (Number.isNaN(tr.t)?'':'\nSIN / COS = TAN = '+fmt(tr.s/tr.c,9)+'   ✓'));
+  $('#checks').style.whiteSpace='pre-line';
+  buildCompare(tr);
+}
+function buildCompare(tr){
+  const ms=ORDER.map(k=>model(k,tr));
+  const head='<thead><tr><th></th>'+ORDER.map(k=>'<th data-conv="'+k+'" class="'+(k===S.conv?'sel':'')+'">'+CONV[k].fn+' as radius<br><span style="font-weight:400;color:var(--muted)">'+NORMTXT[CONV[k].norm]+'</span></th>').join('')+'</tr></thead>';
+  const row=(label,prop,seg,isRad)=>'<tr><td>'+label+'</td>'+ORDER.map((k,i)=>{
+    let cls=(k===S.conv?'sel ':'');
+    if(isRad)cls+='radrow rad'+CONV[k].seg;
+    else if(CONV[k].seg===seg)cls+='rad'+seg;
+    return '<td data-conv="'+k+'" class="'+cls+'">'+fmt(ms[i][prop],5)+'</td>';
+  }).join('')+'</tr>';
+  $('#cmp').innerHTML=head+'<tbody>'+row('Radius','R',null,true)+row('Adjacent','adj','adj')+row('Opposite','opp','opp')+row('Hypotenuse','hyp','hyp')+'</tbody>';
+}
+
+/* ---------- graph ---------- */
+function drawGraph(){
+  const g=gctx;g.setTransform(DPR,0,0,DPR,0,0);g.clearRect(0,0,GW,GH);
+  const L=38,R=12,T=12,B=26,w=GW-L-R,h=GH-T-B,YM=3.2;
+  const px=d=>L+d/360*w,py=y=>T+h/2-(y/YM)*(h/2);
+  g.lineWidth=1;g.font='500 10.5px '+MONO;
+  g.strokeStyle=COL.grid;g.fillStyle=COL.muted;g.textBaseline='middle';g.textAlign='right';
+  [-3,-2,-1,0,1,2,3].forEach(v=>{g.beginPath();g.moveTo(L,py(v));g.lineTo(L+w,py(v));g.strokeStyle=v===0?COL.axis:COL.grid;g.stroke();g.fillText(String(v),L-6,py(v));});
+  g.textAlign='center';g.textBaseline='top';
+  for(let d=0;d<=360;d+=90){g.beginPath();g.moveTo(px(d),T);g.lineTo(px(d),T+h);g.strokeStyle=COL.grid;g.stroke();g.fillStyle=COL.muted;g.fillText(d+'°',px(d),T+h+6);}
+  g.save();g.beginPath();g.rect(L,T,w,h);g.clip();
+  const f={sin:Math.sin,cos:Math.cos,tan:Math.tan,sec:x=>1/Math.cos(x),csc:x=>1/Math.sin(x),cot:x=>Math.cos(x)/Math.sin(x)};
+  FNS.forEach(n=>{
+    if(!S.fns[n])return;
+    g.beginPath();g.strokeStyle=COL[n];g.lineWidth=2;g.shadowColor=COL[n];g.shadowBlur=8;
+    let down=false;
+    for(let x=0;x<=w;x++){
+      const y=f[n]((x/w*360)*D2R);
+      if(!Number.isFinite(y)||Math.abs(y)>6){down=false;continue;}
+      if(down)g.lineTo(L+x,py(y));else{g.moveTo(L+x,py(y));down=true;}
+    }
+    g.stroke();
+  });
+  g.restore();
+  const dn=((S.theta*R2D)%360+360)%360,cxp=px(dn);
+  g.save();g.setLineDash([4,4]);g.strokeStyle=COL.accent;g.lineWidth=1.5;g.beginPath();g.moveTo(cxp,T);g.lineTo(cxp,T+h);g.stroke();g.restore();
+  const tr=trig(S.theta),fv={sin:tr.s,cos:tr.c,tan:tr.t,sec:tr.sec,csc:tr.csc,cot:tr.cot};
+  FNS.forEach(n=>{
+    if(!S.fns[n])return;const v=fv[n];
+    if(!Number.isFinite(v)||Math.abs(v)>YM)return;
+    g.save();g.fillStyle=COL[n];g.shadowColor=COL[n];g.shadowBlur=12;g.beginPath();g.arc(cxp,py(v),5,0,TAU);g.fill();g.restore();
+  });
+  g.save();g.fillStyle=COL.accent;g.font='700 11px '+MONO;g.textAlign=cxp>GW-80?'right':'left';g.textBaseline='top';
+  g.fillText(' θ = '+fmt(dn,1)+'° ',cxp+(cxp>GW-80?-4:4),T+3);g.restore();
+}
+
+/* ---------- pointer interaction ---------- */
+function unwrapTo(a){return a+TAU*Math.round((S.theta-a)/TAU);}
+function stagePointer(e){
+  const r=el.stage.getBoundingClientRect(),x=(e.clientX-r.left-r.width/2)/lastSc,y=-(e.clientY-r.top-r.height/2)/lastSc;
+  if(Math.hypot(x,y)<0.015)return;
+  S.theta=unwrapTo(Math.atan2(y,x));sync();
+}
+let dragStage=false,dragGraph=false;
+el.stage.addEventListener('pointerdown',e=>{dragStage=true;el.stage.setPointerCapture(e.pointerId);el.stage.focus({preventScroll:true});stagePointer(e);});
+el.stage.addEventListener('pointermove',e=>{if(dragStage)stagePointer(e);});
+el.stage.addEventListener('pointerup',()=>{dragStage=false;});
+el.stage.addEventListener('pointercancel',()=>{dragStage=false;});
+el.stage.addEventListener('keydown',e=>{
+  const d=(e.shiftKey?15:1)*D2R;
+  if(e.key==='ArrowLeft'||e.key==='ArrowDown'){S.theta-=d;sync();e.preventDefault();}
+  if(e.key==='ArrowRight'||e.key==='ArrowUp'){S.theta+=d;sync();e.preventDefault();}
+});
+function graphPointer(e){
+  const r=el.graph.getBoundingClientRect(),L=38,R=12,w=r.width-L-R;
+  const d=clamp((e.clientX-r.left-L)/w,0,1)*360;
+  S.theta=unwrapTo(d*D2R);
+  // keep within one turn on the graph
+  S.theta=d*D2R;sync();
+}
+el.graph.addEventListener('pointerdown',e=>{dragGraph=true;el.graph.setPointerCapture(e.pointerId);graphPointer(e);});
+el.graph.addEventListener('pointermove',e=>{if(dragGraph)graphPointer(e);});
+el.graph.addEventListener('pointerup',()=>{dragGraph=false;});
+el.graph.addEventListener('pointercancel',()=>{dragGraph=false;});
+
+/* ---------- main loop ---------- */
+let last=performance.now();
+function frame(ts){
+  const dt=Math.min(0.05,(ts-last)/1000);last=ts;
+  if(S.playing){S.theta+=S.speed*D2R*dt;sync('play');}
+  const target=S.auto?targetHalf():S.zoom;
+  view.half=Math.exp(Math.log(view.half)+(Math.log(target)-Math.log(view.half))*(1-Math.exp(-dt*7)));
+  draw(ts);
+  if(dirty){updateReadouts();drawGraph();dirty=false;}
+  requestAnimationFrame(frame);
+}
+readColors();resize();applyMode();
+view.half=targetHalf();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

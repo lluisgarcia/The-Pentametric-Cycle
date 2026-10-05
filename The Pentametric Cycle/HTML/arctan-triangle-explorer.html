@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One triangle, many names: sin, cos and tan of arctan</title>
+<style>
+:root{
+  --bg:#0d1117; --panel:#151b25; --panel2:#1c2432; --line:#2b3547;
+  --text:#e8eef6; --muted:#8e9bb0;
+  --opp:#ff5d6c; --adj:#4da3ff; --hyp:#3ddc97;
+  --theta:#ffb020; --phi:#b48cff; --psi:#ff7ad9; --gold:#ffd23f;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.5 "Avenir Next","Segoe UI",system-ui,-apple-system,Roboto,sans-serif;
+}
+.wrap{max-width:1320px;margin:0 auto;padding:24px 20px 64px}
+h1{font-size:32px;line-height:1.15;margin:0 0 6px;font-weight:800;letter-spacing:-.01em}
+h2{font-size:21px;margin:0 0 4px;font-weight:750}
+.lede{color:var(--muted);margin:0 0 20px;max-width:760px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.cap{color:var(--muted);font-size:14.5px;margin:10px 0 0;max-width:900px}
+.cap b{color:var(--text)}
+.cr{color:var(--opp);font-weight:700}.cb{color:var(--adj);font-weight:700}.cg{color:var(--hyp);font-weight:700}
+.cth{color:var(--theta);font-weight:700}.cph{color:var(--phi);font-weight:700}.cps{color:var(--psi);font-weight:700}.cgold{color:var(--gold);font-weight:700}
+
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:20px 32px;align-items:center;margin-bottom:18px}
+.ctl-x{flex:1 1 420px;min-width:280px}
+.xhead{display:flex;align-items:baseline;gap:14px;margin-bottom:2px}
+.xhead label{color:var(--muted);font-size:15px}
+.xval{font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--text);line-height:1}
+.xval small{font-size:17px;color:var(--gold);font-weight:700;margin-left:8px}
+.sliderwrap{position:relative;padding-bottom:26px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--adj),var(--opp))}
+input[type=range]::-moz-range-track{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--adj),var(--opp))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;margin-top:-5px;border:4px solid var(--theta);cursor:grab}
+input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:#fff;border:4px solid var(--theta);cursor:grab}
+.tick{position:absolute;top:22px;transform:translateX(-50%);font-size:13px;color:var(--gold);text-align:center;font-weight:700;pointer-events:none}
+.tick::before{content:"";display:block;width:2px;height:8px;background:var(--gold);margin:0 auto 1px}
+.ctl-btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-weight:700;font-size:15px;color:var(--text);background:var(--panel2);border:1px solid var(--line);
+  padding:10px 16px;border-radius:12px;cursor:pointer;transition:background .15s,border-color .15s,transform .05s}
+.btn:hover{border-color:#44526b;background:#222c3d}
+.btn:active{transform:translateY(1px)}
+.btn.gold{background:var(--gold);color:#241c00;border-color:var(--gold)}
+.btn.gold:hover{background:#ffdd66}
+select{font:inherit;font-weight:600;color:var(--text);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.selrow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14.5px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:18px;align-items:start}
+@media (max-width:1000px){.grid{grid-template-columns:1fr}}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:"Avenir Next","Segoe UI",system-ui,sans-serif}
+
+.banner{border-radius:12px;padding:10px 14px;margin:10px 0 8px;font-size:15.5px;background:var(--panel2);border:1px solid var(--line)}
+.banner.on{border-color:var(--gold);background:#2a2611}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 6px}
+.chip{font:inherit;font-size:14.5px;color:var(--text);background:var(--panel2);border:1px solid var(--line);
+  padding:8px 14px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.chip:hover{border-color:#44526b}
+.chip.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,210,63,.22)}
+.dot2{display:inline-block;width:12px;height:22px;border-radius:4px}
+.abar{display:flex;height:36px;border-radius:10px;overflow:hidden;font-weight:800;font-size:16px;color:#141414;margin-top:12px}
+.abar div{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden}
+.abarlbl{font-size:14px;color:var(--muted);margin-top:12px}
+
+/* side panel */
+.side h3{margin:0 0 10px;font-size:18px}
+.vals{display:grid;grid-template-columns:38px 1fr 1fr;gap:8px;align-items:stretch}
+.vh{font-size:14px;line-height:1.25;align-self:end;padding-bottom:2px}
+.vh b{font-size:18px}
+.rowlbl{align-self:center;color:var(--muted);font-weight:700;font-size:16px}
+.cell{position:relative;overflow:hidden;background:var(--panel2);border:2px solid transparent;border-radius:12px;padding:8px 10px 8px 16px;cursor:pointer;transition:border-color .12s,background .12s}
+.cell::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:var(--bar)}
+.cell .num{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.cell .sub{font-size:13px;color:var(--muted)}
+.cell .fr{color:var(--gold);font-weight:800;margin-left:6px}
+.cell.pair{border-color:var(--gold);background:#2a2611}
+.cell[data-g=R]{--bar:linear-gradient(var(--opp) 50%,var(--hyp) 50%)}
+.cell[data-g=B]{--bar:linear-gradient(var(--adj) 50%,var(--hyp) 50%)}
+.cell[data-g=T1]{--bar:linear-gradient(var(--opp) 50%,var(--adj) 50%)}
+.cell[data-g=T2]{--bar:linear-gradient(var(--adj) 50%,var(--opp) 50%)}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+.formulas{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+.fl{background:var(--panel2);border-radius:12px;padding:8px 12px;margin-bottom:8px;font-size:17px;overflow-x:auto;white-space:nowrap}
+.fl.pR{border-left:5px solid var(--opp)}
+.fl.pB{border-left:5px solid var(--adj)}
+.fl .tag{display:block;font-size:12.5px;color:var(--muted);white-space:normal;margin-top:2px}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;margin:0 4px;line-height:1.2;font-size:.95em}
+.frac>span:first-child{border-bottom:2px solid #6b7890;padding:0 5px 1px}
+.frac>span:last-child{padding:1px 5px 0}
+.eqv{font-weight:800;color:var(--gold)}
+
+/* section 3 */
+.sec3{margin-top:18px}
+.sec3head{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ident{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 6px}
+.ident span{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:16.5px;font-variant-numeric:tabular-nums}
+.insight{margin-top:12px;border:1px solid var(--gold);background:#231f0e;border-radius:12px;padding:12px 16px;font-size:16px}
+.insight p{margin:0 0 6px}.insight p:last-child{margin:0;color:var(--muted);font-size:14px}
+
+@media (prefers-reduced-motion:reduce){.btn,.cell{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>One triangle, many names</h1>
+  <p class="lede">A single right triangle can be read from either acute corner. Drag <b>x</b>, flip the triangle, and watch the same red, blue and green segments get renamed as sine, cosine and tangent. Then see why 4/5 turns up in all three.</p>
+
+  <section class="card controls" aria-label="Controls">
+    <div class="ctl-x">
+      <div class="xhead"><label for="xs">x = tan θ = opposite ÷ adjacent</label><div class="xval" id="xval">1.333</div></div>
+      <div class="sliderwrap">
+        <input type="range" id="xs" min="0.1" max="5" step="0.01" value="1.33">
+        <div class="tick" id="snapTick"><span id="snapTickLbl">4/3</span></div>
+      </div>
+    </div>
+    <div class="ctl-btns">
+      <button class="btn gold" id="snapBtn">Snap to 3-4-5 triangle</button>
+      <button class="btn" id="flipBtn">Flip the triangle: θ-view ⇄ φ-view</button>
+      <div class="selrow"><label for="triSel">Pythagorean triple</label>
+        <select id="triSel">
+          <option value="0">3-4-5</option>
+          <option value="1">5-12-13</option>
+          <option value="2">8-15-17</option>
+          <option value="3">7-24-25</option>
+          <option value="4">20-21-29</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card" aria-label="Main triangle figure">
+      <h2>The same triangle from both acute corners</h2>
+      <div class="banner" id="banner"></div>
+      <svg id="main" viewBox="0 0 1080 480" role="img" aria-label="Right triangle with angle theta and its flipped copy with angle phi"></svg>
+      <div class="chips" role="group" aria-label="Highlight">
+        <button class="chip" id="hiSin" aria-pressed="false"><span class="dot2" style="background:linear-gradient(var(--opp) 50%,var(--hyp) 50%)"></span>Highlight sin θ = cos φ (red ÷ green)</button>
+        <button class="chip" id="hiCos" aria-pressed="false"><span class="dot2" style="background:linear-gradient(var(--adj) 50%,var(--hyp) 50%)"></span>Highlight cos θ = sin φ (blue ÷ green)</button>
+        <button class="chip" id="hiNone" aria-pressed="false">No highlight</button>
+      </div>
+      <div class="abar" id="abar" aria-hidden="true"><div id="barTh" style="background:var(--theta)"></div><div id="barPh" style="background:var(--phi)"></div></div>
+      <div class="abarlbl"><span class="cth">θ</span> + <span class="cph">φ</span> = 90°, for every x. The two acute angles of a right triangle always share one right angle.</div>
+      <p class="cap"><b>Left:</b> the triangle with adjacent = 1 (<span class="cb">blue</span>) and opposite = x (<span class="cr">red</span>). The dashed <span class="cph">φ</span> at the corner is a copy of the far corner's angle: parallel lines make them equal, so θ and φ fill the right angle together.
+      <b>Right:</b> the identical triangle flipped, so the red leg is now adjacent and the blue leg is opposite. The faint arc is a unit circle (radius = the <span class="cg">green</span> hypotenuse). Colors follow the physical side, never the trig name.</p>
+    </section>
+
+    <aside class="card side" aria-label="Live values and formulas">
+      <h3>Live values</h3>
+      <div class="vals">
+        <div></div>
+        <div class="vh"><b class="cth">θ</b> = <span id="vTh"></span></div>
+        <div class="vh"><b class="cph">φ</b> = <span id="vPh"></span></div>
+
+        <div class="rowlbl">sin</div>
+        <div class="cell" data-g="R" data-mode="sin"><div class="num" id="sinTh_v"></div><div class="sub"><span class="cr">opp</span> ÷ <span class="cg">hyp</span><span class="fr" id="sinTh_f"></span></div></div>
+        <div class="cell" data-g="B" data-mode="cos"><div class="num" id="sinPh_v"></div><div class="sub"><span class="cb">opp</span> ÷ <span class="cg">hyp</span><span class="fr" id="sinPh_f"></span></div></div>
+
+        <div class="rowlbl">cos</div>
+        <div class="cell" data-g="B" data-mode="cos"><div class="num" id="cosTh_v"></div><div class="sub"><span class="cb">adj</span> ÷ <span class="cg">hyp</span><span class="fr" id="cosTh_f"></span></div></div>
+        <div class="cell" data-g="R" data-mode="sin"><div class="num" id="cosPh_v"></div><div class="sub"><span class="cr">adj</span> ÷ <span class="cg">hyp</span><span class="fr" id="cosPh_f"></span></div></div>
+
+        <div class="rowlbl">tan</div>
+        <div class="cell" data-g="T1" data-mode="none"><div class="num" id="tanTh_v"></div><div class="sub"><span class="cr">opp</span> ÷ <span class="cb">adj</span><span class="fr" id="tanTh_f"></span></div></div>
+        <div class="cell" data-g="T2" data-mode="none"><div class="num" id="tanPh_v"></div><div class="sub"><span class="cb">opp</span> ÷ <span class="cr">adj</span><span class="fr" id="tanPh_f"></span></div></div>
+      </div>
+      <p class="hint">Hover a value to light up its twin. Click one to highlight those sides in the figure. The stripe on each card is its fraction: top color over bottom color.</p>
+
+      <div class="formulas">
+        <h3>Live formulas</h3>
+        <div id="formulas"></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card sec3" aria-label="The 4/5 coincidence">
+    <div class="sec3head">
+      <div>
+        <h2>The coincidence: one number, three triangles</h2>
+        <div class="ident" id="ident"></div>
+      </div>
+      <button class="btn gold" id="flyBtn">Fly the 4/5 across all three</button>
+    </div>
+    <svg id="tri3" viewBox="0 0 1200 620" role="img" aria-label="Three triangles sharing the ratio 4/5"></svg>
+    <div class="insight" id="insight"></div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- constants & state ---------- */
+const C={opp:'#ff5d6c',adj:'#4da3ff',hyp:'#3ddc97',th:'#ffb020',ph:'#b48cff',ps:'#ff7ad9',
+         gold:'#ffd23f',gray:'#98a4b5',axis:'#3a4558',circle:'#2a3446',text:'#e8eef6',muted:'#8e9bb0'};
+const TRIPLES=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]];
+const XMIN=0.1, XMAX=5;
+let tri=TRIPLES[0];
+let xTarget=4/3, xShown=4/3;
+let hi='sin';                 // 'sin' | 'cos' | 'none'
+let flipT=0, flipAnim=null;   // flip animation
+let fly=null, lit=-1, chip=null; // section-3 chip animation
+let raf=0, lastTs=0;
+
+const $=id=>document.getElementById(id);
+const deg=v=>v*180/Math.PI;
+const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function isSnapped(){
+  const rt=tri[1]/tri[0];
+  return Math.abs(xTarget-rt)<1e-9 && Math.abs(xShown-rt)<0.002;
+}
+
+/* ---------- SVG helpers ---------- */
+const f1=v=>v.toFixed(1);
+function T(x,y,html,fill,size,anchor,extra){
+  return `<text x="${f1(x)}" y="${f1(y)}" fill="${fill||C.text}" font-size="${size||22}" text-anchor="${anchor||'middle'}" dominant-baseline="central" font-weight="700" ${extra||''}>${html}</text>`;
+}
+function LN(x1,y1,x2,y2,c,w,extra){
+  return `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra||''}/>`;
+}
+function arcPath(cx,cy,r,t0,t1){ // math angles, counter-clockwise on screen
+  const x0=cx+r*Math.cos(t0), y0=cy-r*Math.sin(t0), x1=cx+r*Math.cos(t1), y1=cy-r*Math.sin(t1);
+  return `M${f1(x0)},${f1(y0)} A${r},${r} 0 ${(t1-t0)>Math.PI?1:0} 0 ${f1(x1)},${f1(y1)}`;
+}
+function ARC(cx,cy,r,t0,t1,c,w,extra){
+  return `<path d="${arcPath(cx,cy,r,t0,t1)}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra||''}/>`;
+}
+function RA(vx,vy,d1x,d1y,d2x,d2y,s){ // right-angle marker at vertex, along unit screen directions
+  return `<path d="M${f1(vx+d1x*s)},${f1(vy+d1y*s)} L${f1(vx+d1x*s+d2x*s)},${f1(vy+d1y*s+d2y*s)} L${f1(vx+d2x*s)},${f1(vy+d2y*s)}" fill="none" stroke="#c9d3e3" stroke-width="2"/>`;
+}
+function hypLabel(O,ang,len,txt,off,color,size){ // rotated label alongside a hypotenuse (up-left side)
+  const mx=O.x+Math.cos(ang)*len/2, my=O.y-Math.sin(ang)*len/2;
+  const lx=mx-Math.sin(ang)*off, ly=my-Math.cos(ang)*off;
+  return T(lx,ly,txt,color,size||22,'middle',`transform="rotate(${(-deg(ang)).toFixed(2)} ${f1(lx)} ${f1(ly)})"`);
+}
+function glow(x1,y1,x2,y2){return LN(x1,y1,x2,y2,C.gold,18,'opacity=".32"');}
+
+/* 3D-style flip: glide reflection taking the theta-view pose onto the phi-view pose */
+function flipVerts(t,a,b){
+  const sq=Math.SQRT1_2, D=(a+b)*sq, beta=Math.PI*t;
+  return [[0,0],[a,0],[a,b]].map(([x,y])=>{
+    const s=(x-y)*sq, d=(x+y)*sq;
+    const s2=s+t*(b-a)*sq;
+    const d2=D/2+(d-D/2)*Math.cos(beta);
+    return [sq*(s2+d2), sq*(d2-s2)];
+  });
+}
+
+/* ---------- main figure ---------- */
+function renderMain(){
+  const x=xShown, H=Math.sqrt(1+x*x);
+  const th=Math.atan(x), ph=Math.PI/2-th, thD=deg(th), phD=90-thD;
+  const [p,q,r]=tri, sn=isSnapped();
+  const L=300, a=L*Math.cos(th), b=L*Math.sin(th);
+  const O1={x:90,y:410}, O2={x:560,y:410};
+  const Q1={x:O1.x+a,y:O1.y}, R1={x:O1.x+a,y:O1.y-b};
+  const Q2={x:O2.x+b,y:O2.y}, P2={x:O2.x+b,y:O2.y-a};
+  const lAdj=sn?`${p}`:'1', lOpp=sn?`${q}`:`x = ${x.toFixed(2)}`, lHyp=sn?`${r}`:`√(1+x²) = ${H.toFixed(3)}`;
+  const sinV=x/H, cosV=1/H;
+  const rS=sn?`${q}/${r}`:sinV.toFixed(3), rC=sn?`${p}/${r}`:cosV.toFixed(3);
+  const hiS=hi==='sin', hiC=hi==='cos', any=hi!=='none';
+  let s='';
+
+  // titles
+  s+=T(O1.x-50,28,`<tspan fill="${C.th}">θ</tspan><tspan fill="${C.text}"> = arctan(x) = ${thD.toFixed(2)}°</tspan>`,C.text,21,'start');
+  s+=T(O2.x-50,28,`<tspan fill="${C.ph}">φ</tspan><tspan fill="${C.text}"> = arctan(1/x) = ${phD.toFixed(2)}°</tspan>`,C.text,21,'start');
+  if(any){
+    const t1=hiS?`<tspan fill="${C.text}">sin </tspan><tspan fill="${C.th}">θ</tspan><tspan fill="${C.text}"> = </tspan><tspan fill="${C.opp}">opposite</tspan><tspan fill="${C.text}"> ÷ </tspan><tspan fill="${C.hyp}">hypotenuse</tspan><tspan fill="${C.gold}"> = ${rS}</tspan>`
+                 :`<tspan fill="${C.text}">cos </tspan><tspan fill="${C.th}">θ</tspan><tspan fill="${C.text}"> = </tspan><tspan fill="${C.adj}">adjacent</tspan><tspan fill="${C.text}"> ÷ </tspan><tspan fill="${C.hyp}">hypotenuse</tspan><tspan fill="${C.gold}"> = ${rC}</tspan>`;
+    const t2=hiS?`<tspan fill="${C.text}">cos </tspan><tspan fill="${C.ph}">φ</tspan><tspan fill="${C.text}"> = </tspan><tspan fill="${C.opp}">adjacent</tspan><tspan fill="${C.text}"> ÷ </tspan><tspan fill="${C.hyp}">hypotenuse</tspan><tspan fill="${C.gold}"> = ${rS}</tspan>`
+                 :`<tspan fill="${C.text}">sin </tspan><tspan fill="${C.ph}">φ</tspan><tspan fill="${C.text}"> = </tspan><tspan fill="${C.adj}">opposite</tspan><tspan fill="${C.text}"> ÷ </tspan><tspan fill="${C.hyp}">hypotenuse</tspan><tspan fill="${C.gold}"> = ${rC}</tspan>`;
+    s+=T(O1.x-50,60,t1,C.text,17,'start');
+    s+=T(O2.x-50,60,t2,C.text,17,'start');
+  }
+
+  // axes + unit-circle arcs
+  [O1,O2].forEach(O=>{
+    s+=LN(O.x-25,O.y,O.x+330,O.y,C.axis,2);
+    s+=LN(O.x,O.y+10,O.x,O.y-335,C.axis,2,'stroke-dasharray="6 6"');
+    s+=`<path d="${arcPath(O.x,O.y,L,0,Math.PI/2)}" fill="none" stroke="${C.circle}" stroke-width="2"/>`;
+    s+=T(O.x+330,O.y+20,'unit circle: radius = hypotenuse',C.muted,12.5,'end','font-weight="500"');
+  });
+
+  // highlight glows (drawn beneath the sides)
+  if(hiS){ s+=glow(Q1.x,Q1.y,R1.x,R1.y); s+=glow(O2.x,O2.y,Q2.x,Q2.y); }
+  if(hiC){ s+=glow(O1.x,O1.y,Q1.x,Q1.y); s+=glow(Q2.x,Q2.y,P2.x,P2.y); }
+  if(any){ s+=glow(O1.x,O1.y,R1.x,R1.y); s+=glow(O2.x,O2.y,P2.x,P2.y); }
+
+  // triangle 1 (theta view)
+  s+=`<polygon points="${f1(O1.x)},${f1(O1.y)} ${f1(Q1.x)},${f1(Q1.y)} ${f1(R1.x)},${f1(R1.y)}" fill="rgba(255,255,255,.035)"/>`;
+  s+=LN(O1.x,O1.y,Q1.x,Q1.y,C.adj,6);
+  s+=LN(Q1.x,Q1.y,R1.x,R1.y,C.opp,6);
+  s+=LN(O1.x,O1.y,R1.x,R1.y,C.hyp,6);
+  // triangle 2 (phi view)
+  s+=`<polygon points="${f1(O2.x)},${f1(O2.y)} ${f1(Q2.x)},${f1(Q2.y)} ${f1(P2.x)},${f1(P2.y)}" fill="rgba(255,255,255,.035)"/>`;
+  s+=LN(O2.x,O2.y,Q2.x,Q2.y,C.opp,6);
+  s+=LN(Q2.x,Q2.y,P2.x,P2.y,C.adj,6);
+  s+=LN(O2.x,O2.y,P2.x,P2.y,C.hyp,6);
+
+  // right-angle markers
+  s+=RA(Q1.x,Q1.y,-1,0,0,-1,Math.max(4,Math.min(16,a*.4,b*.4)));
+  s+=RA(Q2.x,Q2.y,-1,0,0,-1,Math.max(4,Math.min(16,a*.4,b*.4)));
+
+  // angle arcs
+  s+=ARC(O1.x,O1.y,50,0,th,C.th,4);
+  s+=T(O1.x+80*Math.cos(Math.max(th/2,.22)),O1.y-80*Math.sin(Math.max(th/2,.22)),'θ',C.th,22);
+  s+=ARC(O1.x,O1.y,100,th,Math.PI/2,C.ph,3,'stroke-dasharray="6 5"');
+  const tm=Math.min((th+Math.PI/2)/2,Math.PI/2-.22);
+  s+=T(O1.x+124*Math.cos(tm),O1.y-124*Math.sin(tm),'φ',C.ph,22);
+  const tR=(Math.PI+th+1.5*Math.PI)/2;
+  s+=ARC(R1.x,R1.y,46,Math.PI+th,1.5*Math.PI,C.ph,4);
+  s+=T(R1.x+74*Math.cos(tR),R1.y-74*Math.sin(tR),'φ',C.ph,22);
+
+  s+=ARC(O2.x,O2.y,50,0,ph,C.ph,4);
+  s+=T(O2.x+80*Math.cos(Math.max(ph/2,.22)),O2.y-80*Math.sin(Math.max(ph/2,.22)),'φ',C.ph,22);
+  const tP=(Math.PI+ph+1.5*Math.PI)/2;
+  s+=ARC(P2.x,P2.y,46,Math.PI+ph,1.5*Math.PI,C.th,4);
+  s+=T(P2.x+74*Math.cos(tP),P2.y-74*Math.sin(tP),'θ',C.th,22);
+
+  // side length labels
+  s+=T((O1.x+Q1.x)/2,O1.y+30,lAdj,C.adj,23);
+  s+=T(Q1.x+14,(Q1.y+R1.y)/2,lOpp,C.opp,23,'start');
+  s+=hypLabel(O1,th,L,lHyp,22,C.hyp,21);
+  s+=T((O2.x+Q2.x)/2,O2.y+30,lOpp,C.opp,23);
+  s+=T(Q2.x+14,(Q2.y+P2.y)/2,lAdj,C.adj,23,'start');
+  s+=hypLabel(O2,ph,L,lHyp,22,C.hyp,21);
+
+  // arrow tags that point at the same physical segment
+  if(hiS){
+    s+=T(Q1.x+14,(Q1.y+R1.y)/2+28,`← sin θ = ${rS}`,C.gold,18,'start');
+    s+=T((O2.x+Q2.x)/2,O2.y+58,`↑ cos φ = ${rS}`,C.gold,18);
+    s+=T(525,250,'=',C.gold,64);
+    s+=T(525,292,'same segment',C.gold,14,'middle','font-weight="500"');
+  }
+  if(hiC){
+    s+=T((O1.x+Q1.x)/2,O1.y+58,`↑ cos θ = ${rC}`,C.gold,18);
+    s+=T(Q2.x+14,(Q2.y+P2.y)/2+28,`← sin φ = ${rC}`,C.gold,18,'start');
+    s+=T(525,250,'=',C.gold,64);
+    s+=T(525,292,'same segment',C.gold,14,'middle','font-weight="500"');
+  }
+
+  // flip ghost: the triangle physically flips from theta-view to phi-view
+  if(flipT>0.001 && flipT<0.999){
+    const e=easeIO(flipT);
+    const bx=O1.x+(O2.x-O1.x)*e, by=O1.y;
+    const v=flipVerts(e,a,b).map(([X,Y])=>({x:bx+X,y:by-Y}));
+    s+=`<polygon points="${v.map(o=>f1(o.x)+','+f1(o.y)).join(' ')}" fill="rgba(255,255,255,.10)"/>`;
+    s+=LN(v[0].x,v[0].y,v[1].x,v[1].y,C.adj,8);
+    s+=LN(v[1].x,v[1].y,v[2].x,v[2].y,C.opp,8);
+    s+=LN(v[0].x,v[0].y,v[2].x,v[2].y,C.hyp,8);
+    s+=`<circle cx="${f1(v[0].x)}" cy="${f1(v[0].y)}" r="9" fill="${C.th}"/>`;
+    s+=`<circle cx="${f1(v[2].x)}" cy="${f1(v[2].y)}" r="9" fill="${C.ph}"/>`;
+    s+=T(v[0].x-16,v[0].y+18,'θ',C.th,20);
+    s+=T(v[2].x+16,v[2].y-16,'φ',C.ph,20);
+  }
+
+  $('main').innerHTML=s;
+
+  // angle bar
+  $('barTh').style.width=(thD/90*100)+'%'; $('barTh').textContent=`θ ${thD.toFixed(1)}°`;
+  $('barPh').style.width=(phD/90*100)+'%'; $('barPh').textContent=`φ ${phD.toFixed(1)}°`;
+}
+
+/* ---------- text panels ---------- */
+const fracH=(n,d)=>`<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+const R=s=>`<span class="cr">${s}</span>`, B=s=>`<span class="cb">${s}</span>`, G=s=>`<span class="cg">${s}</span>`;
+
+function renderPanels(){
+  const x=xShown, H=Math.sqrt(1+x*x), th=Math.atan(x);
+  const thD=deg(th), phD=90-thD;
+  const [p,q,r]=tri, sn=isSnapped();
+
+  $('xval').innerHTML=(sn?`${q}/${p}`:x.toFixed(2))+(sn?`<small>= ${x.toFixed(3)}</small>`:'');
+  $('vTh').textContent=`${thD.toFixed(2)}°`;
+  $('vPh').textContent=`${phD.toFixed(2)}°`;
+
+  const vals={sinTh:x/H,cosTh:1/H,tanTh:x,sinPh:1/H,cosPh:x/H,tanPh:1/x};
+  const fr={sinTh:[q,r],cosTh:[p,r],tanTh:[q,p],sinPh:[p,r],cosPh:[q,r],tanPh:[p,q]};
+  Object.keys(vals).forEach(k=>{
+    $(k+'_v').textContent=vals[k].toFixed(3);
+    $(k+'_f').textContent=sn?`= ${fr[k][0]}/${fr[k][1]}`:'';
+  });
+
+  const bn=$('banner');
+  if(sn){
+    bn.className='banner on';
+    bn.innerHTML=`<b class="cgold">${p}-${q}-${r} triangle.</b> Sides are scaled ×${p} so they read ${R(q)}, ${B(p)}, ${G(r)}. ${R('The red '+q)} over ${G('the green '+r)} is sin θ <i>and</i> cos φ: one segment, two names.`;
+  }else{
+    bn.className='banner';
+    bn.innerHTML=`Drag x, or press <b>Snap to ${p}-${q}-${r} triangle</b> (x = ${q}/${p}). Near that value the slider sticks, and the sides turn into whole numbers.`;
+  }
+
+  // formulas
+  const xs=sn?`${q}/${p}`:x.toFixed(2);
+  const num=sn?`${q}/${p}`:x.toFixed(2), den=sn?`${r}/${p}`:H.toFixed(3);
+  const one=sn?`${p}/${p}`:'1';
+  const sV=(x/H).toFixed(4), cV=(1/H).toFixed(4);
+  const eqS=sn?`${q}/${r} = `:'', eqC=sn?`${p}/${r} = `:'';
+  $('formulas').innerHTML=`
+   <div class="fl pR">sin(arctan ${xs}) = ${fracH(R('x'),G('√(1+x²)'))} = ${fracH(R(num),G(den))} = <span class="eqv">${eqS}${sV}</span>
+     <span class="tag">opposite ÷ hypotenuse of the θ triangle</span></div>
+   <div class="fl pR">cos(arctan(1/${xs})) = ${fracH(R('x'),G('√(1+x²)'))} = <span class="eqv">${eqS}${sV}</span>
+     <span class="tag">same red ÷ green: the flipped triangle's adjacent leg</span></div>
+   <div class="fl pB">cos(arctan ${xs}) = ${fracH(B('1'),G('√(1+x²)'))} = ${fracH(B(one),G(den))} = <span class="eqv">${eqC}${cV}</span>
+     <span class="tag">adjacent ÷ hypotenuse of the θ triangle</span></div>
+   <div class="fl pB">sin(arctan(1/${xs})) = ${fracH(B('1'),G('√(1+x²)'))} = <span class="eqv">${eqC}${cV}</span>
+     <span class="tag">same blue ÷ green: the flipped triangle's opposite leg</span></div>`;
+
+  // chips state
+  ['hiSin','hiCos','hiNone'].forEach(id=>{
+    const on=(id==='hiSin'&&hi==='sin')||(id==='hiCos'&&hi==='cos')||(id==='hiNone'&&hi==='none');
+    $(id).classList.toggle('on',on); $(id).setAttribute('aria-pressed',on);
+  });
+}
+
+/* ---------- section 3: the 4/5 coincidence ---------- */
+function stops3(){
+  const [p,q,r]=tri, tx=150+900*q/r;
+  return [{x:205,y:413},{x:605,y:413},{x:1005,y:413},{x:tx,y:552}];
+}
+function renderTri3(){
+  const [p,q,r]=tri, u=250/r, ratio=q/r, base=340;
+  const th=Math.atan2(q,p), ph=Math.atan2(p,q), ps=Math.atan2(q,r), hc=Math.hypot(r,q);
+  const st=stops3(), tx=st[3].x;
+  const flying=!!fly;
+  const op=i=>!flying?1:(lit===i?1:(lit===-1?.7:.32));
+  const lg=i=>(flying&&lit===i)?'style="filter:drop-shadow(0 0 14px rgba(255,210,63,.75))"':'';
+  const side=(x1,y1,x2,y2,c,gl,dim)=>(gl?LN(x1,y1,x2,y2,C.gold,18,'opacity=".28"'):'')+LN(x1,y1,x2,y2,c,6,dim?'opacity=".55"':'');
+  let s='';
+
+  const pill=(cx,head,line2,line3)=>`
+    <rect x="${cx-125}" y="372" width="250" height="84" rx="16" fill="#1b2231" stroke="${C.gold}" stroke-width="2"/>
+    ${T(cx,394,head,C.gold,27)}
+    ${T(cx,421,line2,C.text,19)}
+    ${T(cx,443,line3,C.muted,13.5,'middle','font-weight="500"')}`;
+  const rg=`<tspan fill="${C.opp}">${q}</tspan><tspan fill="${C.text}"> ÷ </tspan><tspan fill="${C.hyp}">${r}</tspan>`;
+
+  // Panel A
+  {
+    const O={x:80,y:base}, Q={x:80+p*u,y:base}, Rr={x:Q.x,y:base-q*u};
+    s+=`<g opacity="${op(0)}" ${lg(0)}>`;
+    s+=T(O.x-40,30,`<tspan fill="${C.th}">θ</tspan><tspan fill="${C.text}"> = arctan(${q}/${p}) = ${deg(th).toFixed(2)}°</tspan>`,C.text,20,'start');
+    s+=T(O.x-40,54,'the triangle, seen from θ',C.muted,14,'start','font-weight="500"');
+    s+=LN(O.x-20,base,O.x+270,base,C.axis,2);
+    s+=side(O.x,O.y,Q.x,Q.y,C.adj,false,true)+side(Q.x,Q.y,Rr.x,Rr.y,C.opp,true,false)+side(O.x,O.y,Rr.x,Rr.y,C.hyp,true,false);
+    s+=RA(Q.x,Q.y,-1,0,0,-1,Math.max(5,Math.min(16,p*u*.4,q*u*.4)));
+    s+=ARC(O.x,O.y,44,0,th,C.th,4)+T(O.x+68*Math.cos(Math.max(th/2,.2)),O.y-68*Math.sin(Math.max(th/2,.2)),'θ',C.th,20);
+    s+=T((O.x+Q.x)/2,base+24,`${p}`,C.adj,23);
+    s+=T(Q.x+14,(Q.y+Rr.y)/2,`${q}`,C.opp,23,'start');
+    s+=hypLabel(O,th,r*u,`${r} · hypotenuse`,22,C.hyp,19);
+    s+=pill(205,`sin θ = ${q}/${r}`,rg,'opposite ÷ hypotenuse');
+    s+='</g>';
+  }
+  // Panel B
+  {
+    const O={x:480,y:base}, Q={x:480+q*u,y:base}, P={x:Q.x,y:base-p*u};
+    s+=`<g opacity="${op(1)}" ${lg(1)}>`;
+    s+=T(O.x-40,30,`<tspan fill="${C.ph}">φ</tspan><tspan fill="${C.text}"> = arctan(${p}/${q}) = ${deg(ph).toFixed(2)}°</tspan>`,C.text,20,'start');
+    s+=T(O.x-40,54,'the same triangle, flipped: seen from φ',C.muted,14,'start','font-weight="500"');
+    s+=LN(O.x-20,base,O.x+270,base,C.axis,2);
+    s+=side(O.x,O.y,Q.x,Q.y,C.opp,true,false)+side(Q.x,Q.y,P.x,P.y,C.adj,false,true)+side(O.x,O.y,P.x,P.y,C.hyp,true,false);
+    s+=RA(Q.x,Q.y,-1,0,0,-1,Math.max(5,Math.min(16,p*u*.4,q*u*.4)));
+    s+=ARC(O.x,O.y,44,0,ph,C.ph,4)+T(O.x+68*Math.cos(Math.max(ph/2,.2)),O.y-68*Math.sin(Math.max(ph/2,.2)),'φ',C.ph,20);
+    s+=T((O.x+Q.x)/2,base+24,`${q}`,C.opp,23);
+    s+=T(Q.x+14,(Q.y+P.y)/2,`${p}`,C.adj,23,'start');
+    s+=hypLabel(O,ph,r*u,`${r} · hypotenuse`,22,C.hyp,19);
+    s+=pill(605,`cos φ = ${q}/${r}`,rg,'adjacent ÷ hypotenuse');
+    s+='</g>';
+  }
+  // Panel C
+  {
+    const O={x:880,y:base}, Q={x:880+r*u,y:base}, S={x:Q.x,y:base-q*u};
+    s+=`<g opacity="${op(2)}" ${lg(2)}>`;
+    s+=T(O.x-40,30,`<tspan fill="${C.ps}">ψ</tspan><tspan fill="${C.text}"> = arctan(${q}/${r}) = ${deg(ps).toFixed(2)}°</tspan>`,C.text,20,'start');
+    s+=T(O.x-40,54,`a different triangle: legs are ${q} and ${r}`,C.muted,14,'start','font-weight="500"');
+    s+=LN(O.x-20,base,O.x+270,base,C.axis,2);
+    s+=side(O.x,O.y,Q.x,Q.y,C.hyp,true,false)+side(Q.x,Q.y,S.x,S.y,C.opp,true,false)+side(O.x,O.y,S.x,S.y,C.gray,false,true);
+    s+=RA(Q.x,Q.y,-1,0,0,-1,Math.max(5,Math.min(16,r*u*.4,q*u*.4)));
+    s+=ARC(O.x,O.y,44,0,ps,C.ps,4)+T(O.x+68*Math.cos(Math.max(ps/2,.2)),O.y-68*Math.sin(Math.max(ps/2,.2)),'ψ',C.ps,20);
+    s+=T((O.x+Q.x)/2,base+24,`${r} · a leg`,C.hyp,21);
+    s+=T(Q.x+14,(Q.y+S.y)/2,`${q}`,C.opp,23,'start');
+    s+=hypLabel(O,ps,hc*u,`√${r*r+q*q} ≈ ${hc.toFixed(2)}`,22,C.gray,18);
+    s+=pill(1005,`tan ψ = ${q}/${r}`,rg,'opposite ÷ adjacent leg');
+    s+='</g>';
+  }
+
+  // connectors + shared ruler
+  s+=`<g opacity="${op(3)}" ${lg(3)}>`;
+  [205,605,1005].forEach(cx=>{
+    s+=`<path d="M${cx},458 C${cx},500 ${tx},490 ${tx},538" fill="none" stroke="${C.gold}" stroke-width="2" stroke-dasharray="6 6" opacity=".7"/>`;
+  });
+  s+=T(150,516,`one shared length: ${q}/${r} of the way from 0 to 1`,C.muted,14,'start','font-weight="500"');
+  s+=`<rect x="150" y="545" width="900" height="14" rx="7" fill="#232c3d"/>`;
+  s+=`<rect x="150" y="545" width="${(900*ratio).toFixed(1)}" height="14" rx="7" fill="${C.gold}"/>`;
+  for(let i=0;i<=10;i++){
+    const X=150+90*i;
+    s+=LN(X,563,X,i%5===0?574:569,C.axis,2);
+    if(i%5===0) s+=T(X,588,i===0?'0':(i===5?'0.5':'1'),C.muted,14);
+  }
+  s+=`<polygon points="${f1(tx)},563 ${f1(tx-8)},576 ${f1(tx+8)},576" fill="${C.gold}"/>`;
+  s+=T(tx,598,`${q}/${r} = ${ratio.toFixed(3)}`,C.gold,18);
+  s+='</g>';
+
+  // flying chip
+  if(chip){
+    s+=`<g><rect x="${f1(chip.x-38)}" y="${f1(chip.y-20)}" width="76" height="40" rx="20" fill="${C.gold}" stroke="#fff" stroke-width="2" style="filter:drop-shadow(0 4px 10px rgba(0,0,0,.6))"/>${T(chip.x,chip.y+1,`${q}/${r}`,'#241c00',21)}</g>`;
+  }
+  $('tri3').innerHTML=s;
+}
+
+function flyStep(ts){
+  const cycle=fly.hold+fly.leg, total=cycle*3+fly.hold, t=Math.max(0,ts-fly.t0);
+  if(t>=total){ fly=null; lit=-1; chip=null; return false; }
+  const st=stops3(), i=Math.min(3,Math.floor(t/cycle)), rem=t-i*cycle;
+  if(rem<fly.hold||i===3){ lit=i; chip={x:st[i].x,y:st[i].y}; }
+  else{
+    const u=easeIO((rem-fly.hold)/fly.leg);
+    lit=-1;
+    chip={x:st[i].x+(st[i+1].x-st[i].x)*u, y:st[i].y+(st[i+1].y-st[i].y)*u-70*Math.sin(Math.PI*u)};
+  }
+  return true;
+}
+
+function updateStatic(){
+  const [p,q,r]=tri;
+  $('snapBtn').textContent=`Snap to ${p}-${q}-${r} triangle`;
+  const pct=(q/p-XMIN)/(XMAX-XMIN)*100;
+  $('snapTick').style.left=`calc(${pct.toFixed(3)}% + ${(9-pct*0.18).toFixed(2)}px)`;
+  $('snapTickLbl').textContent=`${q}/${p}`;
+  $('flyBtn').textContent=`Fly the ${q}/${r} across all three`;
+  $('ident').innerHTML=
+    `<span>① sin(arctan(${q}/${p})) = <b class="cgold">${q}/${r}</b></span>`+
+    `<span>② cos(arctan(${p}/${q})) = <b class="cgold">${q}/${r}</b></span>`+
+    `<span>③ tan(arctan(${q}/${r})) = <b class="cgold">${q}/${r}</b></span>`;
+  $('insight').innerHTML=
+    `<p>In <b>A</b> and <b>B</b> the ${G('green '+r)} is the <b>hypotenuse</b>, so ${R(q)}/${G(r)} is a <b>sine</b> (from θ) and a <b>cosine</b> (from φ). In <b>C</b> the very same ${G('length '+r)} is a <b>leg</b>, so ${R(q)}/${G(r)} is a <b>tangent</b>.</p>`+
+    `<p>The two lengths never change. Only the triangle they sit in, and therefore the function's name, changes. For any Pythagorean triple (a, b, c): a/c = sin(arctan(a/b)) = tan(arctan(a/c)). (The tangent line itself is trivially true for any number. The interesting part is that the triple hands you this ratio as a hypotenuse ratio, and it is also a legitimate leg ratio.)</p>`;
+}
+
+/* ---------- animation loop ---------- */
+function kick(){ if(!raf) raf=requestAnimationFrame(frame); }
+function frame(ts){
+  raf=0;
+  const dt=Math.min(64,ts-(lastTs||ts)); lastTs=ts;
+  let busy=false;
+
+  const dx=xTarget-xShown;
+  if(Math.abs(dx)>1e-4){
+    if(reduceMotion) xShown=xTarget;
+    else xShown+=dx*(1-Math.pow(0.0001,dt/1000));
+    busy=true;
+  } else xShown=xTarget;
+
+  if(flipAnim){
+    const u=(ts-flipAnim.t0)/flipAnim.dur;
+    if(u>=1){ flipT=flipAnim.to; flipAnim=null; }
+    else { flipT=flipAnim.from+(flipAnim.to-flipAnim.from)*u; busy=true; }
+  }
+  if(fly){ if(flyStep(ts)) busy=true; }
+
+  renderMain(); renderPanels(); renderTri3();
+  if(busy) raf=requestAnimationFrame(frame); else lastTs=0;
+}
+
+/* ---------- events ---------- */
+const xs=$('xs');
+xs.addEventListener('input',()=>{
+  let v=parseFloat(xs.value); const rt=tri[1]/tri[0];
+  if(Math.abs(v-rt)<0.02) v=rt;          // sticky zone around the triple's ratio
+  xTarget=v; kick();
+});
+$('snapBtn').addEventListener('click',()=>{
+  xTarget=tri[1]/tri[0]; xs.value=xTarget; hi='sin'; kick();
+});
+$('flipBtn').addEventListener('click',()=>{
+  const to=flipT<0.5?1:0;
+  flipAnim={t0:performance.now(),from:flipT,to:to,dur:reduceMotion?1:1700};
+  kick();
+});
+$('triSel').addEventListener('change',e=>{
+  const wasSnapped=isSnapped();
+  tri=TRIPLES[+e.target.value];
+  updateStatic();
+  if(wasSnapped){ xTarget=tri[1]/tri[0]; xs.value=xTarget; }
+  kick();
+});
+$('flyBtn').addEventListener('click',()=>{
+  fly={t0:performance.now(),hold:reduceMotion?400:750,leg:reduceMotion?1:1000};
+  kick();
+});
+$('hiSin').addEventListener('click',()=>{hi='sin';kick();});
+$('hiCos').addEventListener('click',()=>{hi='cos';kick();});
+$('hiNone').addEventListener('click',()=>{hi='none';kick();});
+
+// twin highlighting in the value table
+const valsEl=document.querySelector('.vals');
+valsEl.addEventListener('mouseover',e=>{
+  const c=e.target.closest('.cell'); if(!c) return;
+  valsEl.querySelectorAll('.cell[data-g="'+c.dataset.g+'"]').forEach(n=>n.classList.add('pair'));
+});
+valsEl.addEventListener('mouseout',e=>{
+  valsEl.querySelectorAll('.cell.pair').forEach(n=>n.classList.remove('pair'));
+});
+valsEl.addEventListener('click',e=>{
+  const c=e.target.closest('.cell'); if(!c) return;
+  hi=c.dataset.mode; kick();
+});
+
+/* ---------- init ---------- */
+updateStatic();
+xs.value=xTarget;
+kick();
+})();
+</script>
+</body>
+</html>

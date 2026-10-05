@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>arctan(1) = arctan(1/2) + arctan(1/3): a visual proof</title>
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --bg: #eef2f7;
+    --panel: #ffffff;
+    --ink: #13213a;
+    --muted: #5b6a82;
+    --line: #d5dde9;
+    --grid: #c9d3e2;
+    --grid-strong: #8fa0b8;
+    --blue: #2563eb;
+    --blue-soft: rgba(37, 99, 235, 0.30);
+    --green: #12a150;
+    --green-soft: rgba(18, 161, 80, 0.32);
+    --red: #e0383e;
+    --red-soft: rgba(224, 56, 62, 0.30);
+    --ref: #c2410c;
+    --ref-soft: rgba(194, 65, 12, 0.25);
+    --square-fill: rgba(19, 33, 58, 0.04);
+    --canvas: #fbfcfe;
+    --shadow: 0 1px 2px rgba(19, 33, 58, 0.06), 0 8px 24px rgba(19, 33, 58, 0.06);
+    /* one colour per angle arctan(1/F_k): k2 = 1, k3 = 1/2, k4 = 1/3, k5 = 1/5, ... */
+    --k2: var(--blue); --k3: var(--red); --k4: var(--green);
+    --k5: #d97706; --k6: #7c3aed; --k7: #0891b2; --k8: #db2777; --k9: #65a30d; --k10: #4f46e5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c1424;
+      --panel: #131e33;
+      --ink: #e6ecf7;
+      --muted: #96a5bf;
+      --line: #25324d;
+      --grid: #25324d;
+      --grid-strong: #4a5d80;
+      --blue: #6ea0ff;
+      --blue-soft: rgba(110, 160, 255, 0.30);
+      --green: #3ddc84;
+      --green-soft: rgba(61, 220, 132, 0.28);
+      --red: #ff6b70;
+      --red-soft: rgba(255, 107, 112, 0.30);
+      --ref: #ffa05c;
+      --ref-soft: rgba(255, 160, 92, 0.25);
+      --square-fill: rgba(230, 236, 247, 0.05);
+      --canvas: #0f192d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+      --k5: #fbbf24; --k6: #b79cff; --k7: #4cc9e0; --k8: #ff7ab8; --k9: #a3e635; --k10: #8b93ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c1424;
+    --panel: #131e33;
+    --ink: #e6ecf7;
+    --muted: #96a5bf;
+    --line: #25324d;
+    --grid: #25324d;
+    --grid-strong: #4a5d80;
+    --blue: #6ea0ff;
+    --blue-soft: rgba(110, 160, 255, 0.30);
+    --green: #3ddc84;
+    --green-soft: rgba(61, 220, 132, 0.28);
+    --red: #ff6b70;
+    --red-soft: rgba(255, 107, 112, 0.30);
+    --ref: #ffa05c;
+    --ref-soft: rgba(255, 160, 92, 0.25);
+    --square-fill: rgba(230, 236, 247, 0.05);
+    --canvas: #0f192d;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --k5: #fbbf24; --k6: #b79cff; --k7: #4cc9e0; --k8: #ff7ab8; --k9: #a3e635; --k10: #8b93ff;
+  }
+
+  /* Colour roles for the two grid views.
+     3x3 mirrors the hand-drawn version (red = 1/2, green = 1/3, blue = 1);
+     4x4 uses blue = 1/2, green = 1/3, amber = combined reference. */
+  body[data-mode="3"] {
+    --c-half: var(--red);   --c-half-soft: var(--red-soft);
+    --c-third: var(--green); --c-third-soft: var(--green-soft);
+    --c-whole: var(--blue);  --c-whole-soft: var(--blue-soft);
+  }
+  body[data-mode="4"] {
+    --c-half: var(--blue);   --c-half-soft: var(--blue-soft);
+    --c-third: var(--green); --c-third-soft: var(--green-soft);
+    --c-whole: var(--ref);   --c-whole-soft: var(--ref-soft);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 56px; }
+
+  header { margin-bottom: 22px; max-width: 760px; }
+  h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 4.2vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 8px;
+    letter-spacing: -0.01em;
+  }
+  .sub { color: var(--muted); margin: 0; font-size: 1.02rem; }
+  .c-half { color: var(--c-half); }
+  .c-third { color: var(--c-third); }
+  .c-whole { color: var(--c-whole); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+  }
+  .stage { padding: 14px; }
+
+  .seg-row { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-bottom: 12px; align-items: center; }
+  .seg {
+    display: inline-flex; flex-wrap: wrap; padding: 4px; gap: 4px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+  }
+  .seg label { position: relative; cursor: pointer; }
+  .seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+  .seg span {
+    display: block; padding: 7px 14px; border-radius: 9px;
+    font-weight: 600; font-size: 0.93rem; color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .seg input:checked + span { background: var(--panel); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.16); }
+  .seg input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .seg.steps span { font-size: 0.86rem; padding: 6px 11px; }
+
+  .eq {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: clamp(1.05rem, 2.7vw, 1.4rem);
+    font-weight: 600; margin: 0 0 12px; line-height: 1.35;
+  }
+
+  .canvas-scroll {
+    overflow: auto;
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    padding: 6px;
+    min-height: 200px;
+    max-height: 82vh;
+  }
+  svg { display: block; max-width: none; height: auto; }
+  svg text { font-family: "Inter", system-ui, sans-serif; fill: var(--ink); }
+
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center;
+    padding: 14px 4px 2px;
+  }
+  .slider-row { flex: 1 1 280px; display: flex; align-items: center; gap: 12px; }
+  .slider-row label { font-weight: 600; white-space: nowrap; }
+  input[type="range"] { flex: 1; accent-color: var(--blue); min-width: 120px; height: 28px; }
+  .px-badge { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 62px; text-align: right; }
+  .toggles { display: flex; gap: 16px; flex-wrap: wrap; }
+  .toggles label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; font-size: 0.93rem; color: var(--muted); }
+  input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 10px 4px 0; font-size: 0.9rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+  aside { display: grid; gap: 14px; }
+  .panel { padding: 16px 18px; }
+  .panel h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.12rem; font-weight: 600; margin: 0 0 10px;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.92rem; font-variant-numeric: tabular-nums; }
+  td, th { padding: 6px 0; vertical-align: baseline; }
+  tr + tr td, tr + tr th { border-top: 1px solid var(--line); }
+  th { text-align: left; font-weight: 600; }
+  td.num { text-align: right; font-weight: 600; white-space: nowrap; }
+  td.ex { color: var(--muted); font-size: 0.84rem; padding-right: 10px; }
+  .frac { white-space: nowrap; }
+
+  .angle-grid { display: grid; gap: 10px; }
+  .angle {
+    border-radius: 10px; padding: 10px 12px; border: 1px solid var(--line);
+    border-left-width: 5px;
+  }
+  .angle.half { border-left-color: var(--c-half); }
+  .angle.third { border-left-color: var(--c-third); }
+  .angle.whole { border-left-color: var(--c-whole); }
+  .angle .name { font-size: 0.86rem; color: var(--muted); }
+  .angle .vals { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-weight: 650; font-variant-numeric: tabular-nums; font-size: 1.05rem; }
+  .angle .vals small { font-weight: 500; color: var(--muted); font-size: 0.88rem; }
+  .check {
+    margin-top: 10px; padding: 9px 12px; border-radius: 10px;
+    background: color-mix(in srgb, var(--green) 14%, transparent);
+    font-size: 0.9rem; font-variant-numeric: tabular-nums;
+  }
+
+  .explain { margin-top: 20px; padding: 24px clamp(18px, 4vw, 34px); }
+  .explain h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.4rem; margin: 0 0 12px; font-weight: 600;
+  }
+  .explain .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px 32px; max-width: 1000px; }
+  .explain p { margin: 0 0 12px; max-width: 62ch; }
+  .explain ol { margin: 0; padding-left: 1.2em; max-width: 62ch; }
+  .explain li { margin-bottom: 10px; }
+  .m { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9em; }
+  .qed { margin-top: 6px; font-weight: 600; }
+
+  a { color: var(--blue); }
+  .cass { margin-top: 20px; padding: 24px clamp(18px, 4vw, 34px); }
+  .cass h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: 1.4rem; margin: 0 0 10px; font-weight: 600;
+  }
+  .cass p { margin: 0 0 12px; max-width: 70ch; }
+  .formula {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    font-size: clamp(1.1rem, 3vw, 1.5rem); font-weight: 600;
+    padding: 12px 16px; border-radius: 12px; margin: 4px 0 16px;
+    background: color-mix(in srgb, var(--blue) 10%, transparent);
+    display: inline-block; max-width: 100%; overflow-x: auto;
+  }
+  .cass-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr); gap: 20px; align-items: start; margin-top: 8px; }
+  @media (max-width: 820px) { .cass-grid { grid-template-columns: minmax(0, 1fr); } }
+  .cass-ctl { display: flex; align-items: center; gap: 12px; margin: 6px 0 12px; max-width: 460px; }
+  .cass-ctl label { font-weight: 600; white-space: nowrap; }
+  .cass-ctl output { font-weight: 700; min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+  .cass-svg { overflow-x: auto; background: var(--canvas); border: 1px solid var(--line); border-radius: 10px; padding: 6px; }
+  .tie {
+    margin-top: 14px; padding: 12px 14px; border-radius: 12px;
+    border: 1px solid var(--line); border-left: 5px solid var(--green);
+    background: color-mix(in srgb, var(--green) 7%, transparent); max-width: 70ch;
+  }
+  .tie.flip { border-left-color: var(--ref); background: color-mix(in srgb, var(--ref) 8%, transparent); }
+  .tie p:last-child { margin-bottom: 0; }
+  .seqtbl { margin-top: 6px; }
+  .seqtbl td, .seqtbl th { padding: 5px 8px; text-align: right; }
+  .seqtbl th:first-child, .seqtbl td:first-child { text-align: left; }
+  .seqtbl tr.sel td { background: color-mix(in srgb, var(--blue) 14%, transparent); font-weight: 700; }
+  .tbl-wrap { overflow-x: auto; }
+  details { margin-top: 16px; max-width: 70ch; }
+  summary { cursor: pointer; font-weight: 600; padding: 4px 0; }
+  summary:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 4px; }
+  details .m, .cass .m { white-space: nowrap; }
+</style>
+</head>
+<body data-mode="3">
+<div class="wrap">
+  <header>
+    <h1>Why arctan 1 = arctan ½ + arctan ⅓</h1>
+    <p class="sub">A tilted square on a square grid splits a right angle so that the pieces have tangents ½ and ⅓. Choose the 3×3 or 4×4 picture, or follow the same idea into the Fibonacci numbers. Drag the slider: the drawing grows, the proof does not change.</p>
+  </header>
+
+  <div class="layout">
+    <section class="card stage" aria-label="Interactive diagram">
+      <div class="seg-row">
+        <div class="seg" role="radiogroup" aria-label="Diagram type">
+          <label><input type="radio" name="mode" value="3" checked><span>3 × 3 square</span></label>
+          <label><input type="radio" name="mode" value="4"><span>4 × 4 square</span></label>
+          <label><input type="radio" name="mode" value="F"><span>Fibonacci</span></label>
+        </div>
+        <div class="seg steps" id="stepSeg" role="radiogroup" aria-label="Fibonacci step" hidden>
+          <label><input type="radio" name="step" value="0"><span>1 = 1/2 + 1/3</span></label>
+          <label><input type="radio" name="step" value="1" checked><span>1/3 = 1/5 + 1/8</span></label>
+          <label><input type="radio" name="step" value="2"><span>1/8 = 1/13 + 1/21</span></label>
+          <label><input type="radio" name="step" value="3"><span>1/21 = 1/34 + 1/55</span></label>
+        </div>
+      </div>
+      <div class="eq" id="eq" hidden></div>
+      <div class="canvas-scroll" id="scroll">
+        <svg id="svg" role="img" aria-label="Diagram of the arctan identity"></svg>
+      </div>
+      <div class="controls">
+        <div class="slider-row">
+          <label for="size">Grid square size</label>
+          <input id="size" type="range" min="10" max="100" step="1" value="60">
+          <span class="px-badge" id="sizeOut">60 px</span>
+        </div>
+        <div class="toggles">
+          <label data-modes="3 4"><input type="checkbox" id="tSquare" checked> Tilted square</label>
+          <label data-modes="3 4"><input type="checkbox" id="tTri" checked> Right triangles</label>
+          <label data-modes="3 4"><input type="checkbox" id="tMarks" checked> Edge marks</label>
+          <label data-modes="3 4 F"><input type="checkbox" id="tLabels" checked> Labels</label>
+        </div>
+      </div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <aside>
+      <section class="card panel" aria-labelledby="h-angles">
+        <h2 id="h-angles">Angles</h2>
+        <div class="angle-grid" id="angles"></div>
+        <div class="check" id="check"></div>
+      </section>
+
+      <section class="card panel" aria-labelledby="h-slopes">
+        <h2 id="h-slopes">Rise over run</h2>
+        <table id="slopes"></table>
+      </section>
+
+      <section class="card panel" aria-labelledby="h-sides">
+        <h2 id="h-sides">Side lengths</h2>
+        <table id="sides"></table>
+      </section>
+    </aside>
+  </div>
+
+  <section class="card explain" aria-labelledby="h-explain">
+    <h2 id="h-explain">How the geometry anchors the trigonometry</h2>
+    <div class="cols" id="explain"></div>
+  </section>
+
+  <section class="card cass" id="cassini" aria-labelledby="h-cass">
+    <h2 id="h-cass">Cassini's identity: the one-square gap</h2>
+    <p>The Fibonacci numbers start 1, 1, 2, 3, 5, 8, 13, 21, 34, … and each one is the sum of the two before it. Take any three neighbours, say 5, 8, 13. Multiply the outer two: 5 × 13 = 65. Square the middle one: 8² = 64. The two results differ by exactly 1. Try 8, 13, 21: 8 × 21 = 168 and 13² = 169, off by 1 again, but in the other direction. That pattern is Cassini's identity.</p>
+    <div class="formula">F(n−1) · F(n+1) − F(n)² = (−1)<sup>n</sup></div>
+    <p>Pick n below. The square has side F(n) and the rectangle has sides F(n−1) and F(n+1). Their areas never differ by more than a single unit square.</p>
+
+    <div class="cass-ctl">
+      <label for="cassN">Position n</label>
+      <input id="cassN" type="range" min="2" max="10" step="1" value="5" aria-describedby="cassNOut">
+      <output id="cassNOut" for="cassN">n = 5</output>
+    </div>
+
+    <div class="cass-grid">
+      <div>
+        <div class="cass-svg"><svg id="cassSvg" role="img" aria-label="A square with side F(n) next to a rectangle with sides F(n-1) and F(n+1), with their areas compared."></svg></div>
+      </div>
+      <div>
+        <table id="cassRead" aria-label="Cassini numbers for the chosen n"></table>
+      </div>
+    </div>
+
+    <div class="tie" id="cassTie"></div>
+
+    <h3 style="margin:22px 0 4px;font-size:1.05rem">The first twelve cases</h3>
+    <div class="tbl-wrap"><table class="seqtbl" id="cassTable"></table></div>
+
+    <details>
+      <summary>Why is it always true? A short proof</summary>
+      <p style="margin-top:8px">Check it for the first case, then show that if it holds at one position it holds at the next.</p>
+      <p><strong>Start.</strong> n = 1 gives F(0)·F(2) − F(1)² = 0·1 − 1 = −1 = (−1)<sup>1</sup>. ✓</p>
+      <p><strong>Step.</strong> Suppose F(n−1)·F(n+1) − F(n)² = (−1)<sup>n</sup>. Using F(n+2) = F(n+1) + F(n):</p>
+      <p class="m" style="white-space:normal">F(n)·F(n+2) − F(n+1)²<br>
+        = F(n)·F(n+1) + F(n)² − F(n+1)²<br>
+        = F(n+1)·(F(n) − F(n+1)) + F(n)²<br>
+        = −F(n+1)·F(n−1) + F(n)²<br>
+        = −(F(n−1)·F(n+1) − F(n)²) = −(−1)<sup>n</sup> = (−1)<sup>n+1</sup>. ✓</p>
+      <p>Each step flips the sign, which is where the (−1)<sup>n</sup> comes from.</p>
+    </details>
+  </section>
+</div>
+
+<script>
+(function () {
+  // ---------- vector helpers (grid units, y points up) ----------
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1];
+  const cross = (a, b) => a[0] * b[1] - a[1] * b[0];
+  const len = (a) => Math.hypot(a[0], a[1]);
+  const ang = (v) => Math.atan2(v[1], v[0]);
+  const unit = (v) => { const l = len(v); return [v[0] / l, v[1] / l]; };
+  const dist = (a, b) => len(sub(a, b));
+  const vecAngle = (u, v) => Math.atan2(Math.abs(cross(u, v)), dot(u, v));
+  const fib = (k) => { let a = 0, b = 1; for (let i = 0; i < k; i++) { const t = a + b; a = b; b = t; } return a; };
+
+  const f2 = (n) => n.toFixed(2);
+  const f4 = (n) => n.toFixed(4);
+  const f5 = (n) => n.toFixed(5);
+  const deg = (r) => r * 180 / Math.PI;
+  function nearFrac(x) {
+    for (let n = 1; n <= 100; n++) if (Math.abs(x - 1 / n) < 1e-9) return `1/${n}`;
+    return x.toFixed(4);
+  }
+
+  // ---------- the two grid diagrams ----------
+  const MODES = {};
+
+  // 3x3: square (2,0) (0,1) (1,3) (3,2); the vertical grid line through P splits one 45 degree half
+  (function () {
+    const P = [2, 0], L = [0, 1], T = [1, 3], R = [3, 2], Q = [2, 2], V = [2, 3];
+    MODES['3'] = {
+      N: 3, P, rMul: 1.2,
+      square: [L, T, R, P],
+      sectors: [['half', R, V], ['third', V, T], ['whole', T, L]],
+      angleVecs: { half: [V, R], third: [T, V], whole: [L, T] },
+      rays: [
+        { to: R, col: 'var(--ink)', op: 0.8 }, { to: V, col: 'var(--ink)', op: 0.8 },
+        { to: T, col: 'var(--ink)', op: 0.8 }, { to: L, col: 'var(--ink)', op: 0.8 }
+      ],
+      tris: [
+        { role: 'half',  name: 'P-Q-R', pts: [P, Q, R], right: 1, rise: [Q, R], run: [P, Q], riseName: 'QR', runName: 'PQ', draw: true },
+        { role: 'third', name: 'P-V-T', pts: [P, V, T], right: 1, rise: [V, T], run: [P, V], riseName: 'VT', runName: 'PV', draw: true },
+        { role: 'whole', name: 'P-L-T', pts: [P, L, T], right: 1, rise: [L, T], run: [P, L], riseName: 'LT', runName: 'PL', draw: true }
+      ],
+      verts: [
+        [P, 'P', '(2, 0)', [0, 1], false, false], [L, 'L', '(0, 1)', [-1, 0], false, false],
+        [T, 'T', '(1, 3)', [0, -1], false, false], [R, 'R', '(3, 2)', [1, 0], false, false],
+        [Q, 'Q', '', [1, 0], true, true], [V, 'V', '', [0, -1], true, true]
+      ],
+      sides: [
+        ['PR, a side of the square', '√(1² + 2²) = √5 · g', P, R],
+        ['PL, a side of the square', '√(2² + 1²) = √5 · g', P, L],
+        ['PT, the diagonal', '√(1² + 3²) = √10 · g', P, T],
+        ['PQ', '2 · g', P, Q], ['QR', '1 · g', Q, R],
+        ['PV', '3 · g', P, V], ['VT', '1 · g', V, T]
+      ],
+      explain: () => `
+        <div>
+          <p>Place a tilted square on a 3×3 grid with corners at <span class="m">(2, 0)</span>, <span class="m">(0, 1)</span>, <span class="m">(1, 3)</span> and <span class="m">(3, 2)</span>. Every side is a "1 across, 2 up" step, so all four sides are √5 long and neighbouring sides are perpendicular.</p>
+          <p>At the bottom corner P the right angle is cut in half by the diagonal PT. Each half is 45°.</p>
+        </div>
+        <div>
+          <ol>
+            <li>The <strong class="c-whole">blue half</strong> sits in triangle P-L-T. Its two short sides, PL and LT, are equal and meet at a right angle, so <strong class="c-whole">tan = 1</strong>.</li>
+            <li>The grid's own vertical line through P cuts the other half in two. The <strong class="c-half">red piece</strong> is triangle P-Q-R: 1 across, 2 up, so <strong class="c-half">tan = ½</strong>.</li>
+            <li>The <strong class="c-third">green piece</strong> is triangle P-V-T: 1 across, 3 up, so <strong class="c-third">tan = ⅓</strong>.</li>
+            <li>Red and green together fill the second 45° half, which has the same size as the blue half, so</li>
+          </ol>
+          <p class="qed">arctan ½ + arctan ⅓ = arctan 1 = π/4.</p>
+        </div>`
+    };
+  })();
+
+  // 4x4: square (2.5,0) (0,1.5) (1.5,4) (4,2.5); the midpoint M of edge R-T creates the 1/2 and 1/3 pieces
+  (function () {
+    const P = [2.5, 0], L = [0, 1.5], T = [1.5, 4], R = [4, 2.5];
+    const M = [(R[0] + T[0]) / 2, (R[1] + T[1]) / 2];
+    const uPM = unit(sub(M, P));
+    const F = (() => { const s = dot(sub(T, P), uPM); return [P[0] + uPM[0] * s, P[1] + uPM[1] * s]; })();
+    MODES['4'] = {
+      N: 4, P, rMul: 1.55,
+      square: [L, T, R, P],
+      sectors: [['half', R, M], ['third', M, T]],
+      angleVecs: { half: [R, M], third: [M, T], whole: [R, T] },
+      rays: [
+        { to: T, col: 'var(--c-whole)', dash: true },
+        { to: R, col: 'var(--c-half)', w: 1.3 },
+        { to: M, col: 'var(--ink)' },
+        { to: L, col: 'var(--ink)', op: 0.55 }
+      ],
+      tris: [
+        { role: 'half',  name: 'P-R-M', pts: [P, R, M], right: 1, rise: [R, M], run: [P, R], riseName: 'RM', runName: 'PR', draw: true },
+        { role: 'third', name: 'P-F-T', pts: [P, F, T], right: 1, rise: [F, T], run: [P, F], riseName: 'FT', runName: 'PF', draw: true },
+        { role: 'whole', name: 'P-R-T', pts: [P, R, T], right: 1, rise: [R, T], run: [P, R], riseName: 'RT', runName: 'PR', draw: false }
+      ],
+      verts: [
+        [P, 'P', '(2.5, 0)', [0, 1], false, false], [L, 'L', '(0, 1.5)', [-1, 0], false, false],
+        [T, 'T', '(1.5, 4)', [0, -1], false, false], [R, 'R', '(4, 2.5)', [1, 0], false, false],
+        [M, 'M', '', [1, 0], true, false], [F, 'F', '', [-1, 0], true, true]
+      ],
+      sides: [
+        ['PR, a side of the square', '√(1.5² + 2.5²) = √8.5 · g', P, R],
+        ['PL, a side of the square', '√(2.5² + 1.5²) = √8.5 · g', P, L],
+        ['PT, the diagonal', '√(1² + 4²) = √17 · g', P, T],
+        ['PM', '√(0.25² + 3.25²) = √10.625 · g', P, M],
+        ['RM, half a side', '½ · √8.5 · g', R, M],
+        ['PF, T projected onto PM', 'run of the green triangle', P, F],
+        ['FT', 'PF ÷ 3', F, T]
+      ],
+      explain: () => `
+        <div>
+          <p>The four marked points <span class="m">(0, 1.5)</span>, <span class="m">(1.5, 4)</span>, <span class="m">(4, 2.5)</span> and <span class="m">(2.5, 0)</span> form a tilted square. Each edge is a <span class="m">(1.5, 2.5)</span> step, so all four sides are √8.5 long and neighbouring edges are perpendicular.</p>
+          <p>At the bottom vertex the two edges meet at a right angle, and the long diagonal to the top vertex cuts that corner in half. That diagonal is the <strong class="c-whole">45° reference</strong>, and tan 45° = 1.</p>
+        </div>
+        <div>
+          <ol>
+            <li>Mark <strong>M</strong>, the midpoint of the right-hand edge. In triangle P-R-M the short side is exactly half the long one, so <strong class="c-half">tan = ½</strong>.</li>
+            <li>The diagonal and the line to M leave a sliver between them. Drop a perpendicular from the top vertex onto that line: the run is three times the rise, so <strong class="c-third">tan = ⅓</strong>.</li>
+            <li>The two sectors fill the 45° wedge with no gap and no overlap, so</li>
+          </ol>
+          <p class="qed">arctan ½ + arctan ⅓ = arctan 1 = π/4.</p>
+        </div>`
+    };
+  })();
+
+  // ---------- Fibonacci cascade ----------
+  // Bottom vertex P = (0,0) with the vertical grid line. The diagonal PT of the 3x3 picture is the ray through (-1, 3).
+  // A ray through (-1, h) makes the angle arctan(1/h) with the vertical. Left heights 3, 8, 21, 55 are every
+  // second Fibonacci number; the right ray through (1, 2) is the red 1/2 piece.
+  const HL = [3, 8, 21, 55];
+  function fibModel(n) {
+    const V0 = [0, 1], RR = [1, 2];
+    const left = (h) => [-1, h];
+    const leaves = [];
+    leaves.push({ k: 3, v1: RR, v2: V0, current: n === 0, role: n === 0 ? 'C1' : '' });
+    leaves.push({ k: 2 * n + 4, v1: V0, v2: left(HL[n]), current: true, role: 'C2' });
+    for (let j = 0; j < n; j++) {
+      leaves.push({ k: 2 * j + 5, v1: left(HL[j + 1]), v2: left(HL[j]), current: j === n - 1, role: j === n - 1 ? 'C1' : '' });
+    }
+    const parent = n === 0
+      ? { k: 2, v1: RR, v2: left(HL[0]) }
+      : { k: 2 * n + 2, v1: V0, v2: left(HL[n - 1]) };
+    const c1 = leaves.find((l) => l.role === 'C1');
+    const c2 = leaves.find((l) => l.role === 'C2');
+    const rays = [{ v: RR, h: 2, side: 1 }, { v: V0, vertical: true }].concat(
+      HL.slice(0, n + 1).map((h) => ({ v: left(h), h, side: -1 }))
+    );
+    return { n, leaves, parent, c1, c2, rays };
+  }
+  const kName = (k) => (k === 2 ? 'arctan(1)' : `arctan(1/${fib(k)})`);
+  const kShort = (k) => (k === 2 ? 'arctan 1' : `arctan 1/${fib(k)}`);
+  const kPlain = (k) => (k === 2 ? '1' : `1/${fib(k)}`);
+
+  function explainFib(n) {
+    const col = (k) => `var(--k${k})`;
+    let stepText;
+    if (n === 0) {
+      stepText = `<p><strong>Step 1</strong> is the identity you started with. The right-hand ray goes through <span class="m">(1, 2)</span> (tan = ½) and the left-hand ray through <span class="m">(−1, 3)</span> (tan = ⅓). Together they enclose 45°.</p>`;
+    } else {
+      const a = HL[n - 1], b = HL[n], gap = b - a;
+      stepText = `<p><strong>Step ${n + 1}</strong> adds a ray through height ${b}, next to the ray through height ${a}. The gap on the ladder is ${b} − ${a} = ${gap}, and 1 + ${a}·${b} = ${1 + a * b} = ${gap}². So the wedge between the two rays has tan = ${gap} ÷ ${gap * gap} = <strong style="color:${col(2 * n + 3)}">1/${gap}</strong>. What is left, between the vertical and the new ray, has tan = <strong style="color:${col(2 * n + 4)}">1/${b}</strong>.</p>`;
+    }
+    return `
+      <div>
+        <p>Keep the 3×3 picture's bottom vertex P and its vertical grid line. The diagonal PT climbs 3 while moving 1 to the left, so it passes through <span class="m">(−1, 3)</span> on the grid line one unit to the left. Any ray from P through <span class="m">(−1, h)</span> makes the angle arctan(1/h) with the vertical.</p>
+        ${stepText}
+      </div>
+      <div>
+        <ol>
+          <li>Two rays through heights a and b enclose an angle with <strong>tan = (b − a) ÷ (1 + a·b)</strong>. This is the tangent subtraction formula.</li>
+          <li>Pick heights from the Fibonacci numbers at even positions: 1, 3, 8, 21, 55, … <a href="#cassini">Cassini's identity</a> says 1 + a·b is always the square of the number between them, (b − a)².</li>
+          <li>So every wedge has tan = 1/(b − a), and the gaps 2, 5, 13, 34, … are the Fibonacci numbers at odd positions.</li>
+        </ol>
+        <p class="qed">arctan(1/F<sub>2n</sub>) = arctan(1/F<sub>2n+1</sub>) + arctan(1/F<sub>2n+2</sub>), and it never stops.</p>
+      </div>`;
+  }
+
+  // ---------- DOM ----------
+  const svg = document.getElementById('svg');
+  const sizeEl = document.getElementById('size');
+  const sizeOut = document.getElementById('sizeOut');
+  const tSquare = document.getElementById('tSquare');
+  const tTri = document.getElementById('tTri');
+  const tMarks = document.getElementById('tMarks');
+  const tLabels = document.getElementById('tLabels');
+  const modeInputs = document.querySelectorAll('input[name="mode"]');
+  const stepInputs = document.querySelectorAll('input[name="step"]');
+  let mode = '3';
+  let fibStep = 1;
+
+  const ROLE_TEXT = { half: 'arctan ½', third: 'arctan ⅓', whole: 'arctan 1' };
+
+  function rightMark(corner, va, vb, size, color, X, Y, sw) {
+    const na = unit(va), nb = unit(vb);
+    const c = [X(corner[0]), Y(corner[1])];
+    const a = [na[0], -na[1]], b = [nb[0], -nb[1]];   // flip y for screen space
+    const p1 = [c[0] + a[0] * size, c[1] + a[1] * size];
+    const p2 = [c[0] + (a[0] + b[0]) * size, c[1] + (a[1] + b[1]) * size];
+    const p3 = [c[0] + b[0] * size, c[1] + b[1] * size];
+    return `<polyline points="${p1} ${p2} ${p3}" fill="none" stroke="${color}" stroke-width="${sw * 0.8}"/>`;
+  }
+
+  function render() { if (mode === 'F') renderFib(); else renderGrid(); }
+
+  // ================= 3x3 and 4x4 =================
+  function renderGrid() {
+    const C = MODES[mode];
+    const N = C.N, P = C.P;
+    const g = +sizeEl.value;
+    sizeOut.textContent = g + ' px';
+    document.body.dataset.mode = mode;
+
+    const pad = Math.max(40, Math.round(g * 0.6));
+    const W = N * g + 2 * pad, H = N * g + 2 * pad;
+    const X = (x) => pad + x * g;
+    const Y = (y) => pad + (N - y) * g;
+    const pt = (p) => X(p[0]).toFixed(2) + ',' + Y(p[1]).toFixed(2);
+    const fs = Math.max(10, Math.min(15, g * 0.22));
+    const sw = Math.max(1.4, Math.min(3, g * 0.035));
+    const showLabels = tLabels.checked && g >= 24;
+    const PX = X(P[0]), PY = Y(P[1]);
+
+    let s = '';
+
+    for (let i = 0; i <= N; i++) {
+      const strong = (i === 0 || i === N);
+      const col = strong ? 'var(--grid-strong)' : 'var(--grid)';
+      const w = strong ? 1.5 : 1;
+      s += `<line x1="${X(i)}" y1="${Y(0)}" x2="${X(i)}" y2="${Y(N)}" stroke="${col}" stroke-width="${w}"/>`;
+      s += `<line x1="${X(0)}" y1="${Y(i)}" x2="${X(N)}" y2="${Y(i)}" stroke="${col}" stroke-width="${w}"/>`;
+    }
+    if (g >= 30) {
+      for (let i = 0; i <= N; i++) {
+        s += `<text x="${X(i)}" y="${Y(0) + fs + 8}" font-size="${fs * 0.8}" text-anchor="middle" style="fill:var(--muted)">${i}</text>`;
+        s += `<text x="${X(0) - 10}" y="${Y(i) + fs * 0.3}" font-size="${fs * 0.8}" text-anchor="end" style="fill:var(--muted)">${i}</text>`;
+      }
+    }
+
+    if (tMarks.checked) {
+      const tk = Math.max(4, Math.min(8, g * 0.1));
+      for (let i = 0; i < N; i++) {
+        const m = i + 0.5;
+        s += `<line x1="${X(m)}" y1="${Y(N) - tk}" x2="${X(m)}" y2="${Y(N) + tk}" stroke="var(--ink)" stroke-opacity="0.75" stroke-width="${sw * 0.7}"/>`;
+        s += `<line x1="${X(m)}" y1="${Y(0) - tk}" x2="${X(m)}" y2="${Y(0) + tk}" stroke="var(--ink)" stroke-opacity="0.75" stroke-width="${sw * 0.7}"/>`;
+        s += `<line x1="${X(0) - tk}" y1="${Y(m)}" x2="${X(0) + tk}" y2="${Y(m)}" stroke="var(--ink)" stroke-opacity="0.75" stroke-width="${sw * 0.7}"/>`;
+        s += `<line x1="${X(N) - tk}" y1="${Y(m)}" x2="${X(N) + tk}" y2="${Y(m)}" stroke="var(--ink)" stroke-opacity="0.75" stroke-width="${sw * 0.7}"/>`;
+      }
+      const rs = Math.max(6, g * 0.17);
+      s += rightMark([0, 0], [1, 0], [0, 1], rs, 'var(--ink)', X, Y, sw);
+      s += rightMark([N, N], [-1, 0], [0, -1], rs, 'var(--ink)', X, Y, sw);
+    }
+
+    if (tSquare.checked) {
+      s += `<polygon points="${C.square.map(pt).join(' ')}" fill="var(--square-fill)" stroke="var(--ink)" stroke-opacity="0.55" stroke-width="${sw * 0.8}" stroke-linejoin="round"/>`;
+    }
+
+    const r = C.rMul * g;
+    const arcPt = (a, rad) => [PX + rad * Math.cos(a), PY - rad * Math.sin(a)];
+    const sectorAngles = {};
+    C.sectors.forEach(([role, from, to]) => {
+      const a1 = ang(sub(from, P)), a2 = ang(sub(to, P));
+      sectorAngles[role] = [a1, a2];
+      const p1 = arcPt(a1, r), p2 = arcPt(a2, r);
+      s += `<path d="M ${PX} ${PY} L ${p1[0]} ${p1[1]} A ${r} ${r} 0 0 0 ${p2[0]} ${p2[1]} Z" fill="var(--c-${role}-soft)" stroke="var(--c-${role})" stroke-width="${sw * 0.7}" stroke-linejoin="round"/>`;
+    });
+
+    if (tTri.checked) {
+      const ra = Math.max(5, g * 0.12);
+      C.tris.filter((t) => t.draw).forEach((t) => {
+        s += `<polygon points="${t.pts.map(pt).join(' ')}" fill="none" stroke="var(--c-${t.role})" stroke-width="${sw}" stroke-dasharray="${sw * 3} ${sw * 2}" stroke-linejoin="round"/>`;
+        const c = t.pts[t.right], others = t.pts.filter((_, i) => i !== t.right);
+        s += rightMark(c, sub(others[0], c), sub(others[1], c), ra, `var(--c-${t.role})`, X, Y, sw);
+      });
+    }
+
+    C.rays.forEach((ray) => {
+      const w = sw * (ray.w || 1.1);
+      s += `<line x1="${PX}" y1="${PY}" x2="${X(ray.to[0])}" y2="${Y(ray.to[1])}" stroke="${ray.col}" stroke-opacity="${ray.op || 1}" stroke-width="${w}" stroke-linecap="round"${ray.dash ? ` stroke-dasharray="${sw * 1.2} ${sw * 2.2}"` : ''}/>`;
+    });
+
+    const dotR = Math.max(3, Math.min(5.5, g * 0.07));
+    C.verts.forEach(([p, name, coord, dir, small, onlyTri]) => {
+      if (onlyTri && !tTri.checked) return;
+      const col = (name === 'F' || name === 'Q' || name === 'V') ? 'var(--muted)' : 'var(--ink)';
+      s += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${small ? dotR * 0.8 : dotR}" fill="${small ? 'var(--panel)' : col}" stroke="${col}" stroke-width="${sw * 0.8}"/>`;
+      if (showLabels) {
+        const off = dotR + 8;
+        const tx = X(p[0]) + dir[0] * off;
+        const ty = Y(p[1]) + dir[1] * (off + fs * 0.6) + (dir[1] === 0 ? fs * 0.35 : 0);
+        const anchor = dir[0] < 0 ? 'end' : dir[0] > 0 ? 'start' : 'middle';
+        const label = coord ? `${name} ${coord}` : name;
+        s += `<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="600" text-anchor="${anchor}" style="fill:${col}">${label}</text>`;
+      }
+    });
+
+    if (showLabels && g >= 30) {
+      const lr = r + fs * 2.6;
+      Object.keys(sectorAngles).forEach((role) => {
+        const [a1, a2] = sectorAngles[role];
+        const mid = (a1 + a2) / 2;
+        const p = arcPt(mid, lr);
+        const left = mid > Math.PI / 2;
+        s += `<text x="${p[0] + (left ? -fs * 0.3 : fs * 0.3)}" y="${p[1]}" font-size="${fs * 1.05}" font-weight="700" text-anchor="${left ? 'end' : 'start'}" style="fill:var(--c-${role})">${ROLE_TEXT[role]}</text>`;
+      });
+      if (mode === '4') {
+        const T = C.rays[0].to;
+        const q = [P[0] + (T[0] - P[0]) * 0.55, P[1] + (T[1] - P[1]) * 0.55];
+        s += `<text x="${X(q[0]) - 8}" y="${Y(q[1])}" font-size="${fs}" font-weight="700" text-anchor="end" style="fill:var(--c-whole)">arctan 1 = 45°</text>`;
+      }
+    }
+
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    svg.innerHTML = s;
+
+    updatePanels(C, g);
+  }
+
+  function updatePanels(C, g) {
+    const P = C.P;
+    const scale = (p) => [p[0] * g, p[1] * g];
+    const pP = scale(P);
+
+    const A = {};
+    ['half', 'third', 'whole'].forEach((role) => {
+      const [u, v] = C.angleVecs[role].map((p) => sub(scale(p), pP));
+      A[role] = vecAngle(u, v);
+    });
+    const names = mode === '3'
+      ? { half: 'arctan(1/2), red sector', third: 'arctan(1/3), green sector', whole: 'arctan(1), blue sector' }
+      : { half: 'arctan(1/2), blue sector', third: 'arctan(1/3), green sector', whole: 'arctan(1), combined reference' };
+
+    document.getElementById('angles').innerHTML = ['half', 'third', 'whole'].map((role) => `
+      <div class="angle ${role}"><div class="name">${names[role]}</div>
+        <div class="vals"><span>${f4(deg(A[role]))}°</span><small>${f5(A[role])} rad</small></div></div>`).join('');
+
+    const sum = A.half + A.third;
+    const gap = Math.abs(deg(sum) - 45);
+    document.getElementById('check').innerHTML =
+      `${f4(deg(A.half))}° + ${f4(deg(A.third))}° = <strong>${f4(deg(sum))}°</strong><br>` +
+      `${f5(A.half)} + ${f5(A.third)} = <strong>${f5(sum)}</strong> &nbsp;(π/4 = ${f5(Math.PI / 4)})<br>` +
+      `Gap from 45° at ${g} px: <strong>${gap < 1e-9 ? '0' : gap.toExponential(1)}°</strong>`;
+
+    const order = ['half', 'third', 'whole'];
+    const headers = { half: 'c-half', third: 'c-third', whole: 'c-whole' };
+    const trisByRole = {};
+    C.tris.forEach((t) => (trisByRole[t.role] = t));
+    document.getElementById('slopes').innerHTML = order.map((role) => {
+      const t = trisByRole[role];
+      const rise = dist(scale(t.rise[0]), scale(t.rise[1]));
+      const run = dist(scale(t.run[0]), scale(t.run[1]));
+      return `
+        <tr><th class="${headers[role]}" colspan="2">${ROLE_TEXT[role]}: triangle ${t.name}</th></tr>
+        <tr><td class="ex">rise ${t.riseName}</td><td class="num">${f2(rise)} px</td></tr>
+        <tr><td class="ex">run ${t.runName}</td><td class="num">${f2(run)} px</td></tr>
+        <tr><td class="ex">rise ÷ run</td><td class="num"><span class="frac">${nearFrac(rise / run)}</span> = ${f4(rise / run)}</td></tr>`;
+    }).join('');
+
+    document.getElementById('sides').innerHTML = C.sides.map(([name, expr, a, b]) =>
+      `<tr><td>${name}<div class="ex" style="padding:0">${expr}</div></td><td class="num">${f2(dist(scale(a), scale(b)))} px</td></tr>`
+    ).join('');
+  }
+
+  // ================= Fibonacci view =================
+  function renderFib() {
+    const M = fibModel(fibStep);
+    const g = +sizeEl.value;
+    sizeOut.textContent = g + ' px';
+    document.body.dataset.mode = 'F';
+
+    const XMIN = -4, XMAX = 2, YMAX = 9;
+    const padL = Math.max(36, Math.round(g * 0.5)), padT = 26, padB = Math.max(36, Math.round(g * 0.45)), padR = 112;
+    const W = padL + (XMAX - XMIN) * g + padR, H = padT + YMAX * g + padB;
+    const X = (x) => padL + (x - XMIN) * g;
+    const Y = (y) => padT + (YMAX - y) * g;
+    const PX = X(0), PY = Y(0);
+    const fs = Math.max(10, Math.min(14, g * 0.22));
+    const sw = Math.max(1.4, Math.min(3, g * 0.035));
+    const showLabels = tLabels.checked && g >= 24;
+    const phi = (v) => Math.atan2(-v[0], v[1]);                       // angle from the vertical, positive to the left
+    const far = (v, L) => { const u = unit(v); return [PX + u[0] * L * g, PY - u[1] * L * g]; };
+    const arcPt = (p, R) => [PX - R * g * Math.sin(p), PY - R * g * Math.cos(p)];
+    const arcPath = (p1, p2, R) => {
+      const a = arcPt(p1, R), b = arcPt(p2, R);
+      return `M ${a[0]} ${a[1]} A ${R * g} ${R * g} 0 0 0 ${b[0]} ${b[1]}`;
+    };
+    const colK = (k) => `var(--k${k})`;
+
+    let s = `<defs><clipPath id="win"><rect x="${X(XMIN)}" y="${Y(YMAX)}" width="${(XMAX - XMIN) * g}" height="${YMAX * g}"/></clipPath></defs>`;
+
+    // grid
+    for (let x = XMIN; x <= XMAX; x++) {
+      const strong = x === 0, ladder = (x === -1 || x === 1);
+      s += `<line x1="${X(x)}" y1="${Y(0)}" x2="${X(x)}" y2="${Y(YMAX)}" stroke="${strong || ladder ? 'var(--grid-strong)' : 'var(--grid)'}" stroke-width="${strong ? 1.6 : ladder ? 1.3 : 1}"/>`;
+    }
+    for (let y = 0; y <= YMAX; y++) {
+      s += `<line x1="${X(XMIN)}" y1="${Y(y)}" x2="${X(XMAX)}" y2="${Y(y)}" stroke="${y === 0 ? 'var(--grid-strong)' : 'var(--grid)'}" stroke-width="${y === 0 ? 1.5 : 1}"/>`;
+    }
+    if (g >= 30) {
+      for (let x = XMIN; x <= XMAX; x++) s += `<text x="${X(x)}" y="${Y(0) + fs + 8}" font-size="${fs * 0.8}" text-anchor="middle" style="fill:var(--muted)">${x}</text>`;
+      for (let y = 0; y <= YMAX; y++) s += `<text x="${X(XMIN) - 8}" y="${Y(y) + fs * 0.3}" font-size="${fs * 0.8}" text-anchor="end" style="fill:var(--muted)">${y}</text>`;
+    }
+
+    // wedges and rays, clipped to the window
+    s += `<g clip-path="url(#win)">`;
+    M.leaves.forEach((l) => {
+      const a = far(l.v1, 60), b = far(l.v2, 60);
+      s += `<polygon points="${PX},${PY} ${a[0]},${a[1]} ${b[0]},${b[1]}" fill="${colK(l.k)}" fill-opacity="${l.current ? 0.34 : 0.13}"/>`;
+    });
+    M.rays.forEach((ray) => {
+      const e = far(ray.v, 60);
+      s += `<line x1="${PX}" y1="${PY}" x2="${e[0]}" y2="${e[1]}" stroke="var(--ink)" stroke-opacity="${ray.vertical ? 0.9 : 0.7}" stroke-width="${sw}"/>`;
+    });
+    s += `</g>`;
+    s += `<rect x="${X(XMIN)}" y="${Y(YMAX)}" width="${(XMAX - XMIN) * g}" height="${YMAX * g}" fill="none" stroke="var(--grid-strong)" stroke-width="1.5"/>`;
+
+    // concentric arcs: the parent angle (inner ring) equals the two children (outer ring)
+    const aw = Math.max(4, g * 0.09);
+    const R1 = 3.9, R2 = 4.25;
+    s += `<path d="${arcPath(phi(M.parent.v1), phi(M.parent.v2), R1)}" fill="none" stroke="${colK(M.parent.k)}" stroke-width="${aw}"/>`;
+    [M.c1, M.c2].forEach((c) => {
+      s += `<path d="${arcPath(phi(c.v1), phi(c.v2), R2)}" fill="none" stroke="${colK(c.k)}" stroke-width="${aw}"/>`;
+    });
+
+    // ladder points where the rays cross x = -1 and x = 1
+    const dotR = Math.max(3, Math.min(5, g * 0.07));
+    const pts = [{ x: 1, y: 2, side: 1 }].concat(HL.slice(0, M.n + 1).filter((h) => h <= YMAX).map((h) => ({ x: -1, y: h, side: -1 })));
+    pts.forEach((p) => {
+      s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="${dotR}" fill="var(--ink)"/>`;
+      if (showLabels && g >= 34) {
+        s += `<text x="${X(p.x) + p.side * -1 * (dotR + 6)}" y="${Y(p.y) + fs * 0.35}" font-size="${fs * 0.9}" font-weight="600" text-anchor="${p.side > 0 ? 'start' : 'end'}">(${p.x}, ${p.y})</text>`;
+      }
+    });
+    // ladder gaps between visible left points
+    if (showLabels && g >= 34) {
+      const vis = HL.slice(0, M.n + 1).filter((h) => h <= YMAX);
+      for (let i = 0; i + 1 < vis.length; i++) {
+        const y1 = vis[i], y2 = vis[i + 1], bx = X(-1) + 7;
+        s += `<path d="M ${bx - 3} ${Y(y1)} H ${bx} V ${Y(y2)} H ${bx - 3}" fill="none" stroke="var(--muted)" stroke-width="1.2"/>`;
+        s += `<text x="${bx + 5}" y="${(Y(y1) + Y(y2)) / 2 + fs * 0.35}" font-size="${fs * 0.95}" font-weight="700" style="fill:var(--muted)">${y2 - y1}</text>`;
+      }
+    }
+
+    // apex
+    s += `<circle cx="${PX}" cy="${PY}" r="${dotR + 1}" fill="var(--ink)"/>`;
+    if (showLabels) s += `<text x="${PX + 10}" y="${PY + fs + 14}" font-size="${fs}" font-weight="600">P (0, 0)</text>`;
+
+    // labels with leaders into the right margin
+    if (showLabels) {
+      const labelX = X(XMAX) + 12;
+      const items = [
+        { c: M.parent, pos: arcPt((phi(M.parent.v1) + phi(M.parent.v2)) / 2, R1), bold: true },
+        { c: M.c1, pos: arcPt((phi(M.c1.v1) + phi(M.c1.v2)) / 2, 6.4) },
+        { c: M.c2, pos: arcPt((phi(M.c2.v1) + phi(M.c2.v2)) / 2, 7.7) }
+      ];
+      items.forEach((it) => {
+        s += `<line x1="${it.pos[0]}" y1="${it.pos[1]}" x2="${labelX - 4}" y2="${it.pos[1]}" stroke="${colK(it.c.k)}" stroke-width="1.2" stroke-opacity="0.85"/>`;
+        s += `<circle cx="${it.pos[0]}" cy="${it.pos[1]}" r="3" fill="${colK(it.c.k)}"/>`;
+        s += `<text x="${labelX}" y="${it.pos[1] + fs * 0.35}" font-size="${fs * 1.05}" font-weight="700" style="fill:${colK(it.c.k)}">${kShort(it.c.k)}</text>`;
+      });
+    }
+
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.setAttribute('width', W);
+    svg.setAttribute('height', H);
+    svg.setAttribute('aria-label', 'Fan of rays from the bottom vertex. The angle for ' + kName(M.parent.k) + ' is split into ' + kName(M.c1.k) + ' and ' + kName(M.c2.k) + '.');
+    svg.innerHTML = s;
+
+    updatePanelsFib(M, g);
+  }
+
+  function updatePanelsFib(M, g) {
+    const sc = (v) => [v[0] * g, v[1] * g];
+    const meas = (o) => vecAngle(sc(o.v1), sc(o.v2));
+    const Ap = meas(M.parent), A1 = meas(M.c1), A2 = meas(M.c2);
+    const colK = (k) => `var(--k${k})`;
+    const card = (label, k, a) => `
+      <div class="angle" style="border-left-color:${colK(k)}"><div class="name">${label}: ${kName(k)}</div>
+        <div class="vals"><span>${f4(deg(a))}°</span><small>${f5(a)} rad</small></div></div>`;
+    document.getElementById('angles').innerHTML =
+      card('Parent', M.parent.k, Ap) + card('Piece 1', M.c1.k, A1) + card('Piece 2', M.c2.k, A2);
+
+    const sum = A1 + A2;
+    const gap = Math.abs(deg(sum) - deg(Ap));
+    document.getElementById('check').innerHTML =
+      `${f4(deg(A1))}° + ${f4(deg(A2))}° = <strong>${f4(deg(sum))}°</strong> &nbsp;(parent ${f4(deg(Ap))}°)<br>` +
+      `${f5(A1)} + ${f5(A2)} = <strong>${f5(sum)}</strong> &nbsp;(parent ${f5(Ap)} rad)<br>` +
+      `Gap from the parent at ${g} px: <strong>${gap < 1e-9 ? '0' : gap.toExponential(1)}°</strong>`;
+
+    // rise over run
+    const n = M.n;
+    const px = (v) => f2(v * g) + ' px';
+    const row = (a, b) => `<tr><td class="ex">${a}</td><td class="num">${b}</td></tr>`;
+    const head = (k, t) => `<tr><th colspan="2" style="color:${colK(k)}">${t}</th></tr>`;
+    let html = '';
+    // inner piece: right triangle P, (0, b), (-1, b)
+    const b = HL[n];
+    html += head(M.c2.k, `${kShort(M.c2.k)}: triangle P-(0, ${b})-(−1, ${b})`) +
+      row('rise (ladder distance)', px(1)) + row(`run (height ${b})`, px(b)) +
+      row('rise ÷ run', `<span class="frac">1/${b}</span> = ${f4(1 / b)}`);
+    if (n === 0) {
+      html += head(M.c1.k, `${kShort(M.c1.k)}: triangle P-(0, 2)-(1, 2)`) +
+        row('rise (ladder distance)', px(1)) + row('run (height 2)', px(2)) +
+        row('rise ÷ run', `<span class="frac">1/2</span> = ${f4(0.5)}`);
+      html += head(2, 'arctan 1: combined') +
+        row('(½ + ⅓) ÷ (1 − ½·⅓)', `<span class="frac">1</span> = ${f4((0.5 + 1 / 3) / (1 - 1 / 6))}`);
+    } else {
+      const a = HL[n - 1], d = b - a;
+      html += head(M.c1.k, `${kShort(M.c1.k)}: rays at heights ${a} and ${b}`) +
+        row('ladder gap b − a', px(d)) + row('1 + a·b', `${1 + a * b} = ${d}²`) +
+        row('(b − a) ÷ (1 + a·b)', `<span class="frac">1/${d}</span> = ${f4(d / (1 + a * b))}`);
+      html += head(M.parent.k, `${kShort(M.parent.k)}: triangle P-(0, ${a})-(−1, ${a})`) +
+        row('rise (ladder distance)', px(1)) + row(`run (height ${a})`, px(a)) +
+        row('rise ÷ run', `<span class="frac">1/${a}</span> = ${f4(1 / a)}`);
+    }
+    document.getElementById('slopes').innerHTML = html;
+
+    // side lengths
+    const rows = [['Ray through (1, 2)', '√(1² + 2²) = √5 · g', Math.sqrt(5)]];
+    HL.slice(0, n + 1).forEach((h) => rows.push([`Ray through (−1, ${h})`, `√(1² + ${h}²) = √${1 + h * h} · g`, Math.sqrt(1 + h * h)]));
+    for (let j = 0; j < n; j++) rows.push([`Ladder gap between heights ${HL[j]} and ${HL[j + 1]}`, `${HL[j + 1] - HL[j]} · g`, HL[j + 1] - HL[j]]);
+    document.getElementById('sides').innerHTML = rows.map(([name, expr, v]) =>
+      `<tr><td>${name}<div class="ex" style="padding:0">${expr}</div></td><td class="num">${f2(v * g)} px</td></tr>`).join('');
+  }
+
+  // ---------- static content and mode switching ----------
+  function updateStatic() {
+    const swc = (c) => `<i class="sw" style="background:${c}"></i>`;
+    document.querySelectorAll('.toggles label').forEach((l) => { l.hidden = !l.dataset.modes.split(' ').includes(mode); });
+    document.getElementById('stepSeg').hidden = mode !== 'F';
+    const eq = document.getElementById('eq');
+    eq.hidden = mode !== 'F';
+
+    if (mode === 'F') {
+      const M = fibModel(fibStep);
+      const sp = (k) => `<span style="color:var(--k${k})">${kName(k)}</span>`;
+      eq.innerHTML = `${sp(M.parent.k)} = ${sp(M.c1.k)} + ${sp(M.c2.k)}`;
+      document.getElementById('explain').innerHTML = explainFib(fibStep);
+      document.getElementById('legend').innerHTML =
+        `<span>${swc('var(--k' + M.parent.k + ')')} parent, inner ring: ${kName(M.parent.k)}</span>` +
+        `<span>${swc('var(--k' + M.c1.k + ')')} piece 1: ${kName(M.c1.k)}</span>` +
+        `<span>${swc('var(--k' + M.c2.k + ')')} piece 2: ${kName(M.c2.k)}</span>` +
+        `<span>Faded wedges: pieces from earlier steps</span>`;
+      document.getElementById('h-slopes').textContent = 'Rise over run on the ladder';
+    } else {
+      document.getElementById('explain').innerHTML = MODES[mode].explain();
+      document.getElementById('legend').innerHTML = mode === '3'
+        ? `<span>${swc('var(--c-half)')} arctan(1/2)</span><span>${swc('var(--c-third)')} arctan(1/3)</span><span>${swc('var(--c-whole)')} arctan(1) = 45°</span>`
+        : `<span>${swc('var(--c-half)')} arctan(1/2)</span><span>${swc('var(--c-third)')} arctan(1/3)</span><span>${swc('var(--c-whole)')} combined reference, 45°</span>`;
+      document.getElementById('h-slopes').textContent = 'Rise over run';
+      svg.setAttribute('aria-label', 'A tilted square drawn on a square grid, with the corner at the bottom vertex split into sectors for arctan 1, arctan 1/2 and arctan 1/3.');
+    }
+  }
+
+  modeInputs.forEach((el) => el.addEventListener('change', () => {
+    if (el.checked) { mode = el.value; updateStatic(); render(); }
+  }));
+  stepInputs.forEach((el) => el.addEventListener('change', () => {
+    if (el.checked) { fibStep = +el.value; updateStatic(); render(); }
+  }));
+  [sizeEl, tSquare, tTri, tMarks, tLabels].forEach((el) => el.addEventListener('input', render));
+
+  // ---------- Cassini section ----------
+  const cN = document.getElementById('cassN');
+  function renderCassini() {
+    const n = +cN.value;
+    document.getElementById('cassNOut').textContent = 'n = ' + n;
+    const a = fib(n - 1), s = fib(n), b = fib(n + 1);
+    const prod = a * b, sq = s * s, d = prod - sq;       // d = (-1)^n
+
+    // diagram: square s x s next to rectangle a x b, drawn to scale
+    const maxW = 440, maxH = 300, gapPx = 44, padX = 40, padTop = 18, padBot = 84;
+    const u = Math.min((maxW - gapPx) / (s + a), maxH / Math.max(s, b));
+    const Hu = Math.max(s, b) * u;
+    const W = padX * 2 + (s + a) * u + gapPx, H = padTop + Hu + padBot;
+    const y0 = padTop + Hu;
+    const sx = padX, rx = padX + s * u + gapPx;
+    let g = '';
+    const grid = (x, w, h) => {
+      if (u < 7) return '';
+      let t = '';
+      for (let i = 1; i < Math.round(w / u); i++) t += `<line x1="${x + i * u}" y1="${y0 - h}" x2="${x + i * u}" y2="${y0}" stroke="var(--canvas)" stroke-opacity="0.9" stroke-width="1"/>`;
+      for (let j = 1; j < Math.round(h / u); j++) t += `<line x1="${x}" y1="${y0 - j * u}" x2="${x + w}" y2="${y0 - j * u}" stroke="var(--canvas)" stroke-opacity="0.9" stroke-width="1"/>`;
+      return t;
+    };
+    g += `<rect x="${sx}" y="${y0 - s * u}" width="${s * u}" height="${s * u}" fill="var(--blue)" fill-opacity="0.35" stroke="var(--blue)" stroke-width="2"/>` + grid(sx, s * u, s * u);
+    g += `<rect x="${rx}" y="${y0 - b * u}" width="${a * u}" height="${b * u}" fill="var(--green)" fill-opacity="0.35" stroke="var(--green)" stroke-width="2"/>` + grid(rx, a * u, b * u);
+    // side numbers
+    g += `<text x="${sx - 8}" y="${y0 - s * u / 2 + 5}" font-size="14" font-weight="700" text-anchor="end" style="fill:var(--blue)">${s}</text>`;
+    g += `<text x="${rx - 8}" y="${y0 - b * u / 2 + 5}" font-size="14" font-weight="700" text-anchor="end" style="fill:var(--green)">${b}</text>`;
+    g += `<text x="${sx + s * u / 2}" y="${y0 + 20}" font-size="14" font-weight="700" text-anchor="middle" style="fill:var(--blue)">${s}</text>`;
+    g += `<text x="${rx + a * u / 2}" y="${y0 + 20}" font-size="14" font-weight="700" text-anchor="middle" style="fill:var(--green)">${a}</text>`;
+    // areas
+    g += `<text x="${sx}" y="${y0 + 44}" font-size="14" font-weight="600" style="fill:var(--blue)">F(n)² = ${s} × ${s} = ${sq}</text>`;
+    g += `<text x="${W - padX}" y="${y0 + 44}" font-size="14" font-weight="600" text-anchor="end" style="fill:var(--green)">F(n−1)·F(n+1) = ${a} × ${b} = ${prod}</text>`;
+    // difference
+    const dTxt = d === 1 ? 'The rectangle is bigger by 1 unit square' : 'The square is bigger by 1 unit square';
+    const dCol = 'var(--ref)';
+    g += `<rect x="${padX}" y="${y0 + 58}" width="14" height="14" fill="${dCol}" fill-opacity="0.85"/>`;
+    g += `<text x="${padX + 22}" y="${y0 + 70}" font-size="14" font-weight="700" style="fill:${dCol}">${dTxt}</text>`;
+    const cs = document.getElementById('cassSvg');
+    cs.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    cs.setAttribute('width', W);
+    cs.setAttribute('height', H);
+    cs.innerHTML = g;
+
+    // readouts
+    const sign = d > 0 ? '+1' : '−1';
+    document.getElementById('cassRead').innerHTML = `
+      <tr><td class="ex">F(n−1) = F(${n - 1})</td><td class="num">${a}</td></tr>
+      <tr><td class="ex">F(n) = F(${n})</td><td class="num">${s}</td></tr>
+      <tr><td class="ex">F(n+1) = F(${n + 1})</td><td class="num">${b}</td></tr>
+      <tr><td class="ex">Outer product F(n−1)·F(n+1)</td><td class="num">${a} × ${b} = ${prod}</td></tr>
+      <tr><td class="ex">Middle squared F(n)²</td><td class="num">${s}² = ${sq}</td></tr>
+      <tr><th>Difference</th><td class="num">${prod} − ${sq} = ${sign}</td></tr>
+      <tr><td class="ex">(−1)<sup>${n}</sup></td><td class="num">${sign}</td></tr>`;
+
+    // link to the arctan proof
+    const tie = document.getElementById('cassTie');
+    if (n % 2 === 1) {
+      tie.className = 'tie';
+      tie.innerHTML = `
+        <p><strong>Why it matters for the arctans.</strong> With n odd the square is one unit bigger, so ${a} × ${b} + 1 = ${s}². In the ray picture, put the rays at heights a = ${a} and b = ${b}. They are ${b - a} apart on the ladder, and the wedge between them has</p>
+        <p class="m" style="white-space:normal">tan = (b − a) ÷ (1 + a·b) = ${b - a} ÷ ${1 + prod} = ${b - a} ÷ ${s}² = 1/${s}</p>
+        <p>That is exactly the step <strong>arctan(1/${a}) = arctan(1/${s}) + arctan(1/${b})</strong>${n === 3 ? ', the original identity (arctan 1 = arctan ½ + arctan ⅓)' : ''}.</p>`;
+    } else {
+      tie.className = 'tie flip';
+      tie.innerHTML = `
+        <p><strong>Why the arctan chain skips these.</strong> With n even the sign flips and the rectangle is one unit bigger: ${a} × ${b} = ${s}² + 1. Rays at heights ${a} and ${b} would give</p>
+        <p class="m" style="white-space:normal">tan = ${b - a} ÷ (1 + ${prod}) = ${b - a} ÷ ${1 + prod}</p>
+        <p>which is not a unit fraction, so no clean "arctan(1/something)" comes out. That is why the proof only uses every second Fibonacci number (1, 3, 8, 21, 55, …) as heights, the positions where 1 + a·b is a perfect square.</p>`;
+    }
+
+    // table
+    let t = `<tr><th>n</th><th>F(n)</th><th>F(n−1)·F(n+1)</th><th>F(n)²</th><th>Difference</th></tr>`;
+    for (let i = 1; i <= 12; i++) {
+      const p = fib(i - 1) * fib(i + 1), q = fib(i) * fib(i);
+      t += `<tr class="${i === n ? 'sel' : ''}"><td>${i}</td><td>${fib(i)}</td><td>${p}</td><td>${q}</td><td>${p - q > 0 ? '+1' : '−1'}</td></tr>`;
+    }
+    document.getElementById('cassTable').innerHTML = t;
+  }
+  cN.addEventListener('input', renderCassini);
+  renderCassini();
+
+  updateStatic();
+  render();
+})();
+</script>
+</body>
+</html>

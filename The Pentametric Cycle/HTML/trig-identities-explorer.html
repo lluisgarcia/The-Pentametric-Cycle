@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Two trig identities you can touch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16131f;
+    --bg-1: #1c1830;
+    --bg-2: #211c38;
+    --line: rgba(237,233,228,0.10);
+    --line-strong: rgba(237,233,228,0.20);
+    --text: #ede9e4;
+    --text-dim: #b3aac7;
+    --text-faint: #7d769a;
+    --theta: #f2a154;
+    --theta-soft: rgba(242,161,84,0.16);
+    --phi: #45d0c6;
+    --phi-soft: rgba(69,208,198,0.16);
+    --good: #8fd68a;
+    --radius: 14px;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 700px at 12% -10%, rgba(242,161,84,0.07), transparent 60%),
+      radial-gradient(1000px 600px at 100% 0%, rgba(69,208,198,0.07), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 64px) clamp(18px, 4vw, 40px) 80px;
+  }
+
+  /* ---------- Header ---------- */
+  header{ margin-bottom: 22px; }
+  .eyebrow-row{ display:flex; align-items:center; gap:10px; color: var(--text-faint); font-size: 13px; margin-bottom: 14px; }
+  .eyebrow-row .dotline{ flex:1; height:1px; background: var(--line); }
+  h1{
+    font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: clamp(26px, 4vw, 42px); line-height: 1.14;
+    margin: 0 0 12px; letter-spacing: -0.01em;
+  }
+  h1 .theta-c{ color: var(--theta); } h1 .phi-c{ color: var(--phi); }
+  header p{ color: var(--text-dim); max-width: 66ch; font-size: 16px; margin: 0; }
+
+  /* ---------- Tabs ---------- */
+  .tabnav{ display:flex; gap:8px; margin: 26px 0 26px; border-bottom: 1px solid var(--line); }
+  .tab-btn{
+    background:none; border:none; cursor:pointer;
+    font-family:'Inter', sans-serif; font-size: 15px; font-weight:600;
+    color: var(--text-faint);
+    padding: 10px 4px 14px;
+    margin-right: 22px;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .tab-btn:hover{ color: var(--text-dim); }
+  .tab-btn.active{ color: var(--text); border-color: var(--theta); }
+  .tabpanel{ display:none; }
+  .tabpanel.active{ display:block; }
+
+  /* ---------- Layout ---------- */
+  .stage{ display:grid; grid-template-columns: 1.05fr 0.95fr; gap: 22px; margin-bottom: 22px; }
+  @media (max-width: 880px){ .stage{ grid-template-columns: 1fr; } }
+  .panel{
+    background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: clamp(18px, 2.6vw, 26px);
+  }
+  .panel h2{ font-family: 'Fraunces', serif; font-weight: 500; font-size: 18px; margin: 0 0 4px; color: var(--text); }
+  .panel .sub{ color: var(--text-faint); font-size: 13px; margin: 0 0 18px; }
+
+  .diagram-holder{ background: rgba(0,0,0,0.18); border: 1px solid var(--line); border-radius: 10px; padding: 6px; margin-bottom: 20px; }
+  svg.diagram{ display:block; width:100%; height:auto; }
+
+  .controls{ display:flex; flex-direction:column; gap: 14px; }
+  .slider-row{ display:flex; flex-direction:column; gap:8px; }
+  .slider-label{ display:flex; justify-content:space-between; align-items:baseline; font-size: 13px; color: var(--text-dim); }
+  .slider-label b{ font-family: 'JetBrains Mono', monospace; color: var(--text); font-size: 15px; font-weight: 600; }
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; width:100%; height: 6px; border-radius: 4px;
+    background: linear-gradient(90deg, var(--theta), var(--phi)); outline:none; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
+    background: var(--text); border: 3px solid var(--bg-2);
+    box-shadow: 0 0 0 1px var(--line-strong), 0 2px 6px rgba(0,0,0,0.4); cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%; background: var(--text);
+    border: 3px solid var(--bg-2); box-shadow: 0 0 0 1px var(--line-strong); cursor:pointer;
+  }
+  .presets{ display:flex; flex-wrap:wrap; gap:8px; }
+  .preset-btn{
+    font-family:'JetBrains Mono', monospace; font-size: 13px;
+    background: rgba(255,255,255,0.03); color: var(--text-dim);
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; cursor:pointer;
+    transition: border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .preset-btn:hover{ border-color: var(--line-strong); color: var(--text); }
+  .preset-btn.active{ color: var(--bg); background: linear-gradient(90deg, var(--theta), var(--phi)); border-color: transparent; font-weight: 600; }
+
+  .toggle-row{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-dim); }
+  .toggle-row input{ accent-color: var(--phi); width:15px; height:15px; }
+
+  /* ---------- Readouts ---------- */
+  .angle-cards{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+  .angle-card{ border-radius: 10px; padding: 14px 14px 12px; border: 1px solid var(--line); }
+  .angle-card.theta{ background: var(--theta-soft); border-color: rgba(242,161,84,0.35); }
+  .angle-card.phi{ background: var(--phi-soft); border-color: rgba(69,208,198,0.35); }
+  .angle-card .name{ font-family:'Fraunces', serif; font-size: 20px; margin-bottom: 6px; }
+  .angle-card.theta .name{ color: var(--theta); } .angle-card.phi .name{ color: var(--phi); }
+  .angle-card .val{ font-family:'JetBrains Mono', monospace; font-size: 14px; color: var(--text); }
+  .angle-card .val .deg{ font-weight:600; } .angle-card .val .rad{ color: var(--text-dim); }
+
+  .match-pairs{ display:flex; flex-direction:column; gap: 10px; }
+  .match-row{
+    display:grid; grid-template-columns: 1fr auto 1fr auto; align-items:center; gap: 10px;
+    background: rgba(0,0,0,0.16); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  }
+  .match-row .term{ font-family:'JetBrains Mono', monospace; font-size: 13px; }
+  .match-row .term .fn{ color: var(--text-faint); }
+  .match-row .term .num{ display:block; font-size: 17px; font-weight:600; color: var(--text); margin-top:2px; }
+  .match-row .eq{ color: var(--text-faint); font-size: 15px; }
+  .match-row .check{ justify-self:end; display:flex; align-items:center; gap:6px; font-size: 12px; color: var(--good); font-weight:600; white-space:nowrap; }
+  .match-row .check .dot{ width:7px; height:7px; border-radius:50%; background: var(--good); box-shadow: 0 0 8px var(--good); }
+
+  .readout-list{ display:flex; flex-direction:column; gap:10px; }
+  .readout-row{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    background: rgba(0,0,0,0.16); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  }
+  .readout-row .rname{ font-size: 13px; color: var(--text-dim); }
+  .readout-row .rval{ font-family:'JetBrains Mono', monospace; font-size: 16px; font-weight:600; }
+
+  .chart-panel{ margin-bottom: 22px; }
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; margin-bottom: 6px; }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text-dim); }
+  .legend-swatch{ width:16px; height:3px; border-radius:2px; }
+  .chart-caption{ color: var(--text-faint); font-size: 13px; margin-top: 10px; }
+
+  .explain{ display:grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 780px){ .explain{ grid-template-columns: 1fr; } }
+  .explain h2{ font-family:'Fraunces', serif; font-weight:500; font-size: 22px; margin: 0 0 12px; }
+  .explain p{ color: var(--text-dim); font-size: 15px; margin: 0 0 14px; max-width:56ch; }
+  .explain p:last-child{ margin-bottom:0; }
+  .explain .accent-t{ color: var(--theta); font-weight:600; }
+  .explain .accent-p{ color: var(--phi); font-weight:600; }
+  code.formula{
+    font-family:'JetBrains Mono', monospace; background: rgba(255,255,255,0.05);
+    border:1px solid var(--line); padding: 2px 7px; border-radius: 5px; font-size: 0.92em; white-space: nowrap;
+  }
+
+  footer{ margin-top: 40px; text-align:center; color: var(--text-faint); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow-row"><span>two identities, one right triangle each</span><div class="dotline"></div></div>
+    <h1>Trig identities you can <span class="theta-c">see</span> and <span class="phi-c">touch</span></h1>
+    <p>Both tabs below are driven by a single slider. Move it and watch the geometry — rather than the algebra — do the convincing.</p>
+  </header>
+
+  <div class="tabnav">
+    <button class="tab-btn active" data-tab="tab-comp">Complementary angles</button>
+    <button class="tab-btn" data-tab="tab-tan">Why "tangent"?</button>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- TAB 1: cos(arctan x) = sin(arctan 1/x)                        -->
+  <!-- ============================================================ -->
+  <section class="tabpanel active" id="tab-comp">
+    <p class="sub" style="margin:-6px 0 20px; font-size:14px;">
+      <code class="formula">cos(arctan x) = sin(arctan 1/x)</code> — because the two acute angles in a right triangle always add to 90°.
+    </p>
+
+    <div class="stage">
+      <section class="panel">
+        <h2>The triangle</h2>
+        <p class="sub">Opposite = x, adjacent = 1, so <span style="color:var(--theta)">θ = arctan(x)</span> and <span style="color:var(--phi)">φ = arctan(1/x)</span></p>
+        <div class="diagram-holder"><svg class="diagram" id="triangle" viewBox="0 0 520 400"></svg></div>
+        <div class="controls">
+          <div class="slider-row">
+            <div class="slider-label"><span>x</span><b id="xLabel">1.25</b></div>
+            <input type="range" id="xSlider" min="0.05" max="5" step="0.01" value="1.25">
+          </div>
+          <div class="presets" id="presets"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Live values</h2>
+        <p class="sub">Everything below updates as x moves</p>
+        <div class="angle-cards">
+          <div class="angle-card theta">
+            <div class="name">θ = arctan(x)</div>
+            <div class="val"><span class="deg" id="thetaDeg">—°</span><br><span class="rad" id="thetaRad">— rad</span></div>
+          </div>
+          <div class="angle-card phi">
+            <div class="name">φ = arctan(1/x)</div>
+            <div class="val"><span class="deg" id="phiDeg">—°</span><br><span class="rad" id="phiRad">— rad</span></div>
+          </div>
+        </div>
+        <div class="match-pairs">
+          <div class="match-row">
+            <div class="term"><span class="fn">cos(arctan x)</span><span class="num" id="cosThetaVal">—</span></div>
+            <div class="eq">=</div>
+            <div class="term"><span class="fn">sin(arctan 1/x)</span><span class="num" id="sinPhiVal">—</span></div>
+            <div class="check"><span class="dot"></span>match</div>
+          </div>
+          <div class="match-row">
+            <div class="term"><span class="fn">sin(arctan x)</span><span class="num" id="sinThetaVal">—</span></div>
+            <div class="eq">=</div>
+            <div class="term"><span class="fn">cos(arctan 1/x)</span><span class="num" id="cosPhiVal">—</span></div>
+            <div class="check"><span class="dot"></span>match</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel chart-panel">
+      <h2>Two curves, one line</h2>
+      <p class="sub">y = cos(arctan x) traced solid, y = sin(arctan 1/x) traced dashed on top — they never separate</p>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--theta)"></span> cos(arctan x)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:var(--phi); background-image: linear-gradient(90deg,var(--phi) 60%, transparent 0); background-size: 8px 3px;"></span> sin(arctan 1/x)</div>
+      </div>
+      <svg class="diagram" id="chart" viewBox="0 0 1000 360"></svg>
+      <p class="chart-caption">The dot marks the current x. Both curves sit under it, always — that's the identity, plotted.</p>
+    </section>
+
+    <section class="panel explain">
+      <div>
+        <h2>Why this has to be true</h2>
+        <p>Take any right triangle with legs <b>1</b> and <b>x</b>. The two non‑right angles, <span class="accent-t">θ</span> and <span class="accent-p">φ</span>, share whatever is left of 180° after the right angle takes 90° — so <code class="formula">θ + φ = 90°</code>, always. They're complements by construction.</p>
+        <p>For complementary angles, one's cosine is the other's sine: <code class="formula">cos(θ) = sin(90° − θ) = sin(φ)</code>. Swap in <code class="formula">θ = arctan(x)</code> and <code class="formula">φ = arctan(1/x)</code> and you get the identity at the top.</p>
+      </div>
+      <div>
+        <h2>Reading it off the triangle</h2>
+        <p>From <span class="accent-t">θ</span>'s corner, the side of length <b>1</b> is adjacent and the side of length <b>x</b> is opposite — so <code class="formula">cos θ = 1/√(1+x²)</code>.</p>
+        <p>Stand at <span class="accent-p">φ</span>'s corner instead and the same two sides trade roles: the side of length <b>1</b> is now opposite, so <code class="formula">sin φ = 1/√(1+x²)</code> — the identical ratio. Only the corner you measure from changed.</p>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- TAB 2: why "tangent" — the touching-line picture              -->
+  <!-- ============================================================ -->
+  <section class="tabpanel" id="tab-tan">
+    <p class="sub" style="margin:-6px 0 20px; font-size:14px;">
+      A unit circle, a vertical line touching it at one point, and a ray from the center — the segment the ray cuts off on that line has length <code class="formula">tan θ</code>.
+    </p>
+
+    <div class="stage">
+      <section class="panel">
+        <h2>The touching line</h2>
+        <p class="sub">O is the center, T is the point of tangency, Q sits on the circle at angle <span style="color:var(--theta)">θ</span>, and P is where ray OQ meets the tangent line</p>
+        <div class="diagram-holder"><svg class="diagram" id="tanCircle" viewBox="0 0 560 460"></svg></div>
+        <div class="controls">
+          <div class="slider-row">
+            <div class="slider-label"><span>θ</span><b id="thetaLabel">35°</b></div>
+            <input type="range" id="thetaSlider" min="-75" max="75" step="0.5" value="35">
+          </div>
+          <div class="presets" id="tanPresets"></div>
+          <label class="toggle-row"><input type="checkbox" id="secToggle"> show the secant, OP</label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Live values</h2>
+        <p class="sub">Same angle, measured two ways</p>
+        <div class="readout-list">
+          <div class="readout-row"><span class="rname">θ</span><span class="rval" id="tanThetaDeg" style="color:var(--theta)">35.0°</span></div>
+          <div class="readout-row"><span class="rname">sin θ  (= QF, inside the circle)</span><span class="rval" id="sinVal">—</span></div>
+          <div class="readout-row"><span class="rname">cos θ  (= OF, inside the circle)</span><span class="rval" id="cosVal">—</span></div>
+          <div class="readout-row" style="border-color: rgba(69,208,198,0.35); background: var(--phi-soft);"><span class="rname" style="color:var(--phi)">tan θ  (= TP, on the tangent line)</span><span class="rval" id="tanVal" style="color:var(--phi)">—</span></div>
+          <div class="readout-row" id="secRow" style="display:none;"><span class="rname">sec θ  (= OP, the secant length)</span><span class="rval" id="secVal">—</span></div>
+        </div>
+        <div class="match-pairs" style="margin-top:14px;">
+          <div class="match-row">
+            <div class="term"><span class="fn">sin θ / cos θ</span><span class="num" id="ratioVal">—</span></div>
+            <div class="eq">=</div>
+            <div class="term"><span class="fn">TP / OT</span><span class="num" id="segRatioVal">—</span></div>
+            <div class="check"><span class="dot"></span>match</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel explain">
+      <div>
+        <h2>Why the name fits literally</h2>
+        <p>Picture a unit circle and a vertical line that just grazes its right edge at point <b>T</b> — that line is <i>tangent</i> to the circle, touching it at exactly one point.</p>
+        <p>Send a ray out from the center O at angle θ and keep extending it past the circle until it reaches that vertical line, at point <b>P</b>. The stretch from <b>T</b> up to <b>P</b> is a real, measurable length — and it's exactly <code class="formula">tan θ</code>.</p>
+      </div>
+      <div>
+        <h2>Why that segment equals tan θ</h2>
+        <p>Drop a perpendicular from Q (the point where the ray crosses the circle) down to the axis, at foot <b>F</b>. Triangle O‑F‑Q has legs <code class="formula">cos θ</code> and <code class="formula">sin θ</code>, and it's similar to triangle O‑T‑P — same angle θ at O, both with a right angle.</p>
+        <p>Similar triangles keep their ratios: <code class="formula">TP / OT = QF / OF</code>. Since <code class="formula">OT = 1</code>, that's just <code class="formula">TP = sin θ / cos θ = tan θ</code> — a ratio, turned into a length you can point at.</p>
+      </div>
+    </section>
+  </section>
+
+  <footer>Everything on this page runs locally in your browser — no data leaves the file.</footer>
+</div>
+
+<script>
+(function(){
+  const svgNS = 'http://www.w3.org/2000/svg';
+  function el(tag, attrs){
+    const e = document.createElementNS(svgNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function polar(cx, cy, r, deg){
+    const a = deg * Math.PI / 180;
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+  }
+  function arcPath(cx, cy, r, startDeg, endDeg){
+    const s = polar(cx, cy, r, startDeg);
+    const e2 = polar(cx, cy, r, endDeg);
+    const sweep = endDeg > startDeg ? 1 : 0;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 0 ${sweep} ${e2.x.toFixed(2)} ${e2.y.toFixed(2)}`;
+  }
+  function normalize(dx, dy){ const l = Math.hypot(dx, dy) || 1; return { x: dx / l, y: dy / l }; }
+  function rightAngleMark(vertex, uA, uB, s){
+    const p1 = { x: vertex.x + uA.x * s, y: vertex.y + uA.y * s };
+    const p2 = { x: p1.x + uB.x * s, y: p1.y + uB.y * s };
+    const p3 = { x: vertex.x + uB.x * s, y: vertex.y + uB.y * s };
+    return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} L ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} L ${p3.x.toFixed(2)} ${p3.y.toFixed(2)}`;
+  }
+
+  /* ================= TABS ================= */
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tabpanel');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ============================================================ */
+  /* TAB 1: complementary angles                                    */
+  /* ============================================================ */
+  (function(){
+    const slider = document.getElementById('xSlider');
+    const xLabel = document.getElementById('xLabel');
+    const presetsWrap = document.getElementById('presets');
+    const presets = [ { label:'1/3', value:1/3 }, { label:'1', value:1 }, { label:'5/4', value:5/4 }, { label:'3', value:3 } ];
+    presets.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.textContent = 'x = ' + p.label;
+      btn.dataset.value = p.value;
+      btn.addEventListener('click', () => { slider.value = p.value; update(); });
+      presetsWrap.appendChild(btn);
+    });
+    function refreshPresetActive(x){
+      [...presetsWrap.children].forEach(btn => btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.value) - x) < 0.005));
+    }
+
+    const triSvg = document.getElementById('triangle');
+    const VB_W = 520, VB_H = 400;
+
+    function drawTriangle(x){
+      triSvg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+      triSvg.innerHTML = '';
+      const theta = Math.atan(x);
+      const thetaDeg = theta * 180 / Math.PI;
+      const phiDeg = 90 - thetaDeg;
+      const MAX_LEG = 240;
+      const scale = MAX_LEG / Math.max(1, x);
+      const adjPx = 1 * scale, oppPx = x * scale;
+      const marginL = 70, marginB = 66;
+      const A = { x: marginL, y: VB_H - marginB };
+      const B = { x: marginL + adjPx, y: VB_H - marginB };
+      const C = { x: marginL + adjPx, y: VB_H - marginB - oppPx };
+
+      const defs = el('defs', {});
+      const grad = el('linearGradient', { id: 'triFill', x1:'0', y1:'1', x2:'1', y2:'0' });
+      grad.appendChild(el('stop', { offset:'0%', 'stop-color':'#f2a154', 'stop-opacity':'0.14' }));
+      grad.appendChild(el('stop', { offset:'100%', 'stop-color':'#45d0c6', 'stop-opacity':'0.14' }));
+      defs.appendChild(grad);
+      triSvg.appendChild(defs);
+
+      triSvg.appendChild(el('polygon', { points:`${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`, fill:'url(#triFill)', stroke:'rgba(237,233,228,0.55)', 'stroke-width':2, 'stroke-linejoin':'round' }));
+
+      const s = 14;
+      triSvg.appendChild(el('path', { d:`M ${B.x - s} ${B.y} L ${B.x - s} ${B.y - s} L ${B.x} ${B.y - s}`, fill:'none', stroke:'rgba(237,233,228,0.5)', 'stroke-width':1.5 }));
+
+      const rArc = 34, rArcPhi = 30;
+      triSvg.appendChild(el('path', { d: arcPath(A.x, A.y, rArc, 0, -thetaDeg), fill:'none', stroke:'var(--theta)', 'stroke-width':2.5 }));
+      triSvg.appendChild(el('path', { d: arcPath(C.x, C.y, rArcPhi, 90, 90 + phiDeg), fill:'none', stroke:'var(--phi)', 'stroke-width':2.5 }));
+
+      const thetaMid = polar(A.x, A.y, rArc + 16, -thetaDeg / 2);
+      const phiMid = polar(C.x, C.y, rArcPhi + 18, 90 + phiDeg / 2);
+      const t1 = el('text', { x: thetaMid.x, y: thetaMid.y, fill:'var(--theta)', 'font-size':'17', 'font-family':"'Fraunces', serif", 'text-anchor':'middle', 'dominant-baseline':'middle' }); t1.textContent='θ'; triSvg.appendChild(t1);
+      const t2 = el('text', { x: phiMid.x, y: phiMid.y, fill:'var(--phi)', 'font-size':'17', 'font-family':"'Fraunces', serif", 'text-anchor':'middle', 'dominant-baseline':'middle' }); t2.textContent='φ'; triSvg.appendChild(t2);
+
+      const l1 = el('text', { x:(A.x+B.x)/2, y:A.y+22, fill:'var(--text)', 'font-size':'15', 'font-family':"'JetBrains Mono', monospace", 'text-anchor':'middle' }); l1.textContent='1'; triSvg.appendChild(l1);
+      const l2 = el('text', { x:(A.x+B.x)/2, y:A.y+40, fill:'var(--text-faint)', 'font-size':'10.5', 'font-family':"'Inter', sans-serif", 'text-anchor':'middle' }); l2.textContent='adjacent to θ · opposite to φ'; triSvg.appendChild(l2);
+
+      const bcMidX = B.x, bcMidY = (B.y + C.y) / 2;
+      const gLen = el('g', { transform:`translate(${bcMidX + 16},${bcMidY}) rotate(-90)` });
+      const t3 = el('text', { x:0, y:-2, fill:'var(--text)', 'font-size':'15', 'font-family':"'JetBrains Mono', monospace", 'text-anchor':'middle' }); t3.textContent='x = ' + x.toFixed(2);
+      const t4 = el('text', { x:0, y:16, fill:'var(--text-faint)', 'font-size':'10.5', 'font-family':"'Inter', sans-serif", 'text-anchor':'middle' }); t4.textContent='opposite to θ · adjacent to φ';
+      gLen.appendChild(t3); gLen.appendChild(t4); triSvg.appendChild(gLen);
+
+      const hyp = Math.sqrt(1 + x*x);
+      const hypMidX = (A.x+C.x)/2, hypMidY=(A.y+C.y)/2;
+      const dx=C.x-A.x, dy=C.y-A.y, len=Math.hypot(dx,dy);
+      const nx=-dy/len, ny=dx/len;
+      const hl = el('text', { x: hypMidX+nx*20, y: hypMidY+ny*20, fill:'var(--text)', 'font-size':'14.5', 'font-family':"'JetBrains Mono', monospace", 'text-anchor':'middle', 'dominant-baseline':'middle' });
+      hl.textContent = '√(1+x²) = ' + hyp.toFixed(2); triSvg.appendChild(hl);
+
+      [A,B,C].forEach(p => triSvg.appendChild(el('circle', { cx:p.x, cy:p.y, r:3, fill:'var(--text)' })));
+    }
+
+    const chartSvg = document.getElementById('chart');
+    const CW=1000, CH=360, padL=54, padR=24, padT=20, padB=40, X_MIN=0.05, X_MAX=5;
+    function f(x){ return 1/Math.sqrt(1+x*x); }
+    function xToPx(x){ return padL + (x-X_MIN)/(X_MAX-X_MIN)*(CW-padL-padR); }
+    function yToPx(y){ return padT + (1-y)*(CH-padT-padB); }
+    let chartBuilt=false, dotSolid, dotDashed, dotOuter;
+    function buildChartStatic(){
+      chartSvg.setAttribute('viewBox', `0 0 ${CW} ${CH}`);
+      chartSvg.innerHTML = '';
+      for (let gy=0; gy<=1; gy+=0.25){
+        const y=yToPx(gy);
+        chartSvg.appendChild(el('line', { x1:padL, x2:CW-padR, y1:y, y2:y, stroke:'rgba(237,233,228,0.08)', 'stroke-width':1 }));
+        const lab = el('text', { x:padL-10, y:y+4, fill:'var(--text-faint)', 'font-size':11, 'text-anchor':'end', 'font-family':"'JetBrains Mono', monospace" }); lab.textContent=gy.toFixed(2); chartSvg.appendChild(lab);
+      }
+      [0.05,1,2,3,4,5].forEach(gx => {
+        const x=xToPx(gx);
+        chartSvg.appendChild(el('line', { x1:x, x2:x, y1:padT, y2:CH-padB, stroke:'rgba(237,233,228,0.06)', 'stroke-width':1 }));
+        const lab = el('text', { x:x, y:CH-padB+20, fill:'var(--text-faint)', 'font-size':11, 'text-anchor':'middle', 'font-family':"'JetBrains Mono', monospace" }); lab.textContent=gx; chartSvg.appendChild(lab);
+      });
+      const N=200; let d='';
+      for (let i=0;i<=N;i++){ const x=X_MIN+(X_MAX-X_MIN)*i/N; const px=xToPx(x), py=yToPx(f(x)); d += (i===0?'M':'L')+px.toFixed(2)+' '+py.toFixed(2)+' '; }
+      chartSvg.appendChild(el('path', { d, fill:'none', stroke:'var(--theta)', 'stroke-width':4, 'stroke-linecap':'round' }));
+      chartSvg.appendChild(el('path', { d, fill:'none', stroke:'var(--phi)', 'stroke-width':2.4, 'stroke-dasharray':'2 7', 'stroke-linecap':'round' }));
+      dotOuter = el('circle', { r:9, fill:'none', stroke:'var(--theta)', 'stroke-width':2, opacity:0.55 });
+      dotSolid = el('circle', { r:5.5, fill:'var(--theta)' });
+      dotDashed = el('circle', { r:2.6, fill:'var(--phi)' });
+      chartSvg.appendChild(dotOuter); chartSvg.appendChild(dotSolid); chartSvg.appendChild(dotDashed);
+      chartBuilt = true;
+    }
+    function updateChartMarker(x){
+      const px=xToPx(x), py=yToPx(f(x));
+      [dotOuter,dotSolid,dotDashed].forEach(c => { c.setAttribute('cx',px); c.setAttribute('cy',py); });
+    }
+
+    const elThetaDeg=document.getElementById('thetaDeg'), elThetaRad=document.getElementById('thetaRad');
+    const elPhiDeg=document.getElementById('phiDeg'), elPhiRad=document.getElementById('phiRad');
+    const elCosTheta=document.getElementById('cosThetaVal'), elSinPhi=document.getElementById('sinPhiVal');
+    const elSinTheta=document.getElementById('sinThetaVal'), elCosPhi=document.getElementById('cosPhiVal');
+    function fmt(n){ return n.toFixed(6); }
+
+    function update(){
+      const x = parseFloat(slider.value);
+      xLabel.textContent = x.toFixed(2);
+      refreshPresetActive(x);
+      const theta = Math.atan(x), phi = Math.atan(1/x);
+      elThetaDeg.textContent = (theta*180/Math.PI).toFixed(2)+'°';
+      elThetaRad.textContent = theta.toFixed(4)+' rad';
+      elPhiDeg.textContent = (phi*180/Math.PI).toFixed(2)+'°';
+      elPhiRad.textContent = phi.toFixed(4)+' rad';
+      elCosTheta.textContent = fmt(Math.cos(theta));
+      elSinPhi.textContent = fmt(Math.sin(phi));
+      elSinTheta.textContent = fmt(Math.sin(theta));
+      elCosPhi.textContent = fmt(Math.cos(phi));
+      drawTriangle(x);
+      if (!chartBuilt) buildChartStatic();
+      updateChartMarker(x);
+    }
+    slider.addEventListener('input', update);
+    window.addEventListener('resize', () => { buildChartStatic(); update(); });
+    buildChartStatic(); update();
+  })();
+
+  /* ============================================================ */
+  /* TAB 2: why "tangent"                                           */
+  /* ============================================================ */
+  (function(){
+    const slider = document.getElementById('thetaSlider');
+    const thetaLabel = document.getElementById('thetaLabel');
+    const secToggle = document.getElementById('secToggle');
+    const secRow = document.getElementById('secRow');
+    const presetsWrap = document.getElementById('tanPresets');
+    const presets = [ { label:'15°', value:15 }, { label:'30°', value:30 }, { label:'45°', value:45 }, { label:'60°', value:60 }, { label:'-30°', value:-30 } ];
+    presets.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.textContent = 'θ = ' + p.label;
+      btn.dataset.value = p.value;
+      btn.addEventListener('click', () => { slider.value = p.value; update(); });
+      presetsWrap.appendChild(btn);
+    });
+    function refreshPresetActive(deg){
+      [...presetsWrap.children].forEach(btn => btn.classList.toggle('active', Math.abs(parseFloat(btn.dataset.value) - deg) < 0.05));
+    }
+
+    const svg = document.getElementById('tanCircle');
+    const VB_W = 560, VB_H = 460;
+    const O = { x: 150, y: 230 };
+    const R = 95;
+
+    function draw(deg){
+      svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+      svg.innerHTML = '';
+      const theta = deg * Math.PI / 180;
+      const cosT = Math.cos(theta), sinT = Math.sin(theta), tanT = Math.tan(theta), secT = 1/cosT;
+
+      const Q = { x: O.x + R*cosT, y: O.y - R*sinT };
+      const F = { x: Q.x, y: O.y };
+      const T = { x: O.x + R, y: O.y };
+      const P = { x: O.x + R, y: O.y - R*tanT };
+
+      // tangent line (full height, subtle)
+      svg.appendChild(el('line', { x1:T.x, x2:T.x, y1:12, y2:VB_H-12, stroke:'rgba(237,233,228,0.28)', 'stroke-width':1.5, 'stroke-dasharray':'1 0' }));
+      const tanLineLabel = el('text', { x:T.x+8, y:24, fill:'var(--text-faint)', 'font-size':11, 'font-family':"'Inter', sans-serif" });
+      tanLineLabel.textContent = 'tangent line'; svg.appendChild(tanLineLabel);
+
+      // axis
+      svg.appendChild(el('line', { x1:20, x2:VB_W-20, y1:O.y, y2:O.y, stroke:'rgba(237,233,228,0.14)', 'stroke-width':1 }));
+
+      // circle
+      svg.appendChild(el('circle', { cx:O.x, cy:O.y, r:R, fill:'none', stroke:'rgba(237,233,228,0.45)', 'stroke-width':1.5 }));
+
+      // secant OP (optional)
+      if (secToggle.checked){
+        svg.appendChild(el('line', { x1:O.x, y1:O.y, x2:P.x, y2:P.y, stroke:'var(--text-dim)', 'stroke-width':1.5, 'stroke-dasharray':'5 4' }));
+        const midSec = { x:(O.x+P.x)/2, y:(O.y+P.y)/2 };
+        const nrm = normalize(-(P.y-O.y), P.x-O.x);
+        const sLab = el('text', { x: midSec.x + nrm.x*14, y: midSec.y + nrm.y*14, fill:'var(--text-dim)', 'font-size':12.5, 'font-family':"'JetBrains Mono', monospace", 'text-anchor':'middle' });
+        sLab.textContent = 'sec θ = ' + secT.toFixed(2); svg.appendChild(sLab);
+        secRow.style.display = '';
+      } else {
+        secRow.style.display = 'none';
+      }
+
+      // small triangle O-F-Q fill
+      svg.appendChild(el('polygon', { points:`${O.x},${O.y} ${F.x},${F.y} ${Q.x},${Q.y}`, fill:'rgba(242,161,84,0.10)', stroke:'none' }));
+      // big triangle O-T-P outline
+      svg.appendChild(el('polygon', { points:`${O.x},${O.y} ${T.x},${T.y} ${P.x},${P.y}`, fill:'rgba(69,208,198,0.07)', stroke:'rgba(69,208,198,0.4)', 'stroke-width':1.3, 'stroke-dasharray':'4 4' }));
+
+      // ray O->P (through Q)
+      svg.appendChild(el('line', { x1:O.x, y1:O.y, x2:P.x, y2:P.y, stroke:'var(--theta)', 'stroke-width':2.2 }));
+
+      // TP segment highlighted (the tangent length)
+      svg.appendChild(el('line', { x1:T.x, y1:T.y, x2:P.x, y2:P.y, stroke:'var(--phi)', 'stroke-width':4, 'stroke-linecap':'round' }));
+
+      // perpendicular helper lines
+      svg.appendChild(el('line', { x1:F.x, y1:F.y, x2:Q.x, y2:Q.y, stroke:'var(--text)', 'stroke-width':1.6, 'stroke-dasharray':'3 3', opacity:0.7 }));
+      svg.appendChild(el('line', { x1:O.x, y1:O.y, x2:F.x, y2:F.y, stroke:'var(--text)', 'stroke-width':1.6, opacity:0.55 }));
+
+      // right angle marks
+      const uOT = normalize(O.x-T.x, O.y-T.y);
+      const uTP = normalize(P.x-T.x, P.y-T.y);
+      svg.appendChild(el('path', { d: rightAngleMark(T, uOT, uTP, 12), fill:'none', stroke:'rgba(237,233,228,0.5)', 'stroke-width':1.3 }));
+      const uFO = normalize(O.x-F.x, O.y-F.y);
+      const uFQ = normalize(Q.x-F.x, Q.y-F.y);
+      if (Math.abs(sinT) > 0.02){
+        svg.appendChild(el('path', { d: rightAngleMark(F, uFO, uFQ, 10), fill:'none', stroke:'rgba(237,233,228,0.4)', 'stroke-width':1.2 }));
+      }
+
+      // angle arc at O
+      const rArc = 30;
+      svg.appendChild(el('path', { d: arcPath(O.x, O.y, rArc, 0, -deg), fill:'none', stroke:'var(--theta)', 'stroke-width':2.2 }));
+      const thetaMid = polar(O.x, O.y, rArc+15, -deg/2);
+      const thLab = el('text', { x:thetaMid.x, y:thetaMid.y, fill:'var(--theta)', 'font-size':16, 'font-family':"'Fraunces', serif", 'text-anchor':'middle', 'dominant-baseline':'middle' });
+      thLab.textContent = 'θ'; svg.appendChild(thLab);
+
+      // labels
+      function lbl(p, txt, dx, dy, color, size, fam){
+        const t = el('text', { x:p.x+dx, y:p.y+dy, fill:color||'var(--text)', 'font-size':size||12, 'font-family':fam||"'Inter', sans-serif", 'text-anchor':'middle' });
+        t.textContent = txt; svg.appendChild(t);
+      }
+      lbl(O, 'O', -12, 16, 'var(--text-faint)', 12);
+      lbl(T, 'T', 14, -8, 'var(--text-faint)', 12);
+      lbl(Q, 'Q', Q.y < O.y ? 12 : 12, Q.y < O.y ? -10 : 18, 'var(--text-faint)', 12);
+      lbl(P, 'P', 16, P.y < T.y ? -6 : 14, 'var(--phi)', 12);
+
+      lbl({x:(O.x+T.x)/2, y:O.y}, '1', 0, 18, 'var(--text-faint)', 11.5, "'JetBrains Mono', monospace");
+      lbl({x:(O.x+F.x)/2, y:O.y}, 'cos θ = '+cosT.toFixed(2), 0, -10, 'var(--text)', 11.5, "'JetBrains Mono', monospace");
+      const sinLabelPos = { x:F.x, y:(F.y+Q.y)/2 };
+      lbl(sinLabelPos, 'sin θ = '+sinT.toFixed(2), 46, 0, 'var(--text)', 11.5, "'JetBrains Mono', monospace");
+
+      const tpMid = { x:T.x, y:(T.y+P.y)/2 };
+      lbl(tpMid, 'tan θ = '+tanT.toFixed(2), 54, 0, 'var(--phi)', 12.5, "'JetBrains Mono', monospace");
+
+      [O,T,Q,P].forEach(p => svg.appendChild(el('circle', { cx:p.x, cy:p.y, r:3, fill:'var(--text)' })));
+
+      return { theta, cosT, sinT, tanT, secT };
+    }
+
+    const tanThetaDeg = document.getElementById('tanThetaDeg');
+    const sinVal = document.getElementById('sinVal');
+    const cosVal = document.getElementById('cosVal');
+    const tanVal = document.getElementById('tanVal');
+    const secVal = document.getElementById('secVal');
+    const ratioVal = document.getElementById('ratioVal');
+    const segRatioVal = document.getElementById('segRatioVal');
+
+    function update(){
+      const deg = parseFloat(slider.value);
+      thetaLabel.textContent = deg.toFixed(1) + '°';
+      refreshPresetActive(deg);
+      const { cosT, sinT, tanT, secT } = draw(deg);
+      tanThetaDeg.textContent = deg.toFixed(1) + '°';
+      sinVal.textContent = sinT.toFixed(6);
+      cosVal.textContent = cosT.toFixed(6);
+      tanVal.textContent = tanT.toFixed(6);
+      secVal.textContent = secT.toFixed(6);
+      ratioVal.textContent = (sinT/cosT).toFixed(6);
+      segRatioVal.textContent = tanT.toFixed(6);
+    }
+    slider.addEventListener('input', update);
+    secToggle.addEventListener('change', update);
+    window.addEventListener('resize', update);
+    update();
+  })();
+})();
+</script>
+</body>
+</html>
