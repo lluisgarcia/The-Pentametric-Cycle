@@ -1,7 +1,8 @@
 # Paper — Ὁ Πενταμετρικὸς Κύκλος (The Pentametric Cycle)
 
 **A Nested Palindrome Encoding the Pythagorean Consonances**
-Lluis Garcia Torcal, independent researcher, October 2026
+Lluis Garcia Torcal, independent researcher, October 2026 · ORCID [0009-0007-8570-2536](https://orcid.org/0009-0007-8570-2536)
+Archived preprint: [doi:10.5281/zenodo.23183108](https://doi.org/10.5281/zenodo.23183108)
 
 This folder contains the manuscript, its LaTeX source, the figures, and the scripts that independently check every numerical and geometric claim in the paper.
 

@@ -1,9 +1,11 @@
 # Ὁ Πενταμετρικὸς Κύκλος — The Pentametric Cycle
 
 **A Nested Palindrome Encoding the Pythagorean Consonances**
-Lluis Garcia Torcal · independent researcher · 2026
+Lluis Garcia Torcal · independent researcher · 2026 · ORCID [0009-0007-8570-2536](https://orcid.org/0009-0007-8570-2536)
 
-📄 **Read the paper:** [`Paper/pentametric_cycle.pdf`](Paper/pentametric_cycle.pdf)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23183108.svg)](https://doi.org/10.5281/zenodo.23183108)
+
+📄 **Read the paper:** [`Paper/pentametric_cycle.pdf`](Paper/pentametric_cycle.pdf) · archived preprint on Zenodo: [doi:10.5281/zenodo.23183108](https://doi.org/10.5281/zenodo.23183108)
 
 ---
 
@@ -66,7 +68,22 @@ An AI assistant (Claude, by Anthropic) helped write the manuscript and independe
 
 ## How to cite
 
-> Lluis Garcia Torcal (2026). *Ὁ Πενταμετρικὸς Κύκλος: A Nested Palindrome Encoding the Pythagorean Consonances.* Preprint. https://github.com/lluisgarcia/The-Pentametric-Cycle
+> Garcia Torcal, L. (2026). *Ὁ Πενταμετρικὸς Κύκλος: A Nested Palindrome Encoding the Pythagorean Consonances.* Preprint, Zenodo. https://doi.org/10.5281/zenodo.23183108
+
+BibTeX:
+```bibtex
+@misc{GarciaTorcal2026,
+  author    = {Garcia Torcal, Lluis},
+  title     = {{Ὁ Πενταμετρικὸς Κύκλος}: A Nested Palindrome Encoding the Pythagorean Consonances},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.23183108},
+  url       = {https://doi.org/10.5281/zenodo.23183108},
+  note      = {Preprint}
+}
+```
+
+The DOI above always points to the latest version of the preprint.
 
 ## License
 
