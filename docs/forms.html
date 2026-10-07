@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ten Forms of One Formula · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+/* The Pentametric Cycle — shared styles */
+:root {
+  --bg: #f7f4ee;
+  --panel: #fffdf9;
+  --ink: #1f1f1f;
+  --muted: #5f5b55;
+  --rule: #ddd6ca;
+  --accent: #2b5d8a;      /* octave blue, Fibonacci squares */
+  --accent2: #b4532a;     /* fifth rust, Holden geometry */
+  --c0: #d9d9d9;          /* silence */
+  --c1: #4f7cac;          /* unison */
+  --c2: #2b5d8a;          /* octave */
+  --c3: #b4532a;          /* fifth */
+  --c4: #d99a5b;          /* fourth */
+  --fill: #e9eef4;
+  --ok: #2e7d4f;
+  --serif: "EB Garamond", "Garamond", "Georgia", serif;
+  --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
+    --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
+    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
+  --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
+  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+a { color: var(--accent); }
+.greek { font-family: var(--serif); }
+header.site {
+  border-bottom: 1px solid var(--rule); background: var(--panel);
+}
+header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
+header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); white-space: nowrap; }
+header.site nav { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .95rem; }
+header.site nav a { text-decoration: none; color: var(--muted); }
+header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
+main { padding-top: 28px; padding-bottom: 40px; }
+h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
+h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 30px 0 8px; }
+.lede { color: var(--muted); max-width: 70ch; margin: 0 0 22px; font-size: 1.05rem; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 820px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 12px; }
+.controls label { display: inline-block; font-size: .95rem; }
+.controls label > input, .controls label > select { vertical-align: middle; margin: 0 6px 0 0; }
+.controls label > output { margin-left: 6px; font-family: var(--mono); }
+input[type="range"] { accent-color: var(--accent2); width: 180px; max-width: 100%; }
+input[type="number"], select {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 5px 8px;
+}
+input[type="number"] { width: 9ch; }
+button {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer;
+}
+button.primary { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+button:hover { border-color: var(--muted); }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { padding: 3px 9px; font-size: .9rem; }
+table.data { border-collapse: collapse; width: 100%; font-size: .95rem; }
+table.data th, table.data td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.data th { font-weight: 600; color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .03em; }
+table.data td.num, table.data th.num { text-align: right; font-family: var(--mono); font-size: .9rem; }
+.scroll-x { overflow-x: auto; }
+.readout { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: .95rem; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; font-family: var(--mono); font-size: .9rem; }
+.note { color: var(--muted); font-size: .9rem; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .8rem; border: 1px solid var(--rule); color: var(--muted); }
+.tag.proved { border-color: var(--ok); color: var(--ok); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--muted); }
+.legend > span { display: inline-block; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: -1px; margin-right: 6px; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--sans); fill: var(--ink); }
+.ok { color: var(--ok); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card { display: block; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.card:hover { border-color: var(--accent2); }
+.card h3 { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; margin: 8px 0 4px; }
+.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size: .88rem; }
+footer.site .inner { padding-top: 16px; padding-bottom: 24px; }
+.formula { font-family: var(--serif); font-size: 1.35rem; text-align: center; margin: 6px 0 14px; }
+</style>
+<script>
+// The Pentametric Cycle — shared mathematics
+// P(n) = (n^2 + 4 (n/5)) / 5, with (n/5) the Legendre symbol modulo 5.
+"use strict";
+
+const Pent = (() => {
+  const mod = (a, m) => ((a % m) + m) % m;
+
+  /** Legendre symbol (n/5): 0 if 5 | n, +1 if n = ±1 mod 5, -1 if n = ±2 mod 5. */
+  function leg(n) {
+    const r = mod(n, 5);
+    return r === 0 ? 0 : (r === 1 || r === 4) ? 1 : -1;
+  }
+
+  /** The Pentametric Formula (exact for |n| < 9.4e7). */
+  function P(n) { return (n * n + 4 * leg(n)) / 5; }
+
+  /** Consonance indicator H(n) = P(n) mod 5. */
+  function H(n) { return mod(P(n), 5); }
+
+  /** Interval Map C(m) = (26m - 5m^2)/24, m = 4n^2 mod 10. */
+  function C(m) { return (26 * m - 5 * m * m) / 24; }
+
+  const INTERVALS = [
+    { h: 0, name: "silence", ratio: null, num: 0, den: 0, greek: "σιγή", translit: "sigē" },
+    { h: 1, name: "unison", ratio: "1:1", num: 1, den: 1, greek: "ὁμώνυμον", translit: "homōnymon" },
+    { h: 2, name: "octave", ratio: "2:1", num: 2, den: 1, greek: "διὰ πασῶν", translit: "dia pasōn" },
+    { h: 3, name: "fifth", ratio: "3:2", num: 3, den: 2, greek: "διὰ πέντε", translit: "dia pente" },
+    { h: 4, name: "fourth", ratio: "4:3", num: 4, den: 3, greek: "διὰ τεσσάρων", translit: "dia tessarōn" },
+  ];
+
+  /** CSS custom property holding the colour of H = h. */
+  const colorVar = (h) => `var(--c${h})`;
+
+  // Lucas and Fibonacci numbers as BigInt, k = 0..90.
+  const L = [2n, 1n], F = [0n, 1n];
+  for (let k = 2; k <= 90; k++) { L.push(L[k - 1] + L[k - 2]); F.push(F[k - 1] + F[k - 2]); }
+
+  /** Index k with L_k = n (n >= 1), or -1. L_0 = 2 and L_2 = 3, L_1 = 1. */
+  function lucasIndex(n) {
+    const b = BigInt(n);
+    for (let k = 0; k < L.length; k++) if (L[k] === b) return k;
+    return -1;
+  }
+
+  function isSquare(x) {
+    if (x < 0) return false;
+    const r = Math.round(Math.sqrt(x));
+    return r * r === x;
+  }
+
+  /** Format a number with a proper minus sign. */
+  function fmt(x, digits) {
+    let s = digits === undefined ? String(x) : x.toFixed(digits);
+    if (s.startsWith("-")) s = "−" + s.slice(1);
+    return s;
+  }
+
+  return { mod, leg, P, H, C, INTERVALS, colorVar, L, F, lucasIndex, isSquare, fmt };
+})();
+</script>
+<style>
+  td.f { font-family: var(--serif); font-size: 1.08rem; }
+  td.f small { display: block; font-family: var(--sans); font-size: .82rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand greek" href="index.html">Ὁ Πενταμετρικὸς Κύκλος</a>
+  <nav>
+    <a href="spiral.html">Spiral</a>
+    <a href="defects.html">The ±0.8</a>
+    <a href="palindrome.html">Palindrome</a>
+    <a href="explorer.html">Explorer</a>
+    <a href="forms.html" aria-current="page">Ten forms</a>
+    <a href="curiosity.html">A curiosity</a>
+  </nav>
+</div></header>
+
+<main>
+  <h1>Ten forms of one formula</h1>
+  <p class="lede">The same areas were reached in the spreadsheets by ten different routes: through digits, floors, a polynomial, cosines, a golden rotation and the angles of the pentagon. Each route is a different way of computing the Legendre symbol (n/5), so all ten always agree. Choose n and watch them agree.</p>
+
+  <div class="panel">
+    <div class="controls">
+      <label>n <input id="n" type="number" min="0" max="1000000" value="7" style="width:11ch"></label>
+      <button id="minus">−1</button><button id="plus">+1</button>
+      <span class="note">d = 2n² mod 10 = <strong id="d"></strong>, r = n² mod 10 = <strong id="r"></strong>, (n/5) = <strong id="chi"></strong>, P(n) = <strong id="P"></strong></span>
+    </div>
+    <div class="scroll-x">
+      <table class="data" id="tab" style="min-width:680px"></table>
+    </div>
+    <p class="note">Forms F8 and F9 use cosines and powers of the golden ratio, so they are computed in floating point and agree with P(n) to many decimal places; F9 is evaluated by its recurrence for n ≤ 1400. All the others are exact.</p>
+  </div>
+
+  <h2>Check them all at once</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>for every n from 0 to <input id="M" type="number" min="10" max="200000" value="3000" style="width:10ch"></label>
+      <button id="check" class="primary">Run check</button>
+    </div>
+    <div id="res" class="note">The paper reports this check for 0 ≤ n &lt; 3000.</div>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const phi = (1 + Math.sqrt(5)) / 2, kappa = phi * Math.sin(2 * Math.PI / 5);
+const C = (m) => (26 * m - 5 * m * m) / 24;
+const p = (d) => -d * d / 12 + 17 * d / 30;
+const g = (d) => d * (8 - d) / 12;
+const T = (d) => 2 * g(d) - (d !== 0 ? 1 : 0);
+const q = (x) => x ** 5 - 35 * x ** 3 + 250 * x;
+const roundHalfUp = (x) => Math.floor(x + 0.5);
+function c72(n) { const a = (72 * n) % 360; return a === 72 || a === 288 ? 4 : a === 144 || a === 216 ? -4 : 0; }
+function golden(n) {            // z^n = C_n + i D_n by the recurrence of multiplication by z = phi e^(2 pi i/5)
+  if (n > 1400) return NaN;
+  let Cn = 1, Dn = 0;
+  for (let k = 0; k < n; k++) { const c2 = 0.5 * Cn - kappa * Dn, d2 = kappa * Cn + 0.5 * Dn; Cn = c2; Dn = d2; }
+  const pn = phi ** n;
+  const a = Cn / pn, b = Dn / pn;               // normalised to avoid overflow
+  return (n * n + 8 / Math.sqrt(5) * (a - (a * a - b * b))) / 5;
+}
+
+const FORMS = [
+  { id: "F1", name: "Interval Map", f: "(n² + 4·C(4n² mod 10)) / 5", note: "C(m) = (26m − 5m²)/24; the original spreadsheet construction",
+    v: (n) => (n * n + 4 * C((4 * n * n) % 10)) / 5 },
+  { id: "F2", name: "Legendre symbol", f: "(n² + 4·(n/5)) / 5", note: "the closed form",
+    v: (n) => (n * n + 4 * Pent.leg(n)) / 5 },
+  { id: "F3", name: "Double-square digit", f: "n²/5 + p(d)", note: "p(d) = −d²/12 + 17d/30, d = last digit of 2n²; p(d) = ±0.8 or 0",
+    v: (n) => n * n / 5 + p((2 * n * n) % 10) },
+  { id: "F4", name: "Side and correction", f: "¼ [ (2n/√5)² + (16/5)·T(d) ]", note: "T(d) = 2g(d) − [d ≠ 0]",
+    v: (n) => ((2 * n / Math.sqrt(5)) ** 2 + 16 / 5 * T((2 * n * n) % 10)) / 4 },
+  { id: "F5", name: "Floor and digit", f: "⌊n²/5⌋ + g(d)", note: "g(d) = d(8 − d)/12, which is 1 when d = 2 and 0 otherwise",
+    v: (n) => Math.floor(n * n / 5) + g((2 * n * n) % 10) },
+  { id: "F6", name: "Floor and reciprocal", f: "⌊n²/5⌋ + round(1/d)", note: "round(1/0) = 0, halves rounded up",
+    v: (n) => { const d = (2 * n * n) % 10; return Math.floor(n * n / 5) + (d === 0 ? 0 : roundHalfUp(1 / d)); } },
+  { id: "F7", name: "Odd quintic", f: "(n² + 4·q(r − 5)/216) / 5", note: "q(x) = x⁵ − 35x³ + 250x, r = last digit of n²",
+    v: (n) => (n * n + 4 * q((n * n) % 10 - 5) / 216) / 5 },
+  { id: "F8", name: "Gauss sum (cosines)", f: "⅕ [ n² + (8/√5)(cos 2πn/5 − cos 4πn/5) ]", note: "the angles 72° and 144° of the regular pentagon", float: true,
+    v: (n) => (n * n + 8 / Math.sqrt(5) * (Math.cos(2 * Math.PI * n / 5) - Math.cos(4 * Math.PI * n / 5))) / 5 },
+  { id: "F9", name: "Golden rotation", f: "⅕ [ n² + (8/√5)(Cₙ/φⁿ − (Cₙ² − Dₙ²)/φ²ⁿ) ]", note: "zⁿ = Cₙ + iDₙ with z = φ·e<sup>2πi/5</sup>, by repeated rotation", float: true,
+    v: golden },
+  { id: "F10", name: "Pentagonal angles", f: "(n² + c(n)) / 5", note: "c(n) = 4, −4 or 0 as 72n mod 360 is in {72, 288}, {144, 216} or is 0",
+    v: (n) => (n * n + c72(n)) / 5 },
+];
+
+const agree = (x, P) => Number.isFinite(x) && Math.abs(x - P) <= 1e-7 * Math.max(1, P);
+function show(x) {
+  if (!Number.isFinite(x)) return "—";
+  const r = Math.round(x);
+  return Math.abs(x - r) < 1e-12 * Math.max(1, Math.abs(x)) ? r.toLocaleString("en-US") : x.toFixed(9);
+}
+
+function update() {
+  let n = Math.round(+$("n").value); if (!(n >= 0)) n = 0; if (n > 1e6) n = 1e6;
+  const P = Pent.P(n);
+  $("d").textContent = (2 * n * n) % 10; $("r").textContent = (n * n) % 10;
+  const chi = Pent.leg(n); $("chi").textContent = chi > 0 ? "+1" : chi < 0 ? "−1" : "0";
+  $("P").textContent = P.toLocaleString("en-US");
+  $("tab").innerHTML = "<tr><th>form</th><th>route</th><th>formula</th><th class=num>value at n</th><th class=num>agrees</th></tr>" +
+    FORMS.map((F) => { const x = F.v(n);
+      return `<tr><td><strong>${F.id}</strong></td><td>${F.name}</td><td class="f">${F.f}<small>${F.note}</small></td>` +
+        `<td class="num">${F.float && Number.isFinite(x) ? x.toFixed(10) : show(x)}</td><td class="num">${agree(x, P) ? '<span class="ok">✓</span>' : (Number.isFinite(x) ? "✗" : "n > 1400")}</td></tr>`; }).join("");
+}
+
+$("check").addEventListener("click", () => {
+  const M = Math.min(200000, Math.max(10, Math.round(+$("M").value)));
+  const bad = [];
+  for (let n = 0; n <= M; n++) {
+    const P = Pent.P(n);
+    for (const F of FORMS) {
+      if (F.id === "F9" && n > 1400) continue;
+      if (!agree(F.v(n), P)) { bad.push(`${F.id} at n = ${n}`); if (bad.length > 5) break; }
+    }
+    if (bad.length > 5) break;
+  }
+  $("res").innerHTML = bad.length === 0
+    ? `<span class="ok">All ten forms agree with (n² + 4(n/5))/5 for every n from 0 to ${M.toLocaleString("en-US")}</span>${M > 1400 ? " (F9 checked up to n = 1400)" : ""}.`
+    : `Disagreements: ${bad.join(", ")}`;
+});
+$("n").addEventListener("input", update);
+$("minus").onclick = () => { $("n").value = Math.max(0, +$("n").value - 1); update(); };
+$("plus").onclick = () => { $("n").value = +$("n").value + 1; update(); };
+update();
+</script>
+</body>
+</html>

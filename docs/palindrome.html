@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Playable Palindrome · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<style>
+/* The Pentametric Cycle — shared styles */
+:root {
+  --bg: #f7f4ee;
+  --panel: #fffdf9;
+  --ink: #1f1f1f;
+  --muted: #5f5b55;
+  --rule: #ddd6ca;
+  --accent: #2b5d8a;      /* octave blue, Fibonacci squares */
+  --accent2: #b4532a;     /* fifth rust, Holden geometry */
+  --c0: #d9d9d9;          /* silence */
+  --c1: #4f7cac;          /* unison */
+  --c2: #2b5d8a;          /* octave */
+  --c3: #b4532a;          /* fifth */
+  --c4: #d99a5b;          /* fourth */
+  --fill: #e9eef4;
+  --ok: #2e7d4f;
+  --serif: "EB Garamond", "Garamond", "Georgia", serif;
+  --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
+    --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
+    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
+  --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
+  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font-family: var(--sans); font-size: 16px; line-height: 1.55; }
+a { color: var(--accent); }
+.greek { font-family: var(--serif); }
+header.site {
+  border-bottom: 1px solid var(--rule); background: var(--panel);
+}
+header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
+header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); white-space: nowrap; }
+header.site nav { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .95rem; }
+header.site nav a { text-decoration: none; color: var(--muted); }
+header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
+main { padding-top: 28px; padding-bottom: 40px; }
+h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
+h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 30px 0 8px; }
+.lede { color: var(--muted); max-width: 70ch; margin: 0 0 22px; font-size: 1.05rem; }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 820px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 0 0 12px; }
+.controls label { display: inline-block; font-size: .95rem; }
+.controls label > input, .controls label > select { vertical-align: middle; margin: 0 6px 0 0; }
+.controls label > output { margin-left: 6px; font-family: var(--mono); }
+input[type="range"] { accent-color: var(--accent2); width: 180px; max-width: 100%; }
+input[type="number"], select {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 5px 8px;
+}
+input[type="number"] { width: 9ch; }
+button {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 6px 12px; cursor: pointer;
+}
+button.primary { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+button:hover { border-color: var(--muted); }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent2); outline-offset: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button { padding: 3px 9px; font-size: .9rem; }
+table.data { border-collapse: collapse; width: 100%; font-size: .95rem; }
+table.data th, table.data td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.data th { font-weight: 600; color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .03em; }
+table.data td.num, table.data th.num { text-align: right; font-family: var(--mono); font-size: .9rem; }
+.scroll-x { overflow-x: auto; }
+.readout { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: .95rem; }
+.readout dt { color: var(--muted); }
+.readout dd { margin: 0; font-family: var(--mono); font-size: .9rem; }
+.note { color: var(--muted); font-size: .9rem; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .8rem; border: 1px solid var(--rule); color: var(--muted); }
+.tag.proved { border-color: var(--ok); color: var(--ok); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .9rem; color: var(--muted); }
+.legend > span { display: inline-block; }
+.sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; vertical-align: -1px; margin-right: 6px; }
+svg { display: block; width: 100%; height: auto; }
+svg text { font-family: var(--sans); fill: var(--ink); }
+.ok { color: var(--ok); font-weight: 600; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.card { display: block; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.card:hover { border-color: var(--accent2); }
+.card h3 { font-family: var(--serif); font-weight: 500; font-size: 1.25rem; margin: 8px 0 4px; }
+.card p { margin: 0; color: var(--muted); font-size: .95rem; }
+footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size: .88rem; }
+footer.site .inner { padding-top: 16px; padding-bottom: 24px; }
+.formula { font-family: var(--serif); font-size: 1.35rem; text-align: center; margin: 6px 0 14px; }
+</style>
+<script>
+// The Pentametric Cycle — shared mathematics
+// P(n) = (n^2 + 4 (n/5)) / 5, with (n/5) the Legendre symbol modulo 5.
+"use strict";
+
+const Pent = (() => {
+  const mod = (a, m) => ((a % m) + m) % m;
+
+  /** Legendre symbol (n/5): 0 if 5 | n, +1 if n = ±1 mod 5, -1 if n = ±2 mod 5. */
+  function leg(n) {
+    const r = mod(n, 5);
+    return r === 0 ? 0 : (r === 1 || r === 4) ? 1 : -1;
+  }
+
+  /** The Pentametric Formula (exact for |n| < 9.4e7). */
+  function P(n) { return (n * n + 4 * leg(n)) / 5; }
+
+  /** Consonance indicator H(n) = P(n) mod 5. */
+  function H(n) { return mod(P(n), 5); }
+
+  /** Interval Map C(m) = (26m - 5m^2)/24, m = 4n^2 mod 10. */
+  function C(m) { return (26 * m - 5 * m * m) / 24; }
+
+  const INTERVALS = [
+    { h: 0, name: "silence", ratio: null, num: 0, den: 0, greek: "σιγή", translit: "sigē" },
+    { h: 1, name: "unison", ratio: "1:1", num: 1, den: 1, greek: "ὁμώνυμον", translit: "homōnymon" },
+    { h: 2, name: "octave", ratio: "2:1", num: 2, den: 1, greek: "διὰ πασῶν", translit: "dia pasōn" },
+    { h: 3, name: "fifth", ratio: "3:2", num: 3, den: 2, greek: "διὰ πέντε", translit: "dia pente" },
+    { h: 4, name: "fourth", ratio: "4:3", num: 4, den: 3, greek: "διὰ τεσσάρων", translit: "dia tessarōn" },
+  ];
+
+  /** CSS custom property holding the colour of H = h. */
+  const colorVar = (h) => `var(--c${h})`;
+
+  // Lucas and Fibonacci numbers as BigInt, k = 0..90.
+  const L = [2n, 1n], F = [0n, 1n];
+  for (let k = 2; k <= 90; k++) { L.push(L[k - 1] + L[k - 2]); F.push(F[k - 1] + F[k - 2]); }
+
+  /** Index k with L_k = n (n >= 1), or -1. L_0 = 2 and L_2 = 3, L_1 = 1. */
+  function lucasIndex(n) {
+    const b = BigInt(n);
+    for (let k = 0; k < L.length; k++) if (L[k] === b) return k;
+    return -1;
+  }
+
+  function isSquare(x) {
+    if (x < 0) return false;
+    const r = Math.round(Math.sqrt(x));
+    return r * r === x;
+  }
+
+  /** Format a number with a proper minus sign. */
+  function fmt(x, digits) {
+    let s = digits === undefined ? String(x) : x.toFixed(digits);
+    if (s.startsWith("-")) s = "−" + s.slice(1);
+    return s;
+  }
+
+  return { mod, leg, P, H, C, INTERVALS, colorVar, L, F, lucasIndex, isSquare, fmt };
+})();
+</script>
+<style>
+  .now { font-family: var(--serif); }
+  .now .big { font-size: 2.1rem; line-height: 1.1; }
+  .now .gk { font-size: 1.5rem; color: var(--muted); }
+  .seg { cursor: pointer; transition: opacity .15s; }
+  .seg:hover { opacity: .8; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand greek" href="index.html">Ὁ Πενταμετρικὸς Κύκλος</a>
+  <nav>
+    <a href="spiral.html">Spiral</a>
+    <a href="defects.html">The ±0.8</a>
+    <a href="palindrome.html" aria-current="page">Palindrome</a>
+    <a href="explorer.html">Explorer</a>
+    <a href="forms.html">Ten forms</a>
+    <a href="curiosity.html">A curiosity</a>
+  </nav>
+</div></header>
+
+<main>
+  <h1>The playable palindrome</h1>
+  <p class="lede">Reduce P(n) modulo 5 and read 1, 2, 3, 4 as the ratios 1:1, 2:1, 3:2, 4:3 of the tetractys and 0 as silence. The 51 values for n = 0 … 50 form a palindrome around a silent axis, with the fifth at the centre of each half. Press play to hear it in just intonation.</p>
+
+  <div class="controls panel" style="padding:12px 16px">
+    <button id="play" class="primary">▶ Play</button>
+    <label><input id="retro" type="checkbox"> play backwards (retrograde)</label>
+    <label><input id="loop" type="checkbox" checked> loop</label>
+    <label><input id="drone" type="checkbox"> drone on the fundamental</label>
+    <label>tempo <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmOut">120</output></label>
+    <label>fundamental
+      <select id="f0">
+        <option value="130.81">C3 (130.8 Hz)</option>
+        <option value="146.83">D3 (146.8 Hz)</option>
+        <option value="196.00" selected>G3 (196.0 Hz)</option>
+        <option value="220.00">A3 (220.0 Hz)</option>
+        <option value="261.63">C4 (261.6 Hz)</option>
+      </select>
+    </label>
+    <label>tone
+      <select id="wave">
+        <option value="sine">sine</option>
+        <option value="triangle" selected>triangle</option>
+        <option value="sawtooth">bright</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="panel">
+      <svg id="wheel" viewBox="0 0 520 520" role="img" aria-label="The 51 values of the palindrome arranged around a circle"></svg>
+      <div class="legend" id="legend" style="justify-content:center;margin-top:6px"></div>
+      <p class="note" style="margin:8px 0 0">Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.</p>
+    </div>
+    <div class="panel">
+      <div class="now" aria-live="polite">
+        <div class="note" style="font-family:var(--sans)">position</div>
+        <div class="big">n = <span id="pos">—</span></div>
+        <div class="note" style="font-family:var(--sans);margin-top:10px">P(n), H(n)</div>
+        <div style="font-size:1.25rem" id="vals">—</div>
+        <div class="note" style="font-family:var(--sans);margin-top:10px">interval</div>
+        <div class="big" id="iname">—</div>
+        <div class="gk greek" id="igreek"></div>
+      </div>
+      <h2>Counts</h2>
+      <div class="scroll-x">
+      <table class="data">
+        <tr><th></th><th class="num">period&nbsp;(25)</th><th class="num">palindrome&nbsp;(51)</th></tr>
+        <tr><td>silence</td><td class="num">9 = 3²</td><td class="num">19</td></tr>
+        <tr><td style="white-space:nowrap">unison 1:1</td><td class="num">4</td><td class="num">8</td></tr>
+        <tr><td style="white-space:nowrap">octave 2:1</td><td class="num">4</td><td class="num">8</td></tr>
+        <tr><td style="white-space:nowrap">fifth 3:2</td><td class="num">4</td><td class="num">8</td></tr>
+        <tr><td style="white-space:nowrap">fourth 4:3</td><td class="num">4</td><td class="num">8</td></tr>
+      </table>
+      </div>
+      <p class="note">Each period holds 9 silences and 16 = 4² consonances, 9 + 16 = 25 (echoing 3² + 4² = 5²). Its consonances multiply to 2⁸: exactly eight octaves, because a fifth and a fourth make an octave.</p>
+    </div>
+  </div>
+
+  <h2>Piano roll</h2>
+  <div class="panel scroll-x">
+    <svg id="roll" viewBox="0 0 1000 200" style="min-width:640px" role="img" aria-label="Piano roll of the 51-step palindrome"></svg>
+    <p class="note">Click any column to hear that step. The solid line marks the silent axis at n = 25; dotted lines mark the pairs of fifths at n = 12, 13 and n = 37, 38. Played backwards, the piece is identical: it is its own retrograde.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const N = 51;
+const Hs = Array.from({ length: N }, (_, n) => Pent.H(n));
+const IV = Pent.INTERVALS;
+
+// legend
+$("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("");
+
+// ---- wheel ----
+const wheelSegs = [];
+(function drawWheel() {
+  const svg = $("wheel"), cx = 260, cy = 260, r1 = 170, r2 = 225;
+  // On the circle n = 50 is the same point as n = 0 (the next palindrome starts there),
+  // so the wheel has 50 segments: 0 = 50 at the top, the axis n = 25 at the bottom.
+  const W = 50, ang = (i) => -Math.PI / 2 + (i / W) * 2 * Math.PI;
+  for (let n = 0; n < W; n++) {
+    const a0 = ang(n - 0.45), a1 = ang(n + 0.45);
+    const p = (r, a) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+    const d = `M ${p(r1, a0)} L ${p(r2, a0)} A ${r2} ${r2} 0 0 1 ${p(r2, a1)} L ${p(r1, a1)} A ${r1} ${r1} 0 0 0 ${p(r1, a0)} Z`;
+    const seg = el(svg, "path", { d, fill: `var(--c${Hs[n]})`, class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
+    seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); });
+    el(seg, "title", {}, `n = ${n}: ${IV[Hs[n]].name}`);
+    wheelSegs.push(seg);
+    if (n % 5 === 0) el(svg, "text", { x: cx + (r2 + 18) * Math.cos(ang(n)), y: cy + (r2 + 18) * Math.sin(ang(n)) + 4, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, n === 0 ? "0 = 50" : n);
+  }
+  // mirror axis through n = 0 = 50 and n = 25
+  for (const n of [0, 25]) {
+    const a = ang(n);
+    el(svg, "line", { x1: cx + (r1 - 40) * Math.cos(a), y1: cy + (r1 - 40) * Math.sin(a), x2: cx + (r2 + 4) * Math.cos(a), y2: cy + (r2 + 4) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 4" });
+  }
+  el(svg, "text", { x: cx, y: cy - 18, "text-anchor": "middle", "font-size": 15, fill: "var(--muted)" }, "H(n) = P(n) mod 5");
+  el(svg, "text", { x: cx, y: cy + 8, "text-anchor": "middle", "font-size": 22, class: "greek", style: "font-family:var(--serif)" }, "Ὁ Πενταμετρικὸς");
+  el(svg, "text", { x: cx, y: cy + 34, "text-anchor": "middle", "font-size": 22, style: "font-family:var(--serif)" }, "Παλίνδρομος");
+  el(svg, "text", { x: cx, y: cy + 62, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, "mirror axis through 0 = 50 and 25");
+})();
+
+// ---- piano roll ----
+const rollCols = [];
+(function drawRoll() {
+  const svg = $("roll"), left = 92, w = (1000 - left - 8) / N, rowY = (h) => 20 + (4 - h) * 30;
+  const labels = ["silence", "1:1 unison", "2:1 octave", "3:2 fifth", "4:3 fourth"];
+  for (let h = 1; h <= 4; h++) {
+    el(svg, "line", { x1: left, y1: rowY(h), x2: 1000 - 8, y2: rowY(h), stroke: "var(--rule)" });
+    el(svg, "text", { x: left - 8, y: rowY(h) + 4, "text-anchor": "end", "font-size": 12, fill: "var(--muted)" }, labels[h]);
+  }
+  el(svg, "text", { x: left - 8, y: rowY(0) + 4, "text-anchor": "end", "font-size": 12, fill: "var(--muted)" }, labels[0]);
+  for (let n = 0; n < N; n++) {
+    const x = left + n * w, g = el(svg, "g", { style: "cursor:pointer" });
+    const bg = el(g, "rect", { x, y: 4, width: w, height: 166, fill: "transparent" });
+    const h = Hs[n];
+    if (h === 0) el(g, "rect", { x: x + w * 0.35, y: rowY(0) - 3, width: w * 0.3, height: 6, rx: 2, fill: "var(--c0)" });
+    else el(g, "rect", { x: x + w * 0.1, y: rowY(h) - 9, width: w * 0.8, height: 18, rx: 2, fill: `var(--c${h})` });
+    if (n % 5 === 0) el(svg, "text", { x: x + w / 2, y: 192, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, n);
+    g.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); });
+    rollCols.push(bg);
+  }
+  const vline = (pos, dash) => el(svg, "line", { x1: left + pos * w, y1: 4, x2: left + pos * w, y2: 172, stroke: "var(--ink)", "stroke-width": dash ? 1 : 1.6, "stroke-dasharray": dash ? "2 3" : "" });
+  vline(25.5, false); vline(13, true); vline(38, true);
+})();
+
+// ---- display ----
+let shown = -1;
+function show(n) {
+  if (shown >= 0) { wheelSegs[shown % 50].setAttribute("stroke", "var(--panel)"); wheelSegs[shown % 50].setAttribute("stroke-width", 1); rollCols[shown].setAttribute("fill", "transparent"); }
+  shown = n;
+  wheelSegs[n % 50].setAttribute("stroke", "var(--ink)"); wheelSegs[n % 50].setAttribute("stroke-width", 3);
+  rollCols[n].setAttribute("fill", "var(--fill)");
+  const iv = IV[Hs[n]];
+  $("pos").textContent = n;
+  $("vals").textContent = `P(${n}) = ${Pent.P(n)},  H(${n}) = ${Hs[n]}`;
+  $("iname").textContent = iv.ratio ? `${iv.name} ${iv.ratio}` : "silence";
+  $("igreek").textContent = iv.greek;
+}
+
+// ---- audio ----
+let ctx = null, master = null, droneNodes = null;
+function ensureAudio() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination);
+  }
+  if (ctx.state === "suspended") ctx.resume();
+}
+function tone(freq, t, dur, gain) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = $("wave").value; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(gain, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(gain * 0.55, t + dur * 0.5);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
+}
+function playStep(n, t, dur) {
+  const iv = IV[Hs[n]];
+  if (!iv.ratio) return;
+  const f0 = +$("f0").value;
+  tone(f0, t, dur, 0.5);
+  if (iv.h !== 1) tone(f0 * iv.num / iv.den, t, dur, 0.42);   // unison: one voice is enough
+}
+function setDrone(on) {
+  if (droneNodes) { droneNodes.g.gain.setTargetAtTime(0, ctx.currentTime, 0.1); const d = droneNodes; setTimeout(() => d.o.stop(), 600); droneNodes = null; }
+  if (on && ctx) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine"; o.frequency.value = +$("f0").value / 2;
+    g.gain.value = 0; g.gain.setTargetAtTime(0.18, ctx.currentTime, 0.3);
+    o.connect(g).connect(master); o.start(); droneNodes = { o, g };
+  }
+}
+
+let timer = null, nextTime = 0, step = 0, queue = [], raf = 0;
+// One pass plays all 51 terms. When looping, the last silence (n = 50) is the first silence (n = 0) of the
+// next palindrome, so it is played only once: the loop repeats 50 steps.
+const order = () => { const len = $("loop").checked ? 50 : N; const seq = [...Array(len).keys()]; return $("retro").checked ? seq.map((i) => (50 - i)) : seq; };
+function schedule() {
+  const spb = 60 / +$("bpm").value, seq = order();
+  while (nextTime < ctx.currentTime + 0.12) {
+    if (step >= seq.length) { if ($("loop").checked) step = 0; else { stop(); return; } }
+    const n = seq[step];
+    playStep(n, nextTime, spb * 0.92);
+    queue.push({ n, t: nextTime });
+    nextTime += spb; step++;
+  }
+}
+function animate() {
+  while (queue.length && queue[0].t <= ctx.currentTime) show(queue.shift().n);
+  raf = requestAnimationFrame(animate);
+}
+function start() {
+  ensureAudio();
+  step = 0; queue = []; nextTime = ctx.currentTime + 0.08;
+  if ($("drone").checked) setDrone(true);
+  timer = setInterval(schedule, 25); schedule();
+  raf = requestAnimationFrame(animate);
+  $("play").textContent = "■ Stop";
+}
+function stop() {
+  clearInterval(timer); timer = null; cancelAnimationFrame(raf); queue = [];
+  setDrone(false);
+  $("play").textContent = "▶ Play";
+}
+$("play").addEventListener("click", () => (timer ? stop() : start()));
+$("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").value));
+$("drone").addEventListener("change", () => { if (timer) setDrone($("drone").checked); });
+$("f0").addEventListener("change", () => { if (droneNodes) droneNodes.o.frequency.value = +$("f0").value / 2; });
+show(12);
+</script>
+</body>
+</html>
