@@ -51,7 +51,9 @@ header.site {
 }
 header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
-header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); white-space: nowrap; }
+header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); }
+header.site .brand .greek { white-space: nowrap; }
+header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; margin-left: 6px; }
 header.site nav { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: .9rem; }
 header.site nav a { text-decoration: none; color: var(--muted); }
 header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
@@ -177,7 +179,7 @@ const Pent = (() => {
 </head>
 <body>
 <header class="site"><div class="inner">
-  <a class="brand greek" href="index.html">Ὁ Πενταμετρικὸς Κύκλος</a>
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span> <span class="brand-en">The Pentametric Cycle</span></a>
   <nav>
     <a href="spiral.html">Spiral</a>
     <a href="defects.html">The ±0.8</a>
