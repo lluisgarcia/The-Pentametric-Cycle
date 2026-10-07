@@ -24,6 +24,7 @@
   --c4: #d99a5b;          /* fourth */
   --fill: #e9eef4;
   --ok: #2e7d4f;
+  --accent3: #6b5a9e;     /* exploratory */
   --serif: "EB Garamond", "Garamond", "Georgia", serif;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
@@ -32,13 +33,13 @@
   :root:not([data-theme="light"]) {
     --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
     --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
   --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391;
+  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
@@ -53,7 +54,17 @@ header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap:
 header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); }
 header.site .brand .greek { white-space: nowrap; }
 header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; margin-left: 6px; }
-header.site nav { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: .9rem; }
+header.site nav { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; flex-basis: 100%; }
+header.site .navgroup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
+header.site .navlabel { font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; min-width: 100px; }
+header.site .navgroup.u .navlabel { color: var(--accent); }
+header.site .navgroup.p .navlabel { color: var(--accent2); }
+header.site .navgroup.e .navlabel { color: var(--accent3); }
+.kind { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600; margin: 0 6px 6px 0; }
+.kind.u { color: var(--accent); border: 1px solid var(--accent); }
+.kind.p { color: var(--accent2); border: 1px solid var(--accent2); }
+.kind.e { color: var(--accent3); border: 1px solid var(--accent3); }
+.kind + h1 { margin-top: 4px; }
 header.site nav a { text-decoration: none; color: var(--muted); }
 header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
 main { padding-top: 28px; padding-bottom: 40px; }
@@ -107,6 +118,37 @@ svg text { font-family: var(--sans); fill: var(--ink); }
 footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size: .88rem; }
 footer.site .inner { padding-top: 16px; padding-bottom: 24px; }
 .formula { font-family: var(--serif); font-size: 1.35rem; text-align: center; margin: 6px 0 14px; }
+
+/* ---- navigation: vertical sidebar on wide screens, collapsible menu on narrow ones ---- */
+.menu-toggle { display: none; }
+@media (min-width: 960px) {
+  body { padding-left: 250px; }
+  header.site { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; overflow-y: auto; border-bottom: none; border-right: 1px solid var(--rule); z-index: 10; }
+  header.site .inner { display: block; max-width: none; padding: 22px 18px 28px; }
+  header.site .brand { display: block; font-size: 1.3rem; line-height: 1.25; }
+  header.site .brand-en { display: block; margin: 2px 0 0; font-size: 1rem; }
+  header.site nav { display: block; margin-top: 18px; font-size: .95rem; }
+  header.site .navgroup { display: block; margin: 0 0 18px; }
+  header.site .navlabel { display: block; min-width: 0; margin: 0 0 6px; }
+  header.site .navgroup a { display: block; padding: 4px 10px; margin: 1px 0; border-left: 3px solid transparent; border-radius: 0 6px 6px 0; }
+  header.site .navgroup a:hover { background: var(--bg); color: var(--ink); }
+  header.site nav a[aria-current="page"] { border-bottom: none; background: var(--bg); color: var(--ink); font-weight: 600; }
+  header.site .navgroup.u a[aria-current="page"] { border-left-color: var(--accent); }
+  header.site .navgroup.e a[aria-current="page"] { border-left-color: var(--accent3); }
+  header.site .navgroup.p a[aria-current="page"] { border-left-color: var(--accent2); }
+}
+@media (max-width: 959px) {
+  header.site .inner { align-items: center; flex-wrap: wrap; }
+  header.site .brand { flex: 1; min-width: 0; }
+  header.site .brand-en { display: block; margin: 0; }
+  .menu-toggle { display: inline-block; margin-left: auto; padding: 5px 12px; }
+  header.site nav { display: none; flex-basis: 100%; margin-top: 6px; }
+  header.site.open nav { display: block; }
+  header.site .navgroup { display: block; margin: 0 0 12px; }
+  header.site .navlabel { display: block; min-width: 0; margin: 0 0 4px; }
+  header.site .navgroup a { display: block; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+  header.site nav a[aria-current="page"] { border-bottom: 1px solid var(--rule); background: var(--bg); color: var(--ink); font-weight: 600; }
+}
 </style>
 <script>
 // The Pentametric Cycle — shared mathematics
@@ -173,23 +215,16 @@ const Pent = (() => {
 <body>
 <header class="site"><div class="inner">
   <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span> <span class="brand-en">The Pentametric Cycle</span></a>
-  <nav>
-    <a href="spiral.html">Spiral</a>
-    <a href="defects.html">The ±0.8</a>
-    <a href="pentagon.html">Pentagon clock</a>
-    <a href="monochord.html">Monochord</a>
-    <a href="palindrome.html">Palindrome</a>
-    <a href="tapestry.html">Tapestry</a>
-    <a href="explorer.html" aria-current="page">Explorer</a>
-    <a href="forms.html">Ten forms</a>
-    <a href="composer.html">Composer</a>
-    <a href="growing.html">Growing spiral</a>
-    <a href="primes.html">Other primes</a>
-    <a href="curiosity.html">A curiosity</a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sitenav">☰ Menu</button>
+  <nav id="sitenav">
+    <div class="navgroup u"><span class="navlabel">Understand</span><a href="spiral.html">Spiral</a><a href="defects.html">The ±0.8</a><a href="pentagon.html">Pentagon clock</a><a href="monochord.html">Monochord</a><a href="palindrome.html">Palindrome</a><a href="explorer.html" aria-current="page">Explorer</a><a href="forms.html">Ten forms</a><a href="growing.html">Growing spiral</a></div>
+    <div class="navgroup e"><span class="navlabel">Exploratory</span><a href="primes.html">Other primes</a><a href="curiosity.html">A curiosity</a></div>
+    <div class="navgroup p"><span class="navlabel">Use it</span><a href="composer.html">Composer</a><a href="tapestry.html">Tapestry</a></div>
   </nav>
 </div></header>
 
 <main>
+  <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>Formula explorer</h1>
   <p class="lede">Type any whole number and follow the seven steps that take it to an area, a residue and a musical interval. At the Lucas numbers the area is always a perfect square: the square of the matching Fibonacci number.</p>
 
@@ -320,5 +355,6 @@ $("minus").onclick = () => { $("n").value = Math.max(0, +$("n").value - 1); upda
 $("plus").onclick = () => { $("n").value = +$("n").value + 1; update(); };
 update();
 </script>
+<script>(function(){var h=document.querySelector("header.site"),b=h&&h.querySelector(".menu-toggle");if(b)b.addEventListener("click",function(){var o=h.classList.toggle("open");b.setAttribute("aria-expanded",o);});})();</script>
 </body>
 </html>
