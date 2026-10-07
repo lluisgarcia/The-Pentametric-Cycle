@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Other Primes · The Pentametric Cycle</title>
+<title>Poster Maker · The Pentametric Cycle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -222,6 +222,12 @@ const Pent = (() => {
   return { mod, leg, P, H, C, INTERVALS, colorVar, L, F, lucasIndex, isSquare, fmt };
 })();
 </script>
+<style>
+  #preview { background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; display: flex; justify-content: center; padding: 12px; }
+  #preview img { display: block; max-height: 72vh; width: auto; height: auto; max-width: 100%; box-shadow: 0 2px 14px rgba(0,0,0,.15); }
+  .sw4 { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 4px; }
+  .sw4 i { width: 10px; height: 14px; display: inline-block; border-radius: 2px; }
+</style>
 </head>
 <body>
 <header class="site"><div class="inner">
@@ -246,10 +252,10 @@ const Pent = (() => {
         <li><a href="growing.html">The growing spiral<small>The spiral builds itself, square by square</small></a></li>
       </ul>
     </details>
-    <details class="e" data-current="1">
+    <details class="e">
       <summary><span class="sec">✦ Exploratory</span><span class="desc">Beyond the papers: explorations, not peer reviewed</span></summary>
       <ul>
-        <li><a href="primes.html" aria-current="page">Other primes<small>Why only 5 works, and the 5-12-13 family</small></a></li>
+        <li><a href="primes.html">Other primes<small>Why only 5 works, and the 5-12-13 family</small></a></li>
         <li><a href="cycle13.html">The 13-cycle as music<small>The palindrome with 13: every ratio from 2:1 to 12:11</small></a></li>
         <li><a href="powers.html">Higher powers of 5<small>The cycle modulo 25, 125, 625 and beyond</small></a></li>
         <li><a href="pell.html">Pell numbers<small>Does the trick work for another sequence? So far, no</small></a></li>
@@ -257,7 +263,7 @@ const Pent = (() => {
         <li><a href="curiosity.html">A curiosity: √10/3<small>A ratio within 1 cent of the Pythagorean semitone</small></a></li>
       </ul>
     </details>
-    <details class="p">
+    <details class="p" data-current="1">
       <summary><span class="sec">⤓ Use it</span><span class="desc">Make something and download it</span></summary>
       <ul>
         <li><a href="composer.html">Composer<small>Turn numbers into music and download a MIDI file</small></a></li>
@@ -265,64 +271,53 @@ const Pent = (() => {
         <li><a href="signature.html">Name and date signature<small>Your name or a date as a short piece and a card</small></a></li>
         <li><a href="tuning.html">Tuning file maker<small>Download the cycle's scales as Scala (.scl) files</small></a></li>
         <li><a href="rhythm.html">Rhythm generator<small>The cycle as a drum pattern, with MIDI download</small></a></li>
-        <li><a href="poster.html">Poster maker<small>Prints, wallpapers and covers as SVG or PNG</small></a></li>
+        <li><a href="poster.html" aria-current="page">Poster maker<small>Prints, wallpapers and covers as SVG or PNG</small></a></li>
       </ul>
     </details>
   </nav>
 </div></header>
 
 <main>
-  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
-  <h1>Other primes</h1>
-  <p class="lede">The papers ask what happens if 5 is replaced by another prime p. This page explores two answers. The first shows that the formula itself cannot be copied: 5 is the only prime that works. The second shows that the palindrome and its counts survive for every prime, and that the triple 3² + 4² = 5² is the first of a family that continues with 5² + 12² = 13².</p>
+  <span class="kind p">⤓ Use it · make something and download it</span>
+  <h1>Poster maker</h1>
+  <p class="lede">Turn the mathematics into a print, a wallpaper or an album cover. Pick a design, a colour palette and a format, then download it as SVG (for printing at any size) or PNG.</p>
 
-  <h2>1. The formula works only for p = 5</h2>
   <div class="grid2">
     <div class="panel">
-      <p style="margin-top:0">Try the natural generalisation (n² + c·(n/p)) / p, with (n/p) the Legendre symbol modulo p. For which p and c is it a whole number for every n?</p>
-      <div class="controls">
-        <label>p <select id="p1"></select></label>
-        <label>c <input id="c1" type="number" value="4" style="width:7ch"></label>
+      <div class="controls" style="flex-direction:column;align-items:flex-start">
+        <label>design
+          <select id="design">
+            <option value="wheel">The palindrome wheel</option>
+            <option value="spiral">The spiral and Holden's lines</option>
+            <option value="tapestry">The residue tapestry</option>
+            <option value="rings">Rings of periods</option>
+          </select>
+        </label>
+        <label>palette <select id="pal"></select></label>
+        <label>lettering
+          <select id="font">
+            <option value="bold">bold serif</option>
+            <option value="serif">classic serif</option>
+            <option value="sans">modern sans</option>
+            <option value="mono">typewriter</option>
+          </select></label>
+        <label>format
+          <select id="fmt">
+            <option value="a">Portrait poster (A-series, 1 : √2)</option>
+            <option value="sq">Square (album cover)</option>
+            <option value="wide">Wide wallpaper (16 : 9)</option>
+          </select>
+        </label>
+        <label><input id="txt" type="checkbox" checked> title and formula</label>
+        <label><input id="credit" type="checkbox" checked> small credit line</label>
       </div>
-      <div id="res1" style="font-size:1.05rem"></div>
-      <div class="scroll-x" style="margin-top:12px"><svg id="map1" role="img" aria-label="Map of primes and constants that give whole numbers"></svg></div>
-      <p class="note">Map: rows are primes, columns are c = 0 … p − 1. A filled cell means whole numbers for every n. Only one cell is filled: p = 5, c = 4.</p>
-    </div>
-    <div class="panel">
-      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">Why</h3>
-      <p style="margin-top:0">Taking n = 1 forces 1 + c ≡ 0, so c ≡ −1 (mod p). Then every n with (n/p) = +1 needs n² ≡ 1, i.e. n ≡ ±1. So the only quadratic residues modulo p could be ±1, which leaves room for at most two of them. There are (p − 1)/2 quadratic residues, so p ≤ 5. For p = 3, n = 2 would need 4 − c ≡ 0, i.e. c ≡ 1, contradicting c ≡ −1. So p = 5 and c ≡ 4 (mod 5) is the only case: the formula of the cycle.</p>
-      <p class="note" style="margin-bottom:0">This short argument answers the first open question in the papers. It was checked by computer for every prime below 400.</p>
-    </div>
-  </div>
-
-  <h2>2. The palindrome survives for every prime</h2>
-  <div class="panel">
-    <p style="margin-top:0">Drop the correction and keep the whole part: Q<sub>p</sub>(n) = ⌊n²/p⌋ mod p. For p = 5 this has the same counts as the cycle (9 zeros, each other value 4 times). Choose a prime and see the pattern of one period of p² numbers, written in p rows of p.</p>
-    <div class="controls">
-      <label>prime p <select id="p2"></select></label>
-      <div class="chips" id="trip"></div>
-    </div>
-    <div class="grid2">
-      <div class="scroll-x"><svg id="grid2" role="img" aria-label="One period of floor(n squared over p) mod p in p rows"></svg></div>
-      <div>
-        <dl class="readout" id="read2"></dl>
-        <div id="triple" style="margin-top:12px;padding:12px;border-radius:8px;border:1px solid var(--rule)"></div>
+      <div class="controls" style="margin-bottom:0">
+        <button id="svg" class="primary">⤓ SVG</button>
+        <button id="png">⤓ PNG</button>
       </div>
+      <p class="note" style="margin-bottom:0">PNG width: <select id="res"><option value="2000">2000 px</option><option value="3000" selected>3000 px</option><option value="4500">4500 px</option></select>. SVG files can be enlarged to any size without losing sharpness.</p>
     </div>
-  </div>
-
-  <div class="grid2" style="margin-top:18px">
-    <div class="panel">
-      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">Why the counts are always 2p − 1 and p − 1</h3>
-      <p style="margin-top:0">Write n = pq + r with q and r between 0 and p − 1 (row q, column r in the grid). Then ⌊n²/p⌋ ≡ 2qr + ⌊r²/p⌋ (mod p). In column r = 0 every value is 0. In any other column, 2r is invertible modulo p, so as q runs through a column every value 0, …, p − 1 appears exactly once. That gives 0 a total of p + (p − 1) = 2p − 1 times and every other value p − 1 times, and (2p − 1) + (p − 1)² = p². The same argument, with the extra +1 when n ≡ ±1, gives the counts 9 and 4 of the Pentametric cycle.</p>
-      <p class="note" style="margin-bottom:0">Period p² and the mirror Q<sub>p</sub>(p² − n) = Q<sub>p</sub>(n) follow from expanding (n + p²)² and (p² − n)².</p>
-    </div>
-    <div class="panel">
-      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">When is it a Pythagorean triple?</h3>
-      <p style="margin-top:0">The identity (2p − 1) + (p − 1)² = p² becomes a Pythagorean triple m² + (p − 1)² = p² exactly when 2p − 1 is a perfect square m², that is when p = (m² + 1)/2. The primes of this form begin</p>
-      <p class="formula" style="font-size:1.1rem">5 (3, 4, 5) · 13 (5, 12, 13) · 41 (9, 40, 41) · 61 (11, 60, 61) · 113 · 181 …</p>
-      <p class="note" style="margin-bottom:0">So the split 9 + 16 = 25 of the cycle is the first case of a family. Whether there are infinitely many such primes is not known: it is a special case of a famous open question, whether a quadratic polynomial takes infinitely many prime values.</p>
-    </div>
+    <div id="preview"></div>
   </div>
 </main>
 
@@ -334,75 +329,137 @@ const Pent = (() => {
 
 <script>
 "use strict";
-const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
-function el(parent, name, attrs, text) {
-  const e = document.createElementNS(NS, name);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-  if (text !== undefined) e.textContent = text;
-  parent.appendChild(e); return e;
-}
-const PR = []; for (let k = 3; k < 70; k++) if ([...Array(k).keys()].slice(2).every((d) => k % d)) PR.push(k);
-const mod = (a, m) => ((a % m) + m) % m;
-function powmod(b, e, m) { let r = 1; b = mod(b, m); while (e > 0) { if (e & 1) r = (r * b) % m; b = (b * b) % m; e >>= 1; } return r; }
-const legp = (n, p) => (mod(n, p) === 0 ? 0 : powmod(n, (p - 1) / 2, p) === 1 ? 1 : -1);
-const works = (p, c) => { for (let n = 0; n < p; n++) if (mod(n * n + c * legp(n, p), p) !== 0) return n; return -1; };
+// palettes: background, ink, muted, then colours for H = 0..4
+const PAL = {
+  classic: { name: "Classic", bg: "#f7f4ee", ink: "#000000", muted: "#222222", c: ["#d9d9d9", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b"] },
+  night: { name: "Night", bg: "#15141a", ink: "#ece8e1", muted: "#9a948b", c: ["#34333b", "#7fa8d4", "#4f86c0", "#e08a5e", "#e8b77f"] },
+  ink: { name: "Ink", bg: "#ffffff", ink: "#000000", muted: "#222222", c: ["#e6e6e6", "#9a9a9a", "#555555", "#111111", "#bdbdbd"] },
+  sunset: { name: "Sunset", bg: "#fff6ec", ink: "#000000", muted: "#2a1a14", c: ["#f3e2d3", "#f2a65a", "#e06c4c", "#a8324a", "#5c2a5e"] },
+  ocean: { name: "Ocean", bg: "#eef6f7", ink: "#000000", muted: "#142a33", c: ["#d7e7ea", "#7cc6c9", "#2a9d8f", "#1d4e89", "#e9c46a"] },
+  gold: { name: "Gold on black", bg: "#0d0d0d", ink: "#e9d8a6", muted: "#a08f5d", c: ["#262626", "#6d5d2e", "#b08d3c", "#e9c46a", "#f4e3b2"] },
+};
+for (const [k, p] of Object.entries(PAL)) { const o = document.createElement("option"); o.value = k; o.textContent = p.name; $("pal").appendChild(o); }
 
-// ---- part 1 ----
-for (const p of PR.filter((q) => q <= 47)) { const o = document.createElement("option"); o.value = p; o.textContent = p; if (p === 5) o.selected = true; $("p1").appendChild(o); }
-function part1() {
-  const p = +$("p1").value, c = Math.round(+$("c1").value || 0), bad = works(p, c);
-  $("res1").innerHTML = bad < 0
-    ? `<span class="ok">Whole numbers for every n.</span> For p = ${p}, c = ${c}: (n² ${c >= 0 ? "+" : "−"} ${Math.abs(c)}·(n/${p}))/${p}.`
-    : `Fails at n = ${bad}: (${bad * bad} ${legp(bad, p) * c >= 0 ? "+" : "−"} ${Math.abs(legp(bad, p) * c)})/${p} = ${((bad * bad + c * legp(bad, p)) / p).toFixed(3)} is not a whole number.`;
-}
-(function map() {
-  const svg = $("map1"), rows = PR.filter((q) => q <= 47), cell = 12, lw = 30, W = 47;
-  svg.setAttribute("viewBox", `0 0 ${lw + W * cell + 4} ${rows.length * cell + 20}`);
-  svg.style.minWidth = "520px";
-  rows.forEach((p, i) => {
-    el(svg, "text", { x: lw - 6, y: i * cell + 10, "text-anchor": "end", "font-size": 10, fill: "var(--muted)" }, p);
-    for (let c = 0; c < p; c++) el(svg, "rect", { x: lw + c * cell, y: i * cell, width: cell - 1.5, height: cell - 1.5, fill: works(p, c) < 0 ? "var(--accent2)" : "var(--c0)", opacity: works(p, c) < 0 ? 1 : 0.5 });
-  });
-  el(svg, "text", { x: lw, y: rows.length * cell + 14, "font-size": 10, fill: "var(--muted)" }, "c = 0, 1, 2, … →");
-})();
-$("p1").addEventListener("input", part1); $("c1").addEventListener("input", part1); part1();
+const FMT = { a: [1000, 1414], sq: [1200, 1200], wide: [1920, 1080] };
+const H = (n) => Pent.H(n);
+const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
-// ---- part 2 ----
-for (const p of PR) { const o = document.createElement("option"); o.value = p; o.textContent = p; if (p === 13) o.selected = true; $("p2").appendChild(o); }
-for (const p of [5, 13, 41, 61]) { const b = document.createElement("button"); b.textContent = `p = ${p}`; b.onclick = () => { $("p2").value = p; part2(); }; $("trip").appendChild(b); }
-const hue = (v, p) => (v === 0 ? "var(--c0)" : `hsl(${Math.round(360 * (v - 1) / (p - 1))} 55% 52%)`);
-function part2() {
-  const p = +$("p2").value, svg = $("grid2"), N = p * p;
-  const vals = Array.from({ length: N }, (_, n) => Math.floor(n * n / p) % p);
-  const cell = Math.max(4, Math.floor(520 / p)), lw = 26;
-  svg.setAttribute("viewBox", `0 0 ${lw + p * cell + 2} ${p * cell + 16}`);
-  svg.innerHTML = "";
-  for (let q = 0; q < p; q++) {
-    if (p <= 23 || q % 5 === 0) el(svg, "text", { x: lw - 4, y: q * cell + cell * 0.75, "text-anchor": "end", "font-size": Math.min(11, cell), fill: "var(--muted)" }, q);
-    for (let r = 0; r < p; r++) {
-      const n = q * p + r, v = vals[n];
-      const e = el(svg, "rect", { x: lw + r * cell, y: q * cell, width: cell - (cell > 8 ? 1 : 0), height: cell - (cell > 8 ? 1 : 0), fill: hue(v, p) });
-      el(e, "title", {}, `n = ${n}: ⌊n²/${p}⌋ mod ${p} = ${v}`);
+function arcPath(cx, cy, r1, r2, a0, a1) {
+  const p = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`;
+  return `M${p(r1, a0)}L${p(r2, a0)}A${r2},${r2} 0 0 1 ${p(r2, a1)}L${p(r1, a1)}A${r1},${r1} 0 0 0 ${p(r1, a0)}Z`;
+}
+
+// ---- designs, drawn into a box (x, y, w, h) ----
+function wheel(P, x, y, w, h) {
+  const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) / 2, out = [];
+  const ang = (i) => -Math.PI / 2 + (i / 50) * 2 * Math.PI;
+  for (let n = 0; n < 50; n++) out.push(`<path d="${arcPath(cx, cy, R * 0.62, R, ang(n - 0.44), ang(n + 0.44))}" fill="${P.c[H(n)]}"/>`);
+  out.push(`<line x1="${cx}" y1="${cy - R * 1.03}" x2="${cx}" y2="${cy + R * 1.03}" stroke="${P.muted}" stroke-width="${R * 0.006}" stroke-dasharray="${R * 0.02} ${R * 0.02}"/>`);
+  return out.join("");
+}
+function rings(P, x, y, w, h) {
+  const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) / 2, out = [];
+  const mods = [[25, 1], [50, 0.84], [125, 0.68], [250, 0.52]];   // rings: one period of P(n) mod 5 shown with period 25, then mod 10, mod 25, mod 50 coloured by value mod 5
+  for (const [N, f] of mods) {
+    const r2 = R * f, r1 = r2 - R * 0.13;
+    for (let n = 0; n < N; n++) {
+      const a0 = -Math.PI / 2 + ((n - 0.42) / N) * 2 * Math.PI, a1 = -Math.PI / 2 + ((n + 0.42) / N) * 2 * Math.PI;
+      out.push(`<path d="${arcPath(cx, cy, r1, r2, a0, a1)}" fill="${P.c[H(n)]}"/>`);
     }
   }
-  el(svg, "text", { x: lw, y: p * cell + 12, "font-size": 10, fill: "var(--muted)" }, "column r = n mod p →  ·  row q = ⌊n/p⌋ ↓");
-  const zeros = vals.filter((v) => v === 0).length, counts = new Set();
-  for (let v = 1; v < p; v++) counts.add(vals.filter((x) => x === v).length);
-  const mirror = vals.every((v, n) => v === vals[mod(N - n, N)]);
-  $("read2").innerHTML = [
-    ["period", `${N} = ${p}²`],
-    ["zeros", `${zeros} = 2·${p} − 1`],
-    ["each other value", [...counts].join(", ") + ` times = ${p} − 1`],
-    ["mirror Q(p² − n) = Q(n)", mirror ? '<span class="ok">yes</span>' : "no"],
-    ["count identity", `${zeros} + ${(p - 1) ** 2} = ${N}`],
-  ].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
-  const m = Math.round(Math.sqrt(2 * p - 1)), isT = m * m === 2 * p - 1;
-  $("triple").innerHTML = isT
-    ? `<span class="ok">A Pythagorean triple:</span> ${zeros} + ${(p - 1) ** 2} = ${N} is <strong>${m}² + ${p - 1}² = ${p}²</strong>.`
-    : `Not a triple: 2p − 1 = ${2 * p - 1} is not a perfect square.`;
+  return out.join("");
 }
-$("p2").addEventListener("input", part2); part2();
+function tapestry(P, x, y, w, h) {
+  const cols = 25, rows = Math.max(8, Math.round(cols * h / w)), cell = Math.min(w / cols, h / rows), out = [];
+  const ox = x + (w - cols * cell) / 2, oy = y + (h - rows * cell) / 2, g = cell * 0.08;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const n = r * cols + c + (r % 2 ? 1 : 0);                   // shift odd rows by one: the pattern drifts diagonally
+    out.push(`<rect x="${(ox + c * cell + g).toFixed(2)}" y="${(oy + r * cell + g).toFixed(2)}" width="${(cell - 2 * g).toFixed(2)}" height="${(cell - 2 * g).toFixed(2)}" rx="${(cell * 0.12).toFixed(2)}" fill="${P.c[H(n)]}"/>`);
+  }
+  return out.join("");
+}
+function spiral(P, x, y, w, h) {
+  const Fn = (k) => Number(Pent.F[k]), Ln = (k) => Number(Pent.L[k]), K = 10, Pt = { x: 0.1, y: 0.3 };
+  const centre = (k) => { let r = { x: -0.1 * Ln(k), y: -0.3 * Ln(k) }; for (let t = 0; t < (k - 1) % 4; t++) r = { x: -r.y, y: r.x }; return { x: Pt.x + r.x, y: Pt.y + r.y }; };
+  const corners = (k) => { const c = centre(k), s = Fn(k) / 2; return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => ({ x: +(c.x + a * s).toFixed(6), y: +(c.y + b * s).toFixed(6) })); };
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let k = 1; k <= K; k++) for (const c of corners(k)) { x0 = Math.min(x0, c.x); x1 = Math.max(x1, c.x); y0 = Math.min(y0, c.y); y1 = Math.max(y1, c.y); }
+  const s = Math.min(w / (x1 - x0), h / (y1 - y0)), ox = x + (w - (x1 - x0) * s) / 2, oy = y + (h - (y1 - y0) * s) / 2;
+  const X = (u) => ox + (u - x0) * s, Y = (v) => oy + (y1 - v) * s, out = [];
+  const same = (p, q) => Math.abs(p.x - q.x) < 1e-6 && Math.abs(p.y - q.y) < 1e-6, dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y);
+  for (let k = 1; k <= K; k++) { const c = corners(k); out.push(`<rect x="${X(c[0].x).toFixed(2)}" y="${Y(c[2].y).toFixed(2)}" width="${(Fn(k) * s).toFixed(2)}" height="${(Fn(k) * s).toFixed(2)}" fill="${P.c[H(Ln(k))]}" fill-opacity="0.55" stroke="${P.ink}" stroke-width="${Math.max(1, s * 0.05)}"/>`); }
+  // Holden's lines
+  const big = 200;
+  out.push(`<line x1="${X(-big)}" y1="${Y(-3 * big)}" x2="${X(big)}" y2="${Y(3 * big)}" stroke="${P.c[3]}" stroke-width="${Math.max(1.5, s * 0.08)}"/>`);
+  out.push(`<line x1="${X(-big)}" y1="${Y((1 + big) / 3)}" x2="${X(big)}" y2="${Y((1 - big) / 3)}" stroke="${P.c[2]}" stroke-width="${Math.max(1.5, s * 0.08)}"/>`);
+  // arcs
+  const A = [{ x: -0.5, y: 0.5 }];
+  for (let j = 1; j <= K; j++) A.push(corners(j).find((c) => Math.abs(dist(c, A[j - 1]) - Fn(j) * Math.SQRT2) < 1e-6));
+  let d = "";
+  for (let j = 1; j <= K; j++) {
+    const a = A[j - 1], b = A[j], c = corners(j).filter((q) => !same(q, a) && !same(q, b)).reduce((m, q) => (dist(q, Pt) < dist(m, Pt) ? q : m));
+    const t0 = Math.atan2(a.y - c.y, a.x - c.x); let dt = Math.atan2(b.y - c.y, b.x - c.x) - t0;
+    while (dt > Math.PI) dt -= 2 * Math.PI; while (dt < -Math.PI) dt += 2 * Math.PI;
+    for (let i = 0; i <= 40; i++) { const t = t0 + dt * i / 40; d += (d ? "L" : "M") + X(c.x + Fn(j) * Math.cos(t)).toFixed(2) + "," + Y(c.y + Fn(j) * Math.sin(t)).toFixed(2); }
+  }
+  out.push(`<path d="${d}" fill="none" stroke="${P.ink}" stroke-width="${Math.max(2, s * 0.12)}"/>`);
+  out.push(`<circle cx="${X(Pt.x)}" cy="${Y(Pt.y)}" r="${Math.max(3, s * 0.2)}" fill="${P.ink}"/>`);
+  return out.join("");
+}
+
+function poster() {
+  const P = PAL[$("pal").value], [W, Hh] = FMT[$("fmt").value], design = $("design").value, txt = $("txt").checked, cr = $("credit").checked;
+  const m = Math.min(W, Hh) * 0.08;
+  const topText = txt ? (W > Hh ? Hh * 0.2 : Hh * 0.16) : 0, bottom = (txt ? Hh * 0.07 : 0) + (cr ? Hh * 0.04 : 0);
+  let box = [m, m + topText, W - 2 * m, Hh - 2 * m - topText - bottom];
+  if (W > Hh && txt) box = [W * 0.42, m, W * 0.58 - m, Hh - 2 * m];          // wide: text on the left
+  const body = { wheel, spiral, tapestry, rings }[design](P, ...box);
+  const parts = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${Hh}" width="${W}" height="${Hh}">`,
+    `<defs><clipPath id="box"><rect x="${box[0]}" y="${box[1]}" width="${box[2]}" height="${box[3]}"/></clipPath></defs>`,
+    `<rect width="${W}" height="${Hh}" fill="${P.bg}"/>`, `<g clip-path="url(#box)">${body}</g>`];
+  const FONTS = { bold: ["Georgia, 'Times New Roman', serif", 700], serif: ["Georgia, 'Times New Roman', serif", 400], sans: ["Helvetica, Arial, sans-serif", 700], mono: ["'Courier New', Courier, monospace", 700] };
+  const [serif, fw] = FONTS[$("font").value], sans = $("font").value === "mono" ? serif : "Helvetica, Arial, sans-serif";
+  if (txt) {
+    const big = W > Hh ? Math.min(Hh * 0.065, (W * 0.42 - 2 * m) / 10.5) : Math.min(W, Hh) * 0.065;
+    const tx = W > Hh ? m : W / 2, anchor = W > Hh ? "start" : "middle";
+    const ty = W > Hh ? Hh * 0.38 : m + big;
+    parts.push(`<text x="${tx}" y="${ty}" font-family="${serif}" font-size="${big}" font-weight="${fw}" fill="${P.ink}" text-anchor="${anchor}">Ὁ Πενταμετρικὸς Κύκλος</text>`);
+    parts.push(`<text x="${tx}" y="${ty + big * 0.85}" font-family="${serif}" font-size="${big * 0.5}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.muted}" text-anchor="${anchor}">The Pentametric Cycle</text>`);
+    const fy = W > Hh ? ty + big * 2.2 : Hh - m - (cr ? Hh * 0.04 : 0);
+    parts.push(`<text x="${tx}" y="${fy}" font-family="${serif}" font-size="${big * 0.48}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.ink}" text-anchor="${anchor}">P(n) = (n² + 4·(n/5)) / 5</text>`);
+    const leg = ["silence", "unison 1:1", "octave 2:1", "fifth 3:2", "fourth 4:3"];
+    if (design !== "spiral") {
+      const ly = W > Hh ? fy + big * 1.1 : fy + big * 0.75, fs = big * 0.26;
+      let lx = W > Hh ? m : W / 2 - leg.reduce((a, s) => a + s.length * fs * 0.55 + fs * 2.2, 0) / 2;
+      leg.forEach((s, i) => { parts.push(`<rect x="${lx}" y="${ly - fs * 0.85}" width="${fs}" height="${fs}" rx="${fs * 0.2}" fill="${P.c[i]}"/><text x="${lx + fs * 1.4}" y="${ly}" font-family="${sans}" font-size="${fs}" font-weight="600" fill="${P.muted}">${s}</text>`); lx += s.length * fs * 0.55 + fs * 2.2; });
+    }
+  }
+  if (cr) parts.push(`<text x="${W / 2}" y="${Hh - m * 0.45}" font-family="${sans}" font-size="${Math.min(W, Hh) * 0.016}" fill="${P.muted}" text-anchor="middle">${esc("Lluis Garcia Torcal · lluisgarcia.github.io/The-Pentametric-Cycle · doi:10.5281/zenodo.23183108")}</text>`);
+  parts.push("</svg>");
+  return { svg: parts.join(""), W, Hh };
+}
+// the preview is an image of the exact file you download, so the page's own colours (dark mode) can't change it
+function render() {
+  const img = new Image(); img.alt = "Poster preview";
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(poster().svg);
+  $("preview").replaceChildren(img);
+}
+function save(blob, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000); }
+const fname = (ext) => `pentametric_${$("design").value}_${$("pal").value}_${$("fmt").value}.${ext}`;
+$("svg").onclick = () => save(new Blob([poster().svg], { type: "image/svg+xml" }), fname("svg"));
+$("png").onclick = () => {
+  const { svg, W, Hh } = poster(), scale = +$("res").value / W;
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement("canvas"); cv.width = Math.round(W * scale); cv.height = Math.round(Hh * scale);
+    cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+    cv.toBlob((b) => save(b, fname("png")), "image/png");
+  };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+};
+for (const id of ["design", "pal", "font", "fmt", "txt", "credit"]) $(id).addEventListener("input", render);
+render();
 </script>
 <script>(function(){
   var b=document.body, t=document.querySelector(".menu-toggle"), c=document.querySelector(".menu-close"), s=document.querySelector(".nav-scrim");

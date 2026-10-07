@@ -50,23 +50,17 @@ header.site {
   border-bottom: 1px solid var(--rule); background: var(--panel);
 }
 header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
-header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
+header.site .inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
 header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); }
 header.site .brand .greek { white-space: nowrap; }
-header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; margin-left: 6px; }
-header.site nav { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; flex-basis: 100%; }
-header.site .navgroup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
-header.site .navlabel { font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; min-width: 100px; }
-header.site .navgroup.u .navlabel { color: var(--accent); }
-header.site .navgroup.p .navlabel { color: var(--accent2); }
-header.site .navgroup.e .navlabel { color: var(--accent3); }
+header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; }
+header.site .brand-sep { color: var(--muted); }
+@media (max-width: 600px) { header.site .brand-en { display: block; margin: 0; } header.site .brand-sep { display: none; } }
 .kind { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600; margin: 0 6px 6px 0; }
 .kind.u { color: var(--accent); border: 1px solid var(--accent); }
 .kind.p { color: var(--accent2); border: 1px solid var(--accent2); }
 .kind.e { color: var(--accent3); border: 1px solid var(--accent3); }
 .kind + h1 { margin-top: 4px; }
-header.site nav a { text-decoration: none; color: var(--muted); }
-header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
 main { padding-top: 28px; padding-bottom: 40px; }
 h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
 h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 30px 0 8px; }
@@ -119,35 +113,52 @@ footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size:
 footer.site .inner { padding-top: 16px; padding-bottom: 24px; }
 .formula { font-family: var(--serif); font-size: 1.35rem; text-align: center; margin: 6px 0 14px; }
 
-/* ---- navigation: vertical sidebar on wide screens, collapsible menu on narrow ones ---- */
-.menu-toggle { display: none; }
-@media (min-width: 960px) {
-  body { padding-left: 250px; }
-  header.site { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; overflow-y: auto; border-bottom: none; border-right: 1px solid var(--rule); z-index: 10; }
-  header.site .inner { display: block; max-width: none; padding: 22px 18px 28px; }
-  header.site .brand { display: block; font-size: 1.3rem; line-height: 1.25; }
-  header.site .brand-en { display: block; margin: 2px 0 0; font-size: 1rem; }
-  header.site nav { display: block; margin-top: 18px; font-size: .95rem; }
-  header.site .navgroup { display: block; margin: 0 0 18px; }
-  header.site .navlabel { display: block; min-width: 0; margin: 0 0 6px; }
-  header.site .navgroup a { display: block; padding: 4px 10px; margin: 1px 0; border-left: 3px solid transparent; border-radius: 0 6px 6px 0; }
-  header.site .navgroup a:hover { background: var(--bg); color: var(--ink); }
-  header.site nav a[aria-current="page"] { border-bottom: none; background: var(--bg); color: var(--ink); font-weight: 600; }
-  header.site .navgroup.u a[aria-current="page"] { border-left-color: var(--accent); }
-  header.site .navgroup.e a[aria-current="page"] { border-left-color: var(--accent3); }
-  header.site .navgroup.p a[aria-current="page"] { border-left-color: var(--accent2); }
+/* ---- navigation: a drawer that opens from the right ---- */
+header.site { position: sticky; top: 0; z-index: 20; }
+.menu-toggle { flex: none; font-size: .95rem; padding: 6px 14px; }
+.menu-toggle .mt-close { display: none; }
+body.menu-open .menu-toggle .mt-open { display: none; }
+body.menu-open .menu-toggle .mt-close { display: inline; }
+.nav-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 30; }
+body.menu-open .nav-scrim { opacity: 1; pointer-events: auto; }
+nav.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); z-index: 40;
+  background: var(--panel); border-left: 1px solid var(--rule); box-shadow: -8px 0 24px rgba(0,0,0,.12);
+  transform: translateX(100%); transition: transform .22s ease; overflow-y: auto; padding: 16px 16px 32px;
+  visibility: hidden;
 }
-@media (max-width: 959px) {
-  header.site .inner { align-items: center; flex-wrap: wrap; }
-  header.site .brand { flex: 1; min-width: 0; }
-  header.site .brand-en { display: block; margin: 0; }
-  .menu-toggle { display: inline-block; margin-left: auto; padding: 5px 12px; }
-  header.site nav { display: none; flex-basis: 100%; margin-top: 6px; }
-  header.site.open nav { display: block; }
-  header.site .navgroup { display: block; margin: 0 0 12px; }
-  header.site .navlabel { display: block; min-width: 0; margin: 0 0 4px; }
-  header.site .navgroup a { display: block; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
-  header.site nav a[aria-current="page"] { border-bottom: 1px solid var(--rule); background: var(--bg); color: var(--ink); font-weight: 600; }
+body.menu-open nav.drawer { transform: none; visibility: visible; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.drawer-head .t { font-family: var(--serif); font-size: 1.15rem; }
+.drawer a { text-decoration: none; color: var(--ink); }
+.drawer .home { display: block; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 8px; margin-bottom: 14px; font-weight: 600; }
+.drawer .home:hover, .drawer .home[aria-current="page"] { background: var(--bg); }
+.drawer details { border: 1px solid var(--rule); border-radius: 8px; margin: 0 0 10px; }
+.drawer summary { list-style: none; cursor: pointer; padding: 10px 12px; border-left: 4px solid var(--rule); border-radius: 8px; }
+.drawer summary::-webkit-details-marker { display: none; }
+.drawer summary .sec { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.drawer summary .sec::after { content: "▸"; color: var(--muted); transition: transform .15s; margin-left: auto; }
+.drawer details[open] summary .sec::after { transform: rotate(90deg); }
+.drawer summary .desc { display: block; font-size: .85rem; color: var(--muted); margin-top: 2px; }
+.drawer details.u summary { border-left-color: var(--accent); } .drawer details.u .sec { color: var(--accent); }
+.drawer details.e summary { border-left-color: var(--accent3); } .drawer details.e .sec { color: var(--accent3); }
+.drawer details.p summary { border-left-color: var(--accent2); } .drawer details.p .sec { color: var(--accent2); }
+.drawer ul { list-style: none; margin: 0; padding: 0 0 6px; }
+.drawer li a { display: block; padding: 7px 12px 7px 16px; border-top: 1px solid var(--rule); }
+.drawer li a small { display: block; color: var(--muted); font-size: .8rem; line-height: 1.35; }
+.drawer li a:hover { background: var(--bg); }
+.drawer li a[aria-current="page"] { background: var(--bg); font-weight: 600; box-shadow: inset 3px 0 0 var(--ink); }
+.drawer details[data-current] summary .sec::before { content: "●"; font-size: .7em; }
+select { max-width: 100%; }
+.controls label { max-width: 100%; }
+
+/* wide screens: the open menu is docked beside the page instead of covering it */
+body.no-anim nav.drawer, body.no-anim .nav-scrim { transition: none !important; }
+@media (min-width: 1000px) {
+  body.menu-open { padding-right: 360px; }
+  body.menu-open .nav-scrim { opacity: 0; pointer-events: none; }
+  body.menu-open nav.drawer { box-shadow: none; }
+  .drawer .menu-close { display: none; }
 }
 </style>
 <script>
@@ -214,12 +225,49 @@ const Pent = (() => {
 </head>
 <body>
 <header class="site"><div class="inner">
-  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span> <span class="brand-en">The Pentametric Cycle</span></a>
-  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sitenav">☰ Menu</button>
-  <nav id="sitenav">
-    <div class="navgroup u"><span class="navlabel">Understand</span><a href="spiral.html">Spiral</a><a href="defects.html">The ±0.8</a><a href="pentagon.html">Pentagon clock</a><a href="monochord.html">Monochord</a><a href="palindrome.html">Palindrome</a><a href="explorer.html">Explorer</a><a href="forms.html">Ten forms</a><a href="growing.html">Growing spiral</a></div>
-    <div class="navgroup e"><span class="navlabel">Exploratory</span><a href="primes.html">Other primes</a><a href="curiosity.html" aria-current="page">A curiosity</a></div>
-    <div class="navgroup p"><span class="navlabel">Use it</span><a href="composer.html">Composer</a><a href="tapestry.html">Tapestry</a></div>
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sitenav"><span class="mt-open">☰ Menu</span><span class="mt-close">✕ Close</span></button>
+  <div class="nav-scrim" aria-hidden="true"></div>
+  <nav id="sitenav" class="drawer" aria-label="Site menu">
+    <div class="drawer-head"><span class="t">Menu</span><button class="menu-close" type="button">✕ Close</button></div>
+    <a class="home" href="index.html">⌂ Home</a>
+    <details class="u">
+      <summary><span class="sec">◆ Understand</span><span class="desc">Explore the ideas of the papers interactively</span></summary>
+      <ul>
+        <li><a href="spiral.html">The spiral and Holden's lines<small>Fibonacci squares, the point P and the ±4/5 square</small></a></li>
+        <li><a href="thirds.html">Thirds and tenths<small>Why Holden's lines cut every side at ⅓ and ⅔</small></a></li>
+        <li><a href="defects.html">The ±0.8 correction<small>How n²/5 becomes a whole number, and the last-digit rule</small></a></li>
+        <li><a href="pentagon.html">The pentagon clock<small>Why 5 decides everything, and why the palindrome exists</small></a></li>
+        <li><a href="monochord.html">Monochord and tetractys<small>Where the four consonances come from</small></a></li>
+        <li><a href="palindrome.html">The playable palindrome<small>Hear the 51-step cycle in just intonation</small></a></li>
+        <li><a href="explorer.html">Formula explorer<small>Follow any number through the seven steps</small></a></li>
+        <li><a href="identities.html">Identities gallery<small>Every exact relation of the construction, checked live</small></a></li>
+        <li><a href="forms.html">Ten forms of one formula<small>Ten routes to the same areas, all agreeing</small></a></li>
+        <li><a href="growing.html">The growing spiral<small>The spiral builds itself, square by square</small></a></li>
+      </ul>
+    </details>
+    <details class="e" data-current="1">
+      <summary><span class="sec">✦ Exploratory</span><span class="desc">Beyond the papers: explorations, not peer reviewed</span></summary>
+      <ul>
+        <li><a href="primes.html">Other primes<small>Why only 5 works, and the 5-12-13 family</small></a></li>
+        <li><a href="cycle13.html">The 13-cycle as music<small>The palindrome with 13: every ratio from 2:1 to 12:11</small></a></li>
+        <li><a href="powers.html">Higher powers of 5<small>The cycle modulo 25, 125, 625 and beyond</small></a></li>
+        <li><a href="pell.html">Pell numbers<small>Does the trick work for another sequence? So far, no</small></a></li>
+        <li><a href="transitions.html">The 24 transitions<small>Which interval follows which, as a table and a map</small></a></li>
+        <li><a href="curiosity.html" aria-current="page">A curiosity: √10/3<small>A ratio within 1 cent of the Pythagorean semitone</small></a></li>
+      </ul>
+    </details>
+    <details class="p">
+      <summary><span class="sec">⤓ Use it</span><span class="desc">Make something and download it</span></summary>
+      <ul>
+        <li><a href="composer.html">Composer<small>Turn numbers into music and download a MIDI file</small></a></li>
+        <li><a href="tapestry.html">Residue tapestry<small>Weave the sequence and download it as an image</small></a></li>
+        <li><a href="signature.html">Name and date signature<small>Your name or a date as a short piece and a card</small></a></li>
+        <li><a href="tuning.html">Tuning file maker<small>Download the cycle's scales as Scala (.scl) files</small></a></li>
+        <li><a href="rhythm.html">Rhythm generator<small>The cycle as a drum pattern, with MIDI download</small></a></li>
+        <li><a href="poster.html">Poster maker<small>Prints, wallpapers and covers as SVG or PNG</small></a></li>
+      </ul>
+    </details>
   </nav>
 </div></header>
 
@@ -368,6 +416,27 @@ $("soct").onclick = () => { const t = ac().currentTime + 0.05; tone(f0(), t, 0.8
   el(svg, "text", { x: x(cents(R) * 12), y: y2 + 24, "text-anchor": "middle", "font-size": 12, fill: "var(--accent2)" }, "1094.4¢");
 })();
 </script>
-<script>(function(){var h=document.querySelector("header.site"),b=h&&h.querySelector(".menu-toggle");if(b)b.addEventListener("click",function(){var o=h.classList.toggle("open");b.setAttribute("aria-expanded",o);});})();</script>
+<script>(function(){
+  var b=document.body, t=document.querySelector(".menu-toggle"), c=document.querySelector(".menu-close"), s=document.querySelector(".nav-scrim");
+  var secs=[].slice.call(document.querySelectorAll("nav.drawer details")), KEY="pentametric-menu";
+  var wide=function(){ return window.matchMedia("(min-width: 1000px)").matches; };
+  function load(){ try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch(e){ return {}; } }
+  function save(st){ try { sessionStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+  var st=load();
+  function set(o, keep){ b.classList.toggle("menu-open",o); if(t) t.setAttribute("aria-expanded",o); st.open=o; save(st);
+    if(!keep){ if(o&&c) c.focus(); else if(t) t.focus(); } }
+  // restore: the open section, and (on wide screens) the open menu, without animation
+  secs.forEach(function(d){ if(st.sec && d.classList.contains(st.sec)) d.open=true; });
+  if(st.open && wide()){ b.classList.add("no-anim"); set(true,true); requestAnimationFrame(function(){ requestAnimationFrame(function(){ b.classList.remove("no-anim"); }); }); }
+  // one section open at a time
+  secs.forEach(function(d){ d.addEventListener("toggle",function(){
+    if(d.open){ secs.forEach(function(o){ if(o!==d) o.open=false; }); st.sec=d.classList[0]; }
+    else if(st.sec===d.classList[0]) st.sec=null;
+    save(st); }); });
+  if(t) t.addEventListener("click",function(){ set(!b.classList.contains("menu-open")); });
+  if(c) c.addEventListener("click",function(){ set(false); });
+  if(s) s.addEventListener("click",function(){ set(false); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&b.classList.contains("menu-open")) set(false); });
+})();</script>
 </body>
 </html>

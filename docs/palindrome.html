@@ -50,23 +50,17 @@ header.site {
   border-bottom: 1px solid var(--rule); background: var(--panel);
 }
 header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
-header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
+header.site .inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; padding-bottom: 12px; }
 header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); }
 header.site .brand .greek { white-space: nowrap; }
-header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; margin-left: 6px; }
-header.site nav { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; flex-basis: 100%; }
-header.site .navgroup { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; }
-header.site .navlabel { font-size: .72rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; min-width: 100px; }
-header.site .navgroup.u .navlabel { color: var(--accent); }
-header.site .navgroup.p .navlabel { color: var(--accent2); }
-header.site .navgroup.e .navlabel { color: var(--accent3); }
+header.site .brand-en { font-family: var(--serif); font-size: 1.05rem; color: var(--muted); white-space: nowrap; }
+header.site .brand-sep { color: var(--muted); }
+@media (max-width: 600px) { header.site .brand-en { display: block; margin: 0; } header.site .brand-sep { display: none; } }
 .kind { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .8rem; font-weight: 600; margin: 0 6px 6px 0; }
 .kind.u { color: var(--accent); border: 1px solid var(--accent); }
 .kind.p { color: var(--accent2); border: 1px solid var(--accent2); }
 .kind.e { color: var(--accent3); border: 1px solid var(--accent3); }
 .kind + h1 { margin-top: 4px; }
-header.site nav a { text-decoration: none; color: var(--muted); }
-header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
 main { padding-top: 28px; padding-bottom: 40px; }
 h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
 h2 { font-family: var(--serif); font-weight: 500; font-size: 1.45rem; margin: 30px 0 8px; }
@@ -119,36 +113,59 @@ footer.site { border-top: 1px solid var(--rule); color: var(--muted); font-size:
 footer.site .inner { padding-top: 16px; padding-bottom: 24px; }
 .formula { font-family: var(--serif); font-size: 1.35rem; text-align: center; margin: 6px 0 14px; }
 
-/* ---- navigation: vertical sidebar on wide screens, collapsible menu on narrow ones ---- */
-.menu-toggle { display: none; }
-@media (min-width: 960px) {
-  body { padding-left: 250px; }
-  header.site { position: fixed; top: 0; left: 0; bottom: 0; width: 250px; overflow-y: auto; border-bottom: none; border-right: 1px solid var(--rule); z-index: 10; }
-  header.site .inner { display: block; max-width: none; padding: 22px 18px 28px; }
-  header.site .brand { display: block; font-size: 1.3rem; line-height: 1.25; }
-  header.site .brand-en { display: block; margin: 2px 0 0; font-size: 1rem; }
-  header.site nav { display: block; margin-top: 18px; font-size: .95rem; }
-  header.site .navgroup { display: block; margin: 0 0 18px; }
-  header.site .navlabel { display: block; min-width: 0; margin: 0 0 6px; }
-  header.site .navgroup a { display: block; padding: 4px 10px; margin: 1px 0; border-left: 3px solid transparent; border-radius: 0 6px 6px 0; }
-  header.site .navgroup a:hover { background: var(--bg); color: var(--ink); }
-  header.site nav a[aria-current="page"] { border-bottom: none; background: var(--bg); color: var(--ink); font-weight: 600; }
-  header.site .navgroup.u a[aria-current="page"] { border-left-color: var(--accent); }
-  header.site .navgroup.e a[aria-current="page"] { border-left-color: var(--accent3); }
-  header.site .navgroup.p a[aria-current="page"] { border-left-color: var(--accent2); }
+/* ---- navigation: a drawer that opens from the right ---- */
+header.site { position: sticky; top: 0; z-index: 20; }
+.menu-toggle { flex: none; font-size: .95rem; padding: 6px 14px; }
+.menu-toggle .mt-close { display: none; }
+body.menu-open .menu-toggle .mt-open { display: none; }
+body.menu-open .menu-toggle .mt-close { display: inline; }
+.nav-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.28); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 30; }
+body.menu-open .nav-scrim { opacity: 1; pointer-events: auto; }
+nav.drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(360px, 100vw); z-index: 40;
+  background: var(--panel); border-left: 1px solid var(--rule); box-shadow: -8px 0 24px rgba(0,0,0,.12);
+  transform: translateX(100%); transition: transform .22s ease; overflow-y: auto; padding: 16px 16px 32px;
+  visibility: hidden;
 }
-@media (max-width: 959px) {
-  header.site .inner { align-items: center; flex-wrap: wrap; }
-  header.site .brand { flex: 1; min-width: 0; }
-  header.site .brand-en { display: block; margin: 0; }
-  .menu-toggle { display: inline-block; margin-left: auto; padding: 5px 12px; }
-  header.site nav { display: none; flex-basis: 100%; margin-top: 6px; }
-  header.site.open nav { display: block; }
-  header.site .navgroup { display: block; margin: 0 0 12px; }
-  header.site .navlabel { display: block; min-width: 0; margin: 0 0 4px; }
-  header.site .navgroup a { display: block; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
-  header.site nav a[aria-current="page"] { border-bottom: 1px solid var(--rule); background: var(--bg); color: var(--ink); font-weight: 600; }
+body.menu-open nav.drawer { transform: none; visibility: visible; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.drawer-head .t { font-family: var(--serif); font-size: 1.15rem; }
+.drawer a { text-decoration: none; color: var(--ink); }
+.drawer .home { display: block; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 8px; margin-bottom: 14px; font-weight: 600; }
+.drawer .home:hover, .drawer .home[aria-current="page"] { background: var(--bg); }
+.drawer details { border: 1px solid var(--rule); border-radius: 8px; margin: 0 0 10px; }
+.drawer summary { list-style: none; cursor: pointer; padding: 10px 12px; border-left: 4px solid var(--rule); border-radius: 8px; }
+.drawer summary::-webkit-details-marker { display: none; }
+.drawer summary .sec { font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.drawer summary .sec::after { content: "▸"; color: var(--muted); transition: transform .15s; margin-left: auto; }
+.drawer details[open] summary .sec::after { transform: rotate(90deg); }
+.drawer summary .desc { display: block; font-size: .85rem; color: var(--muted); margin-top: 2px; }
+.drawer details.u summary { border-left-color: var(--accent); } .drawer details.u .sec { color: var(--accent); }
+.drawer details.e summary { border-left-color: var(--accent3); } .drawer details.e .sec { color: var(--accent3); }
+.drawer details.p summary { border-left-color: var(--accent2); } .drawer details.p .sec { color: var(--accent2); }
+.drawer ul { list-style: none; margin: 0; padding: 0 0 6px; }
+.drawer li a { display: block; padding: 7px 12px 7px 16px; border-top: 1px solid var(--rule); }
+.drawer li a small { display: block; color: var(--muted); font-size: .8rem; line-height: 1.35; }
+.drawer li a:hover { background: var(--bg); }
+.drawer li a[aria-current="page"] { background: var(--bg); font-weight: 600; box-shadow: inset 3px 0 0 var(--ink); }
+.drawer details[data-current] summary .sec::before { content: "●"; font-size: .7em; }
+select { max-width: 100%; }
+.controls label { max-width: 100%; }
+
+/* wide screens: the open menu is docked beside the page instead of covering it */
+body.no-anim nav.drawer, body.no-anim .nav-scrim { transition: none !important; }
+@media (min-width: 1000px) {
+  body.menu-open { padding-right: 360px; }
+  body.menu-open .nav-scrim { opacity: 0; pointer-events: none; }
+  body.menu-open nav.drawer { box-shadow: none; }
+  .drawer .menu-close { display: none; }
 }
+</style>
+<style>
+  #handOpts[hidden] { display: none !important; }
+  :root { --mir: #7a5cc0; --opp: #23917f; --poly: #c0398a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mir: #b9a2f0; --opp: #5cc8b4; --poly: #f07ab8; } }
+  :root[data-theme="dark"] { --mir: #b9a2f0; --opp: #5cc8b4; --poly: #f07ab8; }
 </style>
 <script>
 // The Pentametric Cycle — shared mathematics
@@ -221,12 +238,49 @@ const Pent = (() => {
 </head>
 <body>
 <header class="site"><div class="inner">
-  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span> <span class="brand-en">The Pentametric Cycle</span></a>
-  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sitenav">☰ Menu</button>
-  <nav id="sitenav">
-    <div class="navgroup u"><span class="navlabel">Understand</span><a href="spiral.html">Spiral</a><a href="defects.html">The ±0.8</a><a href="pentagon.html">Pentagon clock</a><a href="monochord.html">Monochord</a><a href="palindrome.html" aria-current="page">Palindrome</a><a href="explorer.html">Explorer</a><a href="forms.html">Ten forms</a><a href="growing.html">Growing spiral</a></div>
-    <div class="navgroup e"><span class="navlabel">Exploratory</span><a href="primes.html">Other primes</a><a href="curiosity.html">A curiosity</a></div>
-    <div class="navgroup p"><span class="navlabel">Use it</span><a href="composer.html">Composer</a><a href="tapestry.html">Tapestry</a></div>
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="sitenav"><span class="mt-open">☰ Menu</span><span class="mt-close">✕ Close</span></button>
+  <div class="nav-scrim" aria-hidden="true"></div>
+  <nav id="sitenav" class="drawer" aria-label="Site menu">
+    <div class="drawer-head"><span class="t">Menu</span><button class="menu-close" type="button">✕ Close</button></div>
+    <a class="home" href="index.html">⌂ Home</a>
+    <details class="u" data-current="1">
+      <summary><span class="sec">◆ Understand</span><span class="desc">Explore the ideas of the papers interactively</span></summary>
+      <ul>
+        <li><a href="spiral.html">The spiral and Holden's lines<small>Fibonacci squares, the point P and the ±4/5 square</small></a></li>
+        <li><a href="thirds.html">Thirds and tenths<small>Why Holden's lines cut every side at ⅓ and ⅔</small></a></li>
+        <li><a href="defects.html">The ±0.8 correction<small>How n²/5 becomes a whole number, and the last-digit rule</small></a></li>
+        <li><a href="pentagon.html">The pentagon clock<small>Why 5 decides everything, and why the palindrome exists</small></a></li>
+        <li><a href="monochord.html">Monochord and tetractys<small>Where the four consonances come from</small></a></li>
+        <li><a href="palindrome.html" aria-current="page">The playable palindrome<small>Hear the 51-step cycle in just intonation</small></a></li>
+        <li><a href="explorer.html">Formula explorer<small>Follow any number through the seven steps</small></a></li>
+        <li><a href="identities.html">Identities gallery<small>Every exact relation of the construction, checked live</small></a></li>
+        <li><a href="forms.html">Ten forms of one formula<small>Ten routes to the same areas, all agreeing</small></a></li>
+        <li><a href="growing.html">The growing spiral<small>The spiral builds itself, square by square</small></a></li>
+      </ul>
+    </details>
+    <details class="e">
+      <summary><span class="sec">✦ Exploratory</span><span class="desc">Beyond the papers: explorations, not peer reviewed</span></summary>
+      <ul>
+        <li><a href="primes.html">Other primes<small>Why only 5 works, and the 5-12-13 family</small></a></li>
+        <li><a href="cycle13.html">The 13-cycle as music<small>The palindrome with 13: every ratio from 2:1 to 12:11</small></a></li>
+        <li><a href="powers.html">Higher powers of 5<small>The cycle modulo 25, 125, 625 and beyond</small></a></li>
+        <li><a href="pell.html">Pell numbers<small>Does the trick work for another sequence? So far, no</small></a></li>
+        <li><a href="transitions.html">The 24 transitions<small>Which interval follows which, as a table and a map</small></a></li>
+        <li><a href="curiosity.html">A curiosity: √10/3<small>A ratio within 1 cent of the Pythagorean semitone</small></a></li>
+      </ul>
+    </details>
+    <details class="p">
+      <summary><span class="sec">⤓ Use it</span><span class="desc">Make something and download it</span></summary>
+      <ul>
+        <li><a href="composer.html">Composer<small>Turn numbers into music and download a MIDI file</small></a></li>
+        <li><a href="tapestry.html">Residue tapestry<small>Weave the sequence and download it as an image</small></a></li>
+        <li><a href="signature.html">Name and date signature<small>Your name or a date as a short piece and a card</small></a></li>
+        <li><a href="tuning.html">Tuning file maker<small>Download the cycle's scales as Scala (.scl) files</small></a></li>
+        <li><a href="rhythm.html">Rhythm generator<small>The cycle as a drum pattern, with MIDI download</small></a></li>
+        <li><a href="poster.html">Poster maker<small>Prints, wallpapers and covers as SVG or PNG</small></a></li>
+      </ul>
+    </details>
   </nav>
 </div></header>
 
@@ -261,7 +315,28 @@ const Pent = (() => {
 
   <div class="grid2" style="margin-top:18px">
     <div class="panel">
-      <svg id="wheel" viewBox="0 0 520 520" role="img" aria-label="The 51 values of the palindrome arranged around a circle"></svg>
+      <div class="controls" style="margin-bottom:6px">
+        <label><input id="oVal" type="checkbox" checked> values in the ring</label>
+        <label><input id="oPro" type="checkbox"> protractor</label>
+        <label><input id="oHands" type="checkbox"> two hands</label>
+        <span id="handOpts" hidden style="display:contents">
+        <label><input id="oMir" type="checkbox"> mirror partner <i class="sw" style="background:var(--mir)"></i></label>
+        <label><input id="oOpp" type="checkbox"> opposite (180°) <i class="sw" style="background:var(--opp)"></i></label>
+        <label>shape from A <i class="sw" style="background:var(--poly)"></i>
+          <select id="oPoly">
+            <option value="0">none</option>
+            <option value="120">triangle · 120°</option>
+            <option value="90">square · 90°</option>
+            <option value="72">pentagon · 72°</option>
+            <option value="60">hexagon · 60°</option>
+            <option value="45">octagon · 45°</option>
+            <option value="36">decagon · 36°</option>
+            <option value="30">dodecagon · 30°</option>
+          </select></label>
+        </span>
+      </div>
+      <svg id="wheel" viewBox="0 0 600 600" role="img" aria-label="The values of the palindrome arranged around a circle, with a protractor and two hands" style="touch-action:none;user-select:none;-webkit-user-select:none"></svg>
+      <div class="note" id="handinfo" style="text-align:center;margin-top:4px"></div>
       <div class="legend" id="legend" style="justify-content:center;margin-top:6px"></div>
       <p class="note" style="margin:8px 0 0">Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.</p>
     </div>
@@ -320,33 +395,119 @@ const IV = Pent.INTERVALS;
 // legend
 $("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("");
 
-// ---- wheel ----
+// ---- wheel with values, protractor and two hands ----
 const wheelSegs = [];
+const WCX = 300, WCY = 300, R1 = 158, R2 = 214, W = 50;
+const wang = (i) => -Math.PI / 2 + (i / W) * 2 * Math.PI;           // n = 0 = 50 at the top, clockwise
+let handA = 12, handB = 38, layers = {};
 (function drawWheel() {
-  const svg = $("wheel"), cx = 260, cy = 260, r1 = 170, r2 = 225;
-  // On the circle n = 50 is the same point as n = 0 (the next palindrome starts there),
-  // so the wheel has 50 segments: 0 = 50 at the top, the axis n = 25 at the bottom.
-  const W = 50, ang = (i) => -Math.PI / 2 + (i / W) * 2 * Math.PI;
+  const svg = $("wheel");
+  layers.pro = el(svg, "g", {}); layers.ring = el(svg, "g", {}); layers.labels = el(svg, "g", {});
+  layers.axis = el(svg, "g", {}); layers.centre = el(svg, "g", {}); layers.hands = el(svg, "g", {});
+  layers.vals = el(svg, "g", { "pointer-events": "none" });   // numbers on top so the hands never hide them
+  const p = (r, a) => `${WCX + r * Math.cos(a)},${WCY + r * Math.sin(a)}`;
   for (let n = 0; n < W; n++) {
-    const a0 = ang(n - 0.45), a1 = ang(n + 0.45);
-    const p = (r, a) => `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
-    const d = `M ${p(r1, a0)} L ${p(r2, a0)} A ${r2} ${r2} 0 0 1 ${p(r2, a1)} L ${p(r1, a1)} A ${r1} ${r1} 0 0 0 ${p(r1, a0)} Z`;
-    const seg = el(svg, "path", { d, fill: `var(--c${Hs[n]})`, class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
-    seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); });
-    el(seg, "title", {}, `n = ${n}: ${IV[Hs[n]].name}`);
+    const a0 = wang(n - 0.45), a1 = wang(n + 0.45);
+    const d = `M ${p(R1, a0)} L ${p(R2, a0)} A ${R2} ${R2} 0 0 1 ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 0 ${p(R1, a0)} Z`;
+    const seg = el(layers.ring, "path", { d, fill: `var(--c${Hs[n]})`, class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
+    seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); handA = n; drawHands(); });
+    el(seg, "title", {}, `n = ${n}: H = ${Hs[n]}, ${IV[Hs[n]].name}`);
     wheelSegs.push(seg);
-    if (n % 5 === 0) el(svg, "text", { x: cx + (r2 + 18) * Math.cos(ang(n)), y: cy + (r2 + 18) * Math.sin(ang(n)) + 4, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, n === 0 ? "0 = 50" : n);
+    const rm = (R1 + R2) / 2, a = wang(n);
+    el(layers.vals, "text", { x: WCX + rm * Math.cos(a), y: WCY + rm * Math.sin(a) + 4.5, "text-anchor": "middle", "font-size": 13, "pointer-events": "none",
+      fill: Hs[n] === 0 || Hs[n] === 4 ? "#1f1f1f" : "#fff", stroke: `var(--c${Hs[n]})`, "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600" }, Hs[n]);
+    el(layers.labels, "text", { x: WCX + (R2 + 14) * Math.cos(a), y: WCY + (R2 + 14) * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": n % 5 === 0 ? 11 : 8.5,
+      fill: n % 5 === 0 ? "var(--ink)" : "var(--muted)" }, n === 0 ? "0=50" : n);
   }
-  // mirror axis through n = 0 = 50 and n = 25
+  // protractor: a tick for every step (7.2°) and a label every 36°
+  el(layers.pro, "circle", { cx: WCX, cy: WCY, r: 244, fill: "none", stroke: "var(--rule)" });
+  for (let i = 0; i < W; i++) {
+    const a = wang(i), long = i % 5 === 0;
+    el(layers.pro, "line", { x1: WCX + 244 * Math.cos(a), y1: WCY + 244 * Math.sin(a), x2: WCX + (long ? 256 : 250) * Math.cos(a), y2: WCY + (long ? 256 : 250) * Math.sin(a), stroke: "var(--muted)", "stroke-width": long ? 1.4 : 0.8 });
+    if (long) el(layers.pro, "text", { x: WCX + 271 * Math.cos(a), y: WCY + 271 * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, `${(i * 7.2).toFixed(0)}°`);
+  }
   for (const n of [0, 25]) {
-    const a = ang(n);
-    el(svg, "line", { x1: cx + (r1 - 40) * Math.cos(a), y1: cy + (r1 - 40) * Math.sin(a), x2: cx + (r2 + 4) * Math.cos(a), y2: cy + (r2 + 4) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 4" });
+    const a = wang(n);
+    el(layers.axis, "line", { x1: WCX + (R1 - 30) * Math.cos(a), y1: WCY + (R1 - 30) * Math.sin(a), x2: WCX + (R2 + 4) * Math.cos(a), y2: WCY + (R2 + 4) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 4" });
   }
-  el(svg, "text", { x: cx, y: cy - 18, "text-anchor": "middle", "font-size": 15, fill: "var(--muted)" }, "H(n) = P(n) mod 5");
-  el(svg, "text", { x: cx, y: cy + 8, "text-anchor": "middle", "font-size": 22, class: "greek", style: "font-family:var(--serif)" }, "Ὁ Πενταμετρικὸς");
-  el(svg, "text", { x: cx, y: cy + 34, "text-anchor": "middle", "font-size": 22, style: "font-family:var(--serif)" }, "Παλίνδρομος");
-  el(svg, "text", { x: cx, y: cy + 62, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, "mirror axis through 0 = 50 and 25");
+  el(layers.centre, "text", { x: WCX, y: WCY - 30, "text-anchor": "middle", "font-size": 13, fill: "var(--muted)" }, "H(n) = P(n) mod 5");
+  el(layers.centre, "text", { x: WCX, y: WCY - 6, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, "Ὁ Πενταμετρικὸς");
+  el(layers.centre, "text", { x: WCX, y: WCY + 18, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, "Παλίνδρομος");
+  el(layers.centre, "text", { x: WCX, y: WCY + 42, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, "mirror axis through 0 = 50 and 25");
+  // drag hand B
+  let drag = null;
+  const toN = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let t = Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2; if (t < 0) t += 2 * Math.PI; return Math.round(t / (2 * Math.PI) * W) % W; };
+  svg.addEventListener("pointerdown", (e) => { if (e.target.dataset && e.target.dataset.knob) { drag = e.target.dataset.knob; svg.setPointerCapture(e.pointerId); e.preventDefault(); } });
+  svg.addEventListener("pointermove", (e) => { if (!drag) return; const n = toN(e);
+    if (drag === "A" && n !== handA) { handA = n; show(n); drawHands(); }
+    if (drag === "B" && n !== handB) { handB = n; drawHands(); } });
+  const stop = () => { drag = null; }; svg.addEventListener("pointerup", stop); svg.addEventListener("pointercancel", stop);
+  for (const id of ["oVal", "oPro", "oHands", "oMir", "oOpp", "oPoly"]) $(id).addEventListener("change", applyOptions);
+  applyOptions();
 })();
+function applyOptions(e) {
+  // mirror, opposite and shapes belong to the hands: their options only appear when the hands are on
+  $("handOpts").hidden = !$("oHands").checked;
+  layers.vals.style.display = $("oVal").checked ? "" : "none";
+  layers.pro.style.display = $("oPro").checked ? "" : "none";
+  layers.centre.style.display = $("oHands").checked ? "none" : "";
+  drawHands();
+}
+function polyText(poly, th) {
+  const name = { 120: "triangle", 90: "square", 72: "pentagon", 60: "hexagon", 45: "octagon", 36: "decagon", 30: "dodecagon" }[th];
+  const fmt = (q) => { const w = ((q % W) + W) % W, d = (w * 7.2) % 360;
+    if (Math.abs(w - Math.round(w)) < 1e-9) { const n = Math.round(w) % W; return `${+d.toFixed(1)}° → n = ${n} (${Hs[n] ? IV[Hs[n]].ratio : "silence"})`; }
+    const lo = Math.floor(w), hi = (lo + 1) % W; return `${+d.toFixed(1)}° → between n = ${lo} and ${hi} (${Hs[lo] ? IV[Hs[lo]].ratio : "silence"} | ${Hs[hi] ? IV[Hs[hi]].ratio : "silence"})`; };
+  const exact = Number.isInteger(th / 7.2);
+  return `<strong style="color:var(--poly)">${name}</strong>, corners every ${th}°: ` + poly.slice(1).map(fmt).join(" · ") +
+    (exact ? "" : `<br><span class="note">${th}° is not a whole number of 7.2° steps, so some corners fall between two places on the wheel. Of these shapes only the pentagon (72° = 10 steps) and the decagon (36° = 5 steps) land exactly on the places.</span>`);
+}
+function drawHands() {
+  const g = layers.hands; g.innerHTML = "";
+  if (!$("oHands").checked) { $("handinfo").textContent = ""; return; }
+  const degOf = (n) => +(n * 7.2).toFixed(1);
+  const hand = (n, col, dash, knob) => {
+    const a = wang(n), r = 240, c = Math.cos(a), sn = Math.sin(a);
+    el(g, "line", { x1: WCX, y1: WCY, x2: WCX + r * c, y2: WCY + r * sn, stroke: col, "stroke-width": knob ? 3 : 2.2, "stroke-linecap": "round", "stroke-dasharray": dash || "" });
+    const k = el(g, "circle", { cx: WCX + r * c, cy: WCY + r * sn, r: knob ? 11 : 7, fill: col, stroke: "var(--panel)", "stroke-width": 2, style: knob ? "cursor:grab" : "" });
+    if (knob) k.dataset.knob = knob;
+    // where the hand points on the 360° circle, written along the hand
+    el(g, "text", { x: WCX + 118 * c, y: WCY + 118 * sn + 4, "text-anchor": "middle", "font-size": knob ? 12 : 10.5, fill: col,
+      stroke: "var(--panel)", "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600;pointer-events:none" }, `${degOf(n)}°`);
+  };
+  // the arc between the two hands, clockwise from A to B
+  const steps = ((handB - handA) % W + W) % W, deg = steps * 7.2;
+  if (steps) {
+    const r = 70, a0 = wang(handA), a1 = wang(handB), large = deg > 180 ? 1 : 0;
+    el(g, "path", { d: `M ${WCX + r * Math.cos(a0)} ${WCY + r * Math.sin(a0)} A ${r} ${r} 0 ${large} 1 ${WCX + r * Math.cos(a1)} ${WCY + r * Math.sin(a1)}`, fill: "none", stroke: "var(--accent2)", "stroke-width": 2 });
+  }
+  const mirror = (W - handA) % W, opp = (handA + 25) % W;
+  // a regular shape with one corner on hand A; corners fall on a segment only when the angle is a multiple of 7.2°
+  const th = +$("oPoly").value, poly = [];
+  if (th) {
+    const k = Math.round(360 / th);
+    for (let i = 0; i < k; i++) poly.push(handA + i * th / 7.2);
+    const at = (pos, r) => { const a = wang(pos); return [WCX + r * Math.cos(a), WCY + r * Math.sin(a)]; };
+    el(g, "polygon", { points: poly.map((q) => at(q, 150).join(",")).join(" "), fill: "var(--poly)", "fill-opacity": 0.08, stroke: "var(--poly)", "stroke-width": 1.8 });
+    poly.slice(1).forEach((q) => { const [x, y] = at(q, 240);
+      el(g, "line", { x1: WCX, y1: WCY, x2: x, y2: y, stroke: "var(--poly)", "stroke-width": 1.6, "stroke-dasharray": "1 4", "stroke-linecap": "round" });
+      el(g, "circle", { cx: x, cy: y, r: 5, fill: "var(--poly)", stroke: "var(--panel)", "stroke-width": 1.5 }); });
+  }
+  if ($("oMir").checked) hand(mirror, "var(--mir)", "5 5");
+  if ($("oOpp").checked) hand(opp, "var(--opp)", "2 4");
+  hand(handA, "var(--ink)", "", "A");
+  hand(handB, "var(--accent2)", "", "B");
+  el(g, "circle", { cx: WCX, cy: WCY, r: 5, fill: "var(--ink)" });
+  el(g, "text", { x: WCX, y: WCY + 28, "text-anchor": "middle", "font-size": 15, style: "font-weight:600", fill: "var(--accent2)" }, `${deg.toFixed(1)}°`);
+  const nm = (n) => `n = ${n} at ${degOf(n)}° (H = ${Hs[n]}, ${Hs[n] ? IV[Hs[n]].ratio : "silence"})`;
+  $("handinfo").innerHTML = `<strong>A</strong> ${nm(handA)} · <strong style="color:var(--accent2)">B</strong> ${nm(handB)}<br>angle A→B ${deg.toFixed(1)}° = ${steps} step${steps === 1 ? "" : "s"} of 7.2°` +
+    (steps ? ` (the other way ${(360 - deg).toFixed(1)}°)` : "") +
+    ($("oMir").checked ? `<br><strong style="color:var(--mir)">mirror</strong> of A: ${nm(mirror)}, the same value, because the sequence reads the same backwards` : "") +
+    ($("oOpp").checked ? `<br><strong style="color:var(--opp)">opposite</strong> of A: ${nm(opp)}, the same value, because the cycle repeats every 25 steps (half the circle)` : "") +
+    (th ? "<br>" + polyText(poly, th) : "") +
+    `<br><span class="note">Drag either knob to move a hand, or click a segment to move hand A.</span>`;
+}
 
 // ---- piano roll ----
 const rollCols = [];
@@ -458,6 +619,27 @@ $("drone").addEventListener("change", () => { if (timer) setDrone($("drone").che
 $("f0").addEventListener("change", () => { if (droneNodes) droneNodes.o.frequency.value = +$("f0").value / 2; });
 show(12);
 </script>
-<script>(function(){var h=document.querySelector("header.site"),b=h&&h.querySelector(".menu-toggle");if(b)b.addEventListener("click",function(){var o=h.classList.toggle("open");b.setAttribute("aria-expanded",o);});})();</script>
+<script>(function(){
+  var b=document.body, t=document.querySelector(".menu-toggle"), c=document.querySelector(".menu-close"), s=document.querySelector(".nav-scrim");
+  var secs=[].slice.call(document.querySelectorAll("nav.drawer details")), KEY="pentametric-menu";
+  var wide=function(){ return window.matchMedia("(min-width: 1000px)").matches; };
+  function load(){ try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch(e){ return {}; } }
+  function save(st){ try { sessionStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} }
+  var st=load();
+  function set(o, keep){ b.classList.toggle("menu-open",o); if(t) t.setAttribute("aria-expanded",o); st.open=o; save(st);
+    if(!keep){ if(o&&c) c.focus(); else if(t) t.focus(); } }
+  // restore: the open section, and (on wide screens) the open menu, without animation
+  secs.forEach(function(d){ if(st.sec && d.classList.contains(st.sec)) d.open=true; });
+  if(st.open && wide()){ b.classList.add("no-anim"); set(true,true); requestAnimationFrame(function(){ requestAnimationFrame(function(){ b.classList.remove("no-anim"); }); }); }
+  // one section open at a time
+  secs.forEach(function(d){ d.addEventListener("toggle",function(){
+    if(d.open){ secs.forEach(function(o){ if(o!==d) o.open=false; }); st.sec=d.classList[0]; }
+    else if(st.sec===d.classList[0]) st.sec=null;
+    save(st); }); });
+  if(t) t.addEventListener("click",function(){ set(!b.classList.contains("menu-open")); });
+  if(c) c.addEventListener("click",function(){ set(false); });
+  if(s) s.addEventListener("click",function(){ set(false); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&b.classList.contains("menu-open")) set(false); });
+})();</script>
 </body>
 </html>
