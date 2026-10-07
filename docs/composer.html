@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The ±0.8 Correction · The Pentametric Cycle</title>
+<title>Composer and MIDI Export · The Pentametric Cycle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -167,20 +167,28 @@ const Pent = (() => {
   return { mod, leg, P, H, C, INTERVALS, colorVar, L, F, lucasIndex, isSquare, fmt };
 })();
 </script>
+<style>
+  textarea { width: 100%; min-height: 64px; font: inherit; font-family: var(--mono); font-size: .9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 8px; }
+  .seq { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 10px; }
+  .seq span { min-width: 34px; text-align: center; padding: 3px 4px; border-radius: 4px; font-family: var(--mono); font-size: .78rem; color: #fff; }
+  .seq span.now { outline: 2px solid var(--ink); outline-offset: 1px; }
+  fieldset { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; margin: 0 0 12px; }
+  legend { color: var(--muted); font-size: .85rem; padding: 0 4px; }
+</style>
 </head>
 <body>
 <header class="site"><div class="inner">
   <a class="brand greek" href="index.html">Ὁ Πενταμετρικὸς Κύκλος</a>
   <nav>
     <a href="spiral.html">Spiral</a>
-    <a href="defects.html" aria-current="page">The ±0.8</a>
+    <a href="defects.html">The ±0.8</a>
     <a href="pentagon.html">Pentagon clock</a>
     <a href="monochord.html">Monochord</a>
     <a href="palindrome.html">Palindrome</a>
     <a href="tapestry.html">Tapestry</a>
     <a href="explorer.html">Explorer</a>
     <a href="forms.html">Ten forms</a>
-    <a href="composer.html">Composer</a>
+    <a href="composer.html" aria-current="page">Composer</a>
     <a href="growing.html">Growing spiral</a>
     <a href="primes.html">Other primes</a>
     <a href="curiosity.html">A curiosity</a>
@@ -188,44 +196,53 @@ const Pent = (() => {
 </div></header>
 
 <main>
-  <h1>The ±0.8 correction</h1>
-  <p class="lede">A square of side n·√0.2 has area n²/5, which is almost never a whole number. The Pentametric Formula moves that area by exactly +0.8, −0.8 or 0 to reach the integer P(n), and the matching circles move by exactly ±2π/5. Which way it moves is decided by the last digit of n.</p>
-  <p class="formula">P(n) − n²/5 = <span style="color:var(--accent2)">⁴⁄₅ · (n/5)</span> ∈ {0, +0.8, −0.8}</p>
+  <h1>Composer</h1>
+  <p class="lede">Turn any list of numbers into music. Each number n is sent through the formula to its residue H(n), which becomes silence, a unison, an octave, a fifth or a fourth above a root note. Listen in just intonation, then download the result as a MIDI file to open in any music software.</p>
 
   <div class="grid2">
     <div class="panel">
-      <div class="controls">
-        <label>n <input id="n" type="number" min="1" max="200" value="7"></label>
-        <div class="chips" id="chips"></div>
+      <fieldset>
+        <legend>Numbers</legend>
+        <div class="chips" id="presets" style="margin-bottom:10px"></div>
+        <div class="controls" style="margin-bottom:8px">
+          <label>start <input id="a" type="number" value="0" style="width:8ch"></label>
+          <label>step <input id="d" type="number" value="1" style="width:6ch"></label>
+          <label>count <input id="cnt" type="number" value="51" min="1" max="1000" style="width:7ch"></label>
+          <button id="fill">Make range</button>
+        </div>
+        <textarea id="list" aria-label="numbers separated by commas or spaces"></textarea>
+        <p class="note" style="margin:6px 0 0">Type or paste any whole numbers, separated by commas or spaces.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Sound</legend>
+        <div class="controls" style="margin:0">
+          <label>voicing
+            <select id="voice">
+              <option value="dyad">dyad (root + interval)</option>
+              <option value="melody">melody (upper note only)</option>
+              <option value="arp">arpeggio (root, then interval)</option>
+            </select>
+          </label>
+          <label>root
+            <select id="root">
+              <option value="48">C3</option><option value="50">D3</option><option value="55" selected>G3</option>
+              <option value="57">A3</option><option value="60">C4</option>
+            </select>
+          </label>
+          <label>tempo <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmOut">120</output></label>
+        </div>
+      </fieldset>
+      <div class="controls" style="margin:0">
+        <button id="play" class="primary">▶ Play</button>
+        <button id="midi">⤓ Download MIDI</button>
       </div>
-      <svg id="sq" viewBox="0 0 500 380" role="img" aria-label="The square of area n squared over 5 compared with the square of area P(n), with their circumcircles"></svg>
-      <div class="legend">
-        <span><i class="sw" style="border:2px dashed var(--muted)"></i>side n√0.2, area n²/5</span>
-        <span><i class="sw" style="border:2px solid var(--accent2)"></i>area P(n), an integer</span>
-        <span><i class="sw" style="border:1px dotted var(--accent)"></i>their circumcircles</span>
-      </div>
+      <p class="note" style="margin-bottom:0">MIDI files use equal temperament, so in the download the fifth and fourth are 2 cents away from the pure ratios you hear here; unison and octave are exact.</p>
     </div>
     <div class="panel">
-      <h2 style="margin-top:0">n = <span id="nn"></span></h2>
-      <dl class="readout" id="read"></dl>
-      <p class="note" style="margin-top:12px">The circle through the corners of a square of area A has area πA/2, so a shift of 4/5 in the square becomes a shift of 2π/5 (a fifth of a turn) in the circle.</p>
+      <h2 style="margin-top:0">Your piece</h2>
+      <dl class="readout" id="stats"></dl>
+      <div class="seq" id="seq"></div>
     </div>
-  </div>
-
-  <h2>The correction for n = 0 … <span id="Nlab">50</span></h2>
-  <div class="panel">
-    <div class="controls">
-      <label>up to <input id="N" type="range" min="20" max="100" value="50"><output id="Nout">50</output></label>
-      <span class="legend"><span><i class="sw" style="background:var(--c3)"></i>+0.8 (n ends in 1, 4, 6, 9)</span><span><i class="sw" style="background:var(--c2)"></i>−0.8 (n ends in 2, 3, 7, 8)</span><span>· 0 (n ends in 0, 5)</span><span>○ Lucas number</span></span>
-    </div>
-    <div class="scroll-x"><svg id="bars" viewBox="0 0 1000 230" role="img" aria-label="Bar chart of the correction P(n) minus n squared over 5"></svg></div>
-    <p class="note">Click a bar to inspect that n. At every Lucas number the correction is never 0, and its sign alternates: −0.8 at L<sub>k</sub> with k even, +0.8 with k odd, which is why P(L<sub>k</sub>) = F<sub>k</sub><sup>2</sup> exactly.</p>
-  </div>
-
-  <h2>The last-digit rule</h2>
-  <div class="panel scroll-x">
-    <table class="data" id="digits" style="table-layout:fixed;min-width:620px"></table>
-    <p class="note">The sign comes from the last digit of the double square 2n² (2, 8, 18, 32, 50, …): it ends in 2 for +0.8, in 8 for −0.8 and in 0 for no correction. This is the Legendre symbol (n/5) in disguise.</p>
   </div>
 </main>
 
@@ -237,87 +254,136 @@ const Pent = (() => {
 
 <script>
 "use strict";
-const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
-function el(parent, name, attrs, text) {
-  const e = document.createElementNS(NS, name);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-  if (text !== undefined) e.textContent = text;
-  parent.appendChild(e); return e;
-}
-const signStr = (c) => (c > 0 ? "+0.8" : c < 0 ? "−0.8" : "0");
-const colorOf = (c) => (c > 0 ? "var(--c3)" : c < 0 ? "var(--c2)" : "var(--muted)");
-const lucasSet = new Set(Pent.L.slice(0, 15).map(Number).filter((x) => x > 0));
+const IV = Pent.INTERVALS;
+const SEMI = [null, 0, 12, 7, 5];          // equal-tempered size of each interval in semitones (for MIDI)
+const COLORS = ["#9a9a9a", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b"];
 
-for (const v of [1, 2, 3, 4, 5, 7, 11, 18, 29]) {
-  const b = document.createElement("button"); b.textContent = v; b.onclick = () => { $("n").value = v; drawSquares(); };
-  $("chips").appendChild(b);
+// presets
+const primes = []; for (let k = 2; primes.length < 40; k++) if (primes.every((q) => k % q)) primes.push(k);
+const PRESETS = {
+  "One palindrome (0–50)": [...Array(51).keys()],
+  "Lucas numbers": Pent.L.slice(1, 31).map(Number),
+  "Fibonacci numbers": Pent.F.slice(1, 31).map(Number),
+  "Primes": primes,
+  "Squares": [...Array(30).keys()].map((k) => (k + 1) ** 2),
+  "Two periods (0–49)": [...Array(50).keys()],
+};
+for (const [name, arr] of Object.entries(PRESETS)) {
+  const b = document.createElement("button"); b.textContent = name;
+  b.onclick = () => { $("list").value = arr.join(", "); refresh(); }; $("presets").appendChild(b);
 }
+$("fill").onclick = () => {
+  const a = Math.round(+$("a").value), d = Math.round(+$("d").value), c = Math.min(1000, Math.max(1, Math.round(+$("cnt").value)));
+  $("list").value = Array.from({ length: c }, (_, i) => a + i * d).join(", "); refresh();
+};
 
-function drawSquares() {
-  let n = Math.max(1, Math.min(200, Math.round(+$("n").value || 1)));
-  const svg = $("sq"); svg.innerHTML = "";
-  const chi = Pent.leg(n), Pn = Pent.P(n), A = n * n / 5;
-  const sA = Math.sqrt(A), sP = Math.sqrt(Pn);
-  const R = Math.max(sA, sP) / Math.SQRT2;              // largest circumradius
-  const scale = 165 / R, cx = 250, cy = 190;
-  const sq = (side, attrs) => el(svg, "rect", Object.assign({ x: cx - side * scale / 2, y: cy - side * scale / 2, width: side * scale, height: side * scale, fill: "none" }, attrs));
-  el(svg, "circle", { cx, cy, r: sA / Math.SQRT2 * scale, fill: "none", stroke: "var(--accent)", "stroke-dasharray": "2 3" });
-  if (sP > 0) el(svg, "circle", { cx, cy, r: sP / Math.SQRT2 * scale, fill: "none", stroke: "var(--accent)", "stroke-dasharray": "2 3" });
-  if (sP > 0) sq(sP, { stroke: "var(--accent2)", "stroke-width": 2.5, fill: "var(--fill)" });
-  sq(sA, { stroke: "var(--muted)", "stroke-width": 1.5, "stroke-dasharray": "6 4" });
-  el(svg, "text", { x: 250, y: 372, "text-anchor": "middle", "font-size": 13, fill: "var(--muted)" },
-    chi === 0 ? "the two squares coincide (n is a multiple of 5)" : chi > 0 ? "P(n) is 0.8 larger: the solid square is outside" : "P(n) is 0.8 smaller: the solid square is inside");
-  $("nn").textContent = n;
-  const k = Pent.lucasIndex(n);
-  const rows = [
-    ["last digit of n", String(n % 10)],
-    ["(n/5) Legendre symbol", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
-    ["n²/5", Pent.fmt(A, 1)],
-    ["P(n)", `${Pn}`],
-    ["P(n) − n²/5", `<span style="color:${colorOf(chi)};font-weight:600">${signStr(chi)}</span>`],
-    ["circle area difference", chi === 0 ? "0" : `${chi > 0 ? "+" : "−"}2π/5 = ${Pent.fmt(chi * 2 * Math.PI / 5, 4)}`],
-    ["side √P(n)", Pent.fmt(sP, 4) + (Pent.isSquare(Pn) ? ` = ${Math.round(sP)} (a whole number)` : "")],
-  ];
-  if (k >= 0) rows.push(["Lucas number", `n = L<sub>${k}</sub>, so P(n) = F<sub>${k}</sub><sup>2</sup> = ${Number(Pent.F[k])}<sup>2</sup>`]);
-  $("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
-  drawBars();
+function numbers() {
+  return ($("list").value.match(/-?\d+/g) || []).map(Number).filter((x) => Number.isFinite(x) && Math.abs(x) < 9e7).slice(0, 2000);
 }
-
-function drawBars() {
-  const N = +$("N").value; $("Nout").textContent = N; $("Nlab").textContent = N;
-  const sel = +$("n").value;
-  const svg = $("bars"); svg.innerHTML = "";
-  const left = 46, right = 10, top = 14, mid = 108, h = 70, w = (1000 - left - right) / (N + 1);
-  el(svg, "line", { x1: left, y1: mid, x2: 1000 - right, y2: mid, stroke: "var(--rule)" });
-  for (const [v, y] of [["+0.8", mid - h], ["0", mid], ["−0.8", mid + h]])
-    el(svg, "text", { x: left - 8, y: y + 4, "text-anchor": "end", "font-size": 12, fill: "var(--muted)" }, v);
-  for (let n = 0; n <= N; n++) {
-    const c = Pent.leg(n), x = left + n * w;
-    const g = el(svg, "g", { style: "cursor:pointer" });
-    g.addEventListener("click", () => { if (n > 0) { $("n").value = n; drawSquares(); } });
-    el(g, "rect", { x, y: top, width: w, height: 2 * h + 20, fill: n === sel ? "var(--fill)" : "transparent" });
-    if (c === 0) el(g, "circle", { cx: x + w / 2, cy: mid, r: 2.2, fill: "var(--muted)" });
-    else el(g, "rect", { x: x + w * 0.18, y: c > 0 ? mid - h : mid, width: w * 0.64, height: h, fill: colorOf(c), rx: 1.5 });
-    if (lucasSet.has(n)) el(g, "circle", { cx: x + w / 2, cy: c > 0 ? mid - h - 7 : mid + h + 7, r: 4, fill: "none", stroke: "var(--ink)", "stroke-width": 1.3 });
-    const step = N > 60 ? 10 : 5;
-    if (n % step === 0) el(svg, "text", { x: x + w / 2, y: 222, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, n);
-    el(g, "title", {}, `n = ${n}: P(n) − n²/5 = ${signStr(c)}`);
+let cells = [];
+function refresh() {
+  const ns = numbers(), hs = ns.map((n) => Pent.H(n));
+  const seq = $("seq"); seq.innerHTML = ""; cells = [];
+  for (let i = 0; i < ns.length; i++) {
+    const s = document.createElement("span"); s.style.background = COLORS[hs[i]];
+    s.title = `n = ${ns[i]}: ${IV[hs[i]].name}`; s.textContent = hs[i] === 0 ? "·" : IV[hs[i]].ratio;
+    seq.appendChild(s); cells.push(s);
   }
+  const count = [0, 0, 0, 0, 0]; hs.forEach((h) => count[h]++);
+  const pal = ns.length > 1 && hs.every((h, i) => h === hs[hs.length - 1 - i]);
+  $("stats").innerHTML = [
+    ["notes", String(ns.length)],
+    ["silences", String(count[0])],
+    ["unison / octave", `${count[1]} / ${count[2]}`],
+    ["fifth / fourth", `${count[3]} / ${count[4]}`],
+    ["length at this tempo", `${(ns.length * 60 / +$("bpm").value).toFixed(1)} s`],
+    ["palindrome?", pal ? '<span class="ok">yes, it reads the same backwards</span>' : "no"],
+  ].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  return { ns, hs };
 }
 
-function digitTable() {
-  const head = "<tr><th>last digit of n</th>" + [0,1,2,3,4,5,6,7,8,9].map((d) => `<th class="num">${d}</th>`).join("") + "</tr>";
-  const row = (label, f) => `<tr><td>${label}</td>` + [0,1,2,3,4,5,6,7,8,9].map((d) => `<td class="num">${f(d)}</td>`).join("") + "</tr>";
-  $("digits").innerHTML = `<colgroup><col style="width:22%">${"<col style=\"width:7.8%\">".repeat(10)}</colgroup>` + head
-    + row("last digit of n²", (d) => (d * d) % 10)
-    + row("last digit of 2n²", (d) => (2 * d * d) % 10)
-    + row("correction", (d) => { const c = Pent.leg(d); return `<span style="color:${colorOf(c)};font-weight:600">${signStr(c)}</span>`; });
+// ---- audio (just intonation) ----
+let ctx = null, timer = null, nextT = 0, idx = 0, queue = [], raf = 0, cur = null;
+const midiHz = (m) => 440 * 2 ** ((m - 69) / 12);
+function ac() { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); return ctx; }
+function tone(f, t, dur, g0) {
+  const c = ac(), o = c.createOscillator(), g = c.createGain();
+  o.type = "triangle"; o.frequency.value = f;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(g0, t + 0.015);
+  g.gain.exponentialRampToValueAtTime(g0 * 0.5, t + dur * 0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + 0.03);
 }
+function voice(h, t, spb) {
+  if (h === 0) return;
+  const f0 = midiHz(+$("root").value), up = f0 * IV[h].num / IV[h].den, v = $("voice").value;
+  if (v === "dyad") { tone(f0, t, spb * 0.9, 0.16); if (h !== 1) tone(up, t, spb * 0.9, 0.14); }
+  else if (v === "melody") tone(up, t, spb * 0.9, 0.18);
+  else { tone(f0, t, spb * 0.45, 0.16); tone(up, t + spb / 2, spb * 0.45, 0.16); }
+}
+function stop() {
+  clearInterval(timer); timer = null; cancelAnimationFrame(raf); queue = [];
+  cells.forEach((c) => c.classList.remove("now")); $("play").textContent = "▶ Play";
+}
+$("play").onclick = () => {
+  if (timer) return stop();
+  cur = refresh(); if (!cur.ns.length) return;
+  idx = 0; nextT = ac().currentTime + 0.08;
+  timer = setInterval(() => {
+    const spb = 60 / +$("bpm").value;
+    while (nextT < ctx.currentTime + 0.12) {
+      if (idx >= cur.hs.length) { setTimeout(stop, spb * 1000); clearInterval(timer); return; }
+      voice(cur.hs[idx], nextT, spb); queue.push({ i: idx, t: nextT }); nextT += spb; idx++;
+    }
+  }, 25);
+  const anim = () => {
+    while (queue.length && queue[0].t <= ctx.currentTime) {
+      const { i } = queue.shift(); cells.forEach((c) => c.classList.remove("now"));
+      if (cells[i]) { cells[i].classList.add("now"); }
+    }
+    raf = requestAnimationFrame(anim);
+  };
+  raf = requestAnimationFrame(anim);
+  $("play").textContent = "■ Stop";
+};
 
-$("n").addEventListener("input", drawSquares);
-$("N").addEventListener("input", drawBars);
-digitTable(); drawSquares();
+// ---- MIDI export (Standard MIDI File, format 0) ----
+function vlq(n) { const out = [n & 0x7f]; while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
+function buildMidi(hs) {
+  const PPQ = 480, root = +$("root").value, v = $("voice").value, bpm = +$("bpm").value;
+  const ev = [];                                       // [tick, bytes]
+  const tempo = Math.round(60000000 / bpm);
+  ev.push([0, [0xff, 0x51, 0x03, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255]]);
+  const name = Array.from(new TextEncoder().encode("The Pentametric Cycle"));
+  ev.push([0, [0xff, 0x03, name.length, ...name]]);
+  ev.push([0, [0xc0, 0x00]]);
+  const note = (t, len, key, vel) => { ev.push([t, [0x90, key, vel]]); ev.push([t + len, [0x80, key, 0]]); };
+  hs.forEach((h, i) => {
+    if (h === 0) return;
+    const t = i * PPQ, up = root + SEMI[h];
+    if (v === "dyad") { note(t, PPQ - 24, root, 84); if (h !== 1) note(t, PPQ - 24, up, 78); }
+    else if (v === "melody") note(t, PPQ - 24, up, 88);
+    else { note(t, PPQ / 2 - 12, root, 84); note(t + PPQ / 2, PPQ / 2 - 12, up, 84); }
+  });
+  ev.sort((a, b) => a[0] - b[0] || (a[1][0] === 0x80 ? -1 : 1));
+  const track = []; let last = 0;
+  for (const [t, bytes] of ev) { track.push(...vlq(t - last), ...bytes); last = t; }
+  track.push(0x00, 0xff, 0x2f, 0x00);
+  const len = track.length;
+  const header = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, (PPQ >> 8) & 255, PPQ & 255];
+  const th = [0x4d, 0x54, 0x72, 0x6b, (len >>> 24) & 255, (len >>> 16) & 255, (len >>> 8) & 255, len & 255];
+  return new Uint8Array([...header, ...th, ...track]);
+}
+$("midi").onclick = () => {
+  const { hs } = refresh(); if (!hs.length) return;
+  const blob = new Blob([buildMidi(hs)], { type: "audio/midi" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "pentametric_cycle.mid";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+};
+$("bpm").addEventListener("input", () => { $("bpmOut").textContent = $("bpm").value; refresh(); });
+$("list").addEventListener("input", refresh);
+$("list").value = PRESETS["One palindrome (0–50)"].join(", ");
+refresh();
 </script>
 </body>
 </html>

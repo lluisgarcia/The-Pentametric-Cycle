@@ -52,7 +52,7 @@ header.site {
 header.site .inner, main, footer.site .inner { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 header.site .inner { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; padding-top: 12px; padding-bottom: 12px; }
 header.site .brand { font-family: var(--serif); font-size: 1.35rem; text-decoration: none; color: var(--ink); white-space: nowrap; }
-header.site nav { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: .95rem; }
+header.site nav { display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: .9rem; }
 header.site nav a { text-decoration: none; color: var(--muted); }
 header.site nav a[aria-current="page"] { color: var(--ink); border-bottom: 2px solid var(--accent2); }
 main { padding-top: 28px; padding-bottom: 40px; }
@@ -181,9 +181,15 @@ const Pent = (() => {
   <nav>
     <a href="spiral.html">Spiral</a>
     <a href="defects.html">The ±0.8</a>
+    <a href="pentagon.html">Pentagon clock</a>
+    <a href="monochord.html">Monochord</a>
     <a href="palindrome.html">Palindrome</a>
+    <a href="tapestry.html">Tapestry</a>
     <a href="explorer.html">Explorer</a>
     <a href="forms.html">Ten forms</a>
+    <a href="composer.html">Composer</a>
+    <a href="growing.html">Growing spiral</a>
+    <a href="primes.html">Other primes</a>
     <a href="curiosity.html">A curiosity</a>
   </nav>
 </div></header>
@@ -201,13 +207,23 @@ const Pent = (() => {
     <div class="legend" id="legend"></div>
   </div>
 
-  <h2>Explore</h2>
+  <h2>Understand</h2>
   <div class="cards">
     <a class="card" href="spiral.html"><span class="k">Geometry</span><h3>The spiral and Holden's lines</h3><p>Fibonacci squares, the point P, and a square through P whose area is F<sub>k</sub><sup>2</sup> ± 4/5.</p></a>
     <a class="card" href="defects.html"><span class="k">Correction</span><h3>The ±0.8</h3><p>How n²/5 is moved by ±0.8 to a whole number, why the circles move by ±2π/5, and the last-digit rule.</p></a>
+    <a class="card" href="pentagon.html"><span class="k">Why five</span><h3>The pentagon clock</h3><p>Step around a regular pentagon: the vertex decides the sign of the correction, and the pentagon's mirror makes the palindrome.</p></a>
+    <a class="card" href="monochord.html"><span class="k">Pythagoras</span><h3>Monochord and tetractys</h3><p>Pluck a string at ½, ⅔ and ¾ and see the four consonances as neighbouring rows of the tetractys.</p></a>
     <a class="card" href="palindrome.html"><span class="k">Music</span><h3>The playable palindrome</h3><p>The 51-step cycle as a wheel and a piano roll that you can hear in just intonation.</p></a>
-    <a class="card" href="explorer.html"><span class="k">Arithmetic</span><h3>Formula explorer</h3><p>Follow any number through the seven steps to its area and interval, and search for perfect squares.</p></a>
+    <a class="card" href="tapestry.html"><span class="k">Pattern</span><h3>The residue tapestry</h3><p>Weave the sequence into rows: period, mirror and diagonals appear at a glance.</p></a>
     <a class="card" href="forms.html"><span class="k">Ten routes</span><h3>Ten forms of one formula</h3><p>Digits, floors, a quintic, cosines, a golden rotation and pentagon angles, all giving the same areas.</p></a>
+  </div>
+
+  <h2>Play and explore</h2>
+  <div class="cards">
+    <a class="card" href="explorer.html"><span class="k">Arithmetic</span><h3>Formula explorer</h3><p>Follow any number through the seven steps to its area and interval, and search for perfect squares.</p></a>
+    <a class="card" href="composer.html"><span class="k">Make music</span><h3>Composer and MIDI export</h3><p>Turn any list of numbers into a piece of consonances, listen, and download it as a MIDI file.</p></a>
+    <a class="card" href="growing.html"><span class="k">Animation</span><h3>The growing spiral</h3><p>The spiral builds itself square by square, each square sounding the interval of its Lucas number.</p></a>
+    <a class="card" href="primes.html"><span class="k">Exploratory</span><h3>Other primes</h3><p>Why 5 is the only prime for the formula, and how the palindrome and the triple 5² + 12² = 13² appear for other primes.</p></a>
     <a class="card" href="curiosity.html"><span class="k">Curiosity</span><h3>The ratio √10/3</h3><p>A hypotenuse of the construction that lies within 1 cent of the Pythagorean semitone. Listen and compare.</p></a>
   </div>
 

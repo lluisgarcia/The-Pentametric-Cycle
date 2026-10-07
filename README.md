@@ -7,6 +7,8 @@ Lluis Garcia Torcal · independent researcher · 2026 · ORCID [0009-0007-8570-2
 
 📄 **Read the paper:** [`Paper/pentametric_cycle.pdf`](Paper/pentametric_cycle.pdf) · archived preprint on Zenodo: [doi:10.5281/zenodo.23183108](https://doi.org/10.5281/zenodo.23183108)
 
+🌐 **Interactive visualizations:** https://lluisgarcia.github.io/The-Pentametric-Cycle/
+
 ---
 
 ## In one paragraph
@@ -26,6 +28,7 @@ always produces an integer. It is equivalent to $(n^{2}+4\cdot(n/5))/5$, where $
 | Folder | Contents |
 |---|---|
 | `Paper/` | The manuscript (PDF and LaTeX source), its figures, and Python scripts that independently check every claim. See `Paper/README.md`. |
+| `docs/` | The interactive website, published with GitHub Pages at [lluisgarcia.github.io/The-Pentametric-Cycle](https://lluisgarcia.github.io/The-Pentametric-Cycle/): the spiral and Holden's lines, the ±0.8 correction, the pentagon clock, the monochord and tetractys, the playable palindrome, the residue tapestry, the formula explorer, the ten forms, a composer with MIDI export, the growing spiral, other primes (exploratory) and the √10/3 curiosity. Each page is a single self-contained HTML file. |
 | `Geometry/` | GeoGebra constructions (`.ggb`): the Fibonacci grid, Lucas distances, the ±0.8 square and ±2π/5 circle differences, angles, rotations and the pentagon study. Open them with [GeoGebra](https://www.geogebra.org/classic) (free). |
 | `Tables/` | The original spreadsheets (`.xlsx`) **with their formulas**. They contain the whole family of Pentametric forms, the cycle, the palindrome, the verification counts and the angle tables. Table 2 of the paper maps each formula to its sheet and columns. |
 | `Csv/` | Plain-text exports of every spreadsheet sheet, readable without Excel. These contain values only; the formulas are in `Tables/`. |
@@ -88,6 +91,6 @@ The DOI above always points to the latest version of the preprint.
 ## License
 
 - **Paper, data, spreadsheets, GeoGebra files and images:** [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). You may share and adapt them for any purpose, provided you give appropriate credit.
-- **Python scripts** (`Paper/*.py`): [MIT License](https://opensource.org/licenses/MIT).
+- **Python scripts** (`Paper/*.py`) **and the website code** (`docs/`): [MIT License](https://opensource.org/licenses/MIT).
 
 The classical sources listed under *Attribution* are copyright their respective publishers and are not redistributed here.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Formula Explorer · The Pentametric Cycle</title>
+<title>The Residue Tapestry · The Pentametric Cycle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -177,8 +177,8 @@ const Pent = (() => {
     <a href="pentagon.html">Pentagon clock</a>
     <a href="monochord.html">Monochord</a>
     <a href="palindrome.html">Palindrome</a>
-    <a href="tapestry.html">Tapestry</a>
-    <a href="explorer.html" aria-current="page">Explorer</a>
+    <a href="tapestry.html" aria-current="page">Tapestry</a>
+    <a href="explorer.html">Explorer</a>
     <a href="forms.html">Ten forms</a>
     <a href="composer.html">Composer</a>
     <a href="growing.html">Growing spiral</a>
@@ -188,43 +188,35 @@ const Pent = (() => {
 </div></header>
 
 <main>
-  <h1>Formula explorer</h1>
-  <p class="lede">Type any whole number and follow the seven steps that take it to an area, a residue and a musical interval. At the Lucas numbers the area is always a perfect square: the square of the matching Fibonacci number.</p>
+  <h1>The residue tapestry</h1>
+  <p class="lede">Weave the sequence into rows. Each cell is one n, read left to right and top to bottom, coloured by its residue. When the row length matches the period, every row is the same and the palindrome appears as a mirror down the middle; any other width turns the same sequence into diagonal patterns.</p>
 
   <div class="panel">
     <div class="controls">
-      <label>n <input id="n" type="number" min="0" max="10000000" value="7" style="width:12ch"></label>
-      <button id="minus">−1</button><button id="plus">+1</button>
-      <span class="note">Lucas numbers:</span>
+      <label>row length <input id="W" type="range" min="2" max="60" value="25"><output id="Wout">25</output></label>
       <div class="chips" id="chips"></div>
+      <label>show
+        <select id="mode">
+          <option value="H">H(n) = P(n) mod 5 (the consonances)</option>
+          <option value="D">last digit of P(n) (period 50)</option>
+          <option value="L">(n/5), the sign of the correction</option>
+        </select>
+      </label>
+      <label>rows <input id="rows" type="range" min="6" max="60" value="24"><output id="rowsOut">24</output></label>
     </div>
+    <div class="legend" id="legend" style="margin-bottom:10px"></div>
+    <svg id="tap" role="img" aria-label="Residues of the Pentametric Formula arranged in rows"></svg>
+    <p class="note" id="info" style="margin-bottom:0">Hover over a cell to see n and P(n).</p>
   </div>
 
-  <div class="grid2" style="margin-top:18px">
-    <div class="panel scroll-x">
-      <h2 style="margin-top:0">The seven steps</h2>
-      <table class="data" id="chain"></table>
-    </div>
-    <div class="panel">
-      <h2 style="margin-top:0">Result</h2>
-      <dl class="readout" id="sum"></dl>
-      <div id="ivcard" style="margin-top:16px;padding:14px;border-radius:8px;border:1px solid var(--rule)"></div>
-    </div>
-  </div>
-
-  <h2>Around n</h2>
-  <div class="panel scroll-x">
-    <svg id="strip" viewBox="0 0 1000 120" style="min-width:640px" role="img" aria-label="The values of H for the 25 numbers around n"></svg>
-    <p class="note">One full period of 25 around n; the pattern repeats every 25 and reads the same backwards around every multiple of 25.</p>
-  </div>
-
-  <h2>Which areas are perfect squares?</h2>
+  <h2>What to look for</h2>
   <div class="panel">
-    <div class="controls">
-      <label>search n from 1 to <input id="M" type="number" min="10" max="5000000" value="100000" style="width:11ch"></label>
-      <button id="search" class="primary">Search</button>
-    </div>
-    <div id="found" class="note">Proved in the paper: for n ≥ 1, P(n) is a perfect square exactly when n is a Lucas number.</div>
+    <ul style="margin:0;padding-left:20px">
+      <li><strong>Row length 25:</strong> every row is identical, because H has period 25. Each row reads the same backwards after its first cell, and the centre column pair (n = 12, 13) is the fifth.</li>
+      <li><strong>Row length 50 with “last digit”:</strong> the last digits of the areas repeat every 50 and are mirrored at n = 25.</li>
+      <li><strong>Row length 5:</strong> the sign of the correction depends only on the column, i.e. on n mod 5.</li>
+      <li><strong>Row length 24 or 26:</strong> the same 25-periodic pattern slides one step per row and draws diagonals.</li>
+    </ul>
   </div>
 </main>
 
@@ -238,85 +230,53 @@ const Pent = (() => {
 "use strict";
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
-function el(parent, name, attrs, text) {
-  const e = document.createElementNS(NS, name);
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
-  if (text !== undefined) e.textContent = text;
-  parent.appendChild(e); return e;
+const DIG = ["#d9d9d9", "#4f7cac", "#7aa6c2", "#8fb996", "#d99a5b", "#2b5d8a", "#b4532a", "#9c6fb0", "#c9b458", "#6b6b6b"];
+const IV = Pent.INTERVALS;
+for (const w of [5, 10, 24, 25, 26, 50]) {
+  const b = document.createElement("button"); b.textContent = w;
+  b.onclick = () => { $("W").value = w; draw(); }; $("chips").appendChild(b);
 }
-const big = (x) => x.toLocaleString("en-US");
-for (const k of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20]) {
-  const L = Number(Pent.L[k]), b = document.createElement("button");
-  b.textContent = big(L); b.title = `L${k}`; b.onclick = () => { $("n").value = L; update(); };
-  $("chips").appendChild(b);
+function colour(mode, n) {
+  if (mode === "H") return `var(--c${Pent.H(n)})`;
+  if (mode === "D") return DIG[Pent.P(n) % 10];
+  const c = Pent.leg(n); return c > 0 ? "var(--c3)" : c < 0 ? "var(--c2)" : "var(--c0)";
 }
-
-function update() {
-  let n = Math.round(+$("n").value);
-  if (!Number.isFinite(n) || n < 0) n = 0;
-  if (n > 1e7) n = 1e7;
-  const sq = n * n, m = (4 * sq) % 10, Cm = Pent.C(m), Pn = (sq + 4 * Cm) / 5, two = 2 * Pn, d = two % 10, H = d / 2;
-  const iv = Pent.INTERVALS[H];
-  const rows = [
-    ["1", "residue", "m = 4n² mod 10", `4 · ${big(sq)} mod 10 = ${m}`],
-    ["2", "Interval Map", "C(m) = (26m − 5m²)/24", `(${26 * m} − ${5 * m * m})/24 = ${Pent.fmt(Cm)}`],
-    ["3", "Pentametric area", "P(n) = (n² + 4C(m))/5", `(${big(sq)} ${Cm < 0 ? "−" : "+"} ${Math.abs(4 * Cm)})/5 = ${big(Pn)}`],
-    ["4", "doubling (octave)", "2P(n)", big(two)],
-    ["5", "last digit", "2P(n) mod 10", String(d)],
-    ["6", "halved digit", "H = (2P(n) mod 10)/2", String(H)],
-    ["7", "ratio", "H : (H − 1), with 1 ↦ 1:1", iv.ratio ? `${iv.ratio} (${iv.name})` : "— (silence)"],
-  ];
-  $("chain").innerHTML = "<tr><th>step</th><th>name</th><th>operation</th><th class=num>value</th></tr>" +
-    rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td></tr>`).join("");
-
-  const chi = Pent.leg(n), k = Pent.lucasIndex(n), isSq = Pent.isSquare(Pn);
-  const s = [
-    ["n mod 5", String(n % 5)],
-    ["(n/5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
-    ["closed form", `(n² + 4(n/5))/5 = ${big(Pn)}`],
-    ["n²/5", Pent.fmt(sq / 5, 1)],
-    ["perfect square?", isSq ? `<span class="ok">yes, ${big(Math.round(Math.sqrt(Pn)))}²</span>` : "no"],
-    ["Lucas number?", k >= 0 ? `<span class="ok">yes, n = L<sub>${k}</sub>, P(n) = F<sub>${k}</sub><sup>2</sup></span>` : "no"],
-  ];
-  $("sum").innerHTML = s.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
-  $("ivcard").style.background = iv.h ? `color-mix(in srgb, var(--c${iv.h}) 16%, transparent)` : "transparent";
-  $("ivcard").innerHTML = `<div class="note">interval at n = ${big(n)}</div>
-    <div style="font-family:var(--serif);font-size:1.8rem">${iv.ratio ? iv.name + " " + iv.ratio : "silence"}</div>
-    <div class="greek" style="font-size:1.3rem;color:var(--muted)">${iv.greek}</div>`;
-  drawStrip(n);
+function legend(mode) {
+  if (mode === "H") return IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.h}: ${iv.name}</span>`).join("");
+  if (mode === "D") return DIG.map((c, d) => `<span><i class="sw" style="background:${c}"></i>${d}</span>`).join("") + "<span>· last digit of P(n)</span>";
+  return `<span><i class="sw" style="background:var(--c3)"></i>+1 (+0.8)</span><span><i class="sw" style="background:var(--c2)"></i>−1 (−0.8)</span><span><i class="sw" style="background:var(--c0)"></i>0</span>`;
 }
-
-function drawStrip(n) {
-  const svg = $("strip"); svg.innerHTML = "";
-  const w = 1000 / 25;
-  for (let i = -12; i <= 12; i++) {
-    const m = n + i; const x = (i + 12) * w;
-    const h = Pent.H(m);
-    const g = el(svg, "g", { style: "cursor:pointer" });
-    g.addEventListener("click", () => { $("n").value = Math.abs(m); update(); });
-    el(g, "rect", { x: x + 2, y: 22, width: w - 4, height: 50, rx: 4, fill: `var(--c${h})`, stroke: i === 0 ? "var(--ink)" : "none", "stroke-width": 3 });
-    el(g, "text", { x: x + w / 2, y: 53, "text-anchor": "middle", "font-size": 15, fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff", style: "font-weight:600" }, h);
-    el(g, "text", { x: x + w / 2, y: 92, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, Pent.fmt(m).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-    if (m % 25 === 0) el(svg, "line", { x1: x + w / 2, y1: 8, x2: x + w / 2, y2: 20, stroke: "var(--ink)", "stroke-width": 2 });
+function draw() {
+  const W = +$("W").value, rows = +$("rows").value, mode = $("mode").value;
+  $("Wout").textContent = W; $("rowsOut").textContent = rows;
+  $("legend").innerHTML = legend(mode);
+  const cell = Math.max(6, Math.min(36, Math.floor(1000 / W))), gap = cell > 14 ? 2 : 1, lw = 46;
+  const svg = $("tap");
+  svg.setAttribute("viewBox", `0 0 ${lw + W * cell} ${rows * cell + 4}`);
+  svg.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  for (let r = 0; r < rows; r++) {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", lw - 6); t.setAttribute("y", r * cell + cell * 0.68); t.setAttribute("text-anchor", "end");
+    t.setAttribute("font-size", Math.min(12, cell * 0.7)); t.setAttribute("fill", "var(--muted)"); t.textContent = r * W;
+    if (cell >= 10 || r % 5 === 0) frag.appendChild(t);
+    for (let c = 0; c < W; c++) {
+      const n = r * W + c, e = document.createElementNS(NS, "rect");
+      e.setAttribute("x", lw + c * cell); e.setAttribute("y", r * cell);
+      e.setAttribute("width", cell - gap); e.setAttribute("height", cell - gap); e.setAttribute("rx", cell > 14 ? 2 : 0);
+      e.setAttribute("fill", colour(mode, n)); e.dataset.n = n;
+      frag.appendChild(e);
+    }
   }
-  el(svg, "text", { x: 500, y: 114, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, "H(n) for the 25 numbers around n · ticks mark multiples of 25 (mirror axes)");
+  svg.appendChild(frag);
 }
-
-$("search").addEventListener("click", () => {
-  const M = Math.min(5e6, Math.max(10, Math.round(+$("M").value)));
-  const hits = [];
-  for (let n = 1; n <= M; n++) if (Pent.isSquare(Pent.P(n))) hits.push(n);
-  const allLucas = hits.every((h) => Pent.lucasIndex(h) >= 0);
-  const lucas = [...new Set(Pent.L.map(Number))].filter((x) => x >= 1 && x <= M);
-  const everyLucas = lucas.every((x) => hits.includes(x));
-  $("found").innerHTML = `Found <strong>${hits.length}</strong> values of n ≤ ${big(M)} with P(n) a perfect square: ${hits.map(big).join(", ")}.<br>` +
-    (allLucas ? `<span class="ok">Every one is a Lucas number</span>` : "Not all are Lucas numbers") +
-    (everyLucas ? `, and all ${lucas.length} Lucas numbers up to ${big(M)} appear.` : ", but some Lucas numbers are missing.");
+$("tap").addEventListener("mousemove", (e) => {
+  const n = e.target.dataset && e.target.dataset.n; if (n === undefined) return;
+  const k = +n, h = Pent.H(k);
+  $("info").textContent = `n = ${k}: P(n) = ${Pent.P(k).toLocaleString("en-US")}, last digit ${Pent.P(k) % 10}, H(n) = ${h} (${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}), (n/5) = ${Pent.leg(k)}`;
 });
-$("n").addEventListener("input", update);
-$("minus").onclick = () => { $("n").value = Math.max(0, +$("n").value - 1); update(); };
-$("plus").onclick = () => { $("n").value = +$("n").value + 1; update(); };
-update();
+for (const id of ["W", "mode", "rows"]) $(id).addEventListener("input", draw);
+draw();
 </script>
 </body>
 </html>

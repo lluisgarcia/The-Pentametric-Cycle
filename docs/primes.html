@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Formula Explorer · The Pentametric Cycle</title>
+<title>Other Primes · The Pentametric Cycle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -178,53 +178,67 @@ const Pent = (() => {
     <a href="monochord.html">Monochord</a>
     <a href="palindrome.html">Palindrome</a>
     <a href="tapestry.html">Tapestry</a>
-    <a href="explorer.html" aria-current="page">Explorer</a>
+    <a href="explorer.html">Explorer</a>
     <a href="forms.html">Ten forms</a>
     <a href="composer.html">Composer</a>
     <a href="growing.html">Growing spiral</a>
-    <a href="primes.html">Other primes</a>
+    <a href="primes.html" aria-current="page">Other primes</a>
     <a href="curiosity.html">A curiosity</a>
   </nav>
 </div></header>
 
 <main>
-  <h1>Formula explorer</h1>
-  <p class="lede">Type any whole number and follow the seven steps that take it to an area, a residue and a musical interval. At the Lucas numbers the area is always a perfect square: the square of the matching Fibonacci number.</p>
+  <span class="tag">exploratory · not yet peer reviewed</span>
+  <h1 style="margin-top:8px">Other primes</h1>
+  <p class="lede">The papers ask what happens if 5 is replaced by another prime p. This page explores two answers. The first shows that the formula itself cannot be copied: 5 is the only prime that works. The second shows that the palindrome and its counts survive for every prime, and that the triple 3² + 4² = 5² is the first of a family that continues with 5² + 12² = 13².</p>
 
+  <h2>1. The formula works only for p = 5</h2>
+  <div class="grid2">
+    <div class="panel">
+      <p style="margin-top:0">Try the natural generalisation (n² + c·(n/p)) / p, with (n/p) the Legendre symbol modulo p. For which p and c is it a whole number for every n?</p>
+      <div class="controls">
+        <label>p <select id="p1"></select></label>
+        <label>c <input id="c1" type="number" value="4" style="width:7ch"></label>
+      </div>
+      <div id="res1" style="font-size:1.05rem"></div>
+      <div class="scroll-x" style="margin-top:12px"><svg id="map1" role="img" aria-label="Map of primes and constants that give whole numbers"></svg></div>
+      <p class="note">Map: rows are primes, columns are c = 0 … p − 1. A filled cell means whole numbers for every n. Only one cell is filled: p = 5, c = 4.</p>
+    </div>
+    <div class="panel">
+      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">Why</h3>
+      <p style="margin-top:0">Taking n = 1 forces 1 + c ≡ 0, so c ≡ −1 (mod p). Then every n with (n/p) = +1 needs n² ≡ 1, i.e. n ≡ ±1. So the only quadratic residues modulo p could be ±1, which leaves room for at most two of them. There are (p − 1)/2 quadratic residues, so p ≤ 5. For p = 3, n = 2 would need 4 − c ≡ 0, i.e. c ≡ 1, contradicting c ≡ −1. So p = 5 and c ≡ 4 (mod 5) is the only case: the formula of the cycle.</p>
+      <p class="note" style="margin-bottom:0">This short argument answers the first open question in the papers. It was checked by computer for every prime below 400.</p>
+    </div>
+  </div>
+
+  <h2>2. The palindrome survives for every prime</h2>
   <div class="panel">
+    <p style="margin-top:0">Drop the correction and keep the whole part: Q<sub>p</sub>(n) = ⌊n²/p⌋ mod p. For p = 5 this has the same counts as the cycle (9 zeros, each other value 4 times). Choose a prime and see the pattern of one period of p² numbers, written in p rows of p.</p>
     <div class="controls">
-      <label>n <input id="n" type="number" min="0" max="10000000" value="7" style="width:12ch"></label>
-      <button id="minus">−1</button><button id="plus">+1</button>
-      <span class="note">Lucas numbers:</span>
-      <div class="chips" id="chips"></div>
+      <label>prime p <select id="p2"></select></label>
+      <div class="chips" id="trip"></div>
+    </div>
+    <div class="grid2">
+      <div class="scroll-x"><svg id="grid2" role="img" aria-label="One period of floor(n squared over p) mod p in p rows"></svg></div>
+      <div>
+        <dl class="readout" id="read2"></dl>
+        <div id="triple" style="margin-top:12px;padding:12px;border-radius:8px;border:1px solid var(--rule)"></div>
+      </div>
     </div>
   </div>
 
   <div class="grid2" style="margin-top:18px">
-    <div class="panel scroll-x">
-      <h2 style="margin-top:0">The seven steps</h2>
-      <table class="data" id="chain"></table>
+    <div class="panel">
+      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">Why the counts are always 2p − 1 and p − 1</h3>
+      <p style="margin-top:0">Write n = pq + r with q and r between 0 and p − 1 (row q, column r in the grid). Then ⌊n²/p⌋ ≡ 2qr + ⌊r²/p⌋ (mod p). In column r = 0 every value is 0. In any other column, 2r is invertible modulo p, so as q runs through a column every value 0, …, p − 1 appears exactly once. That gives 0 a total of p + (p − 1) = 2p − 1 times and every other value p − 1 times, and (2p − 1) + (p − 1)² = p². The same argument, with the extra +1 when n ≡ ±1, gives the counts 9 and 4 of the Pentametric cycle.</p>
+      <p class="note" style="margin-bottom:0">Period p² and the mirror Q<sub>p</sub>(p² − n) = Q<sub>p</sub>(n) follow from expanding (n + p²)² and (p² − n)².</p>
     </div>
     <div class="panel">
-      <h2 style="margin-top:0">Result</h2>
-      <dl class="readout" id="sum"></dl>
-      <div id="ivcard" style="margin-top:16px;padding:14px;border-radius:8px;border:1px solid var(--rule)"></div>
+      <h3 style="font-family:var(--serif);font-weight:500;margin-top:0">When is it a Pythagorean triple?</h3>
+      <p style="margin-top:0">The identity (2p − 1) + (p − 1)² = p² becomes a Pythagorean triple m² + (p − 1)² = p² exactly when 2p − 1 is a perfect square m², that is when p = (m² + 1)/2. The primes of this form begin</p>
+      <p class="formula" style="font-size:1.1rem">5 (3, 4, 5) · 13 (5, 12, 13) · 41 (9, 40, 41) · 61 (11, 60, 61) · 113 · 181 …</p>
+      <p class="note" style="margin-bottom:0">So the split 9 + 16 = 25 of the cycle is the first case of a family. Whether there are infinitely many such primes is not known: it is a special case of a famous open question, whether a quadratic polynomial takes infinitely many prime values.</p>
     </div>
-  </div>
-
-  <h2>Around n</h2>
-  <div class="panel scroll-x">
-    <svg id="strip" viewBox="0 0 1000 120" style="min-width:640px" role="img" aria-label="The values of H for the 25 numbers around n"></svg>
-    <p class="note">One full period of 25 around n; the pattern repeats every 25 and reads the same backwards around every multiple of 25.</p>
-  </div>
-
-  <h2>Which areas are perfect squares?</h2>
-  <div class="panel">
-    <div class="controls">
-      <label>search n from 1 to <input id="M" type="number" min="10" max="5000000" value="100000" style="width:11ch"></label>
-      <button id="search" class="primary">Search</button>
-    </div>
-    <div id="found" class="note">Proved in the paper: for n ≥ 1, P(n) is a perfect square exactly when n is a Lucas number.</div>
   </div>
 </main>
 
@@ -244,79 +258,67 @@ function el(parent, name, attrs, text) {
   if (text !== undefined) e.textContent = text;
   parent.appendChild(e); return e;
 }
-const big = (x) => x.toLocaleString("en-US");
-for (const k of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20]) {
-  const L = Number(Pent.L[k]), b = document.createElement("button");
-  b.textContent = big(L); b.title = `L${k}`; b.onclick = () => { $("n").value = L; update(); };
-  $("chips").appendChild(b);
+const PR = []; for (let k = 3; k < 70; k++) if ([...Array(k).keys()].slice(2).every((d) => k % d)) PR.push(k);
+const mod = (a, m) => ((a % m) + m) % m;
+function powmod(b, e, m) { let r = 1; b = mod(b, m); while (e > 0) { if (e & 1) r = (r * b) % m; b = (b * b) % m; e >>= 1; } return r; }
+const legp = (n, p) => (mod(n, p) === 0 ? 0 : powmod(n, (p - 1) / 2, p) === 1 ? 1 : -1);
+const works = (p, c) => { for (let n = 0; n < p; n++) if (mod(n * n + c * legp(n, p), p) !== 0) return n; return -1; };
+
+// ---- part 1 ----
+for (const p of PR.filter((q) => q <= 47)) { const o = document.createElement("option"); o.value = p; o.textContent = p; if (p === 5) o.selected = true; $("p1").appendChild(o); }
+function part1() {
+  const p = +$("p1").value, c = Math.round(+$("c1").value || 0), bad = works(p, c);
+  $("res1").innerHTML = bad < 0
+    ? `<span class="ok">Whole numbers for every n.</span> For p = ${p}, c = ${c}: (n² ${c >= 0 ? "+" : "−"} ${Math.abs(c)}·(n/${p}))/${p}.`
+    : `Fails at n = ${bad}: (${bad * bad} ${legp(bad, p) * c >= 0 ? "+" : "−"} ${Math.abs(legp(bad, p) * c)})/${p} = ${((bad * bad + c * legp(bad, p)) / p).toFixed(3)} is not a whole number.`;
 }
+(function map() {
+  const svg = $("map1"), rows = PR.filter((q) => q <= 47), cell = 12, lw = 30, W = 47;
+  svg.setAttribute("viewBox", `0 0 ${lw + W * cell + 4} ${rows.length * cell + 20}`);
+  svg.style.minWidth = "520px";
+  rows.forEach((p, i) => {
+    el(svg, "text", { x: lw - 6, y: i * cell + 10, "text-anchor": "end", "font-size": 10, fill: "var(--muted)" }, p);
+    for (let c = 0; c < p; c++) el(svg, "rect", { x: lw + c * cell, y: i * cell, width: cell - 1.5, height: cell - 1.5, fill: works(p, c) < 0 ? "var(--accent2)" : "var(--c0)", opacity: works(p, c) < 0 ? 1 : 0.5 });
+  });
+  el(svg, "text", { x: lw, y: rows.length * cell + 14, "font-size": 10, fill: "var(--muted)" }, "c = 0, 1, 2, … →");
+})();
+$("p1").addEventListener("input", part1); $("c1").addEventListener("input", part1); part1();
 
-function update() {
-  let n = Math.round(+$("n").value);
-  if (!Number.isFinite(n) || n < 0) n = 0;
-  if (n > 1e7) n = 1e7;
-  const sq = n * n, m = (4 * sq) % 10, Cm = Pent.C(m), Pn = (sq + 4 * Cm) / 5, two = 2 * Pn, d = two % 10, H = d / 2;
-  const iv = Pent.INTERVALS[H];
-  const rows = [
-    ["1", "residue", "m = 4n² mod 10", `4 · ${big(sq)} mod 10 = ${m}`],
-    ["2", "Interval Map", "C(m) = (26m − 5m²)/24", `(${26 * m} − ${5 * m * m})/24 = ${Pent.fmt(Cm)}`],
-    ["3", "Pentametric area", "P(n) = (n² + 4C(m))/5", `(${big(sq)} ${Cm < 0 ? "−" : "+"} ${Math.abs(4 * Cm)})/5 = ${big(Pn)}`],
-    ["4", "doubling (octave)", "2P(n)", big(two)],
-    ["5", "last digit", "2P(n) mod 10", String(d)],
-    ["6", "halved digit", "H = (2P(n) mod 10)/2", String(H)],
-    ["7", "ratio", "H : (H − 1), with 1 ↦ 1:1", iv.ratio ? `${iv.ratio} (${iv.name})` : "— (silence)"],
-  ];
-  $("chain").innerHTML = "<tr><th>step</th><th>name</th><th>operation</th><th class=num>value</th></tr>" +
-    rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td></tr>`).join("");
-
-  const chi = Pent.leg(n), k = Pent.lucasIndex(n), isSq = Pent.isSquare(Pn);
-  const s = [
-    ["n mod 5", String(n % 5)],
-    ["(n/5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
-    ["closed form", `(n² + 4(n/5))/5 = ${big(Pn)}`],
-    ["n²/5", Pent.fmt(sq / 5, 1)],
-    ["perfect square?", isSq ? `<span class="ok">yes, ${big(Math.round(Math.sqrt(Pn)))}²</span>` : "no"],
-    ["Lucas number?", k >= 0 ? `<span class="ok">yes, n = L<sub>${k}</sub>, P(n) = F<sub>${k}</sub><sup>2</sup></span>` : "no"],
-  ];
-  $("sum").innerHTML = s.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
-  $("ivcard").style.background = iv.h ? `color-mix(in srgb, var(--c${iv.h}) 16%, transparent)` : "transparent";
-  $("ivcard").innerHTML = `<div class="note">interval at n = ${big(n)}</div>
-    <div style="font-family:var(--serif);font-size:1.8rem">${iv.ratio ? iv.name + " " + iv.ratio : "silence"}</div>
-    <div class="greek" style="font-size:1.3rem;color:var(--muted)">${iv.greek}</div>`;
-  drawStrip(n);
-}
-
-function drawStrip(n) {
-  const svg = $("strip"); svg.innerHTML = "";
-  const w = 1000 / 25;
-  for (let i = -12; i <= 12; i++) {
-    const m = n + i; const x = (i + 12) * w;
-    const h = Pent.H(m);
-    const g = el(svg, "g", { style: "cursor:pointer" });
-    g.addEventListener("click", () => { $("n").value = Math.abs(m); update(); });
-    el(g, "rect", { x: x + 2, y: 22, width: w - 4, height: 50, rx: 4, fill: `var(--c${h})`, stroke: i === 0 ? "var(--ink)" : "none", "stroke-width": 3 });
-    el(g, "text", { x: x + w / 2, y: 53, "text-anchor": "middle", "font-size": 15, fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff", style: "font-weight:600" }, h);
-    el(g, "text", { x: x + w / 2, y: 92, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, Pent.fmt(m).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-    if (m % 25 === 0) el(svg, "line", { x1: x + w / 2, y1: 8, x2: x + w / 2, y2: 20, stroke: "var(--ink)", "stroke-width": 2 });
+// ---- part 2 ----
+for (const p of PR) { const o = document.createElement("option"); o.value = p; o.textContent = p; if (p === 13) o.selected = true; $("p2").appendChild(o); }
+for (const p of [5, 13, 41, 61]) { const b = document.createElement("button"); b.textContent = `p = ${p}`; b.onclick = () => { $("p2").value = p; part2(); }; $("trip").appendChild(b); }
+const hue = (v, p) => (v === 0 ? "var(--c0)" : `hsl(${Math.round(360 * (v - 1) / (p - 1))} 55% 52%)`);
+function part2() {
+  const p = +$("p2").value, svg = $("grid2"), N = p * p;
+  const vals = Array.from({ length: N }, (_, n) => Math.floor(n * n / p) % p);
+  const cell = Math.max(4, Math.floor(520 / p)), lw = 26;
+  svg.setAttribute("viewBox", `0 0 ${lw + p * cell + 2} ${p * cell + 16}`);
+  svg.innerHTML = "";
+  for (let q = 0; q < p; q++) {
+    if (p <= 23 || q % 5 === 0) el(svg, "text", { x: lw - 4, y: q * cell + cell * 0.75, "text-anchor": "end", "font-size": Math.min(11, cell), fill: "var(--muted)" }, q);
+    for (let r = 0; r < p; r++) {
+      const n = q * p + r, v = vals[n];
+      const e = el(svg, "rect", { x: lw + r * cell, y: q * cell, width: cell - (cell > 8 ? 1 : 0), height: cell - (cell > 8 ? 1 : 0), fill: hue(v, p) });
+      el(e, "title", {}, `n = ${n}: ⌊n²/${p}⌋ mod ${p} = ${v}`);
+    }
   }
-  el(svg, "text", { x: 500, y: 114, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, "H(n) for the 25 numbers around n · ticks mark multiples of 25 (mirror axes)");
+  el(svg, "text", { x: lw, y: p * cell + 12, "font-size": 10, fill: "var(--muted)" }, "column r = n mod p →  ·  row q = ⌊n/p⌋ ↓");
+  const zeros = vals.filter((v) => v === 0).length, counts = new Set();
+  for (let v = 1; v < p; v++) counts.add(vals.filter((x) => x === v).length);
+  const mirror = vals.every((v, n) => v === vals[mod(N - n, N)]);
+  $("read2").innerHTML = [
+    ["period", `${N} = ${p}²`],
+    ["zeros", `${zeros} = 2·${p} − 1`],
+    ["each other value", [...counts].join(", ") + ` times = ${p} − 1`],
+    ["mirror Q(p² − n) = Q(n)", mirror ? '<span class="ok">yes</span>' : "no"],
+    ["count identity", `${zeros} + ${(p - 1) ** 2} = ${N}`],
+  ].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  const m = Math.round(Math.sqrt(2 * p - 1)), isT = m * m === 2 * p - 1;
+  $("triple").innerHTML = isT
+    ? `<span class="ok">A Pythagorean triple:</span> ${zeros} + ${(p - 1) ** 2} = ${N} is <strong>${m}² + ${p - 1}² = ${p}²</strong>.`
+    : `Not a triple: 2p − 1 = ${2 * p - 1} is not a perfect square.`;
 }
-
-$("search").addEventListener("click", () => {
-  const M = Math.min(5e6, Math.max(10, Math.round(+$("M").value)));
-  const hits = [];
-  for (let n = 1; n <= M; n++) if (Pent.isSquare(Pent.P(n))) hits.push(n);
-  const allLucas = hits.every((h) => Pent.lucasIndex(h) >= 0);
-  const lucas = [...new Set(Pent.L.map(Number))].filter((x) => x >= 1 && x <= M);
-  const everyLucas = lucas.every((x) => hits.includes(x));
-  $("found").innerHTML = `Found <strong>${hits.length}</strong> values of n ≤ ${big(M)} with P(n) a perfect square: ${hits.map(big).join(", ")}.<br>` +
-    (allLucas ? `<span class="ok">Every one is a Lucas number</span>` : "Not all are Lucas numbers") +
-    (everyLucas ? `, and all ${lucas.length} Lucas numbers up to ${big(M)} appear.` : ", but some Lucas numbers are missing.");
-});
-$("n").addEventListener("input", update);
-$("minus").onclick = () => { $("n").value = Math.max(0, +$("n").value - 1); update(); };
-$("plus").onclick = () => { $("n").value = +$("n").value + 1; update(); };
-update();
+$("p2").addEventListener("input", part2); part2();
 </script>
 </body>
 </html>
