@@ -17,7 +17,7 @@ The *Pentametric Formula*
 
 $$\mathfrak{P}(n)=\frac{n^{2}+4\,C(m)}{5},\qquad m=4n^{2}\bmod 10,\qquad C(m)=\frac{26m-5m^{2}}{24}$$
 
-always produces an integer. It is equivalent to $(n^{2}+4\cdot(n/5))/5$, where $(n/5)$ is the Legendre symbol modulo 5, and it can be reached by a whole family of ten equivalent forms: digits, floors, a quintic, cosines, golden-ratio rotations and pentagonal angles.
+always produces an integer. It is equivalent to $\left(n^{2}+4\left(\frac{n}{5}\right)\right)/5$, where $\left(\frac{n}{5}\right)$ is the Legendre symbol modulo 5 (0 or ±1, not a fraction), and it can be reached by a whole family of ten equivalent forms: digits, floors, a quintic, cosines, golden-ratio rotations and pentagonal angles.
 
 **The cycle.** Doubling the area, taking the last digit and halving it gives a value $H(n)\in\{0,1,2,3,4\}$. The single rule $H:(H-1)$ turns $H$ into silence or one of the four Pythagorean consonances: unison 1:1, octave 2:1, fifth 3:2 and fourth 4:3. The resulting sequence repeats every 25 terms. Each period has 9 silences and 4 of each consonance, and the full 51-term palindrome mirrors at the Axis $n=25$.
 

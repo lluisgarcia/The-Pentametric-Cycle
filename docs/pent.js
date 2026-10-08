@@ -1,11 +1,11 @@
 // The Pentametric Cycle — shared mathematics
-// P(n) = (n^2 + 4 (n/5)) / 5, with (n/5) the Legendre symbol modulo 5.
+// P(n) = (n^2 + 4 (n | 5)) / 5, with (n | 5) the Legendre symbol modulo 5.
 "use strict";
 
 const Pent = (() => {
   const mod = (a, m) => ((a % m) + m) % m;
 
-  /** Legendre symbol (n/5): 0 if 5 | n, +1 if n = ±1 mod 5, -1 if n = ±2 mod 5. */
+  /** Legendre symbol (n | 5): 0 if 5 | n, +1 if n = ±1 mod 5, -1 if n = ±2 mod 5. */
   function leg(n) {
     const r = mod(n, 5);
     return r === 0 ? 0 : (r === 1 || r === 4) ? 1 : -1;
