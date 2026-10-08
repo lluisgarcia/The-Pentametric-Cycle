@@ -61,6 +61,11 @@
   <div class="grid2" style="margin-top:18px">
     <div class="panel">
       <div class="controls" style="margin-bottom:6px">
+        <label>wheel <select id="wmode">
+          <option value="full">the palindrome: n = 0–50 (50 places)</option>
+          <option value="inner">the inner palindrome: n = 1–24 (24 places)</option>
+          <option value="quarter">a quarter: n = 1–12 (12 places)</option></select></label>
+        <label id="swingL" class="hidden">play <select id="swing"><option value="swing">swing: 1→12, then back 12→1</option><option value="loop">loop: 1→12, 1→12 …</option></select></label>
         <label><input id="oVal" type="checkbox" checked> values in the ring</label>
         <label><input id="oPro" type="checkbox"> protractor</label>
         <label><input id="oHands" type="checkbox"> two hands</label>
@@ -83,7 +88,7 @@
       <svg id="wheel" viewBox="0 0 600 600" role="img" aria-label="The values of the palindrome arranged around a circle, with a protractor and two hands" style="touch-action:none;user-select:none;-webkit-user-select:none"></svg>
       <div class="note" id="handinfo" style="text-align:center;margin-top:4px"></div>
       <div class="legend" id="legend" style="justify-content:center;margin-top:6px"></div>
-      <p class="note" style="margin:8px 0 0">Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.</p>
+      <p class="note" id="wheelNote" style="margin:8px 0 0"></p>
     </div>
     <div class="panel">
       <div class="now" aria-live="polite">
@@ -141,56 +146,79 @@ const IV = Pent.INTERVALS;
 $("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("");
 
 // ---- wheel with values, protractor and two hands ----
+// Three wheels: the full palindrome (n = 0–50, where 50 lands on 0: 50 places), the inner palindrome
+// (n = 1–24: 24 places) and a quarter (n = 1–12: 12 places). Places are numbered i = 0 … W − 1, n = first + i.
+const MODES = {
+  full: { W: 50, first: 0, axes: [0, 25], lab: 5, A: 12, B: 38, title: ["Ὁ Πενταμετρικὸς", "Παλίνδρομος"], sub: "mirror axis through 0 = 50 and 25" },
+  inner: { W: 24, first: 1, axes: [11.5, 23.5], lab: 2, A: 11, B: 17, title: ["the inner", "palindrome"], sub: "mirror between 12 | 13 and 24 | 1" },
+  quarter: { W: 12, first: 1, axes: [11.5], lab: 1, A: 0, B: 6, title: ["a quarter", "of the palindrome"], sub: "swinging back plays n = 13 … 24" },
+};
+let M = MODES.full, W = 50, STEP = 7.2;
 const wheelSegs = [];
-const WCX = 300, WCY = 300, R1 = 158, R2 = 214, W = 50;
-const wang = (i) => -Math.PI / 2 + (i / W) * 2 * Math.PI;           // n = 0 = 50 at the top, clockwise
+const WCX = 300, WCY = 300, R1 = 158, R2 = 214;
+const wang = (i) => -Math.PI / 2 + (i / W) * 2 * Math.PI;           // place 0 at the top, clockwise
+const nAt = (i) => M.first + (((Math.round(i) % W) + W) % W);
+function posOf(n) {                                                  // the place on the wheel that shows step n
+  if ($("wmode").value === "full") return n % 50;
+  if ($("wmode").value === "inner") return n >= 1 && n <= 24 ? n - 1 : -1;
+  return n >= 1 && n <= 12 ? n - 1 : n >= 13 && n <= 24 ? 24 - n : -1;   // quarter: n = 13…24 is 12…1 swung back
+}
 let handA = 12, handB = 38, layers = {};
-(function drawWheel() {
-  const svg = $("wheel");
+const svgW = $("wheel");
+const toN = (e) => { const pt = svgW.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svgW.getScreenCTM().inverse());
+  let t = Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2; if (t < 0) t += 2 * Math.PI; return Math.round(t / (2 * Math.PI) * W) % W; };
+function buildWheel() {
+  M = MODES[$("wmode").value]; W = M.W; STEP = 360 / W; handA = M.A; handB = M.B;
+  const svg = svgW; svg.innerHTML = ""; wheelSegs.length = 0;
   layers.pro = el(svg, "g", {}); layers.ring = el(svg, "g", {}); layers.labels = el(svg, "g", {});
   layers.axis = el(svg, "g", {}); layers.centre = el(svg, "g", {}); layers.hands = el(svg, "g", {});
   layers.vals = el(svg, "g", { "pointer-events": "none" });   // numbers on top so the hands never hide them
-  const p = (r, a) => `${WCX + r * Math.cos(a)},${WCY + r * Math.sin(a)}`;
-  for (let n = 0; n < W; n++) {
-    const a0 = wang(n - 0.45), a1 = wang(n + 0.45);
+  const p = (r, a) => `${WCX + r * Math.cos(a)},${WCY + r * Math.sin(a)}`, gap = W > 30 ? 0.45 : 0.47;
+  const fs = W > 30 ? 13 : 16;
+  for (let i = 0; i < W; i++) {
+    const n = nAt(i), a0 = wang(i - gap), a1 = wang(i + gap);
     const d = `M ${p(R1, a0)} L ${p(R2, a0)} A ${R2} ${R2} 0 0 1 ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 0 ${p(R1, a0)} Z`;
     const seg = el(layers.ring, "path", { d, fill: `var(--c${Hs[n]})`, class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
-    seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); handA = n; drawHands(); });
+    seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); handA = i; drawHands(); });
     el(seg, "title", {}, `n = ${n}: H = ${Hs[n]}, ${IV[Hs[n]].name}`);
     wheelSegs.push(seg);
-    const rm = (R1 + R2) / 2, a = wang(n);
-    el(layers.vals, "text", { x: WCX + rm * Math.cos(a), y: WCY + rm * Math.sin(a) + 4.5, "text-anchor": "middle", "font-size": 13, "pointer-events": "none",
+    const rm = (R1 + R2) / 2, a = wang(i);
+    el(layers.vals, "text", { x: WCX + rm * Math.cos(a), y: WCY + rm * Math.sin(a) + fs * 0.35, "text-anchor": "middle", "font-size": fs, "pointer-events": "none",
       fill: Hs[n] === 0 || Hs[n] === 4 ? "#1f1f1f" : "#fff", stroke: `var(--c${Hs[n]})`, "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600" }, Hs[n]);
-    el(layers.labels, "text", { x: WCX + (R2 + 14) * Math.cos(a), y: WCY + (R2 + 14) * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": n % 5 === 0 ? 11 : 8.5,
-      fill: n % 5 === 0 ? "var(--ink)" : "var(--muted)" }, n === 0 ? "0=50" : n);
+    const big = W > 30 ? n % 5 === 0 : true;
+    el(layers.labels, "text", { x: WCX + (R2 + 14) * Math.cos(a), y: WCY + (R2 + 14) * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": big ? 11 : 8.5,
+      fill: big ? "var(--ink)" : "var(--muted)" }, W === 50 && n === 0 ? "0=50" : n);
   }
-  // protractor: a tick for every step (7.2°) and a label every 36°
+  // protractor: a tick for every place and labelled degrees
   el(layers.pro, "circle", { cx: WCX, cy: WCY, r: 244, fill: "none", stroke: "var(--rule)" });
   for (let i = 0; i < W; i++) {
-    const a = wang(i), long = i % 5 === 0;
+    const a = wang(i), long = i % M.lab === 0;
     el(layers.pro, "line", { x1: WCX + 244 * Math.cos(a), y1: WCY + 244 * Math.sin(a), x2: WCX + (long ? 256 : 250) * Math.cos(a), y2: WCY + (long ? 256 : 250) * Math.sin(a), stroke: "var(--muted)", "stroke-width": long ? 1.4 : 0.8 });
-    if (long) el(layers.pro, "text", { x: WCX + 271 * Math.cos(a), y: WCY + 271 * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, `${(i * 7.2).toFixed(0)}°`);
+    if (long) el(layers.pro, "text", { x: WCX + 271 * Math.cos(a), y: WCY + 271 * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, `${+(i * STEP).toFixed(1)}°`);
   }
-  for (const n of [0, 25]) {
-    const a = wang(n);
+  for (const q of M.axes) {
+    const a = wang(q);
     el(layers.axis, "line", { x1: WCX + (R1 - 30) * Math.cos(a), y1: WCY + (R1 - 30) * Math.sin(a), x2: WCX + (R2 + 4) * Math.cos(a), y2: WCY + (R2 + 4) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 4" });
   }
   el(layers.centre, "text", { x: WCX, y: WCY - 30, "text-anchor": "middle", "font-size": 13, fill: "var(--muted)" }, "H(n) = P(n) mod 5");
-  el(layers.centre, "text", { x: WCX, y: WCY - 6, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, "Ὁ Πενταμετρικὸς");
-  el(layers.centre, "text", { x: WCX, y: WCY + 18, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, "Παλίνδρομος");
-  el(layers.centre, "text", { x: WCX, y: WCY + 42, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, "mirror axis through 0 = 50 and 25");
-  // drag hand B
-  let drag = null;
-  const toN = (e) => { const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse());
-    let t = Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2; if (t < 0) t += 2 * Math.PI; return Math.round(t / (2 * Math.PI) * W) % W; };
-  svg.addEventListener("pointerdown", (e) => { if (e.target.dataset && e.target.dataset.knob) { drag = e.target.dataset.knob; svg.setPointerCapture(e.pointerId); e.preventDefault(); } });
-  svg.addEventListener("pointermove", (e) => { if (!drag) return; const n = toN(e);
-    if (drag === "A" && n !== handA) { handA = n; show(n); drawHands(); }
-    if (drag === "B" && n !== handB) { handB = n; drawHands(); } });
-  const stop = () => { drag = null; }; svg.addEventListener("pointerup", stop); svg.addEventListener("pointercancel", stop);
-  for (const id of ["oVal", "oPro", "oHands", "oMir", "oOpp", "oPoly"]) $(id).addEventListener("change", applyOptions);
+  el(layers.centre, "text", { x: WCX, y: WCY - 6, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, M.title[0]);
+  el(layers.centre, "text", { x: WCX, y: WCY + 18, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, M.title[1]);
+  el(layers.centre, "text", { x: WCX, y: WCY + 42, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, M.sub);
+  $("swingL").classList.toggle("hidden", W !== 12);
+  $("wheelNote").textContent = {
+    full: "Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.",
+    inner: "The 24 terms n = 1 … 24 read the same backwards: they mirror between the pair of fifths at 12 | 13 and across the join 24 | 1. Each place is 15°. Going round, the silence at n = 25 (and 0) is left out.",
+    quarter: "The 12 terms n = 1 … 12 are a quarter of the palindrome; they do not mirror on their own. Swinging back over them plays n = 13 … 24, because that half is the first half reversed: the swing is the inner palindrome. Each place is 30°.",
+  }[$("wmode").value];
   applyOptions();
-})();
+}
+svgW.addEventListener("pointerdown", (e) => { if (e.target.dataset && e.target.dataset.knob) { dragK = e.target.dataset.knob; svgW.setPointerCapture(e.pointerId); e.preventDefault(); } });
+let dragK = null;
+svgW.addEventListener("pointermove", (e) => { if (!dragK) return; const i = toN(e);
+  if (dragK === "A" && i !== handA) { handA = i; show(nAt(i)); drawHands(); }
+  if (dragK === "B" && i !== handB) { handB = i; drawHands(); } });
+const stopDrag = () => { dragK = null; }; svgW.addEventListener("pointerup", stopDrag); svgW.addEventListener("pointercancel", stopDrag);
+for (const id of ["oVal", "oPro", "oHands", "oMir", "oOpp", "oPoly"]) $(id).addEventListener("change", applyOptions);
 function applyOptions(e) {
   // mirror, opposite and shapes belong to the hands: their options only appear when the hands are on
   $("handOpts").hidden = !$("oHands").checked;
@@ -199,40 +227,37 @@ function applyOptions(e) {
   layers.centre.style.display = $("oHands").checked ? "none" : "";
   drawHands();
 }
+const SHAPES = { 120: "triangle", 90: "square", 72: "pentagon", 60: "hexagon", 45: "octagon", 36: "decagon", 30: "dodecagon" };
 function polyText(poly, th) {
-  const name = { 120: "triangle", 90: "square", 72: "pentagon", 60: "hexagon", 45: "octagon", 36: "decagon", 30: "dodecagon" }[th];
-  const fmt = (q) => { const w = ((q % W) + W) % W, d = (w * 7.2) % 360;
-    if (Math.abs(w - Math.round(w)) < 1e-9) { const n = Math.round(w) % W; return `${+d.toFixed(1)}° → n = ${n} (${Hs[n] ? IV[Hs[n]].ratio : "silence"})`; }
-    const lo = Math.floor(w), hi = (lo + 1) % W; return `${+d.toFixed(1)}° → between n = ${lo} and ${hi} (${Hs[lo] ? IV[Hs[lo]].ratio : "silence"} | ${Hs[hi] ? IV[Hs[hi]].ratio : "silence"})`; };
-  const exact = Number.isInteger(th / 7.2);
-  return `<strong style="color:var(--poly)">${name}</strong>, corners every ${th}°: ` + poly.slice(1).map(fmt).join(" · ") +
-    (exact ? "" : `<br><span class="note">${th}° is not a whole number of 7.2° steps, so some corners fall between two places on the wheel. Of these shapes only the pentagon (72° = 10 steps) and the decagon (36° = 5 steps) land exactly on the places.</span>`);
+  const fmt = (q) => { const w = ((q % W) + W) % W, d = (w * STEP) % 360;
+    if (Math.abs(w - Math.round(w)) < 1e-9) { const n = nAt(w); return `${+d.toFixed(1)}° → n = ${n} (${Hs[n] ? IV[Hs[n]].ratio : "silence"})`; }
+    const lo = Math.floor(w), a = nAt(lo), b = nAt(lo + 1); return `${+d.toFixed(1)}° → between n = ${a} and ${b} (${Hs[a] ? IV[Hs[a]].ratio : "silence"} | ${Hs[b] ? IV[Hs[b]].ratio : "silence"})`; };
+  const exact = Number.isInteger(+(th / STEP).toFixed(9)), fits = Object.entries(SHAPES).filter(([t]) => Number.isInteger(+(t / STEP).toFixed(9))).map(([, nm]) => nm).reverse();
+  return `<strong style="color:var(--poly)">${SHAPES[th]}</strong>, corners every ${th}°: ` + poly.slice(1).map(fmt).join(" · ") +
+    (exact ? "" : `<br><span class="note">${th}° is not a whole number of ${+STEP.toFixed(1)}° steps, so some corners fall between two places. On this wheel these shapes land exactly on the places: ${fits.join(", ")}.</span>`);
 }
 function drawHands() {
   const g = layers.hands; g.innerHTML = "";
   if (!$("oHands").checked) { $("handinfo").textContent = ""; return; }
-  const degOf = (n) => +(n * 7.2).toFixed(1);
-  const hand = (n, col, dash, knob) => {
-    const a = wang(n), r = 240, c = Math.cos(a), sn = Math.sin(a);
+  const degOf = (i) => +((((i % W) + W) % W) * STEP).toFixed(1);
+  const hand = (i, col, dash, knob) => {
+    const a = wang(i), r = 240, c = Math.cos(a), sn = Math.sin(a);
     el(g, "line", { x1: WCX, y1: WCY, x2: WCX + r * c, y2: WCY + r * sn, stroke: col, "stroke-width": knob ? 3 : 2.2, "stroke-linecap": "round", "stroke-dasharray": dash || "" });
     const k = el(g, "circle", { cx: WCX + r * c, cy: WCY + r * sn, r: knob ? 11 : 7, fill: col, stroke: "var(--panel)", "stroke-width": 2, style: knob ? "cursor:grab" : "" });
     if (knob) k.dataset.knob = knob;
-    // where the hand points on the 360° circle, written along the hand
     el(g, "text", { x: WCX + 118 * c, y: WCY + 118 * sn + 4, "text-anchor": "middle", "font-size": knob ? 12 : 10.5, fill: col,
-      stroke: "var(--panel)", "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600;pointer-events:none" }, `${degOf(n)}°`);
+      stroke: "var(--panel)", "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600;pointer-events:none" }, `${degOf(i)}°`);
   };
-  // the arc between the two hands, clockwise from A to B
-  const steps = ((handB - handA) % W + W) % W, deg = steps * 7.2;
+  const steps = ((handB - handA) % W + W) % W, deg = steps * STEP;
   if (steps) {
     const r = 70, a0 = wang(handA), a1 = wang(handB), large = deg > 180 ? 1 : 0;
     el(g, "path", { d: `M ${WCX + r * Math.cos(a0)} ${WCY + r * Math.sin(a0)} A ${r} ${r} 0 ${large} 1 ${WCX + r * Math.cos(a1)} ${WCY + r * Math.sin(a1)}`, fill: "none", stroke: "var(--accent2)", "stroke-width": 2 });
   }
-  const mirror = (W - handA) % W, opp = (handA + 25) % W;
-  // a regular shape with one corner on hand A; corners fall on a segment only when the angle is a multiple of 7.2°
+  const mirror = W === 50 ? (W - handA) % W : W - 1 - handA, opp = (handA + W / 2) % W;
   const th = +$("oPoly").value, poly = [];
   if (th) {
     const k = Math.round(360 / th);
-    for (let i = 0; i < k; i++) poly.push(handA + i * th / 7.2);
+    for (let i = 0; i < k; i++) poly.push(handA + i * th / STEP);
     const at = (pos, r) => { const a = wang(pos); return [WCX + r * Math.cos(a), WCY + r * Math.sin(a)]; };
     el(g, "polygon", { points: poly.map((q) => at(q, 150).join(",")).join(" "), fill: "var(--poly)", "fill-opacity": 0.08, stroke: "var(--poly)", "stroke-width": 1.8 });
     poly.slice(1).forEach((q) => { const [x, y] = at(q, 240);
@@ -245,11 +270,16 @@ function drawHands() {
   hand(handB, "var(--accent2)", "", "B");
   el(g, "circle", { cx: WCX, cy: WCY, r: 5, fill: "var(--ink)" });
   el(g, "text", { x: WCX, y: WCY + 28, "text-anchor": "middle", "font-size": 15, style: "font-weight:600", fill: "var(--accent2)" }, `${deg.toFixed(1)}°`);
-  const nm = (n) => `n = ${n} at ${degOf(n)}° (H = ${Hs[n]}, ${Hs[n] ? IV[Hs[n]].ratio : "silence"})`;
-  $("handinfo").innerHTML = `<strong>A</strong> ${nm(handA)} · <strong style="color:var(--accent2)">B</strong> ${nm(handB)}<br>angle A→B ${deg.toFixed(1)}° = ${steps} step${steps === 1 ? "" : "s"} of 7.2°` +
+  const nm = (i) => { const n = nAt(i); return `n = ${n} at ${degOf(i)}° (H = ${Hs[n]}, ${Hs[n] ? IV[Hs[n]].ratio : "silence"})`; };
+  const same = (i) => Hs[nAt(i)] === Hs[nAt(handA)];
+  const why = {
+    mir: { full: "because the sequence reads the same backwards", inner: "because n = 1 … 24 reads the same backwards", quarter: "n = 1 … 12 alone is not a palindrome" },
+    opp: { full: "because the cycle repeats every 25 steps (half the circle)", inner: "half of this wheel is 12 steps, not a period of the cycle", quarter: "half of this wheel is 6 steps, not a period of the cycle" },
+  }, md = $("wmode").value;
+  $("handinfo").innerHTML = `<strong>A</strong> ${nm(handA)} · <strong style="color:var(--accent2)">B</strong> ${nm(handB)}<br>angle A→B ${deg.toFixed(1)}° = ${steps} step${steps === 1 ? "" : "s"} of ${+STEP.toFixed(1)}°` +
     (steps ? ` (the other way ${(360 - deg).toFixed(1)}°)` : "") +
-    ($("oMir").checked ? `<br><strong style="color:var(--mir)">mirror</strong> of A: ${nm(mirror)}, the same value, because the sequence reads the same backwards` : "") +
-    ($("oOpp").checked ? `<br><strong style="color:var(--opp)">opposite</strong> of A: ${nm(opp)}, the same value, because the cycle repeats every 25 steps (half the circle)` : "") +
+    ($("oMir").checked ? `<br><strong style="color:var(--mir)">mirror</strong> of A: ${nm(mirror)}, ${same(mirror) ? "the same value" : "a different value"}: ${why.mir[md]}` : "") +
+    ($("oOpp").checked ? `<br><strong style="color:var(--opp)">opposite</strong> of A: ${nm(opp)}, ${same(opp) ? "the same value" : "a different value"}${md === "full" ? ", " : " here: "}${why.opp[md]}` : "") +
     (th ? "<br>" + polyText(poly, th) : "") +
     `<br><span class="note">Drag either knob to move a hand, or click a segment to move hand A.</span>`;
 }
@@ -281,9 +311,10 @@ const rollCols = [];
 // ---- display ----
 let shown = -1;
 function show(n) {
-  if (shown >= 0) { wheelSegs[shown % 50].setAttribute("stroke", "var(--panel)"); wheelSegs[shown % 50].setAttribute("stroke-width", 1); rollCols[shown].setAttribute("fill", "transparent"); }
+  wheelSegs.forEach((sg) => { sg.setAttribute("stroke", "var(--panel)"); sg.setAttribute("stroke-width", 1); });
+  if (shown >= 0) rollCols[shown].setAttribute("fill", "transparent");
   shown = n;
-  wheelSegs[n % 50].setAttribute("stroke", "var(--ink)"); wheelSegs[n % 50].setAttribute("stroke-width", 3);
+  const i = posOf(n); if (i >= 0 && wheelSegs[i]) { wheelSegs[i].setAttribute("stroke", "var(--ink)"); wheelSegs[i].setAttribute("stroke-width", 3); }
   rollCols[n].setAttribute("fill", "var(--fill)");
   const iv = IV[Hs[n]];
   $("pos").textContent = n;
@@ -330,7 +361,13 @@ function setDrone(on) {
 let timer = null, nextTime = 0, step = 0, queue = [], raf = 0;
 // One pass plays all 51 terms. When looping, the last silence (n = 50) is the first silence (n = 0) of the
 // next palindrome, so it is played only once: the loop repeats 50 steps.
-const order = () => { const len = $("loop").checked ? 50 : N; const seq = [...Array(len).keys()]; return $("retro").checked ? seq.map((i) => (50 - i)) : seq; };
+const order = () => {
+  const md = $("wmode").value; let seq;
+  if (md === "full") { const len = $("loop").checked ? 50 : N; seq = [...Array(len).keys()]; return $("retro").checked ? seq.map((i) => (50 - i)) : seq; }
+  if (md === "inner" || $("swing").value === "swing") seq = Array.from({ length: 24 }, (_, i) => i + 1);   // the swing 1→12→1 is n = 1 … 24
+  else seq = Array.from({ length: 12 }, (_, i) => i + 1);
+  return $("retro").checked ? seq.reverse() : seq;
+};
 function schedule() {
   const spb = 60 / +$("bpm").value, seq = order();
   while (nextTime < ctx.currentTime + 0.12) {
@@ -362,6 +399,8 @@ $("play").addEventListener("click", () => (timer ? stop() : start()));
 $("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").value));
 $("drone").addEventListener("change", () => { if (timer) setDrone($("drone").checked); });
 $("f0").addEventListener("change", () => { if (droneNodes) droneNodes.o.frequency.value = +$("f0").value / 2; });
+$("wmode").addEventListener("change", () => { if (timer) stop(); buildWheel(); show(nAt(handA)); });
+buildWheel();
 show(12);
 </script>
 <script src="menu.js"></script>
