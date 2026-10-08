@@ -101,6 +101,10 @@
       <label>up to <select id="nmax"><option>10</option><option>20</option><option selected>30</option><option>50</option><option>100</option><option value="custom">custom…</option></select></label>
       <label id="nmaxCL" class="hidden">n max <input id="nmaxC" type="number" min="1" max="3000" step="1" value="500" style="width:8ch"></label>
       <label>speed <input id="speed" type="range" min="1" max="12" value="3"><output id="spOut">3 steps/s</output></label>
+      <span id="fibCtl" class="hidden" style="display:contents">
+        <button id="jump" title="skip the steps in between">⏭ next Fibonacci square</button>
+        <label><input id="oSkip" type="checkbox"> only the Lucas steps</label>
+      </span>
     </div>
   </div>
 
@@ -227,8 +231,12 @@ function colourOf(g) {
 // "only the Fibonacci squares": the Lucas numbers n = L_k (k ≥ 1), where P(n) = F_k²; the growing Fibonacci spiral inside the Pentametric one
 const fibOnly = () => $("squares").value === "fib";
 const LUC_LIST = [...LUCAS].filter(([v, k]) => k >= 1).map(([v]) => v).sort((a, b) => a - b);
-const nextStep = (m) => (fibOnly() ? (LUC_LIST.find((v) => v > m) ?? m) : m + 1);
-const prevStep = (m) => (fibOnly() ? ([...LUC_LIST].reverse().find((v) => v < m) ?? 0) : m - 1);
+// In the Fibonacci view every step still sounds (the time between squares is real); "only the Lucas steps" skips it
+const nextLucas = (m) => LUC_LIST.find((v) => v > m) ?? m;
+const prevLucas = (m) => [...LUC_LIST].reverse().find((v) => v < m) ?? 0;
+const skipping = () => fibOnly() && $("oSkip").checked;
+const nextStep = (m) => (skipping() ? nextLucas(m) : m + 1);
+const prevStep = (m) => (skipping() ? prevLucas(m) : m - 1);
 // golden-spiral arcs (as in Holden's tiling): a quarter circle of radius F_k in each Fibonacci square, coordinates with O at the origin
 const ARC = (() => {
   const Fk = (k) => Number(Pent.F[k]), out = [];
@@ -321,6 +329,12 @@ function drawScene(cv, R, cx, cy, lensMode) {
     g2.globalAlpha = gold; g2.setLineDash([6 * dpr, 4 * dpr]); g2.lineWidth = lw * 1.2;
     [[1, 3, "--accent"], [3, -1, "--accent2"]].forEach(([a, b, c]) => { const m = Math.hypot(a, b), L = R * 3; g2.strokeStyle = css(c); g2.beginPath(); g2.moveTo(X(-a / m * L), Y(-b / m * L)); g2.lineTo(X(a / m * L), Y(b / m * L)); g2.stroke(); });
     g2.setLineDash([]); g2.globalAlpha = 1;
+  }
+  // Fibonacci view, between two squares: a small dot shows where the current step is (it is heard, not drawn)
+  if (fibOnly() && !lensMode && n > 0 && !(LUCAS.get(n) >= 1)) {
+    const g = place(n); g2.beginPath(); g2.arc(X(g.c.x), Y(g.c.y), dpr * 5, 0, 2 * Math.PI); g2.fillStyle = colourOf(g); g2.fill();
+    g2.strokeStyle = css("--ink"); g2.lineWidth = dpr * 1.2; g2.stroke();
+    g2.font = `600 ${11 * dpr}px ${css("--sans")}`; g2.fillStyle = css("--ink"); g2.textAlign = "left"; g2.fillText(`n = ${n}`, X(g.c.x) + 8 * dpr, Y(g.c.y) - 6 * dpr);
   }
   // the centre O, and in the magnifier the inner corner of the current square
   g2.beginPath(); g2.arc(X(0), Y(0), dpr * (lensMode ? 3.5 : 3.5), 0, 2 * Math.PI); g2.fillStyle = css("--ink"); g2.fill();
@@ -498,6 +512,8 @@ function readout() {
   if (shape !== "sq") rows.push(["area − circle through O", g.chi === 0 ? "0" : `${g.chi > 0 ? "+" : "−"}2π/5`]);
   if (view3 && $("axis").value !== "off") rows.push(["height", ($("axis").value === "t" ? `${f(height(n))} · time ${timeLabel(n)}` : f(height(n))) + (vmult() !== 1 ? ` (stretched ×${vmult()})` : "")]);
   if (view3 && hmult() !== 1) rows.push(["distance shown", `${f(g.d * hmult())} (stretched ×${hmult()})`]);
+  if (fibOnly() && n >= 1) { const nx = nextLucas(n), pv = LUCAS.get(n) >= 1 ? n : prevLucas(n);
+    rows.push(["next Fibonacci square", nx > n ? `n = ${nx}, in ${nx - n} step${nx - n === 1 ? "" : "s"} (the wait from n = ${pv} is ${nx - pv}, a Lucas number)` : "beyond the range"]); }
   if (LUCAS.has(n)) { const k = LUCAS.get(n); rows.push(["Lucas number", `L${toSub(k)}: P = F${toSub(k)}² = ${Number(Pent.F[k])}²`]);
   }
   if (n >= 1) { const b = between(n), sw = Pent.fmt(+(place(n).swing / DEG).toFixed(1));
@@ -531,6 +547,7 @@ function update(animate) {
   readout();
   if (view3) { build3(); }
   else { const t = fitExtent(Math.max(n, 3)); if (animate) animateExtent(t); else { cancelAnimationFrame(extentAnim); extent = extentTarget = t; draw2(); } }
+  if (fibOnly() && !view3) { $("hint").textContent = $("oSkip").checked ? "Only the Lucas steps: the Fibonacci squares one after another, without the time in between." : "Every step still sounds, but only the Fibonacci squares are drawn; the dot is the step in between. The wait between two squares is itself a Lucas number (2, 1, 3, 4, 7, 11, 18, 29 … steps), so it grows by about φ each time; at large n use ⏭ to jump to the next square."; return; }
   $("hint").textContent = (view3 ? "Drag to turn the view; scroll or pinch to zoom." : gold < 0.5 && n <= 3 ? "The magnifier shows the centre O: watch the corner of each new square pass beyond O (+0.8), stop short (−0.8) or land on it (0)." : "") + ($("hint").dataset.grid ? " " + $("hint").dataset.grid : "");
 }
 function go(m, animate = true, withSound = false) { const was = n; n = Math.max(0, Math.min(nmax, m)); update(animate); if (withSound && n !== was) sound(n); }
@@ -543,11 +560,13 @@ function stepDelay() {
 function pause() { clearTimeout(timer); timer = null; $("play").textContent = n >= nmax ? "▶ Play" : n ? "▶ Continue" : "▶ Play"; }
 function tick() { const nx = nextStep(n); if (n >= nmax || nx > nmax || nx === n) return pause(); go(nx, true, true); timer = setTimeout(tick, stepDelay()); }
 $("play").onclick = () => { if (timer) return pause(); if (n >= nmax || nextStep(n) > nmax) go(0, false); $("play").textContent = "❚❚ Pause"; tick(); };
-$("fwd").onclick = () => { pause(); go(nextStep(n), true, true); };
+$("fwd").onclick = () => { pause(); const nx = nextStep(n); if (nx > nmax || nx === n) return; go(nx, true, true); };
 $("back").onclick = () => { pause(); go(prevStep(n), true, true); };
-$("squares").addEventListener("change", () => { $("oArcsL").classList.toggle("hidden", !fibOnly() && false); update(false); });
-for (const id of ["oArcs"]) $(id).addEventListener("change", () => update(false));
-if (new URLSearchParams(location.search).get("view") === "fib") $("squares").value = "fib";     // the old "growing spiral" address lands here
+function fibUI() { $("fibCtl").classList.toggle("hidden", !fibOnly()); update(false); }
+$("squares").addEventListener("change", fibUI);
+$("jump").onclick = () => { pause(); const nx = nextLucas(n); if (nx > n && nx <= nmax) go(nx, true, true); };
+for (const id of ["oArcs", "oSkip"]) $(id).addEventListener("change", () => update(false));
+if (new URLSearchParams(location.search).get("view") === "fib") { $("squares").value = "fib"; fibUI(); }     // the old "growing spiral" address lands here
 $("reset").onclick = () => { pause(); userZoom = false; go(0, false); };
 $("nslider").addEventListener("input", () => { pause(); go(+$("nslider").value, false); });
 function setNmax() {
