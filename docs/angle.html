@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Angle of 0.8 · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<style>
+  .opp { color: var(--accent2); font-weight: 600; } .adj { color: var(--accent); font-weight: 600; } .hyp { color: var(--ok); font-weight: 600; }
+  .th { color: var(--c4); font-weight: 600; } .ph { color: var(--accent3); font-weight: 600; }
+  .vals { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px 10px; align-items: center; font-size: .95rem; }
+  .vals .h { color: var(--muted); font-size: .85rem; text-align: center; }
+  .vals .c { border: 1px solid var(--rule); border-radius: 8px; padding: 5px 8px; text-align: center; font-family: var(--mono); font-size: .9rem; }
+  .vals .c small { display: block; font-family: var(--sans); color: var(--muted); font-size: .78rem; }
+  .vals .c.lit { border-color: var(--c4); background: var(--fill); }
+  .big { font-family: var(--mono); font-size: 1.6rem; }
+  table.data td.yes { color: var(--ok); font-weight: 600; }
+  table.data tr.here td { background: var(--fill); }
+  table#tab th { text-transform: none; letter-spacing: 0; }
+  .fx { font-family: var(--serif); font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The angle of 0.8</h1>
+  <p class="lede">The correction in 𝔓(n) = n²/5 + 0.8·(n|5) is always +0.8, −0.8 or 0. Drawn as a slope, 0.8 is an angle: arctan(4/5) = 38.6598°, and twice that is 77.3196°. This page follows that angle: the triangle it makes, the three ways 4/5 can be read in a right triangle, and the family of angles it belongs to, which leads back to the floor cycles of other primes.</p>
+
+  <h2>1 · The ±0.8 triangle</h2>
+  <div class="grid2">
+    <div class="panel">
+      <svg id="fan" viewBox="0 0 540 330" role="img" aria-label="Triangle from O to (1, 0.8) and (1, −0.8)"></svg>
+    </div>
+    <div class="panel">
+      <div class="controls" style="margin-bottom:8px">
+        <label>n <input id="n" type="number" min="0" max="9999" value="1"></label>
+        <button id="nm">−1</button><button id="np">+1</button>
+      </div>
+      <dl class="readout" id="nread"></dl>
+      <p class="note">From O, one step to the right, then up 0.8 when (n|5) = +1 (n ends in 1, 4, 6, 9), down 0.8 when it is −1 (2, 3, 7, 8), and straight on when n is a multiple of 5. The correction itself is explained on <a href="defects.html">The ±0.8 correction</a>.</p>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:14px">
+    <p style="margin-top:0">The two outer points are 1.6 apart, the full span of the correction. Each half is a right triangle with legs 1 and 0.8, that is 5 and 4: the triangle <b>4-5-√41</b>, with the angle θ = arctan(4/5) at O. The whole triangle has apex angle 2θ = 77.3196°, with <span class="fx">tan 2θ = 40/9, sin 2θ = 40/41, cos 2θ = 9/41</span>, so doubling the angle gives the whole-number triangle <b>9-40-41</b>. Each long side is √1.64 = √41/5.</p>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">exact</span> All values above are exact (fractions and the double-angle formulas); the degrees are rounded to four places.</p>
+  </div>
+
+  <h2>2 · One triangle, many names</h2>
+  <p>A right triangle can be read from either acute corner. Drag <b>x</b>: the <span class="adj">blue</span> leg is 1, the <span class="opp">red</span> leg is x, the <span class="hyp">green</span> side is the hypotenuse. On the right the same triangle is flipped, so the red leg is now next to the angle. Colours follow the physical side, not the name sine, cosine or tangent.</p>
+  <div class="panel controls">
+    <label>x = tan θ <input id="xs" type="range" min="0.1" max="5" step="0.01" value="1.33"><output id="xo"></output></label>
+    <label>exact <select id="pre">
+      <option value="">—</option>
+      <option value="4/3" selected>4/3 (3-4-5)</option><option value="3/4">3/4 (4-3-5)</option>
+      <option value="4/5">4/5 (5-4-√41)</option><option value="1/2">1/2 (θ₂ of the paper)</option>
+      <option value="12/5">12/5 (5-12-13)</option><option value="40/9">40/9 (9-40-41)</option>
+    </select></label>
+    <span class="chips"><button id="hs" aria-pressed="true">sin θ = cos φ</button><button id="hc" aria-pressed="false">cos θ = sin φ</button><button id="hn" aria-pressed="false">no highlight</button></span>
+  </div>
+  <div class="grid2">
+    <div class="panel"><svg id="two" viewBox="0 0 780 360" role="img" aria-label="The same right triangle seen from both acute corners"></svg></div>
+    <div class="panel">
+      <div class="vals" id="vals"></div>
+      <p class="note">θ + φ = 90° for every x, so the sine of one is the cosine of the other, and their tangents are reciprocals.</p>
+    </div>
+  </div>
+
+  <h2>3 · 0.8, three ways</h2>
+  <div class="panel">
+    <svg id="three" viewBox="0 0 1000 330" role="img" aria-label="Three triangles in which a ratio equals 4/5"></svg>
+    <p style="margin-bottom:0">The same 4/5 is the <b>sine</b> of the larger angle of the 3-4-5 triangle, the <b>cosine</b> of its smaller angle, and the <b>tangent</b> of θ in the 4-5-√41 triangle of section 1. So sin(arctan 4/3) = cos(arctan 3/4) = tan(arctan 4/5) = 0.8. The 3-4-5 triangle is itself a doubled angle: 2·arctan(1/2) = arctan(4/3), and arctan(1/2) is the angle θ₂ of the paper's construction, so <span class="fx">sin 2θ₂ = 0.8</span>. Two different members of the same family (next section) give the same 0.8. With numbers this small, that is best read as a coincidence.</p>
+  </div>
+
+  <h2>4 · The family arctan(k/(k+1))</h2>
+  <p>arctan(1/2) is the first of a family: θ<sub>k</sub> = arctan(k/(k+1)). Our angle arctan(4/5) is k = 4. Two exact facts hold for every k:</p>
+  <ul>
+    <li><span class="fx">θ<sub>k</sub> + arctan(1/(2k+1)) = 45°</span>, because tan of the sum is (2k² + 2k + 1)/(2k² + 2k + 1) = 1.</li>
+    <li>Doubling θ<sub>k</sub> gives the whole-number triangle <span class="fx">(2k+1, 2k(k+1), p)</span> with p = k² + (k+1)²: 3-4-5, 5-12-13, 7-24-25, 9-40-41, 11-60-61, …</li>
+  </ul>
+  <div class="panel controls">
+    <label>k <input id="k" type="range" min="1" max="100" step="1" value="4" style="width:260px"><output id="ko"></output></label>
+    <span class="note" id="kinfo"></span>
+  </div>
+  <p class="note">θ<sub>k</sub> never reaches 45°: the gap is always arctan(1/(2k+1)), which shrinks as k grows but is never zero. In the same way 2θ<sub>k</sub> creeps towards 90° and the doubled triangle gets thinner and thinner, without ever becoming a line. The slider goes to k = 100, where the gap is 0.2851°.</p>
+  <div class="panel"><svg id="fam" viewBox="0 0 920 330" role="img" aria-label="The angle arctan(k/(k+1)), its complement to 45°, and the doubled triangle"></svg></div>
+
+  <h3 style="font-family:var(--serif);font-weight:500;font-size:1.25rem;margin:22px 0 6px">The link to the floor cycles of other primes</h3>
+  <p>On <a href="primes.html">Other primes</a> and <a href="cycle13.html">The 13-cycle as music</a>, the sequence ⌊n²/p⌋ mod p has period p². For a prime p, every non-zero value occurs p − 1 times per period and 0 occurs 2p − 1 times, so</p>
+  <p class="formula">(2p − 1) + (p − 1)² = p².</p>
+  <p>This is a Pythagorean triple exactly when 2p − 1 is a perfect square, and 2p − 1 = (2k+1)² means p = k² + (k+1)². So the primes whose silences form a square are exactly the hypotenuses of the doubled triangles of this family, and the triple of the counts is the doubled triangle itself: for k = 1, 9 silences and 16 = 4² for the rest give 3-4-5; for our k = 4, p = 41, 81 silences and 40² give 9-40-41, the triangle of the ±0.8 apex. When p = k² + (k+1)² is not prime (25, 85, 145, …) the even counts break. The table counts every period in your browser: choose how far it goes, and click a row to draw that triangle above.</p>
+  <div class="panel controls">
+    <label>rows up to k = <input id="kmax" type="number" min="1" max="30" value="10"></label>
+    <span class="note" id="tabinfo"></span>
+  </div>
+  <div class="panel scroll-x"><table class="data" id="tab"></table></div>
+  <p class="note"><span class="tag proved">proved</span> the 45° identity, the doubled triple and the step from the counts to p = k² + (k+1)² are short algebra. <span class="tag">computed</span> the counts in the table, for the rows shown (up to k = 30, p = 1861). The uniform counts for every prime are shown on Other primes.</p>
+
+  <h2>5 · And in the geometry?</h2>
+  <div class="panel">
+    <p style="margin-top:0">We looked for the angle in the two pictures of the construction, and the honest answer is: <b>nowhere special</b>. See for yourself: choose a picture and a slope, and every segment between two marked points (centres, corners and O) that makes that angle is drawn in gold. With <i>custom</i> you can choose any number of squares, not only multiples of 5 (up to 300 around the pentagon, 40 in the tiling, where the squares grow so fast that the small ones vanish).</p>
+    <div class="controls">
+      <label>picture <select id="gpic"><option value="pent" selected>The Pentametric spiral</option><option value="tile">Golden-rectangle tiling</option></select></label>
+      <label>slope <select id="gsl"><option value="4/5" selected>4/5 (38.66°)</option><option value="3/4">3/4 (36.87°)</option><option value="1/2">1/2 (26.57°)</option><option value="2/3">2/3 (33.69°)</option><option value="1/3">1/3 (18.43°)</option><option value="3/5">3/5 (30.96°)</option></select></label>
+      <label>squares up to <select id="gN"></select></label>
+      <label id="gCl" class="hidden">custom <input id="gC" type="number" min="1" step="1"> <span class="note" id="gCn"></span></label>
+      <label><input id="gall" type="checkbox" checked> show all squares</label>
+    </div>
+    <div class="grid2">
+      <div><svg id="geo" viewBox="0 0 600 600" role="img" aria-label="Segments with the chosen slope in the chosen picture"></svg></div>
+      <div>
+        <dl class="readout" id="gread"></dl>
+        <p class="note" id="gnote"></p>
+        <div class="legend" style="margin-top:8px">
+          <span><i class="sw" style="background:var(--c4)"></i>segment with the chosen slope</span>
+          <span><i class="sw" style="border:2px solid var(--accent3)"></i>silent square (n a multiple of 5)</span>
+          <span><i class="sw" style="border:1px solid var(--muted)"></i>other square</span>
+        </div>
+      </div>
+    </div>
+    <ul style="margin-bottom:0">
+      <li><b>Golden-rectangle tiling</b> (all corners up to square 40): two segments have slope 4/5, from the corner of squares 1|2 to the corner of 5|8 (length √41) and from 3|4 to 6|9 (length 2√41), and none further out. Slope 3/4 also has exactly two, while the Fibonacci slopes 1/2, 2/3, 3/5, 5/8, … have 36 to 41 each.</li>
+      <li><b>The Pentametric spiral</b> (squares 1 to 60 around the pentagon): fourteen segments make the angle with a spoke or with the line across it, for example from the centre of square 5 to the side corners of square 25 (ratio 20/25). All of them lie on the silent ray. From the centre of square 5, the side corners of square 5(k+1) are seen at exactly θ<sub>k</sub> = arctan(k/(k+1)) from the line across the spoke (they are 5k steps of √0.1 further along it and 5(k+1) steps to the side), so the whole family of section 4 appears there, but so do other slopes. A multiple of 5 has 𝔓(n) = n²/5 exactly, so its square has its inner corner at O, and along that ray every rational slope appears; 1/2 and 1/3 appear even more often.</li>
+    </ul>
+  </div>
+  <p class="note">The 0.8 lives in the arithmetic, not in the pictures: in the correction, in the doubled angle of the paper's θ₂, and in the family of triangles whose primes give square silences.</p>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const DEG = 180 / Math.PI;
+const f1 = (v) => (+v).toFixed(1);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const COL = () => ({ opp: css("--accent2"), adj: css("--accent"), hyp: css("--ok"), th: css("--c4"), ph: css("--accent3"), ink: css("--ink"), muted: css("--muted"), rule: css("--rule"), fill: css("--fill"), c0: css("--c0") });
+function T(x, y, txt, fill, size, anchor, extra) { return `<text x="${f1(x)}" y="${f1(y)}" fill="${fill}" font-size="${size || 16}" text-anchor="${anchor || "middle"}" dominant-baseline="central" ${extra || ""}>${txt}</text>`; }
+function LN(x1, y1, x2, y2, c, w, extra) { return `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra || ""}/>`; }
+// arc around (cx, cy) between math angles t0 < t1 (counter-clockwise, y up on screen)
+function ARC(cx, cy, r, t0, t1, c, w, extra) {
+  const x0 = cx + r * Math.cos(t0), y0 = cy - r * Math.sin(t0), x1 = cx + r * Math.cos(t1), y1 = cy - r * Math.sin(t1);
+  return `<path d="M${f1(x0)},${f1(y0)} A${r},${r} 0 ${t1 - t0 > Math.PI ? 1 : 0} 0 ${f1(x1)},${f1(y1)}" fill="none" stroke="${c}" stroke-width="${w}" ${extra || ""}/>`;
+}
+function RA(x, y, dx1, dy1, dx2, dy2, s, c) { return `<path d="M${f1(x + dx1 * s)},${f1(y + dy1 * s)} L${f1(x + dx1 * s + dx2 * s)},${f1(y + dy1 * s + dy2 * s)} L${f1(x + dx2 * s)},${f1(y + dy2 * s)}" fill="none" stroke="${c}" stroke-width="1.5"/>`; }
+const sqrtTxt = (n) => { const r = Math.round(Math.sqrt(n)); return r * r === n ? String(r) : `√${n}`; };
+
+// ---------- 1 · the ±0.8 triangle ----------
+function drawFan() {
+  const C = COL(), n = Math.max(0, Math.floor(+$("n").value || 0)), chi = Pent.leg(n);
+  const O = { x: 60, y: 165 }, s = 180, top = { x: O.x + s, y: O.y - 0.8 * s }, bot = { x: O.x + s, y: O.y + 0.8 * s }, mid = { x: O.x + s, y: O.y };
+  const th = Math.atan(0.8);
+  let h = "";
+  h += LN(O.x - 20, O.y, O.x + s + 150, O.y, C.rule, 1.5, 'stroke-dasharray="5 5"');
+  h += `<polygon points="${O.x},${O.y} ${top.x},${top.y} ${bot.x},${bot.y}" fill="${C.fill}" opacity=".7"/>`;
+  h += LN(O.x, O.y, top.x, top.y, C.hyp, 3) + LN(O.x, O.y, bot.x, bot.y, C.hyp, 3);
+  h += LN(top.x, top.y, bot.x, bot.y, C.opp, 3);
+  h += LN(O.x, O.y, mid.x, mid.y, C.adj, 3);
+  h += RA(mid.x, mid.y, -1, 0, 0, -1, 10, C.muted);
+  h += ARC(O.x, O.y, 56, 0, th, C.th, 3) + ARC(O.x, O.y, 46, -th, 0, C.th, 3);
+  h += T(O.x + 78, O.y - 24, "θ", C.th, 17) + T(O.x + 68, O.y + 20, "θ", C.th, 17);
+  h += ARC(O.x, O.y, 30, -th, th, C.ph, 2, 'stroke-dasharray="3 3"');
+  h += T(O.x - 52, O.y + 74, "2θ = 77.32°", C.ph, 14, "start");
+  h += T(O.x - 10, O.y + 3, "O", C.ink, 15, "end");
+  h += T((O.x + mid.x) / 2, O.y + 14, "1", C.adj, 16);
+  h += T(top.x + 12, (top.y + O.y) / 2, "+0.8", C.opp, 16, "start") + T(bot.x + 12, (bot.y + O.y) / 2, "−0.8", C.opp, 16, "start");
+  h += T(top.x + 70, O.y - 14, "span 1.6", C.opp, 14, "start");
+  h += T((O.x + top.x) / 2 - 18, (O.y + top.y) / 2 - 12, "√41/5", C.hyp, 15);
+  h += T(O.x + s + 60, O.y + 0.8 * s - 10, "θ = arctan(4/5) = 38.6598°", C.th, 15, "start");
+  // the lit point for n
+  const P = chi > 0 ? top : chi < 0 ? bot : mid, col = chi > 0 ? C.adj : chi < 0 ? C.opp : C.c0;
+  h += LN(O.x, O.y, P.x, P.y, C.ink, 1.5, 'stroke-dasharray="2 4"');
+  h += `<circle cx="${P.x}" cy="${P.y}" r="8" fill="${col}" stroke="${C.ink}" stroke-width="1.5"/>`;
+  $("fan").innerHTML = h;
+  const corr = chi > 0 ? "+0.8" : chi < 0 ? "−0.8" : "0";
+  const iv = ["silence", "unison", "octave", "fifth", "fourth"][Pent.H(n)];
+  $("nread").innerHTML = [["n", n], ["(n|5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"], ["n²/5", (n * n / 5).toFixed(1)], ["correction", corr], ["𝔓(n)", Pent.P(n)], ["slope from O", chi === 0 ? "0 (straight on)" : `${corr} → ${chi > 0 ? "+" : "−"}38.66°`], ["♪(n)", iv]]
+    .map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+}
+$("n").addEventListener("input", drawFan);
+$("nm").onclick = () => { $("n").value = Math.max(0, (+$("n").value || 0) - 1); drawFan(); };
+$("np").onclick = () => { $("n").value = (+$("n").value || 0) + 1; drawFan(); };
+
+// ---------- 2 · one triangle, many names ----------
+let hi = "sin", exact = [4, 3];   // exact = [opp, adj] when snapped
+function setX(x, ex) {
+  exact = ex || null;
+  $("xs").value = x; drawTwo();
+}
+function drawTwo() {
+  const C = COL(), x = +$("xs").value, H = Math.hypot(1, x), th = Math.atan(x), ph = Math.PI / 2 - th;
+  const sn = exact && Math.abs(exact[0] / exact[1] - x) < 1e-9;
+  if (!sn) { exact = null; $("pre").value = ""; }
+  const [p, q] = sn ? exact : [x, 1], r2 = sn ? p * p + q * q : 0;
+  const lOpp = sn ? String(p) : `x = ${x.toFixed(2)}`, lAdj = sn ? String(q) : "1", lHyp = sn ? sqrtTxt(r2) : `√(1+x²) = ${H.toFixed(3)}`;
+  const fr = (a, b) => (sn ? `${a}/${b}` : "");
+  $("xo").textContent = x.toFixed(2);
+  const L = 230, a = L * Math.cos(th), b = L * Math.sin(th), O1 = { x: 50, y: 310 }, O2 = { x: 440, y: 310 };
+  let s = "";
+  const glow = (x1, y1, x2, y2) => LN(x1, y1, x2, y2, C.th, 14, 'opacity=".28"');
+  const Q1 = { x: O1.x + a, y: O1.y }, R1 = { x: O1.x + a, y: O1.y - b }, Q2 = { x: O2.x + b, y: O2.y }, P2 = { x: O2.x + b, y: O2.y - a };
+  [O1, O2].forEach((O) => { s += ARC(O.x, O.y, L, 0, Math.PI / 2, C.rule, 1.5); });
+  if (hi !== "none") { s += glow(O1.x, O1.y, R1.x, R1.y) + glow(O2.x, O2.y, P2.x, P2.y); }
+  if (hi === "sin") { s += glow(Q1.x, Q1.y, R1.x, R1.y) + glow(O2.x, O2.y, Q2.x, Q2.y); }
+  if (hi === "cos") { s += glow(O1.x, O1.y, Q1.x, Q1.y) + glow(Q2.x, Q2.y, P2.x, P2.y); }
+  s += `<polygon points="${O1.x},${O1.y} ${Q1.x},${Q1.y} ${R1.x},${R1.y}" fill="${C.fill}" opacity=".6"/>`;
+  s += `<polygon points="${O2.x},${O2.y} ${Q2.x},${Q2.y} ${P2.x},${P2.y}" fill="${C.fill}" opacity=".6"/>`;
+  s += LN(O1.x, O1.y, Q1.x, Q1.y, C.adj, 4) + LN(Q1.x, Q1.y, R1.x, R1.y, C.opp, 4) + LN(O1.x, O1.y, R1.x, R1.y, C.hyp, 4);
+  s += LN(O2.x, O2.y, Q2.x, Q2.y, C.opp, 4) + LN(Q2.x, Q2.y, P2.x, P2.y, C.adj, 4) + LN(O2.x, O2.y, P2.x, P2.y, C.hyp, 4);
+  const ra = Math.max(4, Math.min(12, a * 0.3, b * 0.3));
+  s += RA(Q1.x, Q1.y, -1, 0, 0, -1, ra, C.muted) + RA(Q2.x, Q2.y, -1, 0, 0, -1, ra, C.muted);
+  s += ARC(O1.x, O1.y, 40, 0, th, C.th, 3) + T(O1.x + 62 * Math.cos(Math.max(th / 2, 0.2)), O1.y - 62 * Math.sin(Math.max(th / 2, 0.2)), "θ", C.th, 17);
+  s += ARC(R1.x, R1.y, 32, Math.PI + th, 1.5 * Math.PI, C.ph, 3);
+  const t1 = (Math.PI + th + 1.5 * Math.PI) / 2; s += T(R1.x + 50 * Math.cos(t1), R1.y - 50 * Math.sin(t1), "φ", C.ph, 17);
+  s += ARC(O2.x, O2.y, 40, 0, ph, C.ph, 3) + T(O2.x + 62 * Math.cos(Math.max(ph / 2, 0.2)), O2.y - 62 * Math.sin(Math.max(ph / 2, 0.2)), "φ", C.ph, 17);
+  s += ARC(P2.x, P2.y, 32, Math.PI + ph, 1.5 * Math.PI, C.th, 3);
+  const t2 = (Math.PI + ph + 1.5 * Math.PI) / 2; s += T(P2.x + 50 * Math.cos(t2), P2.y - 50 * Math.sin(t2), "θ", C.th, 17);
+  s += T((O1.x + Q1.x) / 2, O1.y + 20, lAdj, C.adj, 16) + T(Q1.x + 10, (Q1.y + R1.y) / 2, lOpp, C.opp, 16, "start");
+  s += T((O2.x + Q2.x) / 2, O2.y + 20, lOpp, C.opp, 16) + T(Q2.x + 10, (Q2.y + P2.y) / 2, lAdj, C.adj, 16, "start");
+  const hl = (O, ang) => { const mx = O.x + Math.cos(ang) * L / 2, my = O.y - Math.sin(ang) * L / 2, lx = mx - Math.sin(ang) * 16, ly = my - Math.cos(ang) * 16; return T(lx, ly, lHyp, C.hyp, 15, "middle", `transform="rotate(${(-ang * DEG).toFixed(2)} ${f1(lx)} ${f1(ly)})"`); };
+  s += hl(O1, th) + hl(O2, ph);
+  s += T(O1.x - 30, 20, `θ = arctan(x) = ${(th * DEG).toFixed(2)}°`, C.th, 15, "start");
+  s += T(O2.x - 30, 20, `φ = arctan(1/x) = ${(ph * DEG).toFixed(2)}°`, C.ph, 15, "start");
+  $("two").innerHTML = s;
+  const sv = x / H, cv = 1 / H;
+  const cell = (v, sub, f, on) => `<div class="c${on ? " lit" : ""}">${v.toFixed(4)}${f ? " = " + f : ""}<small>${sub}</small></div>`;
+  const hy = sn ? sqrtTxt(r2) : "";
+  $("vals").innerHTML = `<div></div><div class="h"><span class="th">θ</span> = ${(th * DEG).toFixed(4)}°</div><div class="h"><span class="ph">φ</span> = ${(ph * DEG).toFixed(4)}°</div>`
+    + `<div>sin</div>` + cell(sv, '<span class="opp">red</span> ÷ <span class="hyp">green</span>', fr(p, hy), hi === "sin") + cell(cv, '<span class="adj">blue</span> ÷ <span class="hyp">green</span>', fr(q, hy), hi === "cos")
+    + `<div>cos</div>` + cell(cv, '<span class="adj">blue</span> ÷ <span class="hyp">green</span>', fr(q, hy), hi === "cos") + cell(sv, '<span class="opp">red</span> ÷ <span class="hyp">green</span>', fr(p, hy), hi === "sin")
+    + `<div>tan</div>` + cell(x, '<span class="opp">red</span> ÷ <span class="adj">blue</span>', fr(p, q), false) + cell(1 / x, '<span class="adj">blue</span> ÷ <span class="opp">red</span>', fr(q, p), false);
+}
+$("xs").addEventListener("input", () => { exact = null; drawTwo(); });
+$("pre").addEventListener("change", () => { const v = $("pre").value; if (!v) return; const [p, q] = v.split("/").map(Number); setX(p / q, [p, q]); });
+[["hs", "sin"], ["hc", "cos"], ["hn", "none"]].forEach(([id, m]) => { $(id).onclick = () => { hi = m; ["hs", "hc", "hn"].forEach((j) => $(j).setAttribute("aria-pressed", j === id)); drawTwo(); }; });
+
+// ---------- 3 · 0.8 three ways ----------
+function drawThree() {
+  const C = COL(), u = 46; let s = "";
+  // tri(ox, oy, adj, opp, labels, angle at O, which two sides in gold, caption)
+  const tri = (ox, oy, adj, opp, lab, gold, cap1, cap2) => {
+    const Q = { x: ox + adj * u, y: oy }, R = { x: ox + adj * u, y: oy - opp * u }, th = Math.atan2(opp, adj);
+    let t = `<polygon points="${ox},${oy} ${Q.x},${Q.y} ${R.x},${R.y}" fill="${C.fill}" opacity=".6"/>`;
+    const g = (x1, y1, x2, y2) => LN(x1, y1, x2, y2, C.th, 14, 'opacity=".3"');
+    if (gold.includes("adj")) t += g(ox, oy, Q.x, Q.y);
+    if (gold.includes("opp")) t += g(Q.x, Q.y, R.x, R.y);
+    if (gold.includes("hyp")) t += g(ox, oy, R.x, R.y);
+    t += LN(ox, oy, Q.x, Q.y, C.adj, 4) + LN(Q.x, Q.y, R.x, R.y, C.opp, 4) + LN(ox, oy, R.x, R.y, C.hyp, 4);
+    t += RA(Q.x, Q.y, -1, 0, 0, -1, 10, C.muted);
+    t += ARC(ox, oy, 34, 0, th, C.th, 3);
+    t += T(ox + 52 * Math.cos(th / 2), oy - 52 * Math.sin(th / 2), "θ", C.th, 15);
+    t += T((ox + Q.x) / 2, oy + 18, lab[0], C.adj, 16) + T(Q.x + 10, (Q.y + R.y) / 2, lab[1], C.opp, 16, "start");
+    t += T((ox + R.x) / 2 - 14, (oy + R.y) / 2 - 10, lab[2], C.hyp, 16);
+    t += T(ox + adj * u / 2, oy + 50, cap1, C.ink, 17) + T(ox + adj * u / 2, oy + 74, cap2, C.muted, 14);
+    return t;
+  };
+  s += tri(30, 230, 3, 4, ["3", "4", "5"], ["opp", "hyp"], "sin θ = 4/5", "3-4-5, θ = arctan(4/3) = 2θ₂");
+  s += tri(360, 230, 4, 3, ["4", "3", "5"], ["adj", "hyp"], "cos θ = 4/5", "the same triangle, other corner");
+  s += tri(680, 230, 5, 4, ["5", "4", "√41"], ["opp", "adj"], "tan θ = 4/5", "4-5-√41, θ = arctan(4/5)");
+  $("three").innerHTML = s;
+}
+
+// ---------- 4 · the family ----------
+const isPrime = (n) => { if (n < 2) return false; for (let d = 2; d * d <= n; d++) if (n % d === 0) return false; return true; };
+function drawFam() {
+  const C = COL(), k = +$("k").value, p = k * k + (k + 1) ** 2, A = 2 * k + 1, B = 2 * k * (k + 1);
+  const th = Math.atan(k / (k + 1)), sm = Math.atan(1 / (2 * k + 1));
+  $("ko").textContent = k;
+  $("kinfo").innerHTML = `θ<sub>${k}</sub> = arctan(${k}/${k + 1}) = ${(th * DEG).toFixed(4)}° · + arctan(1/${A}) = ${(sm * DEG).toFixed(4)}° · sum ${((th + sm) * DEG).toFixed(10).replace(/0+$/, "").replace(/\.$/, "")}° · 2θ = ${(2 * th * DEG).toFixed(4)}°` + (k === 4 ? " · <b>the angle of 0.8</b>" : k === 1 ? " · <b>θ₂ of the paper</b>" : "");
+  let s = "";
+  // left: triangle k, k+1 with the 45° diagonal
+  const O = { x: 40, y: 290 }, sc = 250 / (k + 1), Q = { x: O.x + (k + 1) * sc, y: O.y }, R = { x: Q.x, y: O.y - k * sc }, D = { x: Q.x, y: O.y - (k + 1) * sc };
+  s += `<polygon points="${O.x},${O.y} ${Q.x},${Q.y} ${R.x},${R.y}" fill="${C.fill}" opacity=".6"/>`;
+  s += LN(O.x, O.y, D.x, D.y, C.muted, 1.5, 'stroke-dasharray="5 5"') + LN(R.x, R.y, D.x, D.y, C.muted, 1.5, 'stroke-dasharray="5 5"');
+  s += T(D.x + 8, D.y, "45°", C.muted, 14, "start");
+  s += LN(O.x, O.y, Q.x, Q.y, C.adj, 4) + LN(Q.x, Q.y, R.x, R.y, C.opp, 4) + LN(O.x, O.y, R.x, R.y, C.hyp, 4);
+  s += RA(Q.x, Q.y, -1, 0, 0, -1, 10, C.muted);
+  s += ARC(O.x, O.y, 60, 0, th, C.th, 3) + T(O.x + 82 * Math.cos(th / 2), O.y - 82 * Math.sin(th / 2), `θ${k === 4 ? " = 38.66°" : ""}`, C.th, 15, "start");
+  s += ARC(O.x, O.y, 120, th, Math.PI / 4, C.ph, 3) + T(O.x + 128 * Math.cos(Math.PI / 4 + 0.12), O.y - 128 * Math.sin(Math.PI / 4 + 0.12), `arctan(1/${A})`, C.ph, 14, "end");
+  s += T((O.x + Q.x) / 2, O.y + 18, String(k + 1), C.adj, 16) + T(Q.x + 10, (Q.y + R.y) / 2, String(k), C.opp, 16, "start");
+  s += T((O.x + R.x) / 2 - 16, (O.y + R.y) / 2 - 12, sqrtTxt(k * k + (k + 1) ** 2), C.hyp, 15);
+  // right: the doubled triangle (A, B, p)
+  const O2 = { x: 400, y: 290 }, sc2 = 260 / p, Q2 = { x: O2.x + A * sc2 * Math.max(1, 1), y: O2.y };
+  const hgt = B * sc2, wid = A * sc2, Qd = { x: O2.x + wid, y: O2.y }, Rd = { x: O2.x + wid, y: O2.y - hgt };
+  s += `<polygon points="${O2.x},${O2.y} ${Qd.x},${Qd.y} ${Rd.x},${Rd.y}" fill="${C.fill}" opacity=".6"/>`;
+  s += LN(O2.x, O2.y, Qd.x, Qd.y, C.adj, 4) + LN(Qd.x, Qd.y, Rd.x, Rd.y, C.opp, 4) + LN(O2.x, O2.y, Rd.x, Rd.y, C.hyp, 4);
+  s += RA(Qd.x, Qd.y, -1, 0, 0, -1, 8, C.muted);
+  s += ARC(O2.x, O2.y, 30, 0, 2 * th, C.th, 3) + T(O2.x + 44 * Math.cos(th), O2.y - 44 * Math.sin(th) - 4, "2θ", C.th, 14, "start");
+  s += T((O2.x + Qd.x) / 2, O2.y + 18, String(A), C.adj, 16) + T(Qd.x + 10, (Qd.y + Rd.y) / 2, String(B), C.opp, 16, "start");
+  s += T((O2.x + Rd.x) / 2 - 18, (O2.y + Rd.y) / 2, String(p), C.hyp, 16, "end");
+  const pr = isPrime(p), TX = 610;
+  s += T(TX, 70, `doubled: ${A}-${B}-${p}`, C.ink, 18, "start");
+  s += T(TX, 98, `${A}² + ${B}² = ${p}²`, C.muted, 15, "start");
+  s += T(TX, 126, `p = ${k}² + ${k + 1}² = ${p}, ${pr ? "prime" : "not prime"}`, pr ? css("--ok") : C.muted, 15, "start");
+  s += T(TX, 154, `2p − 1 = ${2 * p - 1} = ${A}²`, C.muted, 15, "start");
+  s += T(TX, 182, `tan 2θ = ${B}/${A}, sin 2θ = ${B}/${p}`, C.muted, 15, "start");
+  $("fam").innerHTML = s;
+  [...$("tab").querySelectorAll("tr[data-k]")].forEach((tr) => tr.classList.toggle("here", +tr.dataset.k === k));
+}
+$("k").addEventListener("input", drawFam);
+function buildTable() {
+  let h = '<thead><tr><th class="num">k</th><th class="num">θ<sub>k</sub></th><th class="num">2θ<sub>k</sub></th><th>doubled triangle</th><th class="num">p</th><th>prime</th><th class="num">zeros of ⌊n²/p⌋ mod p</th><th>= (2k+1)²</th><th>every other value p − 1 times</th></tr></thead><tbody>';
+  const K = Math.max(1, Math.min(30, Math.floor(+$("kmax").value || 10))), t0 = performance.now();
+  let good = 0, nprime = 0;
+  for (let k = 1; k <= K; k++) {
+    const p = k * k + (k + 1) ** 2, cnt = new Array(p).fill(0);
+    for (let n = 0; n < p * p; n++) cnt[Math.floor(n * n / p) % p]++;
+    const z = cnt[0], uni = cnt.slice(1).every((c) => c === p - 1), A = 2 * k + 1;
+    const th = Math.atan(k / (k + 1)) * DEG, pr = isPrime(p);
+    if (pr) { nprime++; if (z === A * A && uni) good++; }
+    h += `<tr data-k="${k}" style="cursor:pointer"><td class="num">${k}</td><td class="num">${th.toFixed(4)}°</td><td class="num">${(2 * th).toFixed(4)}°</td><td>${A}-${2 * k * (k + 1)}-${p}</td><td class="num">${p}</td><td class="${pr ? "yes" : ""}">${pr ? "yes" : "no"}</td><td class="num">${z}</td><td class="${z === A * A ? "yes" : ""}">${z === A * A ? "yes" : "no"}</td><td class="${uni ? "yes" : ""}">${uni ? "yes" : "no"}</td></tr>`;
+  }
+  $("tab").innerHTML = h + "</tbody>";
+  $("tabinfo").textContent = `${K} rows: ${nprime} primes p, and ${good} of them have (2k+1)² silences and every other value p − 1 times; counted in ${Math.round(performance.now() - t0)} ms`;
+  drawFam();
+}
+$("kmax").addEventListener("change", buildTable);
+$("tab").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-k]"); if (!tr) return; $("k").value = tr.dataset.k; drawFam(); $("fam").scrollIntoView({ behavior: "smooth", block: "center" }); });
+
+// ---------- 5 · the geometry ----------
+const FIB = [0, 1], LUC = [2, 1];
+for (let i = 2; i < 64; i++) { FIB.push(FIB[i - 1] + FIB[i - 2]); LUC.push(LUC[i - 1] + LUC[i - 2]); }
+function pentPoints(N) {         // the pentagon arrangement of the Pentametric spiral (y up)
+  const pts = [{ x: 0, y: 0, name: "O", n: 0 }], sq = [];
+  for (let n = 1; n <= N; n++) {
+    const a = 72 * n / DEG, u = { x: Math.sin(a), y: Math.cos(a) }, v = { x: u.y, y: -u.x };
+    const d = n * Math.sqrt(0.1), h = Math.sqrt(Pent.P(n) / 2), c = { x: u.x * d, y: u.y * d };
+    const cs = [[1, 0, "outer corner"], [0, 1, "side corner"], [-1, 0, "inner corner"], [0, -1, "side corner"]].map(([p, q, nm]) => ({ x: c.x + h * (p * u.x + q * v.x), y: c.y + h * (p * u.y + q * v.y), name: `${nm} of ${n}`, n }));
+    pts.push({ ...c, name: `centre of ${n}`, n }, ...cs);
+    sq.push({ n, poly: [cs[0], cs[1], cs[2], cs[3]], silent: n % 5 === 0 });
+  }
+  return { pts, sq, step: 18 };   // angles measured from the spokes and the lines across them: every multiple of 18°
+}
+function tilePoints(N) {         // the golden-rectangle tiling, Gardiner's coordinates, centres from Holden's formula
+  const pts = [], sq = [];
+  for (let k = 1; k <= N; k++) {
+    let r = { x: -0.1 * LUC[k], y: -0.3 * LUC[k] };
+    for (let t = 0; t < (k - 1) % 4; t++) r = { x: -r.y, y: r.x };
+    const c = { x: 0.1 + r.x, y: 0.3 + r.y }, h = FIB[k] / 2;
+    const cs = [[1, 1], [-1, 1], [-1, -1], [1, -1]].map(([p, q]) => ({ x: c.x + p * h, y: c.y + q * h, name: `corner of ${k}`, n: k }));
+    pts.push({ ...c, name: `centre of ${k}`, n: k }, ...cs);
+    sq.push({ n: k, poly: cs, silent: false });
+  }
+  return { pts, sq, step: 90 };   // angles measured from the axes
+}
+function mergePts(pts) {        // a point shared by several squares is listed once, with all its names
+  const out = [];
+  for (const p of pts) {
+    const q = out.find((o) => Math.abs(o.x - p.x) < 1e-9 && Math.abs(o.y - p.y) < 1e-9);
+    if (q) { if (!q.names.includes(p.name)) q.names.push(p.name); q.ns.push(p.n); } else out.push({ x: p.x, y: p.y, names: [p.name], ns: [p.n] });
+  }
+  return out;
+}
+const lastN = { pent: "25", tile: "10" }, custN = { pent: 100, tile: 20 }, MAXN = { pent: 300, tile: 40 };   // each picture keeps its own range
+function fillN() {
+  const pic = $("gpic").value, opts = pic === "pent" ? [10, 25, 30, 40, 50, 60] : [6, 8, 10, 12, 14];
+  $("gN").innerHTML = opts.map((v) => `<option value="${v}">${v}</option>`).join("") + '<option value="c">custom…</option>';
+  $("gN").value = lastN[pic];
+  $("gC").max = MAXN[pic]; $("gC").value = custN[pic];
+  $("gCn").textContent = `any whole number from 1 to ${MAXN[pic]}`;
+  $("gCl").classList.toggle("hidden", lastN[pic] !== "c");
+}
+function rangeN() {
+  const pic = $("gpic").value;
+  if ($("gN").value !== "c") return +$("gN").value;
+  const v = Math.max(1, Math.min(MAXN[pic], Math.floor(+$("gC").value || 1)));
+  $("gC").value = v; custN[pic] = v; return v;
+}
+function drawGeo() {
+  const C = COL(), pic = $("gpic").value, N = rangeN(), [a, b] = $("gsl").value.split("/").map(Number);
+  const G = pic === "pent" ? pentPoints(N) : tilePoints(N), P = mergePts(G.pts);
+  const r = Math.atan(a / b) * DEG % G.step, tol = 1e-7;
+  const hits = [];
+  for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+    const dx = P[j].x - P[i].x, dy = P[j].y - P[i].y; if (Math.hypot(dx, dy) < 1e-9) continue;
+    let ang = Math.atan2(dy, dx) * DEG % G.step; if (ang < 0) ang += G.step;
+    if (Math.min(Math.abs(ang - r), Math.abs(ang - (G.step - r))) < tol)
+      hits.push([P[i], P[j]]);
+  }
+  // view box from the drawn squares
+  let xs = [], ys = []; G.sq.forEach((q) => q.poly.forEach((p) => { xs.push(p.x); ys.push(p.y); }));
+  // the spiral is drawn with O fixed at the centre, so changing the range only zooms; the tiling is fitted to its squares
+  const R = Math.max(...xs.map(Math.abs), ...ys.map(Math.abs)), yTop = Math.max(...ys);
+  const [x0, x1, y0, y1] = pic === "pent" ? [-R, R, -R, R] : [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)], W = 600, pad = 24;
+  const sc = (W - 2 * pad) / Math.max(x1 - x0, y1 - y0), ox = pad + ((W - 2 * pad) - (x1 - x0) * sc) / 2, oy = pad + ((W - 2 * pad) - (y1 - y0) * sc) / 2;
+  const X = (x) => ox + (x - x0) * sc, Y = (y) => W - oy - (y - y0) * sc;
+  let s = "";
+  if (pic === "pent") {   // the five spokes, the silent one marked
+    for (let m = 0; m < 5; m++) { const ang = 72 * m / DEG, R = Math.max(x1 - x0, y1 - y0); s += LN(X(0), Y(0), X(R * Math.sin(ang)), Y(R * Math.cos(ang)), m === 0 ? C.ph : C.rule, m === 0 ? 2 : 1, 'stroke-dasharray="4 5"'); }
+    s += T(X(0) - 8, Y(yTop) + 4, "silent ray: n = 5, 10, 15, …", C.ph, 13, "end");
+  }
+  const show = $("gall").checked;
+  G.sq.forEach((q) => {
+    if (!show && !q.silent) return;
+    const pts = q.poly.map((p) => `${f1(X(p.x))},${f1(Y(p.y))}`).join(" ");
+    s += `<polygon points="${pts}" fill="${q.silent ? C.fill : "none"}" fill-opacity="${q.silent ? 0.35 : 0}" stroke="${q.silent ? C.ph : C.muted}" stroke-width="${q.silent ? 1.8 : 0.7}" opacity="${q.silent ? 1 : 0.55}"/>`;
+  });
+  const labStep = Math.max(1, Math.ceil(15 / (10 * Math.sqrt(0.1) * sc)));   // label every silent square only while the labels have room
+  G.sq.forEach((q) => { if ((show || q.silent) && (q.silent || pic === "tile" || q.n <= 10)) { const c = q.poly.reduce((m, p) => ({ x: m.x + p.x / 4, y: m.y + p.y / 4 }), { x: 0, y: 0 }); if (q.silent && pic === "pent") { if ((q.n / 5) % labStep === 0) s += T(X(q.poly[0].x) + 7, Y(q.poly[0].y) + 2, q.n, C.ph, 12, "start"); } else s += T(X(c.x), Y(c.y), q.n, C.muted, Math.max(9, Math.min(14, 6 + q.n / 3)), "middle"); } });
+  hits.forEach(([p, q]) => { s += LN(X(p.x), Y(p.y), X(q.x), Y(q.y), C.th, 2.5); s += `<circle cx="${f1(X(p.x))}" cy="${f1(Y(p.y))}" r="3" fill="${C.th}"/><circle cx="${f1(X(q.x))}" cy="${f1(Y(q.y))}" r="3" fill="${C.th}"/>`; });
+  const o = pic === "pent" ? { x: 0, y: 0 } : { x: 0.1, y: 0.3 };
+  s += `<circle cx="${f1(X(o.x))}" cy="${f1(Y(o.y))}" r="3.5" fill="${C.ink}"/>` + T(X(o.x) - 6, Y(o.y) + 10, pic === "pent" ? "O" : "P", C.ink, 13, "end");
+  $("geo").innerHTML = s;
+  const onSilent = (p) => p.ns.every((n) => n === 0 || n % 5 === 0);
+  const silentAll = pic === "pent" && hits.length > 0 && hits.every(([p, q]) => onSilent(p) && onSilent(q));
+  $("gread").innerHTML = [["segments", hits.length], ["points tested", P.length], ...(pic === "pent" ? [["all on the silent ray", hits.length ? (silentAll ? '<span class="ok">yes</span>' : "no") : "—"]] : [])].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  const list = hits.slice(0, 8).map(([p, q]) => `${p.names.join(" = ")} → ${q.names.join(" = ")}`).join("<br>");
+  $("gnote").innerHTML = (pic === "pent"
+    ? "In the pentagon picture the angle is measured from the five spokes and the lines across them (every multiple of 18°). A square whose n is a multiple of 5 has area n²/5 exactly, so its half-diagonal equals its distance n·√0.1 from O: its inner corner sits on O, and all the silent squares grow from that one point along one spoke. Measured along that spoke, their corners and centres are whole steps of √0.1, so every simple slope turns up there, each from a certain size on: 1/2 and 1/3 from square 10, 2/3 from 15, 3/4 and 3/5 from 20, 4/5 from 25. Seen from the centre of square 5, the side corners of squares 10, 15, 20, 25, … lie at exactly arctan(1/2), arctan(2/3), arctan(3/4), arctan(4/5), … from the line across the spoke: the whole family of section 4, one member per silent square, with the angle of 0.8 at square 25."
+    : "In the tiling the angle is measured from the axes, so slopes a/b and b/a are the same angle. The Fibonacci slopes (1/2, 2/3, 3/5, …) are built into the tiling and appear many times; the others appear only near the centre, or not at all.")
+    + (!hits.length ? `<br><br><b>No segment with this slope up to square ${N}.</b>${pic === "pent" ? " The first ones need a larger silent square: try a larger range." : ""}` : "")
+    + (hits.length ? `<br><br><b>Segments${hits.length > 8 ? " (first 8)" : ""}:</b><br>${list}` : "");
+}
+["gpic"].forEach((id) => $(id).addEventListener("change", () => { fillN(); drawGeo(); }));
+["gsl", "gall"].forEach((id) => $(id).addEventListener("change", drawGeo));
+$("gN").addEventListener("change", () => { lastN[$("gpic").value] = $("gN").value; $("gCl").classList.toggle("hidden", $("gN").value !== "c"); drawGeo(); });
+$("gC").addEventListener("change", drawGeo);
+fillN();
+
+function all() { drawFan(); drawTwo(); drawThree(); drawFam(); drawGeo(); }
+buildTable(); all();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
