@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chord Progressions · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<style>
+  .row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+  .row + .row { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--rule); }
+  #rowPlay { border-top: 2px solid var(--accent2) !important; }
+  .hidden { display: none !important; }
+  #chart { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; }
+  .cell { border: 1px solid var(--rule); border-radius: 8px; padding: 6px 6px 5px; background: var(--panel); min-height: 74px; position: relative; cursor: pointer; }
+  .cell .nn { font-size: .72rem; color: var(--muted); font-family: var(--mono); }
+  .cell .ch { font-family: var(--serif); font-size: 1.25rem; line-height: 1.15; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cell .rn { font-size: .8rem; color: var(--muted); }
+  .cell .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; border-radius: 0 0 8px 8px; }
+  .cell.rest .ch { color: var(--muted); }
+  .cell.acc { box-shadow: inset 0 3px 0 var(--accent2); }
+  .cell.now { outline: 2px solid var(--ink); outline-offset: 1px; background: var(--fill); }
+  .cell.hold .ch { color: var(--muted); font-style: italic; font-size: 1rem; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind p">⤓ Use it · make something and download it</span>
+  <h1>Chord progressions</h1>
+  <p class="lede">Let the cycle write the harmony. Each step n moves the root of the chord by its interval: a fifth goes up a fifth, a fourth up a fourth, the unison and the octave stay, and silence rests. With the Pentametric cycle this gives only three chords, I, IV and V, and the root comes home after every period. Play it, then download it as MIDI with smooth voice leading, a bass line and, in flamenco style, palmas.</p>
+
+  <div class="panel">
+    <div class="row">
+      <label>cycle <select id="mode"><option value="5">Pentametric: I, IV, V</option><option value="13">13-cycle (exploratory)</option></select></label>
+      <label>key <select id="key"></select></label>
+      <label>scale <select id="scale">
+        <option value="major">major</option><option value="minor">natural minor</option><option value="harm">harmonic minor</option>
+        <option value="dorian">dorian</option><option value="mixo">mixolydian</option></select></label>
+      <label>chords <select id="size"><option value="3">triads</option><option value="4" selected>sevenths</option><option value="5">power chords</option></select></label>
+      <label><input id="flam" type="checkbox"> flamenco</label>
+      <label id="flamRL" class="hidden">rhythm <select id="flamR"><option value="rumba">rumba (4/4)</option><option value="compas">compás de 12 (soleá, bulerías)</option></select></label>
+    </div>
+    <div class="row">
+      <label>length <select id="len"></select></label>
+      <label id="lenCL" class="hidden">steps <input id="lenC" type="number" min="1" max="2000" step="1" value="8" style="width:7ch"></label>
+      <label title="where in the palindrome (n = 0–50) the window begins">start at n = <input id="start" type="number" min="0" step="1" value="1" style="width:7ch"></label>
+      <label>silence <select id="sil"><option value="rest">rests</option><option value="hold" selected>holds the chord</option><option value="drone">keeps a drone on the tonic</option></select></label>
+      <label id="beatsL">beats per chord <select id="beats"><option>1</option><option selected>2</option><option>4</option></select></label>
+      <label>voicing <select id="voicing"><option value="smooth">smooth voice leading</option><option value="root">root position blocks</option></select></label>
+      <label><input id="bass" type="checkbox" checked> bass line</label>
+    </div>
+    <div class="row" id="rowPlay">
+      <button id="play" class="primary">▶ Play</button>
+      <label><input id="loop" type="checkbox"> loop</label>
+      <label>tempo <input id="bpm" type="range" min="40" max="220" value="96"><output id="bpmOut">96</output></label>
+      <button id="midi">⤓ MIDI</button>
+      <button id="txt">⤓ Chord chart (.txt)</button>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="panel">
+      <div id="chart" aria-label="The chord progression, one cell per step"></div>
+      <p class="note" id="chartNote" style="margin-bottom:0"></p>
+    </div>
+    <div class="panel">
+      <div class="note" style="font-family:var(--sans)">now</div>
+      <div id="nowCh" style="font-family:var(--serif);font-size:2.2rem;line-height:1.1">—</div>
+      <div id="nowRn" class="note" style="font-size:1rem"></div>
+      <dl class="readout" id="read" style="margin-top:12px"></dl>
+    </div>
+  </div>
+
+  <h2>How the chords are made</h2>
+  <div class="panel">
+    <p style="margin-top:0">The cycle gives intervals, not chords, so a rule turns one into the other. Here the rule moves the <em>root</em>: H(n) = 3 (the fifth, 3:2) moves it up a fifth, H(n) = 4 (the fourth, 4:3) up a fourth, H(n) = 1 and 2 (unison and octave) leave it where it is, and H(n) = 0 is a rest. On each root the page builds the chord of the chosen scale, and the voicing moves each voice to the nearest note of the next chord.</p>
+    <p>Starting from the tonic, fifths and fourths alone can only reach the fourth and fifth degrees, so the Pentametric cycle plays I, IV and V and nothing else: the harmony of the blues, folk and early rock, produced by the formula without being chosen. Each period of 25 holds four fifths and four fourths, and a fifth plus a fourth is an octave, so the root is back home after every period (the musical face of “the consonances multiply to 2⁸”).</p>
+    <p><strong>Flamenco.</strong> The box switches to the Spanish minor (in A by default): i and iv from the natural minor and a major V, so the same rule gives Am, Dm and E (Am7, Dm7 and E7 with a minor ninth when sevenths are on). That is the backbone of a lot of rumba flamenca. Choose <em>rumba</em> for a 4/4 strum with palmas on 2 and 4, or <em>compás de 12</em> for one step per beat with palmas accenting 3, 6, 8, 10 and 12, as in soleá and bulerías. A period has 24 transitions, exactly two compases of 12; this is a numerical coincidence, recorded as such. Between the blues and flamenco there is a structural resemblance: a 12-bar blues is three 4-bar phrases, and heard one bar to a beat it becomes a 12-beat cycle like the compás, with its phrases grouped differently (4 + 4 + 4 against 3 + 3 + 2 + 2 + 2), like the same language spoken with two accents. Choose 12 steps with 4 beats per chord for a 12-bar form, then switch flamenco on to hear it as compás. The classic flamenco cadence Am–G–F–E steps downwards and does not come from the formula.</p>
+    <p class="note" style="margin-bottom:0"><strong>13-cycle (exploratory).</strong> Uses ⌊n²/13⌋ mod 13 with the same rule H : (H − 1), so the root can move by every ratio from 2:1 to 12:11, each rounded to the nearest semitone (5:4 → 4, 6:5 and 7:6 → 3, 8:7 to 12:11 → 2). It visits all twelve roots and also comes home after each period of 169. Roots outside the scale get a major chord (a dominant seventh with sevenths on). Chords sound in equal temperament, so they can be played on any instrument.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const SHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+const FLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+const KEYS = ["C", "C♯/D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+KEYS.forEach((k, i) => { const o = document.createElement("option"); o.value = i; o.textContent = k; $("key").appendChild(o); });
+const SCALES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10], harm: [0, 2, 3, 5, 7, 8, 11], dorian: [0, 2, 3, 5, 7, 9, 10], mixo: [0, 2, 4, 5, 7, 9, 10] };
+const ROMAN = ["I", "♭II", "II", "♭III", "III", "IV", "♯IV", "V", "♭VI", "VI", "♭VII", "VII"];
+
+// ---- the cycle ----
+const val = (mode, n) => (mode === 5 ? Pent.H(n) : Math.floor(n * n / 13) % 13);
+const ratioOf = (v) => (v === 0 ? "silence" : v === 1 ? "1:1" : `${v}:${v - 1}`);
+const INAME = { 0: "silence", 1: "unison", 2: "octave", 3: "fifth", 4: "fourth" };
+// root motion in semitones: up by the interval v:(v−1), rounded to the nearest semitone; unison and octave stay
+const move = (v) => (v <= 2 ? 0 : Math.round(12 * Math.log2(v / (v - 1))));
+
+function lengths(mode) {
+  const custom = ["cus", "custom…", Math.max(1, Math.min(2000, Math.round(+$("lenC").value || 8)))];
+  return mode === 5
+    ? [["s3", "3 steps (loops on the 4th)", 3], ["s4", "4 steps (loops on the 5th)", 4], ["s12", "12 steps (half the palindrome)", 12], ["p1", "one period (25 steps)", 25], ["pal", "the palindrome (n = 0–50)", 51], ["p2", "two periods (50 steps)", 50], custom]
+    : [["s3", "3 steps (loops on the 4th)", 3], ["s4", "4 steps (loops on the 5th)", 4], ["s12", "12 steps", 12], ["s48", "48 steps", 48], ["p1", "one period (169 steps)", 169], custom];
+}
+function fillLengths() {
+  const mode = +$("mode").value, keep = $("len").value;
+  $("len").innerHTML = lengths(mode).map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+  $("len").value = [...$("len").options].some((o) => o.value === keep) ? keep : "p1";
+  $("lenCL").classList.toggle("hidden", $("len").value !== "cus");
+}
+
+// ---- chords ----
+// flamenco: natural minor for i and iv, with the raised seventh only on the V (E7 in A): the Spanish minor
+function scaleOf() { return SCALES[$("flam").checked ? "minor" : $("scale").value]; }
+function useFlats(tonic) {
+  const minorish = $("flam").checked || ["minor", "harm", "dorian"].includes($("scale").value);
+  return [1, 3, 5, 8, 10].includes(tonic) || (minorish && [0, 2, 5, 7].includes(tonic)) || (!minorish && tonic === 5);
+}
+// pitch classes (relative to the tonic) and name of the chord on root r
+function chordOn(r) {
+  const S = scaleOf(), size = +$("size").value, idx = S.indexOf(r), fl = $("flam").checked;
+  let rel;                                          // intervals above the root
+  if (size === 5) rel = [0, 7, 12];
+  else if (idx >= 0) {
+    const deg = (k) => { const j = idx + k; return S[j % 7] + 12 * Math.floor(j / 7) - S[idx]; };
+    rel = size === 3 ? [0, deg(2), deg(4)] : [0, deg(2), deg(4), deg(6)];
+  } else rel = size === 3 ? [0, 4, 7] : [0, 4, 7, 10];   // outside the scale: major (dominant seventh)
+  if (fl && r === 7 && size !== 5) rel = size === 3 ? [0, 4, 7] : [0, 4, 7, 10, 13];   // flamenco: major V, V7(♭9) with sevenths
+  const q = rel.slice(1).join(",");
+  const SUF = { "4,7": "", "3,7": "m", "3,6": "dim", "4,8": "+", "4,7,11": "maj7", "4,7,10": "7", "3,7,10": "m7", "3,6,10": "m7♭5", "3,6,9": "dim7", "3,7,11": "m(maj7)", "4,8,11": "maj7♯5", "4,7,10,13": "7(♭9)", "7,12": "5" };
+  const suf = SUF[q] !== undefined ? SUF[q] : "";
+  const minor = rel[1] === 3, dim = q.startsWith("3,6"), aug = q.startsWith("4,8");
+  let rn = ROMAN[r]; if (size !== 5 && (minor || dim)) rn = rn.replace(/[IV]+/, (m) => m.toLowerCase());
+  if (dim) rn += "°"; if (aug) rn += "+";
+  if (q === "3,6,9") rn += "7";
+  if (size === 4 && !dim) rn += suf.includes("maj7") ? "maj7" : suf.includes("7") ? "7" : "";
+  if (size === 4 && q === "3,6,10") rn = rn.replace("°", "ø7");
+  if (q === "4,7,10,13") rn = rn.replace("7", "7♭9");
+  return { rel, suf, rn, inScale: idx >= 0 || size === 5 };
+}
+
+// ---- the progression ----
+function progression() {
+  const mode = +$("mode").value, tonic = +$("key").value, [, , L] = lengths(mode).find((x) => x[0] === $("len").value) || lengths(mode)[0];
+  const start = $("len").value === "pal" ? 0 : Math.max(0, Math.round(+$("start").value || 0));
+  const names = useFlats(tonic) ? FLAT : SHARP, steps = [];
+  let r = 0, last = null;
+  for (let i = 0; i < L; i++) {
+    const n = start + i, v = val(mode, n);
+    if (v === 0) { steps.push({ n, v, rest: true, prev: last }); continue; }
+    r = (r + move(v)) % 12;
+    const c = chordOn(r), pc = (tonic + r) % 12;
+    last = { n, v, r, pc, name: names[pc] + c.suf, rn: c.rn, rel: c.rel, inScale: c.inScale };
+    steps.push(last);
+  }
+  return { steps, mode, tonic, start, names };
+}
+
+// ---- voicing ----
+const RANGE = [55, 79];                             // G3 … G5
+function voice(pcs, prev, smooth) {
+  if (!smooth || !prev) {                           // root position: root between G3 and F♯4, the rest stacked above
+    let m = 55 + ((pcs[0] - 55) % 12 + 12) % 12; const out = [m];
+    for (const p of pcs.slice(1)) { m += ((p - m) % 12 + 12) % 12 || 12; out.push(m); }
+    return out;
+  }
+  const opts = pcs.map((p) => { const o = []; for (let m = RANGE[0]; m <= RANGE[1]; m++) if ((m - p) % 12 === 0) o.push(m); return o; });
+  let best = null, bestCost = Infinity;
+  const pick = (i, cur) => {
+    if (i === opts.length) {
+      const s = [...cur].sort((a, b) => a - b);
+      if (new Set(s).size < s.length) return;
+      let cost = 0;
+      const P = [...prev].sort((a, b) => a - b);
+      for (const m of s) cost += Math.min(...P.map((q) => Math.abs(q - m)));
+      for (const q of P) cost += 0.5 * Math.min(...s.map((m) => Math.abs(q - m)));
+      if (s[s.length - 1] - s[0] > 19) cost += 6;                   // keep the hand together
+      for (let k = 1; k < s.length; k++) if (s[k] - s[k - 1] === 1) cost += s.length > 4 ? 0.5 : 2.5;   // avoid semitone clusters between neighbours
+      cost += 0.05 * Math.abs((s[0] + s[s.length - 1]) / 2 - 66);   // stay near the middle
+      if (cost < bestCost) { bestCost = cost; best = s; }
+      return;
+    }
+    for (const m of opts[i]) { cur.push(m); pick(i + 1, cur); cur.pop(); }
+  };
+  pick(0, []);
+  return best;
+}
+
+// ---- events (in beats), shared by playback and MIDI ----
+function events() {
+  const P = progression(), fl = $("flam").checked, rhythm = fl ? $("flamR").value : "plain";
+  const beats = rhythm === "compas" ? 1 : +$("beats").value, smooth = $("voicing").value === "smooth", sil = $("sil").value;
+  const notes = [], claps = [], marks = [];
+  let prevV = null, prevBass = null;
+  const chordVoices = new Map();
+  P.steps.forEach((s) => {
+    if (s.rest) return;
+    const pcs = s.rel.map((x) => (P.tonic + s.r + x) % 12);
+    const vce = voice(pcs, prevV, smooth); chordVoices.set(s, vce); prevV = vce;
+  });
+  const bassOf = (pc) => { let m = 36 + pc; if (prevBass !== null) { while (m - prevBass > 6) m -= 12; while (prevBass - m > 6) m += 12; } while (m < 33) m += 12; while (m > 52) m -= 12; prevBass = m; return m; };
+  const strum = (t, vce, dur, vel, gap = 0.018) => vce.forEach((m, i) => notes.push({ t: t + i * gap, d: dur, m, vel: Math.round(vel * (i ? 0.92 : 1)), tr: "chords" }));
+  const total = P.steps.length * beats;
+  P.steps.forEach((s, i) => {
+    const t0 = i * beats;
+    marks.push({ t: t0, i });
+    let ch = s.rest ? (sil === "hold" ? s.prev : null) : s;
+    const vce = ch ? chordVoices.get(ch) : null;
+    if (s.rest && sil === "drone") notes.push({ t: t0, d: beats * 0.98, m: 36 + P.tonic + (36 + P.tonic < 33 ? 12 : 0), vel: 60, tr: "bass" });
+    if (!vce) return;
+    const isHold = s.rest;
+    if (rhythm === "compas") {
+      const beat = (i % 12) + 1, acc = [3, 6, 8, 10, 12].includes(beat);
+      strum(t0, vce, 0.9, (acc ? 96 : 66) * (isHold ? 0.75 : 1), 0.022);
+    } else if (rhythm === "rumba") {
+      // per bar of 8 eighths: down on 1, muted chop on 2, up on 2&, down on 3, chop on 4, up on 4&
+      const pat = [[0, 1, 0.45], [1, 0.55, 0.12], [1.5, 0.75, 0.3], [2, 0.95, 0.45], [3, 0.55, 0.12], [3.5, 0.75, 0.3]];
+      for (let bar = Math.floor(t0 / 4); bar * 4 < t0 + beats; bar++)
+        for (const [b, v, d] of pat) { const h = bar * 4 + b; if (h >= t0 && h < t0 + beats) strum(h, vce, d, Math.round(92 * v * (isHold ? 0.8 : 1)), 0.012); }
+    } else if (!isHold || sil === "hold") {
+      if (isHold) { const last = notes.filter((x) => x.tr === "chords").slice(-vce.length); last.forEach((x) => (x.d += beats)); }
+      else strum(t0, vce, beats * 0.96, 84, 0.006);
+    }
+    if ($("bass").checked && !isHold) { const pcRoot = (P.tonic + ch.r) % 12; notes.push({ t: t0, d: Math.min(beats, rhythm === "compas" ? 1 : beats) * 0.9, m: bassOf(pcRoot), vel: 88, tr: "bass" }); }
+  });
+  // palmas
+  if (rhythm === "compas") for (let b = 0; b < total; b++) { const beat = (b % 12) + 1; claps.push({ t: b, vel: [3, 6, 8, 10, 12].includes(beat) ? 110 : 55 }); }
+  if (rhythm === "rumba") for (let b = 0; b < total; b++) if (b % 2 === 1) claps.push({ t: b, vel: 100 });
+  return { P, notes, claps, marks, beats, total, rhythm };
+}
+
+// ---- chart ----
+let cells = [];
+function render() {
+  fillLengths();
+  const fl = $("flam").checked;
+  $("flamRL").classList.toggle("hidden", !fl); $("scale").disabled = fl;
+  $("beatsL").classList.toggle("hidden", fl && $("flamR").value === "compas");
+  $("start").disabled = $("len").value === "pal";
+  const E = events(), P = E.P;
+  cells = P.steps.map((s, i) => {
+    const d = document.createElement("div");
+    const acc = E.rhythm === "compas" && [3, 6, 8, 10, 12].includes((i % 12) + 1);
+    d.className = "cell" + (s.rest ? " rest" : "") + (acc ? " acc" : "");
+    const col = P.mode === 5 ? `var(--c${s.v})` : s.v ? `hsl(${Math.round(20 + 300 * s.v / 13)} 50% 55%)` : "var(--c0)";
+    const holdTxt = s.rest && $("sil").value === "hold" && s.prev ? `<span title="held">(${s.prev.name})</span>` : s.rest && $("sil").value === "drone" ? "drone" : "·";
+    d.innerHTML = `<div class="nn">n=${s.n} · ${P.mode === 5 ? s.v : ratioOf(s.v)}</div><div class="ch">${s.rest ? holdTxt : s.name}</div><div class="rn">${s.rest ? "rest" : s.rn}</div><div class="bar" style="background:${col}"></div>`;
+    if (s.rest && $("sil").value === "hold") d.classList.add("hold");
+    d.onclick = () => audition(i);
+    return d;
+  });
+  $("chart").replaceChildren(...cells);
+  // readout
+  const used = new Map(); P.steps.forEach((s) => { if (!s.rest) used.set(s.name, (used.get(s.name) || 0) + 1); });
+  let r = 0; P.steps.forEach((s) => { if (!s.rest) r = s.r; });
+  const vs = []; let prev = null; P.steps.forEach((s) => { if (!s.rest) { const pcs = s.rel.map((x) => (P.tonic + s.r + x) % 12); const v = voice(pcs, prev, $("voicing").value === "smooth"); if (prev) { const a = [...prev].sort((x, y) => x - y), b = [...v].sort((x, y) => x - y); let mv = 0; for (const m of b) mv += Math.min(...a.map((q) => Math.abs(q - m))); vs.push(mv / b.length); } prev = v; } });
+  const avg = vs.length ? vs.reduce((a, b) => a + b, 0) / vs.length : 0;
+  $("read").innerHTML = [
+    ["key", `${KEYS[P.tonic]} ${fl ? "Spanish minor" : $("scale").options[$("scale").selectedIndex].text}`],
+    ["steps", `${P.steps.length} (n = ${P.start} – ${P.start + P.steps.length - 1}), ${P.steps.filter((s) => s.rest).length} rests`],
+    ["chords used", [...used].sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k} ×${c}`).join(", ")],
+    ["root at the end", r === 0 ? "home (the tonic)" : `${ROMAN[r]}, ${r} semitones above the tonic`],
+    ["voice movement", `${avg.toFixed(2)} semitones per voice, on average`],
+    ["length", `${E.total} beats at ${$("bpm").value} bpm = ${fmtTime(E.total * 60 / +$("bpm").value)}`],
+  ].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  $("chartNote").textContent = E.rhythm === "compas" ? "One step per beat. The orange line marks the accented beats of the compás: 3, 6, 8, 10 and 12. Click a cell to hear it." : "Click a cell to hear its chord. Each cell shows n, its value in the cycle, the chord and its Roman numeral.";
+}
+const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+
+// ---- sound ----
+let ctx = null, master = null, noise = null;
+function ac() {
+  if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination);
+    const len = ctx.sampleRate * 0.2; noise = ctx.createBuffer(1, len, ctx.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; }
+  if (ctx.state === "suspended") ctx.resume();
+  return ctx;
+}
+const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+function playNote(t, m, d, vel, kind) {
+  const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter(), a = vel / 127;
+  const pluck = $("flam").checked && kind === "chords";
+  o.type = kind === "bass" ? "triangle" : pluck ? "sawtooth" : "triangle"; o.frequency.value = hz(m);
+  f.type = "lowpass"; f.frequency.setValueAtTime(pluck ? 3200 : 2400, t); if (pluck) f.frequency.exponentialRampToValueAtTime(700, t + Math.min(d, 0.6));
+  const peak = (kind === "bass" ? 0.32 : 0.14) * a;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.008);
+  if (pluck) g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.12, Math.min(d, 1.2)));
+  else { g.gain.setTargetAtTime(peak * 0.6, t + 0.02, 0.25); g.gain.setTargetAtTime(0.0001, t + d, 0.08); }
+  o.connect(f).connect(g).connect(master); o.start(t); o.stop(t + d + 0.5);
+}
+function clap(t, vel) {
+  for (const off of [0, 0.011, 0.023]) {
+    const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noise; f.type = "bandpass"; f.frequency.value = 1800; f.Q.value = 1.4;
+    g.gain.setValueAtTime(0, t + off); g.gain.linearRampToValueAtTime(0.5 * vel / 127, t + off + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.09);
+    s.connect(f).connect(g).connect(master); s.start(t + off); s.stop(t + off + 0.12);
+  }
+}
+let playing = null;
+function stop() { if (playing) { clearInterval(playing.timer); cancelAnimationFrame(playing.raf); } playing = null; $("play").textContent = "▶ Play"; cells.forEach((c) => c.classList.remove("now")); }
+function play() {
+  if (playing) return stop();
+  ac(); const E = events(), spb = 60 / +$("bpm").value, t0 = ctx.currentTime + 0.1;
+  const all = [...E.notes.map((x) => ({ ...x, k: "n" })), ...E.claps.map((x) => ({ ...x, k: "c" }))].sort((a, b) => a.t - b.t);
+  let ptr = 0;
+  playing = { t0, spb, E, timer: null, raf: 0, lit: -1 };
+  const pump = () => {
+    const horizon = ctx.currentTime + 0.35;
+    while (ptr < all.length && t0 + all[ptr].t * spb < horizon) { const x = all[ptr++]; if (x.k === "n") playNote(t0 + x.t * spb, x.m, x.d * spb, x.vel, x.tr); else clap(t0 + x.t * spb, x.vel); }
+    if (ptr >= all.length && ctx.currentTime > t0 + E.total * spb) { if ($("loop").checked) { stop(); play(); } else stop(); }
+  };
+  playing.timer = setInterval(pump, 60); pump();
+  const tick = () => {
+    if (!playing) return;
+    const b = (ctx.currentTime - t0) / spb, i = Math.floor(b / E.beats);
+    if (i !== playing.lit && i >= 0 && i < cells.length) { cells.forEach((c) => c.classList.remove("now")); cells[i].classList.add("now"); playing.lit = i; showNow(E.P.steps[i]);
+      const r = cells[i].getBoundingClientRect(); if (r.top < 0 || r.bottom > innerHeight) cells[i].scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+    playing.raf = requestAnimationFrame(tick);
+  };
+  playing.raf = requestAnimationFrame(tick);
+  $("play").textContent = "■ Stop";
+}
+function showNow(s) {
+  if (!s) return;
+  if (s.rest) { $("nowCh").textContent = $("sil").value === "hold" && s.prev ? `(${s.prev.name})` : "·"; $("nowRn").textContent = `n = ${s.n}: silence`; return; }
+  $("nowCh").textContent = s.name; $("nowRn").textContent = `${s.rn} · n = ${s.n}: ${+$("mode").value === 5 ? INAME[s.v] + " " + ratioOf(s.v) : ratioOf(s.v)}`;
+}
+function audition(i) {
+  ac(); const E = events(), s = E.P.steps[i], t = ctx.currentTime + 0.03; showNow(s);
+  const ch = s.rest ? ($("sil").value === "hold" ? s.prev : null) : s; if (!ch) return;
+  const pcs = ch.rel.map((x) => (E.P.tonic + ch.r + x) % 12), v = voice(pcs, null, false);
+  v.forEach((m, k) => playNote(t + k * 0.02, m, 1.2, 90, "chords"));
+  if ($("bass").checked) playNote(t, 36 + (E.P.tonic + ch.r) % 12, 1.2, 90, "bass");
+}
+
+// ---- MIDI: format 1, tracks for chords, bass and palmas ----
+function vlq(n) { const out = [n & 0x7f]; while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
+const txt = (s) => Array.from(new TextEncoder().encode(s));
+function trackBytes(ev) {
+  ev.sort((a, b) => a[0] - b[0] || ((a[1][0] & 0xf0) === 0x80 ? -1 : 1));
+  const out = []; let last = 0;
+  for (const [t, bytes] of ev) { out.push(...vlq(Math.max(0, t - last)), ...bytes); last = Math.max(last, t); }
+  out.push(0x00, 0xff, 0x2f, 0x00);
+  return [0x4d, 0x54, 0x72, 0x6b, (out.length >>> 24) & 255, (out.length >>> 16) & 255, (out.length >>> 8) & 255, out.length & 255, ...out];
+}
+function buildMidi() {
+  const E = events(), PPQ = 480, T = (b) => Math.round(b * PPQ), tempo = Math.round(60000000 / +$("bpm").value), fl = $("flam").checked;
+  const t0 = [[0, [0xff, 0x51, 0x03, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255]], [0, [0xff, 0x03, ...[txt("The Pentametric Cycle: chords")].map((a) => [a.length, ...a]).flat()]]];
+  if (E.rhythm === "compas") t0.push([0, [0xff, 0x58, 0x04, 12, 2, 24, 8]]); else t0.push([0, [0xff, 0x58, 0x04, 4, 2, 24, 8]]);
+  // chord names as markers
+  E.P.steps.forEach((s, i) => { if (!s.rest) { const a = txt(s.name); t0.push([T(i * E.beats), [0xff, 0x06, a.length, ...a]]); } });
+  const chan = (ch, name, prog, list) => {
+    const ev = [[0, [0xff, 0x03, ...[txt(name)].map((a) => [a.length, ...a]).flat()]], [0, [0xc0 | ch, prog]]];
+    for (const x of list) { ev.push([T(x.t), [0x90 | ch, x.m, Math.max(1, Math.min(127, x.vel))]]); ev.push([T(x.t + x.d), [0x80 | ch, x.m, 0]]); }
+    return trackBytes(ev);
+  };
+  const tracks = [trackBytes(t0),
+    chan(0, fl ? "Guitar" : "Chords", fl ? 24 : 0, E.notes.filter((x) => x.tr === "chords")),
+    chan(1, "Bass", 32, E.notes.filter((x) => x.tr === "bass"))];
+  if (E.claps.length) tracks.push(chan(9, "Palmas", 0, E.claps.map((c) => ({ t: c.t, d: 0.1, m: 39, vel: c.vel }))));
+  const head = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, (PPQ >> 8) & 255, PPQ & 255];
+  return new Uint8Array([...head, ...tracks.flat()]);
+}
+function download(blob, name) { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+const fileBase = () => { const P = progression(); return `pentametric_chords_${$("mode").value === "13" ? "13cycle_" : ""}${SHARP[P.tonic].replace("♯", "s")}${$("flam").checked ? "_flamenco_" + $("flamR").value : "_" + $("scale").value}`; };
+$("midi").onclick = () => download(new Blob([buildMidi()], { type: "audio/midi" }), fileBase() + ".mid");
+$("txt").onclick = () => {
+  const E = events(), P = E.P, per = E.rhythm === "compas" ? 12 : 4, lines = [];
+  lines.push("The Pentametric Cycle: chord progression", `Cycle: ${$("mode").options[$("mode").selectedIndex].text}`,
+    `Key: ${KEYS[P.tonic]} ${$("flam").checked ? "Spanish minor (flamenco, " + $("flamR").value + ")" : $("scale").options[$("scale").selectedIndex].text}`,
+    `Steps: n = ${P.start} to ${P.start + P.steps.length - 1}, ${E.beats} beat(s) per step, ${$("bpm").value} bpm`, "Rule: fifth = root up a fifth, fourth = up a fourth, unison/octave = same root, silence = rest", "");
+  for (let i = 0; i < P.steps.length; i += per) {
+    const row = P.steps.slice(i, i + per);
+    lines.push("| " + row.map((s) => (s.rest ? "·" : s.name).padEnd(9)).join("| ") + "|");
+    lines.push("  " + row.map((s) => (s.rest ? "" : s.rn).padEnd(9)).join("  ") + `   (n = ${row[0].n}–${row[row.length - 1].n})`);
+  }
+  lines.push("", "lluisgarcia.github.io/The-Pentametric-Cycle · doi:10.5281/zenodo.23183108");
+  download(new Blob([lines.join("\n")], { type: "text/plain" }), fileBase() + ".txt");
+};
+
+// ---- controls ----
+$("flam").addEventListener("change", () => { if ($("flam").checked) $("key").value = 9; stop(); render(); });
+$("len").addEventListener("change", () => { if (["s3", "s4"].includes($("len").value)) $("loop").checked = true; });
+for (const id of ["mode", "key", "scale", "size", "flamR", "len", "lenC", "start", "sil", "beats", "voicing", "bass"]) $(id).addEventListener("change", () => { stop(); render(); });
+$("bpm").addEventListener("input", () => { $("bpmOut").textContent = $("bpm").value; render(); });
+$("play").onclick = play;
+$("mode").addEventListener("change", () => { $("start").value = 1; render(); });
+fillLengths(); render();
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
