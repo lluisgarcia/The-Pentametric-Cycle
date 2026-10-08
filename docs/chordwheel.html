@@ -82,6 +82,7 @@
         <label><input id="oVal" type="checkbox" checked> values in the ring</label>
         <label><input id="oNote" type="checkbox" checked> notes</label>
         <label><input id="oPro" type="checkbox"> protractor</label>
+        <label id="winL">palindrome window <button id="scL" title="scroll back">◀</button> <span id="scTxt" style="font-family:var(--mono)"></span> <button id="scR" title="scroll on">▶</button> <button id="scO" title="jump to the next octave of the palindrome">⏭ octave</button> <button id="sc0" title="back to the start">↺</button></label>
         <label><input id="oHands" type="checkbox"> two hands</label>
         <span id="handOpts" hidden style="display:contents">
           <label><input id="oMir" type="checkbox"> mirror partner <i class="sw" style="background:var(--mir)"></i></label>
@@ -188,7 +189,8 @@ const WCX = 300, WCY = 300, R1 = 158, R2 = 214, RP = 110;
 let RN = 134;
 const wang = (i) => -Math.PI / 2 + ROT + LAY * ((i + OFF) / W) * 2 * Math.PI;
 const at = (i, r) => [WCX + r * Math.cos(wang(i)), WCY + r * Math.sin(wang(i))];
-let PL = [];            // the places: { n, h, b, j, pc, k } (pc = null: no note)
+let PL = [];
+let WIN = 0;            // the palindrome window: the wheel shows n = first + WIN … (round all 50); the places, octaves and stacked notes stay put            // the places: { n, h, b, j, pc, k } (pc = null: no note)
 const nAt = (i) => PL[mod(Math.round(i), W)].n;
 const VALq = (i) => PL[i].h;
 const nameOf = (h) => IV[h].name, colOf = (h) => `var(--c${h})`;
@@ -222,7 +224,7 @@ function layoutPlaces() {
   PL = [];
   let cur = t;                                       // the cycle's own root walk, along n
   for (let i = 0; i < W; i++) {
-    const n = M.first + i, h = Pent.H(n), s = slotOf(n), P = { n, h, b: s ? s.b : null, j: s ? s.j : null, pc: null, k: null, semi: null };
+    const n0 = M.first + i, n = mod(n0 + WIN, 50), h = Pent.H(n), s = slotOf(n0), P = { n, h, b: s ? s.b : null, j: s ? s.j : null, pc: null, k: null, semi: null };
     if (L === "walk") { if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); if (h !== 0 && s) { P.pc = cur; P.semi = mod(cur - t, 12); } }
     else if (s) {
       const lap = f ? 0 : s.b;                       // a pure layout goes on round its spiral, one comma per octave, unless folded
@@ -300,6 +302,8 @@ function fillVoices() {
 }
 function showVoiceCtl() { $("octL").classList.toggle("hidden", W === 12 || $("voice").value === "all" || $("mode").value === "free"); $("octLab").textContent = $("voice").value === "across" ? "from octave" : "octave"; }
 function buildWheel() {
+  if ($("layout").value !== "walk") WIN = 0;             // the window only matters for the cycle's own notes
+  $("winL").classList.toggle("hidden", $("layout").value !== "walk");
   M = MODES[$("wmode").value]; W = M.W; STEP = 360 / W; OFF = W === 50 ? 0 : 0.5; ROT = (+$("rot").value) * Math.PI / 180; LAY = +$("lay").value;
   RN = W === 12 ? 134 : 138;
   $("foldL").classList.toggle("hidden", W === 12);
@@ -342,9 +346,9 @@ function buildWheel() {
   }
   el(layers.pro, "circle", { cx: WCX, cy: WCY, r: RP, fill: "none", stroke: "var(--rule)", "stroke-dasharray": "2 4" });
   // the silences that are not places: n = 0 on the seam of the 12 wheel, n = 0 and 25 on the seam of the 24 wheel
-  if (W !== 50) { const a = wang(-0.5), t = +$("tr").value;
+  if (W !== 50 && (WIN === 0 || $("layout").value === "walk")) { const a = wang(-0.5), t = +$("tr").value;
     el(layers.labels, "line", { x1: WCX + (R1 - 6) * Math.cos(a), y1: WCY + (R1 - 6) * Math.sin(a), x2: WCX + (R2 + 6) * Math.cos(a), y2: WCY + (R2 + 6) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "3 3" });
-    const g0 = el(layers.labels, "g", {}), lab = $("layout").value === "walk" ? "0 = " + NOTE[t] : (W === 12 ? "0" : "0|25"), rr = $("layout").value === "walk" ? 20 : W === 12 ? 10 : 16, RB = W === 12 ? R2 + 15 : R2 + 32;
+    const g0 = el(layers.labels, "g", {}), lab = $("layout").value === "walk" ? (WIN ? "start = " : "0 = ") + NOTE[t] : (W === 12 ? "0" : "0|25"), rr = $("layout").value === "walk" ? (WIN ? 30 : 20) : W === 12 ? 10 : 16, RB = W === 12 ? R2 + 15 : R2 + 32;
     el(g0, "rect", { x: WCX + RB * Math.cos(a) - rr, y: WCY + RB * Math.sin(a) - 9, width: 2 * rr, height: 18, rx: 9, fill: "var(--c0)", stroke: "var(--ink)", "stroke-width": 1 });
     el(g0, "text", { x: WCX + RB * Math.cos(a), y: WCY + RB * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: "#1f1f1f", style: "font-weight:600" }, lab);
     el(g0, "title", {}, $("layout").value === "walk" ? `n = 0: the silence that starts the cycle; the walk starts here on ${NOTE[t]}` : W === 12 ? "n = 0: the silence that starts the cycle, between n = 12 and n = 1" : "n = 0 and n = 25: the two silences that frame the inner palindrome");
@@ -363,7 +367,7 @@ function buildWheel() {
     fourths: "Going round, each place is a fourth (5 semitones) above the one before: the circle of fifths read the other way.",
     chrom: "Going round, each place is a semitone above the one before: the twelve tones in order.",
     walk: "The notes the cycle makes itself (the rule of the <a href=\"chords.html\">Chord progressions</a> page): a fifth moves the root up a fifth, a fourth up a fourth, unison and octave keep it, a silence is a rest (·). Only three roots ever appear, the key, a fourth above and a fifth above; after each period of 25 the walk is home again.",
-  }[L] + " " + wheelTxt;
+  }[L] + " " + wheelTxt + (WIN ? ` <strong>Palindrome window moved by ${WIN}:</strong> the places now show n = ${PL[0].n}…${PL[W - 1].n}. ` + (L === "walk" ? "With the cycle's own notes the walk starts on the key at the beginning of the window, so this section of the palindrome makes its own notes." : "The notes stay on their places and the palindrome's values slide under them.") : (L === "walk" ? " Use the palindrome window ◀ ▶ ⏭ to walk another section of the cycle." : ""));
   if (isPure() && isKirn()) $("wheelNote").innerHTML += " <strong>Kirnberger fifth:</strong> each pure fifth narrowed by one schisma 32805/32768 (1.954¢). The schisma is exactly the square of √10/3 ÷ 256/243, the gap between the <a href=\"curiosity.html\">√10/3 curiosity</a> and the limma, so (√10/3)² = 10/9 = limma² × schisma. The fifth becomes 16384/10935 = 700.0013¢, and twelve of them land only 0.0154¢ (the “atom of Kirnberger”) above seven octaves: the comma all but disappears. It can never be exactly zero, because no fraction of whole numbers is a 12th root of 2.";
   if (isPure()) { if ($("tune").value !== "pent") lastTune = $("tune").value; $("tune").value = "pent";
     $("tune").options[$("tune").options.length - 1].text = isKirn() ? (L === "purefourths" ? "Pentametric (Kirnberger fourth)" : "Pentametric (Kirnberger fifth)") : L === "purefourths" ? "Pentametric (pure 4:3 = Pythagorean)" : "Pentametric (pure 3:2 = Pythagorean)"; }
@@ -375,6 +379,7 @@ function buildWheel() {
   $("tLab").textContent = L === "walk" ? "key: the root at n = 0" : "key: the note at n = 1";
   $("oppLab").textContent = L === "walk" ? "opposite (180°)" : W === 12 ? "opposite (180°, the tritone)" : "opposite (180°)";
   chordMenus();
+  $("scTxt").textContent = `n = ${PL[0].n}…${PL[W - 1].n}`;
   applyOptions(); drawChord();
 }
 function clickPlace(i) {
@@ -599,6 +604,10 @@ $("root").addEventListener("change", () => { drawChord(); playChord(false); });
 ["voice", "oct", "inv"].forEach((id) => $(id).addEventListener("change", () => { drawChord(); playChord(false); }));
 $("mode").addEventListener("change", () => { const lib = $("mode").value === "lib"; $("libRow").classList.toggle("hidden", !lib); $("freeRow").classList.toggle("hidden", lib); freeSet = []; drawChord(); });
 $("clear").onclick = () => { freeSet = []; drawChord(); };
+$("scL").onclick = () => { WIN = mod(WIN - 1, 50); freeSet = []; buildWheel(); };
+$("scR").onclick = () => { WIN = mod(WIN + 1, 50); freeSet = []; buildWheel(); };
+$("scO").onclick = () => { const st = W === 24 ? [1, 26] : [1, 13, 26, 38], cur = PL[0].n === 0 ? 0.5 : PL[0].n, nx = st.find((x) => x > cur) || st[0]; WIN = mod(nx - M.first, 50); freeSet = []; buildWheel(); };
+$("sc0").onclick = () => { WIN = 0; freeSet = []; buildWheel(); };
 buildWheel();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", buildWheel);
 </script>

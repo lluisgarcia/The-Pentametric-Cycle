@@ -15,6 +15,7 @@
   --fill: #e9eef4;
   --ok: #2e7d4f;
   --accent3: #6b5a9e;     /* exploratory */
+  --accent4: #9a6b12;     /* exotic */
   --serif: "EB Garamond", "Garamond", "Georgia", serif;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
@@ -23,13 +24,13 @@
   :root:not([data-theme="light"]) {
     --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
     --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0;
+    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
   --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0;
+  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
@@ -50,6 +51,7 @@ header.site .brand-sep { color: var(--muted); }
 .kind.u { color: var(--accent); border: 1px solid var(--accent); }
 .kind.p { color: var(--accent2); border: 1px solid var(--accent2); }
 .kind.e { color: var(--accent3); border: 1px solid var(--accent3); }
+.kind.x { color: var(--accent4); border: 1px solid var(--accent4); }
 .kind + h1 { margin-top: 4px; }
 main { padding-top: 28px; padding-bottom: 40px; }
 h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
@@ -132,6 +134,7 @@ body.menu-open nav.drawer { transform: none; visibility: visible; }
 .drawer summary .desc { display: block; font-size: .85rem; color: var(--muted); margin-top: 2px; }
 .drawer details.u summary { border-left-color: var(--accent); } .drawer details.u .sec { color: var(--accent); }
 .drawer details.e summary { border-left-color: var(--accent3); } .drawer details.e .sec { color: var(--accent3); }
+.drawer details.x summary { border-left-color: var(--accent4); } .drawer details.x .sec { color: var(--accent4); }
 .drawer details.p summary { border-left-color: var(--accent2); } .drawer details.p .sec { color: var(--accent2); }
 .drawer ul { list-style: none; margin: 0; padding: 0 0 6px; }
 .drawer li a { display: block; padding: 7px 12px 7px 16px; border-top: 1px solid var(--rule); }

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sky Wheel · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<script src="ephem.js"></script>
+<style>
+  :root { --fire: #c8492f; --earth: #6f8a2a; --air: #b58a12; --water: #2f6fb3; --chord: #b8740a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fire: #e0735a; --earth: #9fbf55; --air: #e3c058; --water: #6aa5e6; --chord: #f0b54a; } }
+  :root[data-theme="dark"] { --fire: #e0735a; --earth: #9fbf55; --air: #e3c058; --water: #6aa5e6; --chord: #f0b54a; }
+  .glyph { font-family: "Segoe UI Symbol", "Noto Sans Symbols", "Noto Sans Symbols 2", "DejaVu Sans", sans-serif; }
+  .hidden { display: none !important; }
+  table.data td.r { color: var(--accent2); font-weight: 600; }
+  .chordname { font-family: var(--serif); font-size: 1.8rem; line-height: 1.1; }
+  input[type="datetime-local"] { font: inherit; padding: 3px 6px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind x">✧ Exotic exploration · symbolic and playful, not a claim</span>
+  <h1>The sky wheel</h1>
+  <p class="lede">The twelve signs of the zodiac on a wheel of twelve places, like the quarter of the palindrome on the chord wheel. For any date and place, the page computes where the Sun, the Moon and the planets are, draws their aspects, lays the palindrome's values under the signs, and turns the signs the planets occupy into notes: the chord the sky makes. Astrology is a symbolic tradition, not science; this page is a playful exploration, and the astronomy under it is real.</p>
+
+  <div class="panel" style="margin-bottom:18px">
+    <div class="controls">
+      <label>date and time <input id="dt" type="datetime-local" step="60"></label>
+      <button id="now">now</button>
+      <label>latitude <input id="lat" type="number" step="0.01" min="-89.9" max="89.9" value="41.55"></label>
+      <label>longitude (east +) <input id="lon" type="number" step="0.01" min="-180" max="180" value="2.11"></label>
+      <button id="geo" title="Ask the browser for your position">use my location</button>
+      <span class="note" id="placeNote">Sabadell, Spain</span>
+    </div>
+    <div class="controls" style="border-top:1px solid var(--rule);padding-top:12px;margin-bottom:0">
+      <label>notes <select id="layout">
+        <option value="fifths" selected>circle of fifths</option>
+        <option value="pure">Pentametric circle of fifths (pure 3:2)</option>
+        <option value="fourths">circle of fourths</option>
+        <option value="purefourths">Pentametric circle of fourths (pure 4:3)</option>
+        <option value="chrom">chromatic (12 tones)</option>
+        <option value="purechrom">Pentametric chromatic (pure 3:2)</option>
+        <option value="walk">the cycle's own notes</option></select></label>
+      <label><span id="keyLab">key on Aries</span> <select id="key"></select></label>
+      <label id="winL">palindrome window <button id="scL" title="scroll back">◀</button> <span id="scTxt" style="font-family:var(--mono)"></span> <button id="scR" title="scroll on">▶</button> <button id="scO" title="jump to the next octave: n = 1, 13, 26, 38">⏭ octave</button></label>
+      <label>aspect orb ± <input id="orb" type="number" min="0" max="12" step="0.5" value="6" style="width:6ch">°</label>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="controls" style="margin-bottom:6px">
+        <label><input id="oAsp" type="checkbox" checked> aspects</label>
+        <label><input id="oChord" type="checkbox"> sky chord shape</label>
+        <label><input id="oVal" type="checkbox" checked> palindrome values</label>
+        <label><input id="oNote" type="checkbox" checked> notes</label>
+        <label><input id="oDeg" type="checkbox" checked> degrees</label>
+      </div>
+      <svg id="wheel" viewBox="0 0 640 640" role="img" aria-label="The zodiac wheel with the planets, their aspects and the palindrome"></svg>
+      <div class="legend" id="legend" style="justify-content:center;margin-top:6px"></div>
+    </div>
+    <div class="panel">
+      <h2 style="margin-top:0">The sky chord</h2>
+      <div class="chordname" id="cname">—</div>
+      <dl class="readout" id="cread" style="margin-top:8px"></dl>
+      <div class="controls" style="margin-top:10px">
+        <button id="pChord" class="primary">▶ chord</button>
+        <button id="pPlan">▶ the planets in turn</button>
+        <label>root <select id="rootB"></select></label>
+      </div>
+      <div class="controls" style="margin-top:6px"><span class="note">bodies in the chord:</span> <span id="bodyBox" style="display:contents"></span>
+        <button id="bAll" title="Sun to Pluto">all</button><button id="bFast" title="Sun, Moon, Mercury, Venus, Mars">fast</button><button id="bSlow" title="Jupiter to Pluto">slow</button></div>
+      <p class="note" id="soundNote"></p>
+    </div>
+  </div>
+
+  <h2>Positions</h2>
+  <div class="panel scroll-x"><table class="data" id="tab"></table></div>
+
+  <h2>Aspects</h2>
+  <div class="panel scroll-x"><table class="data" id="aspTab"></table></div>
+  <p class="note" id="aspNote"></p>
+
+  <h2>About this page</h2>
+  <div class="panel">
+    <p style="margin-top:0"><strong>The sky.</strong> Positions are tropical and geocentric (seen from the Earth, measured along the ecliptic from the spring equinox), computed in your browser from orbital elements with Kepler's equation and the main perturbations of the Moon, Jupiter, Saturn and Uranus (after P. Schlyter, <i>How to compute planetary positions</i>). Checked against Astrolog 7.80 for 8 October 2026, 18:50 UT at Sabadell: every body within 0.05°, the ascendant and midheaven within 0.01°. The node is the Moon's mean north node. The starting point was the author's own spreadsheet, built on T. Singal and A. K. Singal, <i>Determining planetary positions in the sky for ±50 years to an accuracy of 1° with a calculator</i> (arXiv:0910.2778); the method here keeps more terms, so it holds to a few arcminutes over centuries.</p>
+    <p><strong>The wheel.</strong> As on a classic chart, Aries starts at the left and the signs run counterclockwise; the houses are the signs themselves ("null" or whole-sign houses, house 1 = Aries). The ascendant (Asc) and midheaven (MC) for the place are marked on the rim. Aspects are the classic angles between two bodies: conjunction 0°, sextile 60°, square 90°, trine 120°, opposition 180°, within the orb.</p>
+    <p style="margin-bottom:0"><strong>The notes and the palindrome.</strong> The twelve signs are the twelve places of a quarter of the palindrome: Aries is n = 1 and the key sits on it, as on the <a href="chordwheel.html">chord wheel</a>, with the same layouts and pure tunings. The values under the signs are the quarter n = 1–12. With <i>the cycle's own notes</i> a palindrome window appears: it moves the section of the cycle under the signs (◀ ▶ one step, ⏭ one octave: n = 1, 13, 26, 38), and the notes come from that section, since the walk starts on the key at the step before it. Which note goes on which sign is a choice, not something the sky or the formula gives.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) { const e = document.createElementNS(NS, name); for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v); if (text !== undefined) e.textContent = text; parent.appendChild(e); return e; }
+const mod = (a, m) => ((a % m) + m) % m, RAD = Math.PI / 180, VS = "︎";
+const NOTE = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+const ZOD = [["♈", "Aries"], ["♉", "Taurus"], ["♊", "Gemini"], ["♋", "Cancer"], ["♌", "Leo"], ["♍", "Virgo"], ["♎", "Libra"], ["♏", "Scorpio"], ["♐", "Sagittarius"], ["♑", "Capricorn"], ["♒", "Aquarius"], ["♓", "Pisces"]];
+const ELEM = ["fire", "earth", "air", "water"], MODE = ["cardinal", "fixed", "mutable"];
+const GLYPH = { Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇", Node: "☊" };
+const ASP = [[0, "conjunction", "☌", "var(--ink)"], [60, "sextile", "⚹", "var(--water)"], [90, "square", "□", "var(--fire)"], [120, "trine", "△", "var(--earth)"], [180, "opposition", "☍", "var(--fire)"]];
+const IV = Pent.INTERVALS;
+const dms = (x) => { const d = Math.floor(x), m = Math.floor((x - d) * 60 + 1e-9); return `${d}°${String(m).padStart(2, "0")}′`; };
+$("key").innerHTML = NOTE.map((n, i) => `<option value="${i}">${n}</option>`).join("");
+
+// ---- date and place ----
+function setNow() { const d = new Date(), p = (x) => String(x).padStart(2, "0"); $("dt").value = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; }
+setNow();
+$("now").onclick = () => { setNow(); draw(); };
+$("geo").onclick = () => {
+  if (!navigator.geolocation) { $("placeNote").textContent = "this browser cannot give a location"; return; }
+  $("placeNote").textContent = "asking…";
+  navigator.geolocation.getCurrentPosition((pos) => { $("lat").value = pos.coords.latitude.toFixed(2); $("lon").value = pos.coords.longitude.toFixed(2); $("placeNote").textContent = "your location"; draw(); },
+    () => { $("placeNote").textContent = "location not available: Sabadell kept"; }, { timeout: 10000 });
+};
+["dt", "lat", "lon", "orb"].forEach((id) => $(id).addEventListener("change", () => { if (id === "lat" || id === "lon") $("placeNote").textContent = ""; draw(); }));
+
+// ---- notes on the signs (the same layouts as the chord wheel; Aries = n = 1, the first place) ----
+let sc = 0;     // the palindrome window: the signs show n = sc + 1 … sc + 12 (round all 50)
+const nOf = (z) => mod(sc + z + 1, 50);
+const isPure = () => ["pure", "purefourths", "purechrom"].includes($("layout").value);
+const FIFTH = 1200 * Math.log2(3 / 2);
+function noteOf(z) {          // { pc, k } for sign z (k: fifths above the key, for the pure layouts)
+  const t = +$("key").value, L = $("layout").value;
+  if (L === "fifths" || L === "pure") return { pc: mod(t + 7 * z, 12), k: z };
+  if (L === "fourths" || L === "purefourths") return { pc: mod(t + 5 * z, 12), k: -z };
+  if (L === "chrom" || L === "purechrom") return { pc: mod(t + z, 12), k: mod(7 * z, 12) };
+  return null;
+}
+let walkNotes = [];
+function computeWalk() {      // the cycle's own notes: start on the key at the step before the window, then walk
+  const t = +$("key").value; let cur = t; walkNotes = [];
+  for (let z = 0; z < 12; z++) { const h = Pent.H(nOf(z)); if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); walkNotes.push(h === 0 ? null : { pc: cur, k: null }); }
+}
+const signNote = (z) => $("layout").value === "walk" ? walkNotes[z] : noteOf(z);
+const LOF = { 0: 0, 7: 1, 2: 2, 9: 3, 4: 4, 11: 5, 6: 6, 1: -5, 8: -4, 3: -3, 10: -2, 5: -1 };
+function spell(k) { const L = "FCGDAEB"[mod(k + 1, 7)], acc = Math.floor((k + 1) / 7), a = Math.abs(acc); if (!acc) return L; return L + (acc > 0 ? "𝄪".repeat(Math.floor(a / 2)) + (a % 2 ? "♯" : "") : "𝄫".repeat(Math.floor(a / 2)) + (a % 2 ? "♭" : "")); }
+const noteName = (z) => { const N = signNote(z); if (!N) return "·"; return isPure() ? spell(LOF[+$("key").value] + N.k) : NOTE[N.pc]; };
+
+// ---- the chart ----
+const CX = 320, CY = 320, R_OUT = 300, R_Z = 262, R_H = 244, R_V = 222, R_N = 200, R_P = 170, R_IN = 128;
+const ang = (lon) => (180 + lon) * RAD;                 // Aries 0° at the left, counterclockwise
+const P = (r, lon) => [CX + r * Math.cos(ang(lon)), CY - r * Math.sin(ang(lon))];
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let CH = null;
+function compute() {
+  const d = new Date($("dt").value);
+  CH = Ephem.chart(isNaN(d) ? new Date() : d, +$("lat").value, +$("lon").value);
+}
+function aspects(list) {
+  const orb = +$("orb").value, out = [];
+  for (let i = 0; i < list.length; i++) for (let j = i + 1; j < list.length; j++) {
+    let dd = Math.abs(list[i].lon - list[j].lon); if (dd > 180) dd = 360 - dd;
+    for (const [a, nm, g, col] of ASP) if (Math.abs(dd - a) <= orb) out.push({ a: list[i], b: list[j], angle: a, name: nm, g, col, exact: dd, off: dd - a });
+  }
+  return out;
+}
+// the bodies: aspects use all of them; the chord uses the ticked ones
+const BNAMES = ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Node"];
+$("bodyBox").innerHTML = BNAMES.map((b) => `<label><input type="checkbox" data-b="${b}"${b === "Node" ? "" : " checked"}> <span class="glyph">${GLYPH[b]}\uFE0E</span> ${b === "Node" ? "node" : b}</label>`).join(" ");
+const ticked = () => [...document.querySelectorAll("#bodyBox input")].filter((x) => x.checked).map((x) => x.dataset.b);
+const setTicks = (list) => { document.querySelectorAll("#bodyBox input").forEach((x) => { x.checked = list.includes(x.dataset.b); }); fillRoot(); draw(); };
+function fillRoot() { const cur = $("rootB").value || "Sun", t = ticked(); $("rootB").innerHTML = t.map((b) => `<option value="${b}">${b === "Node" ? "node" : b}'s sign</option>`).join(""); $("rootB").value = t.includes(cur) ? cur : (t[0] || ""); }
+const chosen = () => CH.bodies.filter((b) => b.name !== "Node");
+const chordBodies = () => { const t = ticked(); return CH.bodies.filter((b) => t.includes(b.name)); };
+function draw() {
+  compute(); if ($("layout").value === "walk") computeWalk();
+  const svg = $("wheel"); svg.innerHTML = "";
+  const walk = $("layout").value === "walk"; if (!walk) sc = 0;            // the window only matters for the cycle's own notes
+  $("winL").classList.toggle("hidden", !walk);
+  $("scTxt").textContent = `n = ${nOf(0)}…${nOf(11)}`;
+  $("keyLab").textContent = $("layout").value === "walk" ? "key (the step before the window)" : "key on Aries";
+  // the sign ring, the houses, the palindrome values and the notes
+  for (let z = 0; z < 12; z++) {
+    const a0 = z * 30, a1 = a0 + 30, col = `var(--${ELEM[z % 4]})`;
+    const arc = (r1, r2) => { const [x1, y1] = P(r1, a0), [x2, y2] = P(r2, a0), [x3, y3] = P(r2, a1), [x4, y4] = P(r1, a1); return `M ${x1} ${y1} L ${x2} ${y2} A ${r2} ${r2} 0 0 0 ${x3} ${y3} L ${x4} ${y4} A ${r1} ${r1} 0 0 1 ${x1} ${y1} Z`; };
+    el(svg, "path", { d: arc(R_Z, R_OUT), fill: col, "fill-opacity": 0.32, stroke: "var(--panel)", "stroke-width": 1.5 });
+    const [gx, gy] = P((R_Z + R_OUT) / 2, a0 + 15); const t = el(svg, "text", { x: gx, y: gy + 8, "text-anchor": "middle", "font-size": 22, fill: col, class: "glyph" }, ZOD[z][0] + VS); el(t, "title", {}, `${ZOD[z][1]} (${ELEM[z % 4]}, ${MODE[z % 3]})`);
+    el(svg, "path", { d: arc(R_H, R_Z), fill: "none", stroke: "var(--rule)", "stroke-width": 1 });
+    const [hx, hy] = P((R_H + R_Z) / 2, a0 + 15); el(svg, "text", { x: hx, y: hy + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, z + 1);
+    const n = nOf(z), h = Pent.H(n);   // (with the window at its start: n = 1 … 12 under Aries … Pisces)
+    if ($("oVal").checked) { el(svg, "path", { d: arc(R_V - 13, R_H - 4), fill: `var(--c${h})`, stroke: "var(--panel)", "stroke-width": 1, "fill-opacity": 0.9 });
+      const [vx, vy] = P((R_V - 13 + R_H - 4) / 2, a0 + 15); const tv = el(svg, "text", { x: vx, y: vy + 5, "text-anchor": "middle", "font-size": 14, style: "font-weight:600", fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff" }, h); el(tv, "title", {}, `n = ${n}: H = ${h}, ${IV[h].name}`);
+      const [nx, ny] = P(R_H + 2, a0 + 3); el(svg, "text", { x: nx, y: ny + 3, "text-anchor": "middle", "font-size": 8, fill: "var(--muted)" }, n); }
+    if ($("oNote").checked) { const [qx, qy] = P(R_N, a0 + 15); el(svg, "text", { x: qx, y: qy + 6, "text-anchor": "middle", "font-size": 16, fill: signNote(z) ? "var(--ink)" : "var(--muted)", style: "font-family:var(--serif)" }, noteName(z)); }
+  }
+  // degree ticks on the inner edge of the sign ring
+  for (let dg = 0; dg < 360; dg++) { const L = dg % 10 === 0 ? 10 : dg % 5 === 0 ? 6 : 3, [x1, y1] = P(R_Z, dg), [x2, y2] = P(R_Z - L, dg); el(svg, "line", { x1, y1, x2, y2, stroke: "var(--muted)", "stroke-width": dg % 30 === 0 ? 1.4 : 0.6 }); }
+  el(svg, "circle", { cx: CX, cy: CY, r: R_IN, fill: "none", stroke: "var(--rule)" });
+  // ascendant and midheaven
+  for (const [lon, lab] of [[CH.asc, "Asc"], [CH.mc, "MC"]]) { const [x1, y1] = P(R_OUT + 2, lon), [x2, y2] = P(R_IN, lon), [tx, ty] = P(R_OUT + 14, lon);
+    el(svg, "line", { x1, y1, x2, y2, stroke: "var(--accent2)", "stroke-width": 1.2, "stroke-dasharray": "4 3" }); el(svg, "text", { x: tx, y: ty + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--accent2)", style: "font-weight:600" }, lab); }
+  const B = chosen(), occ = [...new Set(chordBodies().map((b) => Math.floor(b.lon / 30)))].sort((a, b) => a - b);
+  // aspects
+  const AS = aspects(B);
+  if ($("oAsp").checked) for (const x of AS) { if (x.angle === 0) continue; const [x1, y1] = P(R_IN, x.a.lon), [x2, y2] = P(R_IN, x.b.lon); el(svg, "line", { x1, y1, x2, y2, stroke: x.col, "stroke-width": 1.4, opacity: 0.85, "stroke-dasharray": x.angle === 60 || x.angle === 120 ? "" : "5 3" }); }
+  // the sky chord shape: the signs the ticked bodies occupy, a corner at the middle of each sign, joined round the wheel (root = larger dot)
+  if ($("oChord").checked && occ.length >= 2) {
+    const rbz = Math.floor((CH.bodies.find((b) => b.name === $("rootB").value) || CH.bodies[0]).lon / 30);
+    const cz = occ.filter((z) => signNote(z)), pts = cz.map((z) => P(R_IN, z * 30 + 15));
+    if (pts.length >= 2) el(svg, "polygon", { points: pts.map((q) => q.join(",")).join(" "), fill: "var(--chord)", "fill-opacity": 0.18, stroke: "var(--chord)", "stroke-width": 2.6, "stroke-linejoin": "round" });
+    cz.forEach((z, k) => { el(svg, "circle", { cx: pts[k][0], cy: pts[k][1], r: z === rbz ? 7 : 4.5, fill: z === rbz ? "var(--chord)" : "var(--panel)", stroke: "var(--chord)", "stroke-width": 2 }); });
+  }
+  // the bodies, spread out where they crowd, with a tick at the true position
+  const all = CH.bodies.slice().sort((a, b) => a.lon - b.lon), pos = all.map((b) => b.lon);
+  for (let pass = 0; pass < 30; pass++) for (let i = 0; i < pos.length; i++) { const j = (i + 1) % pos.length; let gap = mod(pos[j] - pos[i], 360); if (gap < 7) { pos[i] -= (7 - gap) / 2; pos[j] += (7 - gap) / 2; } }
+  all.forEach((b, i) => {
+    const [x1, y1] = P(R_Z - 1, b.lon), [x2, y2] = P(R_Z - 12, b.lon), [lx, ly] = P(R_P + 8, pos[i]), [gx, gy] = P(R_P, pos[i]);
+    el(svg, "line", { x1, y1, x2, y2, stroke: "var(--ink)", "stroke-width": 2 });
+    el(svg, "line", { x1: x2, y1: y2, x2: lx, y2: ly, stroke: "var(--muted)", "stroke-width": 0.6 });
+    const t = el(svg, "text", { x: gx, y: gy + 7, "text-anchor": "middle", "font-size": 20, fill: b.name === "Node" ? "var(--muted)" : "var(--ink)", class: "glyph" }, GLYPH[b.name] + VS);
+    el(t, "title", {}, `${b.name} ${b.lon.toFixed(3)}°${b.retro ? " R" : ""}`);
+    if ($("oDeg").checked) { const [dx, dy] = P(R_P - 22, pos[i]); el(svg, "text", { x: dx, y: dy + 4, "text-anchor": "middle", "font-size": 9.5, fill: "var(--muted)" }, `${Math.floor(mod(b.lon, 30))}°${b.retro ? "R" : ""}`); }
+  });
+  $("legend").innerHTML = ELEM.map((e) => `<span><i class="sw" style="background:var(--${e})"></i>${e}</span>`).join("") + ASP.slice(1).map(([a, nm, g, col]) => `<span><i class="sw" style="background:${col}"></i>${nm} ${a}°</span>`).join("") + IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}</span>`).join("");
+  tables(AS, B, occ);
+}
+function tables(AS, B, occ) {
+  let h = '<thead><tr><th></th><th>body</th><th class="num">longitude</th><th>sign</th><th></th><th>note</th><th class="num">H</th></tr></thead><tbody>';
+  for (const b of CH.bodies) { const z = Math.floor(b.lon / 30);
+    h += `<tr><td class="glyph" style="font-size:1.15rem">${GLYPH[b.name]}${VS}</td><td>${b.name === "Node" ? "North node" : b.name}</td><td class="num">${b.lon.toFixed(3)}°</td><td><span class="glyph">${ZOD[z][0]}${VS}</span> ${dms(mod(b.lon, 30))} ${ZOD[z][1]}</td><td class="r">${b.retro ? "R" : ""}</td><td>${noteName(z)}</td><td class="num">${Pent.H(nOf(z))}</td></tr>`; }
+  for (const [lon, nm] of [[CH.asc, "Ascendant"], [CH.mc, "Midheaven"]]) { const z = Math.floor(lon / 30); h += `<tr><td></td><td>${nm}</td><td class="num">${lon.toFixed(3)}°</td><td><span class="glyph">${ZOD[z][0]}${VS}</span> ${dms(mod(lon, 30))} ${ZOD[z][1]}</td><td></td><td></td><td></td></tr>`; }
+  $("tab").innerHTML = h + "</tbody>";
+  $("aspTab").innerHTML = '<thead><tr><th>aspect</th><th>between</th><th class="num">angle</th><th class="num">off exact</th><th>signs</th><th>notes</th></tr></thead><tbody>' +
+    (AS.length ? AS.map((x) => { const za = Math.floor(x.a.lon / 30), zb = Math.floor(x.b.lon / 30); return `<tr><td><span class="glyph">${x.g}${VS}</span> ${x.name}</td><td><span class="glyph">${GLYPH[x.a.name]}${VS}</span> ${x.a.name} – <span class="glyph">${GLYPH[x.b.name]}${VS}</span> ${x.b.name}</td><td class="num">${x.exact.toFixed(2)}°</td><td class="num">${x.off >= 0 ? "+" : "−"}${Math.abs(x.off).toFixed(2)}°</td><td>${ZOD[za][1]} – ${ZOD[zb][1]}</td><td>${noteName(za)} – ${noteName(zb)}</td></tr>`; }).join("") : '<tr><td colspan="6">no aspects within the orb</td></tr>') + "</tbody>";
+  $("aspNote").textContent = "Aspects are measured between the exact longitudes, so two bodies in neighbouring signs can be in conjunction, and a trine can join signs of different elements near their edges.";
+  // the sky chord
+  const rb = CH.bodies.find((b) => b.name === $("rootB").value) || CH.bodies[0];
+  const notes = occ.map((z) => ({ z, N: signNote(z) })), sounding = notes.filter((x) => x.N), sun = Math.floor(rb.lon / 30);
+  const pcs = [...new Set(sounding.map((x) => x.N.pc))];
+  const rootPc = signNote(sun) ? signNote(sun).pc : pcs[0];
+  $("cname").textContent = pcs.length ? chordName(pcs, rootPc) : "—";
+  $("cread").innerHTML = [["signs", occ.map((z) => `<span class="glyph">${ZOD[z][0]}${VS}</span> ${ZOD[z][1]}`).join(", ")],
+    ["notes", notes.map((x) => x.N ? noteName(x.z) : `${ZOD[x.z][1]}: silence`).join(" ")],
+    ["root", `${rb.name === "Node" ? "the node" : "the " + rb.name}'s sign, ${ZOD[sun][1]}${signNote(sun) ? ": " + noteName(sun) : " (a silence here, so the first note is used)"}`],
+    ["values under them", occ.map((z) => `${Pent.H(nOf(z))}`).join(" ")]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+}
+// ---- chord names (the main chord types) ----
+const TYPES = [["", [0, 4, 7]], ["m", [0, 3, 7]], ["sus4", [0, 5, 7]], ["sus2", [0, 2, 7]], ["dim", [0, 3, 6]], ["aug", [0, 4, 8]], ["7", [0, 4, 7, 10]], ["maj7", [0, 4, 7, 11]], ["m7", [0, 3, 7, 10]], ["m7♭5", [0, 3, 6, 10]], ["dim7", [0, 3, 6, 9]], ["6", [0, 4, 7, 9]], ["m6", [0, 3, 7, 9]], ["add9", [0, 4, 7, 2]], ["9", [0, 4, 7, 10, 2]], ["maj9", [0, 4, 7, 11, 2]], ["m9", [0, 3, 7, 10, 2]], ["5", [0, 7]], ["7sus4", [0, 5, 7, 10]], ["6/9", [0, 4, 7, 9, 2]], ["11", [0, 4, 7, 10, 2, 5]], ["13", [0, 4, 7, 10, 2, 5, 9]]];
+function chordName(pcs, root) {
+  const key = (a) => [...new Set(a)].sort((x, y) => x - y).join(","), k = key(pcs), hits = [];
+  for (let r = 0; r < 12; r++) for (const [suf, iv] of TYPES) if (key(iv.map((x) => mod(r + x, 12))) === k) hits.push(r === root ? NOTE[r] + suf : NOTE[r] + suf + "/" + NOTE[root]);
+  hits.sort((a, b) => (a.includes("/") ? 1 : 0) - (b.includes("/") ? 1 : 0));
+  return hits.length ? hits.slice(0, 3).join(" = ") : pcs.map((p) => NOTE[p]).join(" ") + (pcs.length >= 6 ? " (a cluster)" : "");
+}
+// ---- sound ----
+let ctx = null, master = null;
+function ensure() { if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.2; master.connect(ctx.destination); } if (ctx.state === "suspended") ctx.resume(); }
+function tone(f, t, d, g) { const o = ctx.createOscillator(), a = ctx.createGain(); o.type = "triangle"; o.frequency.value = f; a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + 0.02); a.gain.exponentialRampToValueAtTime(g * 0.5, t + d * 0.5); a.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(a).connect(master); o.start(t); o.stop(t + d + 0.03); }
+const etF = (m) => 440 * Math.pow(2, (m - 69) / 12);
+function freqOfSign(z, octave) {     // the note of sign z, in the octave above the key (pure layouts: in pure fifths or fourths)
+  const N = signNote(z), t = +$("key").value; if (!N) return null;
+  const semi = mod(N.pc - t, 12), midi = 48 + t + semi + 12 * (octave || 0);
+  return isPure() ? etF(midi) * Math.pow(2, N.k * (FIFTH - 700) / 1200) : etF(midi);
+}
+$("pChord").onclick = () => { ensure(); const B = chordBodies(), occ = [...new Set(B.map((b) => Math.floor(b.lon / 30)))], t0 = ctx.currentTime + 0.03, fs = occ.map((z) => freqOfSign(z)).filter((f) => f).sort((a, b) => a - b), g = 0.5 / Math.max(2, fs.length); fs.forEach((f) => tone(f, t0, 2.2, g)); $("soundNote").textContent = `Sounding the signs the bodies occupy, ${fs.length} notes, ${isPure() ? "in pure " + ($("layout").value === "purefourths" ? "fourths" : "fifths") : "in equal temperament"}.`; };
+$("pPlan").onclick = () => { ensure(); const B = chordBodies(), t0 = ctx.currentTime + 0.03; B.forEach((b, i) => { const f = freqOfSign(Math.floor(b.lon / 30)); if (f) tone(f, t0 + i * 0.32, 0.9, 0.24); }); $("soundNote").textContent = "Each ticked body plays the note of its sign, in order from the Sun outward (silent signs stay silent)."; };
+// ---- controls ----
+$("scL").onclick = () => { sc = mod(sc - 1, 50); draw(); };
+$("scR").onclick = () => { sc = mod(sc + 1, 50); draw(); };
+$("bodyBox").addEventListener("change", () => { fillRoot(); draw(); });
+$("rootB").addEventListener("change", draw);
+$("bAll").onclick = () => setTicks(BNAMES.slice(0, 10)); $("bFast").onclick = () => setTicks(BNAMES.slice(0, 5)); $("bSlow").onclick = () => setTicks(BNAMES.slice(5, 10));
+$("scO").onclick = () => { const st = [1, 13, 26, 38], cur = sc + 1, nx = st.find((x) => x > cur) || st[0]; sc = nx - 1; draw(); };
+fillRoot();
+["layout", "key", "oAsp", "oChord", "oVal", "oNote", "oDeg"].forEach((id) => $(id).addEventListener("change", draw));
+draw();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
