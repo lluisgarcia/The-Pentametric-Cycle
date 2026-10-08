@@ -247,6 +247,7 @@ const Pent = (() => {
         <li><a href="identities.html">Identities gallery<small>Every exact relation of the construction, checked live</small></a></li>
         <li><a href="forms.html">Ten forms of one formula<small>Ten routes to the same areas, all agreeing</small></a></li>
         <li><a href="growing.html" aria-current="page">The growing spiral<small>The spiral builds itself, square by square</small></a></li>
+        <li><a href="pentaspiral.html">The Pentametric spiral<small>Your areas around a pentagon, in 2D and 3D, and into the golden rectangle</small></a></li>
       </ul>
     </details>
     <details class="e">
@@ -280,7 +281,9 @@ const Pent = (() => {
   <p class="lede">Watch the Fibonacci spiral build itself, one square at a time, while the view pulls back. Each new square of side F<sub>k</sub> sounds the interval of its Lucas number, H(L<sub>k</sub>) = P(L<sub>k</sub>) mod 5 = F<sub>k</sub><sup>2</sup> mod 5.</p>
 
   <div class="panel controls">
+    <button id="back" title="one square back">−1</button>
     <button id="play" class="primary">▶ Grow</button>
+    <button id="fwd" title="one square forward">+1</button>
     <button id="reset">↺ Start again</button>
     <label>speed <input id="speed" type="range" min="1" max="5" value="3"><output id="spOut">3</output></label>
     <label><input id="lines" type="checkbox"> Holden's lines and P</label>
@@ -419,6 +422,16 @@ function grow() {
   addSquare(k); animateView(bounds(k), ms * 0.8);
   sound(info(k), Math.min(1.6, ms / 1000 * 0.9));
 }
+function back() {
+  pause();
+  if (k <= 0) return;
+  layers.sq.lastChild && layers.sq.lastChild.remove(); layers.arc.lastChild && layers.arc.lastChild.remove();
+  k--;
+  animateView(bounds(Math.max(k, 1)), 500);
+  if (k) sound(info(k), 0.8); else { $("kk").textContent = "—"; $("read").innerHTML = ""; $("iv").innerHTML = ""; }
+  $("play").textContent = k ? "▶ Continue" : "▶ Grow";
+}
+function fwd() { pause(); if (k < KMAX) { grow(); $("play").textContent = k >= KMAX ? "▶ Grow" : "▶ Continue"; } }
 function pause() { clearInterval(timer); timer = null; $("play").textContent = k >= KMAX ? "▶ Grow" : "▶ Continue"; }
 function play() {
   if (timer) return pause();
@@ -431,6 +444,8 @@ function reset() {
 }
 $("play").onclick = play;
 $("reset").onclick = reset;
+$("back").onclick = back;
+$("fwd").onclick = fwd;
 $("speed").addEventListener("input", () => { $("spOut").textContent = $("speed").value; if (timer) { clearInterval(timer); timer = setInterval(grow, 2600 / +$("speed").value); } });
 $("lines").addEventListener("change", () => drawLines($("lines").checked));
 setView(bounds(1));
