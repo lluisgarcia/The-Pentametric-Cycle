@@ -47,6 +47,23 @@
     <p class="note">Two facts stand out. The square of √10/3 is exactly <strong>10:9</strong>, the just “minor whole tone” of Ptolemy's syntonic diatonic, so √10/3 is exactly half of that tone. And it lies within about <strong>1 cent</strong> of the Pythagorean semitone, the limma 256:243, whereas the equal-tempered semitone is almost 9 cents away.</p>
   </div>
 
+  <h2>Half a schisma: the exact link to the limma</h2>
+  <div class="panel">
+    <p style="margin-top:0">The “about 1 cent” between √10/3 and the limma has an exact name. Square both sides:</p>
+    <p class="formula">(√10/3)² = 10/9 = (256/243)² × 32805/32768</p>
+    <p>(check: 65536 × 32805 / (59049 × 32768) = 65610/59049 = 10/9). The last factor, 32805/32768 = 1.954 cents, is the <strong>schisma</strong> of tuning theory. So <strong>√10/3 is the limma widened by exactly half a schisma</strong>, 0.977 cents: the minor whole tone 10:9 is two limmas and one schisma.</p>
+    <dl class="readout">
+      <dt>√10/3 − limma</dt><dd>0.97686 cents = ½ schisma, exactly</dd>
+      <dt>24 × that gap</dt><dd>23.44465 cents = 12 schismas</dd>
+      <dt>Pythagorean comma</dt><dd>531441/524288 = 23.46001 cents</dd>
+      <dt>difference</dt><dd>0.01536 cents (the “atom of Kirnberger”)</dd>
+      <dt>3:2 less one schisma</dt><dd>16384/10935 = 700.00128 cents (Kirnberger's fifth)</dd>
+      <dt>12 such fifths − 7 octaves</dt><dd>0.01536 cents</dd>
+    </dl>
+    <p>Twelve pure fifths 3:2 overshoot seven octaves by the Pythagorean comma, which is why a circle of pure fifths never closes. Twenty-four of these half-schismas (twelve schismas) come within 0.015 cents of that comma, so narrowing each pure fifth by one schisma, that is by (√10/3 ÷ limma)², gives a fifth of 700.0013 cents: equal temperament's fifth to a thousandth of a cent, and a circle that misses closing by only 0.015 cents. You can hear it on <a href="chordwheel.html">The chord wheel</a> (Pentametric circle of fifths, fifth: Kirnberger).</p>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">exact</span> the identity is plain arithmetic. <span class="tag">known</span> the schisma, the near-equality of twelve schismas and the comma, and the fifth 16384/10935 are classical tuning theory (J. P. Kirnberger, 18th century, proposed this fifth as a whole-number stand-in for equal temperament). What is new here is only the route: from the triangle with legs 1 and 1/3 to that fifth. No fraction of whole numbers can close the circle exactly, since 2<sup>7/12</sup> is irrational; and √10 only brings square roots, never a 12th root of 2.</p>
+  </div>
+
   <h2>Can it replace the equal-tempered semitone?</h2>
   <div class="panel">
     <p style="margin-top:0">An equal temperament must close at the octave: twelve equal steps have to make exactly 2:1. Twelve steps of 2<sup>1/12</sup> give 1200 cents. Twelve steps of √10/3 give only <strong>1094.4 cents</strong>, about a semitone short of the octave; it would take 13.16 of them to reach 2:1. So √10/3 cannot be the step of a scale that repeats at the octave. It could be the step of a <em>non-octave</em> scale, a family that composers have explored (for example Wendy Carlos's alpha and beta scales, or the Bohlen–Pierce scale), and that is a legitimate artistic direction rather than a correction of equal temperament.</p>
@@ -65,7 +82,7 @@
     <svg id="ladder" viewBox="0 0 1000 150" role="img" aria-label="Two ladders of twelve steps compared with the octave"></svg>
   </div>
 
-  <p class="note" style="margin-top:20px">Status: the closeness of √10/3 to the limma and to 2<sup>1/12</sup> is a numerical observation. No mechanism linking the construction to tuning theory is claimed here. Observation by the author in GeoGebra, where the triangle has EF = 1, FB<sub>3</sub> = 1/3 and EB<sub>3</sub> = 1.0540925533894…</p>
+  <p class="note" style="margin-top:20px">Status: the closeness of √10/3 to 2<sup>1/12</sup> is a numerical observation; its distance from the limma is exactly half a schisma (shown above), which ties it to known tuning theory. Observation by the author in GeoGebra, where the triangle has EF = 1, FB<sub>3</sub> = 1/3 and EB<sub>3</sub> = 1.0540925533894…</p>
 </main>
 
 <footer class="site"><div class="inner">

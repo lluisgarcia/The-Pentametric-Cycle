@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chord Wheel · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<style>
+  :root { --mir: #7a5cc0; --opp: #23917f; --poly: #c0398a; --chord: #b8740a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --mir: #b9a2f0; --opp: #5cc8b4; --poly: #f07ab8; --chord: #f0b54a; } }
+  :root[data-theme="dark"] { --mir: #b9a2f0; --opp: #5cc8b4; --poly: #f07ab8; --chord: #f0b54a; }
+  .seg { cursor: pointer; transition: opacity .15s; }
+  .seg:hover { opacity: .8; }
+  #handOpts[hidden], .hidden { display: none !important; }
+  .chordname { font-family: var(--serif); font-size: 2rem; line-height: 1.1; }
+  table.data tr.here td { background: var(--fill); }
+  table.data tr[data-r] { cursor: pointer; }
+  .yes { color: var(--ok); font-weight: 600; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The chord wheel</h1>
+  <p class="lede">Put the twelve notes on the twelve places of a quarter of the palindrome, and every chord becomes a polygon inside the wheel, as on the circle of fifths. The inner palindrome (24 places) and the whole palindrome (50 places) hold two and four octaves of twelve, so there the chords get voices. Here you can choose how the notes are laid out, build any chord, hear it, measure its shape, and see which values of the palindrome lie under its notes. Which note goes on which place is a choice, not something the formula gives, so this page is an exploration.</p>
+
+  <div class="panel" style="margin-bottom:18px">
+  <div class="controls">
+    <label>wheel <select id="wmode">
+      <option value="quarter" selected>a quarter: n = 1–12 (12 places)</option>
+      <option value="inner">the inner palindrome: n = 1–24 (24 places, 2 octaves)</option>
+      <option value="full">the palindrome: n = 0–50 (50 places, 4 octaves)</option></select></label>
+    <label id="foldL" class="hidden">octaves run <select id="fold"><option value="straight" selected>straight</option><option value="fold">folded (n and 25 − n share a note)</option></select></label>
+    <label>numbers run <select id="lay"><option value="1">clockwise</option><option value="-1">counterclockwise (like a chart)</option></select></label>
+    <label>start at <select id="rot"><option value="0">the top</option><option value="90">the right (90°)</option><option value="180">the bottom (180°)</option><option value="270">the left (270°, like Aries on a chart)</option></select></label>
+    <label>notes <select id="layout">
+      <option value="fifths" selected>circle of fifths</option>
+      <option value="pure">Pentametric circle of fifths (pure 3:2)</option>
+      <option value="fourths">circle of fourths</option>
+      <option value="chrom">chromatic (12 tones)</option>
+      <option value="purechrom">Pentametric chromatic (pure 3:2)</option>
+      <option value="purefourths">Pentametric circle of fourths (pure 4:3)</option>
+      <option value="walk">the cycle's own notes</option>
+</select></label>
+    <label><span id="tLab">key: the note at n = 0</span> <select id="tr"></select></label>
+    <label id="fifthL" class="hidden"><span id="fifthLab">fifth</span> <select id="fifth"><option value="pure" selected>pure 3:2</option><option value="kirn">3:2 less a schisma (Kirnberger, from √10/3)</option></select></label>
+  </div>
+  <div class="controls" style="border-top:1px solid var(--rule);padding-top:12px;margin-bottom:0">
+    <strong style="font-family:var(--serif);font-size:1.15rem;font-weight:500">Hear it</strong>
+    <button id="pBlock" class="primary">▶ chord</button>
+    <button id="pArp">▶ arpeggio</button>
+    <label>inversion <select id="inv"></select></label>
+    <label>voicing <select id="voice"></select></label>
+    <label id="octL" class="hidden"><span id="octLab">octave</span> <select id="oct"></select></label>
+    <label>tuning <select id="tune">
+      <option value="et" selected>equal</option>
+      <option value="just">just (over the chord's root)</option>
+      <option value="pyth">Pythagorean (the cycle's 3:2)</option>
+      <option value="mean">¼-comma meantone</option>
+      <option value="werck">Werckmeister III</option>
+      <option value="kirn3">Kirnberger III</option>
+      <option value="vall">Vallotti</option>
+      <option value="kfifth">Kirnberger fifth (≈ equal)</option>
+      <option value="pent" hidden>Pentametric</option></select></label>
+    <label>tone <select id="wave"><option value="sine">sine</option><option value="triangle" selected>triangle</option><option value="sawtooth">bright</option></select></label>
+  </div>
+  <p class="note" id="soundNote" style="margin:8px 0 0">Click a place on the wheel or a row of the table to hear a chord, or press ▶.</p>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="controls" style="margin-bottom:6px">
+        <label><input id="oVal" type="checkbox" checked> values in the ring</label>
+        <label><input id="oNote" type="checkbox" checked> notes</label>
+        <label><input id="oPro" type="checkbox"> protractor</label>
+        <label><input id="oHands" type="checkbox"> two hands</label>
+        <span id="handOpts" hidden style="display:contents">
+          <label><input id="oMir" type="checkbox"> mirror partner <i class="sw" style="background:var(--mir)"></i></label>
+          <label><input id="oOpp" type="checkbox"> <span id="oppLab">opposite (180°)</span> <i class="sw" style="background:var(--opp)"></i></label>
+          <label>shape from A <i class="sw" style="background:var(--poly)"></i>
+            <select id="oPoly"><option value="0">none</option><option value="120">triangle · 120°</option><option value="90">square · 90°</option><option value="60">hexagon · 60°</option><option value="30">dodecagon · 30°</option></select></label>
+        </span>
+      </div>
+      <svg id="wheel" viewBox="0 0 600 600" role="img" aria-label="The quarter of the palindrome on a wheel, with notes and a chord polygon" style="touch-action:none;user-select:none;-webkit-user-select:none"></svg>
+      <div class="note" id="handinfo" style="text-align:center;margin-top:4px"></div>
+      <div class="legend" id="legend" style="justify-content:center;margin-top:6px"></div>
+      <p class="note" id="wheelNote" style="margin:8px 0 0"></p>
+    </div>
+
+    <div class="panel">
+      <div class="controls" style="margin-bottom:8px">
+        <label>build <select id="mode"><option value="lib" selected>a chord from the list</option><option value="free">a free chord (click places)</option></select></label>
+      </div>
+      <div class="controls" id="libRow" style="margin-bottom:8px">
+        <label>chord <select id="ctype"></select></label>
+        <label>root <select id="root"></select></label>
+      </div>
+      <div class="controls hidden" id="freeRow" style="margin-bottom:8px">
+        <span class="note">Click places on the wheel to add or remove notes. The first one is the root.</span>
+        <button id="clear">clear</button>
+      </div>
+      <div class="chordname" id="cname">—</div>
+      <dl class="readout" id="cread" style="margin-top:8px"></dl>
+
+    </div>
+  </div>
+
+  <h2>This chord on every root</h2>
+  <p>On a layout with one place per note in each octave, every root gives the same polygon, only turned. What changes is which values of the palindrome lie under the notes. Click a row to show that root on the wheel.</p>
+  <div class="panel scroll-x"><table class="data" id="tab"></table></div>
+  <p class="note" id="tabNote"></p>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const mod = (a, m) => ((a % m) + m) % m;
+const IV = Pent.INTERVALS;
+const NOTE = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+const INTV = ["unison", "minor second", "major second", "minor third", "major third", "perfect fourth", "tritone", "perfect fifth", "minor sixth", "major sixth", "minor seventh", "major seventh"];
+$("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
+
+// ---- the chord list (as on the circle-of-fifths chord-shape map), written as degrees ----
+const DEG = { "1": 0, "b9": 13, "2": 2, "9": 14, "#9": 15, "b3": 3, "3": 4, "4": 5, "11": 17, "b5": 6, "#11": 18, "5": 7, "#5": 8, "6": 9, "13": 21, "bb7": 9, "b7": 10, "7": 11 };
+const CHORDS = [
+  ["Major", [["", "1 3 5"], ["maj7", "1 3 5 7"], ["5 (power chord)", "1 5"], ["maj9", "1 3 5 7 9"], ["maj11", "1 3 5 7 9 11"], ["maj13", "1 3 5 7 9 11 13"], ["6", "1 3 5 6"], ["add9", "1 3 5 9"], ["6/9", "1 3 5 6 9"], ["maj7♭5", "1 3 b5 7"], ["maj7♯11", "1 3 5 7 #11"]]],
+  ["Suspended", [["sus2", "1 2 5"], ["sus4", "1 4 5"]]],
+  ["Minor", [["m", "1 b3 5"], ["m7", "1 b3 5 b7"], ["m9", "1 b3 5 b7 9"], ["m6", "1 b3 5 6"], ["m11", "1 b3 5 b7 9 11"], ["m13", "1 b3 5 b7 9 11 13"], ["m(maj7)", "1 b3 5 7"], ["m(maj9)", "1 b3 5 7 9"], ["m7♭5", "1 b3 b5 b7"], ["m7♯5", "1 b3 #5 b7"]]],
+  ["Dominant", [["7", "1 3 5 b7"], ["9", "1 3 5 b7 9"], ["11", "1 3 5 b7 9 11"], ["13", "1 3 5 b7 9 11 13"], ["7sus4", "1 4 5 b7"], ["7♭5", "1 3 b5 b7"], ["7♯5", "1 3 #5 b7"], ["7♭9", "1 3 5 b7 b9"], ["7♯9", "1 3 5 b7 #9"], ["7♭5(♭9)", "1 3 b5 b7 b9"], ["7♯5(♭9)", "1 3 #5 b7 b9"], ["9♭5", "1 3 b5 b7 9"], ["9♯5", "1 3 #5 b7 9"], ["13(♯11)", "1 3 5 b7 9 #11 13"], ["13(♭9)", "1 3 5 b7 b9 11 13"], ["11(♭9)", "1 3 5 b7 b9 11"]]],
+  ["Augmented and diminished", [["aug", "1 3 #5"], ["aug7", "1 3 #5 b7"], ["dim", "1 b3 b5"], ["dim7", "1 b3 b5 bb7"]]],
+];
+const LIB = [];
+CHORDS.forEach(([g, list]) => list.forEach(([suf, degs]) => LIB.push({ g, suf, degs: degs.split(" "), semis: degs.split(" ").map((d) => DEG[d]) })));
+$("ctype").innerHTML = CHORDS.map(([g, list]) => `<optgroup label="${g}">` + list.map(([suf, degs]) => { const i = LIB.findIndex((c) => c.suf === suf && c.g === g); return `<option value="${i}">${suf ? suf.replace(/^5 \(power chord\)$/, "5 (power chord)") : "major"} · ${degs}</option>`; }).join("") + "</optgroup>").join("");
+$("ctype").value = "0";
+const FULL_CTYPE = $("ctype").innerHTML;
+// with the cycle's own notes only the chords made of the notes it produces can be chosen (key, fourth, fifth: C, F, G in C)
+const availPcs = () => [...new Set(PL.map((P) => P.pc).filter((x) => x !== null))];
+const fits = (c, r) => { const a = availPcs(); return a.includes(r) && pcsOf(c, r).every((p) => a.includes(p)); };
+function chordMenus() {
+  const walk = $("layout").value === "walk", ct = $("ctype").value, rt = $("root").value;
+  if (!walk) { if ($("ctype").dataset.walk) { $("ctype").innerHTML = FULL_CTYPE; $("ctype").value = ct; delete $("ctype").dataset.walk; } $("root").innerHTML = NOTE.map((nm, i) => `<option value="${i}">${nm}</option>`).join(""); $("root").value = rt; return; }
+  $("ctype").dataset.walk = "1";
+  const ok = LIB.map((c, i) => [c, i]).filter(([c]) => [...Array(12).keys()].some((r) => fits(c, r)));
+  $("ctype").innerHTML = ok.map(([c, i]) => `<option value="${i}">${c.suf ? c.suf : "major"} · ${c.degs.join(" ")}</option>`).join("");
+  $("ctype").value = ok.some(([, i]) => String(i) === ct) ? ct : String(ok[0][1]);
+  const c = LIB[+$("ctype").value], roots = [...Array(12).keys()].filter((r) => fits(c, r));
+  $("root").innerHTML = roots.map((r) => `<option value="${r}">${NOTE[r]}</option>`).join("");
+  $("root").value = roots.includes(+rt) ? rt : String(roots[0]);
+}
+const pcsOf = (c, r) => [...new Set(c.semis.map((s) => mod(r + s, 12)))];
+const chordName = (c, r) => NOTE[r] + (c.suf === "" ? "" : c.suf === "5 (power chord)" ? "5" : c.suf);
+
+// ---- the wheels ----
+// quarter: n = 1–12 (one octave); inner: n = 1–24 (two octaves of 12); full: n = 0–49, where n = 0 and n = 25 are the two
+// silences between the four octaves (one period = silence + quarter + quarter reversed). Every place i has its n, its value H(n),
+// and, unless it is one of those two silences, a slot j = 1–12 in octave (block) b. "Folded" makes every other octave run back:
+// the slot of n is then that of 25 − n (or 50 − n), so each octave carries the same values on the same notes.
+const MODES = {
+  quarter: { W: 12, first: 1, nb: 1, lab: 1, shapes: [120, 90, 60, 30], mirror: (i) => 11 - i, mtxt: "n ↔ 13 − n", title: "a quarter" },
+  inner: { W: 24, first: 1, nb: 2, lab: 2, shapes: [120, 90, 60, 45, 30], mirror: (i) => 23 - i, mtxt: "n ↔ 25 − n", title: "the inner palindrome" },
+  full: { W: 50, first: 0, nb: 4, lab: 5, shapes: [72, 36], mirror: (i) => (50 - i) % 50, mtxt: "n ↔ 50 − n", title: "the palindrome" },
+};
+let M = MODES.quarter, W = 12, STEP = 30, OFF = 0.5, ROT = 0, LAY = 1;
+const WCX = 300, WCY = 300, R1 = 158, R2 = 214, RP = 110;
+let RN = 134;
+const wang = (i) => -Math.PI / 2 + ROT + LAY * ((i + OFF) / W) * 2 * Math.PI;
+const at = (i, r) => [WCX + r * Math.cos(wang(i)), WCY + r * Math.sin(wang(i))];
+let PL = [];            // the places: { n, h, b, j, pc, k } (pc = null: no note)
+const nAt = (i) => PL[mod(Math.round(i), W)].n;
+const VALq = (i) => PL[i].h;
+const nameOf = (h) => IV[h].name, colOf = (h) => `var(--c${h})`;
+const isFold = () => W > 12 && $("fold").value === "fold";
+function slotOf(n) {
+  if (W === 12) return { b: 0, j: n };
+  const f = isFold();
+  if (W === 24) return n <= 12 ? { b: 0, j: n } : { b: 1, j: f ? 25 - n : n - 12 };
+  if (n === 0 || n === 25) return null;
+  if (n <= 12) return { b: 0, j: n };
+  if (n <= 24) return { b: 1, j: f ? 25 - n : n - 12 };
+  if (n <= 37) return { b: 2, j: n - 25 };
+  return { b: 3, j: f ? 50 - n : n - 37 };
+}
+// ---- notes ----
+const isPure = () => ["pure", "purechrom", "purefourths"].includes($("layout").value);
+const isKirn = () => $("fifth").value === "kirn";
+const LOF = { 0: 0, 7: 1, 2: 2, 9: 3, 4: 4, 11: 5, 6: 6, 1: -5, 8: -4, 3: -3, 10: -2, 5: -1 };   // a note's place on the line of fifths (C = 0)
+function spell(k) { const L = "FCGDAEB"[mod(k + 1, 7)], acc = Math.floor((k + 1) / 7), a = Math.abs(acc);
+  if (!acc) return L; if (a > 3) return L + (acc > 0 ? `<sup>${a}♯</sup>` : `<sup>${a}♭</sup>`).replace(/<\/?sup>/g, "") ;
+  return L + (acc > 0 ? "𝄪".repeat(Math.floor(a / 2)) + (a % 2 ? "♯" : "") : "𝄫".repeat(Math.floor(a / 2)) + (a % 2 ? "♭" : "")); }
+// Kirnberger's fifth 16384/10935 = 3:2 narrowed by one schisma 32805/32768, and the schisma is exactly (√10/3 ÷ 256/243)²
+const FIFTH = () => isKirn() ? 1200 * Math.log2(16384 / 10935) : 1200 * Math.log2(3 / 2);
+const pureCents = (k) => mod(k * FIFTH(), 1200);
+const pureRatio = (k) => { if (isKirn()) return k === 1 ? "16384/10935" : `(16384/10935)^${k}, octave-reduced`; const m = Math.floor(Math.abs(k) * Math.log2(3)) + (k < 0 ? 1 : 0);   // the power of 2 that brings 3^k into the octave
+  if (Math.abs(k) > 9) return k > 0 ? `3^${k}/2^${m}` : `2^${m}/3^${-k}`;
+  let num = k >= 0 ? Math.pow(3, k) : 1, den = k >= 0 ? 1 : Math.pow(3, -k); while (num / den >= 2) den *= 2; while (num / den < 1) num *= 2; return `${num}/${den}`; };
+const pureDev = (k) => k * (FIFTH() - 700);     // cents above equal temperament
+function layoutPlaces() {
+  const t = +$("tr").value, L = $("layout").value, f = isFold();
+  PL = [];
+  let cur = t;                                       // the cycle's own root walk, along n
+  for (let i = 0; i < W; i++) {
+    const n = M.first + i, h = Pent.H(n), s = slotOf(n), P = { n, h, b: s ? s.b : null, j: s ? s.j : null, pc: null, k: null, semi: null };
+    if (L === "walk") { if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); if (h !== 0 && s) { P.pc = cur; P.semi = mod(cur - t, 12); } }
+    else if (s) {
+      const lap = f ? 0 : s.b;                       // a pure layout goes on round its spiral, one comma per octave, unless folded
+      const q = s.j - 1;                             // stacked layouts start with the key on the first place of each octave
+      if (L === "fifths" || L === "pure") { P.pc = mod(t + 7 * q, 12); P.semi = mod(7 * q, 12); P.k = q + 12 * lap; }
+      else if (L === "fourths" || L === "purefourths") { P.pc = mod(t + 5 * q, 12); P.semi = mod(5 * q, 12); P.k = -(q + 12 * lap); }
+      else { P.pc = mod(t + q, 12); P.semi = q; P.k = mod(7 * q, 12) + 12 * lap; }
+    }
+    PL.push(P);
+  }
+}
+const notesArr = () => PL.map((P) => P.pc);
+// on the pure spiral, a note one turn further round is a comma higher (fourths: lower): it keeps its name and gets a ⁺ (⁻) per turn
+function pureName(k) { const lap = k >= 0 ? Math.floor(k / 12) : -Math.floor(-k / 12), base = k - 12 * lap; return spell(LOF[+$("tr").value] + base) + (lap > 0 ? "⁺".repeat(lap) : "⁻".repeat(-lap)); }
+const nameAt = (i) => PL[i].pc === null ? "·" : isPure() ? pureName(PL[i].k) : NOTE[PL[i].pc];
+const onePerNote = () => $("layout").value !== "walk";
+let lastTune = "et";
+// the pitch of a place: the key note sits at n = 0; each octave (block) is 12 semitones higher
+const BASE = () => (W === 50 ? 36 : 48);
+const midiOf = (i) => BASE() + +$("tr").value + PL[i].semi + 12 * PL[i].b;
+
+// ---- state and chords ----
+let freeSet = [];
+let handA = 0, handB = 6, layers = {}, dragK = null;
+function chordNow() {
+  if ($("mode").value === "lib") { const c = LIB[+$("ctype").value], r = +$("root").value; return { c, r, pcs: pcsOf(c, r), name: chordName(c, r) }; }
+  const pcs = [...new Set(freeSet.map((i) => PL[i].pc).filter((x) => x !== null))];
+  return { c: null, r: pcs.length ? pcs[0] : null, pcs, name: freeName(pcs) };
+}
+function freeName(pcs) {
+  if (!pcs.length) return "—";
+  const key = (a) => [...a].sort((x, y) => x - y).join(",");
+  const hits = [];
+  for (const c of LIB) for (let r = 0; r < 12; r++) if (key(pcsOf(c, r)) === key(pcs)) hits.push(chordName(c, r) + (r === pcs[0] ? "" : `/${NOTE[pcs[0]]}`));
+  return hits.length ? hits.slice(0, 4).join(" = ") : pcs.map((p) => NOTE[p]).join(" ");
+}
+const allPlaces = (pcs) => { const out = []; for (let i = 0; i < W; i++) if (PL[i].pc !== null && pcs.includes(PL[i].pc)) out.push(i); return out; };
+// the places a chord is drawn and played on. On the 12 wheel: every place of its notes. On the 24 and 50 wheels the voices
+// choose them: every place, one octave (with inversions: the lowest notes move up an octave), a low root, or spread.
+function chordPlaces(ch, rootOverride) {
+  const pcs = rootOverride === undefined ? ch.pcs : pcsOf(ch.c, rootOverride), r = rootOverride === undefined ? ch.r : rootOverride;
+  if ($("mode").value === "free") return [...freeSet].sort((a, b) => a - b);
+  if (W === 12 || $("voice").value === "all") return allPlaces(pcs);
+  const v = $("voice").value, b0 = +$("oct").value;
+  const inBlock = (pc, b) => { for (let i = 0; i < W; i++) if (PL[i].pc === pc && PL[i].b === b) return i; return -1; };
+  // the chord's notes in order from the bass: the inversion rotates them (root position: root first, 1st inversion: the third first, …)
+  const invN = Math.min(+$("inv").value || 0, pcs.length - 1), order = pcs.slice(invN).concat(pcs.slice(0, invN));
+  // each note once, going up: "close" keeps them in one octave (a note that would fall below the one before goes to the next octave);
+  // "across" shares them out over the octaves from the chosen one upwards, lowest octaves first (a seventh on two octaves: 2 + 2,
+  // a triad on four: one per octave)
+  const nOct = v === "across" ? M.nb - b0 : 1, k = order.length, size = [];
+  for (let o = 0; o < nOct; o++) size.push(Math.floor(k / nOct) + (o < k % nOct ? 1 : 0));
+  const sel = []; let o = 0, used = 0, prevMidi = -1;
+  for (const pc of order) {
+    while (o < nOct - 1 && used >= size[o]) { o++; used = 0; }
+    let b = b0 + o, i = inBlock(pc, b);
+    while (i >= 0 && midiOf(i) <= prevMidi && b + 1 < M.nb) { b++; i = inBlock(pc, b); }
+    if (i >= 0) { sel.push(i); prevMidi = midiOf(i); }
+    used++;
+  }
+  return [...new Set(sel)].sort((a, b) => a - b);
+}
+
+// ---- drawing ----
+const svgW = $("wheel");
+function fillVoices() {
+  const cur = $("voice").value;
+  const opts = W === 12 ? [["close", "close"], ["bass", "low root"]] : [["across", "across the octaves"], ["close", "close (one octave)"], ["all", "every place"]];
+  $("voice").innerHTML = opts.map(([v, t]) => `<option value="${v}">${t}</option>`).join("");
+  $("voice").value = opts.some(([v]) => v === cur) ? cur : opts[0][0];
+  const co = +$("oct").value || 0;
+  $("oct").innerHTML = Array.from({ length: M.nb }, (_, b) => `<option value="${b}">${b + 1}</option>`).join("");
+  $("oct").value = String(Math.min(co, M.nb - 1));
+  showVoiceCtl();
+}
+function showVoiceCtl() { $("octL").classList.toggle("hidden", W === 12 || $("voice").value === "all" || $("mode").value === "free"); $("octLab").textContent = $("voice").value === "across" ? "from octave" : "octave"; }
+function buildWheel() {
+  M = MODES[$("wmode").value]; W = M.W; STEP = 360 / W; OFF = W === 50 ? 0 : 0.5; ROT = (+$("rot").value) * Math.PI / 180; LAY = +$("lay").value;
+  RN = W === 12 ? 134 : 138;
+  $("foldL").classList.toggle("hidden", W === 12);
+  $("oPoly").innerHTML = '<option value="0">none</option>' + M.shapes.map((t) => `<option value="${t}">${SHAPES[t]} · ${t}°</option>`).join("");
+  if (handA >= W) handA = 0; if (handB >= W) handB = Math.floor(W / 2);
+  fillVoices();
+  layoutPlaces();
+  $("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
+  const svg = svgW; svg.innerHTML = "";
+  layers = {}; ["pro", "ring", "labels", "chord", "hands", "notes", "vals"].forEach((k) => { layers[k] = el(svg, "g", k === "vals" || k === "notes" ? { "pointer-events": "none" } : {}); });
+  const p = (r, a) => `${WCX + r * Math.cos(a)},${WCY + r * Math.sin(a)}`, gap = W > 30 ? 0.45 : 0.47, fs = W === 50 ? 12 : W === 24 ? 14 : 16, nfs = W === 50 ? 10.5 : W === 24 ? 13.5 : 17;
+  for (let i = 0; i < W; i++) {
+    const P = PL[i], n = P.n, h = P.h, a0 = wang(i - gap), a1 = wang(i + gap), sw = LAY > 0 ? 1 : 0;
+    const d = `M ${p(R1, a0)} L ${p(R2, a0)} A ${R2} ${R2} 0 0 ${sw} ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 ${1 - sw} ${p(R1, a0)} Z`;
+    const seg = el(layers.ring, "path", { d, fill: colOf(h), class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
+    el(seg, "title", {}, `n = ${n}: H = ${h}, ${nameOf(h)}` + (P.pc !== null ? ` · note ${nameAt(i)}` + (W > 12 ? `, octave ${P.b + 1}` : "") : ""));
+    seg.addEventListener("click", () => clickPlace(i));
+    const rm = (R1 + R2) / 2, a = wang(i);
+    el(layers.vals, "text", { x: WCX + rm * Math.cos(a), y: WCY + rm * Math.sin(a) + fs * 0.35, "text-anchor": "middle", "font-size": fs,
+      fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff", stroke: colOf(h), "stroke-width": 4, "paint-order": "stroke", style: "font-weight:600" }, h);
+    const big = W === 50 ? n % 5 === 0 : true;
+    el(layers.labels, "text", { x: WCX + (R2 + 14) * Math.cos(a), y: WCY + (R2 + 14) * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": big ? 11 : 8.5, fill: big ? "var(--ink)" : "var(--muted)" }, n);
+    el(layers.notes, "text", { x: WCX + RN * Math.cos(a), y: WCY + RN * Math.sin(a) + nfs * 0.35, "text-anchor": "middle", "font-size": nfs, fill: P.pc === null ? "var(--muted)" : "var(--ink)", style: "font-family:var(--serif)" }, P.pc === null && W === 50 && (n === 0 || n === 25) && $("layout").value === "walk" ? `(${NOTE[+$("tr").value]})` : nameAt(i));
+  }
+  // octave boundaries on the 24 and 50 wheels
+  if (W > 12) for (let i = 0; i < W; i++) {
+    const nx = (i + 1) % W; if (PL[i].b === PL[nx].b && PL[i].b !== null) continue;
+    const a = wang(i + 0.5);
+    el(layers.labels, "line", { x1: WCX + (RP - 8) * Math.cos(a), y1: WCY + (RP - 8) * Math.sin(a), x2: WCX + (R1 - 2) * Math.cos(a), y2: WCY + (R1 - 2) * Math.sin(a), stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "2 3" });
+  }
+  if (W > 12) for (let b = 0; b < M.nb; b++) {
+    const idx = PL.map((P, i) => (P.b === b ? i : -1)).filter((i) => i >= 0), mid = (idx[0] + idx[idx.length - 1]) / 2, a = wang(mid);
+    el(layers.labels, "text", { x: WCX + (RP - 22) * Math.cos(a), y: WCY + (RP - 22) * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 10.5, fill: "var(--muted)" }, `octave ${b + 1}`);
+  }
+  el(layers.pro, "circle", { cx: WCX, cy: WCY, r: 244, fill: "none", stroke: "var(--rule)" });
+  for (let i = 0; i < W; i++) {
+    const a = wang(i - OFF), long = i % M.lab === 0;
+    el(layers.pro, "line", { x1: WCX + 244 * Math.cos(a), y1: WCY + 244 * Math.sin(a), x2: WCX + (long ? 256 : 250) * Math.cos(a), y2: WCY + (long ? 256 : 250) * Math.sin(a), stroke: "var(--muted)", "stroke-width": long ? 1.4 : 0.8 });
+    if (long) el(layers.pro, "text", { x: WCX + 271 * Math.cos(a), y: WCY + 271 * Math.sin(a) + 3.5, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, `${+(i * STEP).toFixed(1)}°`);
+  }
+  el(layers.pro, "circle", { cx: WCX, cy: WCY, r: RP, fill: "none", stroke: "var(--rule)", "stroke-dasharray": "2 4" });
+  // the silences that are not places: n = 0 on the seam of the 12 wheel, n = 0 and 25 on the seam of the 24 wheel
+  if (W !== 50) { const a = wang(-0.5), t = +$("tr").value;
+    el(layers.labels, "line", { x1: WCX + (R1 - 6) * Math.cos(a), y1: WCY + (R1 - 6) * Math.sin(a), x2: WCX + (R2 + 6) * Math.cos(a), y2: WCY + (R2 + 6) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "3 3" });
+    const g0 = el(layers.labels, "g", {}), lab = $("layout").value === "walk" ? "0 = " + NOTE[t] : (W === 12 ? "0" : "0|25"), rr = $("layout").value === "walk" ? 20 : W === 12 ? 10 : 16, RB = W === 12 ? R2 + 15 : R2 + 32;
+    el(g0, "rect", { x: WCX + RB * Math.cos(a) - rr, y: WCY + RB * Math.sin(a) - 9, width: 2 * rr, height: 18, rx: 9, fill: "var(--c0)", stroke: "var(--ink)", "stroke-width": 1 });
+    el(g0, "text", { x: WCX + RB * Math.cos(a), y: WCY + RB * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: "#1f1f1f", style: "font-weight:600" }, lab);
+    el(g0, "title", {}, $("layout").value === "walk" ? `n = 0: the silence that starts the cycle; the walk starts here on ${NOTE[t]}` : W === 12 ? "n = 0: the silence that starts the cycle, between n = 12 and n = 1" : "n = 0 and n = 25: the two silences that frame the inner palindrome");
+    if (isPure() && !isKirn() && (W === 12 || !isFold())) el(layers.labels, "text", { x: WCX + (RB + 22) * Math.cos(a), y: WCY + (RB + 22) * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--accent2)", stroke: "var(--panel)", "stroke-width": 3, "paint-order": "stroke" }, ($("layout").value === "purefourths" ? "−" : "") + `${W === 12 ? "" : "2 × "}comma`); }
+  const L = $("layout").value;
+  const wheelTxt = {
+    quarter: `Each place is 30°. ` + (L === "walk" ? `The walk starts on the key ${NOTE[+$("tr").value]} at n = 0, the silence that starts the cycle (the grey badge on the seam).` : `The key ${NOTE[+$("tr").value]} is on the first place, n = 1, and the circle runs round to n = 12; the silence n = 0 sits on the seam between them.` + (isPure() ? " The thirteenth step would be the key again but a comma off, and that gap falls on the seam." : " Twelve steps close the circle, so the step after n = 12 is the key again.")),
+    inner: `Each place is 15°: two octaves of twelve, n = 1–12 and n = 13–24 (dotted line between them). The silences n = 0 and n = 25 sit on the seam. ` + (isFold() ? "Folded: the second octave runs back, so n and 25 − n carry the same note and, because the inner palindrome reads the same backwards, the same value." : "Straight: the second octave goes on in the same direction, so it carries the quarter's values reversed under the same order of notes."),
+    full: `Each place is 7.2°: four octaves of twelve, n = 1–12, 13–24, 26–37 and 38–49, with the two silences n = 0 and n = 25 between them (no note: ·). Your “4 groups of 12” is exact: one period is silence + the quarter + the quarter reversed. ` + (isFold() ? "Folded: octaves 2 and 4 run back (n ↔ 25 − n and n ↔ 50 − n), so every octave carries the same values on the same notes." : "Straight: every octave goes on in the same direction, so octaves 2 and 4 carry the values reversed."),
+  }[$("wmode").value];
+  $("wheelNote").innerHTML = {
+    pure: "The cycle's own intervals build this circle: its fifth 3:2, brought back into the octave with its own octave 2:1. These are the ratios of the tetractys, and the result is the old Pythagorean tuning. The notes are the same twelve as on the usual circle of fifths, but each is a little sharper than equal temperament, and the circle does not close: twelve pure fifths overshoot seven octaves by the Pythagorean comma 531441/524288 = 23.46¢, so the twelfth fifth, which should bring back the key, lands a comma above it (B♯ above C), right across the seam." + (W > 12 && !isFold() ? " On this wheel the spiral goes on: each new octave is one more comma higher, so its notes get new names (shown as ⁺: C⁺ is the key a comma higher, the B♯ of pure fifths, G⁺ is G a comma higher, and so on)." : ""),
+    purefourths: "The circle of fifths read the other way, with the cycle's own fourth 4:3. The notes come out as flats (F = 4/3, B♭ = 16/9, E♭ = 32/27, …), each a little flatter than equal temperament, and the twelfth pure fourth lands a Pythagorean comma (23.46¢) below the key note (D𝄫 below C), right across the seam." + (W > 12 && !isFold() ? " On this wheel each new octave goes one more comma lower (shown as ⁻)." : ""),
+    purechrom: "The same pure notes as the Pentametric circle of fifths, set in order of pitch. The semitones then come in two sizes: the limma 256/243 = 90.22¢ (seven of them) and the apotome 2187/2048 = 113.69¢ (five), and 7 × 90.22 + 5 × 113.69 = 1200¢. (The limma is the semitone that the <a href=\"curiosity.html\">√10/3 curiosity</a> comes within 1¢ of.)",
+    fifths: "Going round, each place is a fifth (7 semitones) above the one before, so the twelve notes close after twelve fifths, as in equal temperament. The other way round, each step is a fourth.",
+    fourths: "Going round, each place is a fourth (5 semitones) above the one before: the circle of fifths read the other way.",
+    chrom: "Going round, each place is a semitone above the one before: the twelve tones in order.",
+    walk: "The notes the cycle makes itself (the rule of the <a href=\"chords.html\">Chord progressions</a> page): a fifth moves the root up a fifth, a fourth up a fourth, unison and octave keep it, a silence is a rest (·). Only three roots ever appear, the key, a fourth above and a fifth above; after each period of 25 the walk is home again.",
+  }[L] + " " + wheelTxt;
+  if (isPure() && isKirn()) $("wheelNote").innerHTML += " <strong>Kirnberger fifth:</strong> each pure fifth narrowed by one schisma 32805/32768 (1.954¢). The schisma is exactly the square of √10/3 ÷ 256/243, the gap between the <a href=\"curiosity.html\">√10/3 curiosity</a> and the limma, so (√10/3)² = 10/9 = limma² × schisma. The fifth becomes 16384/10935 = 700.0013¢, and twelve of them land only 0.0154¢ (the “atom of Kirnberger”) above seven octaves: the comma all but disappears. It can never be exactly zero, because no fraction of whole numbers is a 12th root of 2.";
+  if (isPure()) { if ($("tune").value !== "pent") lastTune = $("tune").value; $("tune").value = "pent";
+    $("tune").options[$("tune").options.length - 1].text = isKirn() ? (L === "purefourths" ? "Pentametric (Kirnberger fourth)" : "Pentametric (Kirnberger fifth)") : L === "purefourths" ? "Pentametric (pure 4:3 = Pythagorean)" : "Pentametric (pure 3:2 = Pythagorean)"; }
+  else if ($("tune").value === "pent") $("tune").value = lastTune;
+  $("tune").disabled = isPure();
+  $("fifthL").classList.toggle("hidden", !isPure());
+  const fo = L === "purefourths"; $("fifthLab").textContent = fo ? "fourth" : "fifth";
+  $("fifth").options[0].text = fo ? "pure 4:3" : "pure 3:2"; $("fifth").options[1].text = fo ? "4:3 plus a schisma (Kirnberger, from √10/3)" : "3:2 less a schisma (Kirnberger, from √10/3)";
+  $("tLab").textContent = L === "walk" ? "key: the root at n = 0" : "key: the note at n = 1";
+  $("oppLab").textContent = L === "walk" ? "opposite (180°)" : W === 12 ? "opposite (180°, the tritone)" : "opposite (180°)";
+  chordMenus();
+  applyOptions(); drawChord();
+}
+function clickPlace(i) {
+  if (PL[i].pc === null) return;
+  if ($("mode").value === "lib") { if ($("layout").value === "walk" && !fits(LIB[+$("ctype").value], PL[i].pc)) return; $("root").value = PL[i].pc; drawChord(); playChord(false); return; }
+  const k = freeSet.indexOf(i); if (k >= 0) freeSet.splice(k, 1); else freeSet.push(i);
+  drawChord();
+  if (freeSet.length) { ensureAudio(); tone(freqPlace(i, null), ctx.currentTime + 0.02, 0.6, 0.25); }
+}
+for (const id of ["oVal", "oNote", "oPro", "oHands", "oMir", "oOpp", "oPoly"]) $(id).addEventListener("change", applyOptions);
+function applyOptions() {
+  $("handOpts").hidden = !$("oHands").checked;
+  layers.vals.style.display = $("oVal").checked ? "" : "none";
+  layers.notes.style.display = $("oNote").checked ? "" : "none";
+  layers.pro.style.display = $("oPro").checked ? "" : "none";
+  drawHands();
+}
+
+// exact corner angles: an inscribed angle is half the arc it stands on
+function shapeOf(places) {
+  const k = places.length; if (k < 2) return null;
+  const arcs = places.map((q, j) => mod(places[(j + 1) % k] - q, W) || W);
+  const ang = places.map((_, j) => k < 3 ? null : +((360 - STEP * (arcs[(j - 1 + k) % k] + arcs[j])) / 2).toFixed(2));
+  const rot = (a, s) => a.slice(s).concat(a.slice(0, s)), eq = (a, b) => a.every((x, j) => x === b[j]);
+  const regular = arcs.every((x) => x === arcs[0]);
+  const rev = [...arcs].reverse(), mirror = arcs.some((_, s) => eq(rot(rev, s), arcs));
+  let period = k; for (let s = 1; s < k; s++) if (k % s === 0 && eq(rot(arcs, s), arcs)) { period = s; break; }
+  return { arcs, ang, regular, mirror, turns: k / period };
+}
+function drawChord() {
+  showVoiceCtl();
+  const g = layers.chord; g.innerHTML = "";
+  const ch = chordNow(), places = chordPlaces(ch);
+  $("cname").textContent = ch.name;
+  if (places.length) {
+    const pts = places.map((i) => at(i, RP));
+    if (places.length >= 3) el(g, "polygon", { points: pts.map((q) => q.join(",")).join(" "), fill: "var(--chord)", "fill-opacity": 0.16, stroke: "var(--chord)", "stroke-width": 2.6, "stroke-linejoin": "round" });
+    else if (places.length === 2) el(g, "line", { x1: pts[0][0], y1: pts[0][1], x2: pts[1][0], y2: pts[1][1], stroke: "var(--chord)", "stroke-width": 2.6 });
+    places.forEach((i, j) => {
+      const isRoot = PL[i].pc === ch.r;
+      el(g, "circle", { cx: pts[j][0], cy: pts[j][1], r: isRoot ? (W === 50 ? 6.5 : 8) : (W === 50 ? 4.5 : 5.5), fill: isRoot ? "var(--chord)" : "var(--panel)", stroke: "var(--chord)", "stroke-width": 2.2 });
+    });
+    el(g, "circle", { cx: WCX, cy: WCY, r: 2.5, fill: "var(--muted)" });
+  }
+  const sh = shapeOf(places), rows = [];
+  if (ch.c) rows.push(["degrees", ch.c.degs.join(" ")]);
+  rows.push(["notes", ch.pcs.map((p) => NOTE[p]).join(" ") || "—"]);
+  const nts = notesArr(), missing = ch.pcs.filter((p) => !nts.includes(p));
+  rows.push(["on the wheel", places.length ? places.map((i) => `${nameAt(i)}${W > 12 ? `<sub>${PL[i].b + 1}</sub>` : ""} at n = ${PL[i].n}`).join(", ") : "—"]);
+  if (missing.length) rows.push(["not on this wheel", missing.map((p) => NOTE[p]).join(" ")]);
+  if (places.length) {
+    rows.push(["values under the notes", places.map((i) => `${PL[i].h} (${nameOf(PL[i].h)})`).join(", ")]);
+    const sil = places.filter((i) => PL[i].h === 0).length;
+    rows.push(["silent notes", sil ? `${sil} of ${places.length}` : '<span class="yes">none: every note sounds</span>']);
+  }
+  if (isPure() && places.length) {
+    const ri = places.find((i) => PL[i].pc === ch.r), rc = ri !== undefined ? pureCents(PL[ri].k) : 0;
+    rows.push([$("layout").value === "purefourths" ? (isKirn() ? "in Kirnberger fourths" : "in pure fourths") : isKirn() ? "in Kirnberger fifths" : "in pure fifths", places.map((i) => `${nameAt(i)} = ${pureRatio(PL[i].k)} (${pureCents(PL[i].k).toFixed(isKirn() ? 4 : 2)}¢)`).join(", ")]);
+    if (ri !== undefined) rows.push(["above the root", places.filter((i) => i !== ri).map((i) => { const c = mod(pureCents(PL[i].k) - rc, 1200), et = Math.round(c / 100) * 100; return `${nameAt(i)} ${c.toFixed(isKirn() ? 4 : 2)}¢ (${c - et >= 0 ? "+" : "−"}${Math.abs(c - et).toFixed(isKirn() ? 4 : 2)} from equal)`; }).join(", ")]);
+  }
+  if (sh) {
+    rows.push([`sides (steps of ${+STEP.toFixed(1)}°)`, sh.arcs.join(" + ") + ` = ${W}`]);
+    if (sh.ang[0] !== null) rows.push(["corner angles", places.map((i, j) => `${nameAt(i)} ${sh.ang[j]}°`).join(", ") + ` (sum ${+sh.ang.reduce((a, b) => a + b, 0).toFixed(2)}°)`]);
+    rows.push(["shape", places.length < 3 ? "a line, not a polygon" : sh.regular ? `regular ${["", "", "", "triangle", "square", "pentagon", "hexagon"][places.length] || places.length + "-gon"}` : sh.turns > 1 ? `the same after a turn of ${+(360 / sh.turns).toFixed(1)}°` + (sh.mirror ? ", with mirror axes" : "") : sh.mirror ? "symmetric: it has a mirror axis" : "no symmetry: its mirror image is a different chord"]);
+    if (W === 12 && ch.c && onePerNote() && places.length >= 3 && !sh.mirror) { const twin = mirrorTwin(ch); if (twin) rows.push(["mirror image", twin]); }
+  }
+  const vv = $("voice").value;
+  fillInv(W === 12 || vv !== "all" ? ch.pcs.length : 1);
+  $("inv").disabled = W > 12 && vv === "all";
+  $("inv").title = $("inv").disabled ? "“every place” already uses every octave, so there is nothing to invert" : "";
+  $("cread").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  drawTable(ch);
+  drawHands();
+}
+function mirrorTwin(ch) {
+  const key = (a) => [...a].sort((x, y) => x - y).join(",");
+  let best = null;
+  for (let a = 0; a < 12; a++) {
+    const target = key(ch.pcs.map((p) => mod(a - p, 12)));
+    for (const c of LIB) for (let r = 0; r < 12; r++) if (key(pcsOf(c, r)) === target) {
+      const score = (r === ch.r ? 2 : 0) + (c === ch.c ? -1 : 0);
+      if (!best || score > best.score) best = { score, c, r };
+    }
+  }
+  if (!best) return null;
+  return best.c === ch.c ? "the same chord type (the shape is its own mirror image turned)" : `the shape of every ${best.c.suf ? best.c.suf : "major"} chord, e.g. ${chordName(best.c, best.r)}`;
+}
+function drawTable(ch) {
+  if ($("mode").value !== "lib") { $("tab").innerHTML = ""; $("tabNote").textContent = "Choose a chord from the list to compare all twelve roots."; return; }
+  const c = ch.c, t = +$("tr").value, order = [...Array(12).keys()].map((k) => mod(t + ($("layout").value.includes("chrom") ? k : 7 * k), 12));
+  const nts = notesArr();
+  let h = '<thead><tr><th>root</th><th>notes</th><th>on the wheel at n</th><th>values under the notes</th><th class="num">silent</th><th class="num">missing</th></tr></thead><tbody>';
+  let clean = 0;
+  for (const r of order) {
+    if ($("layout").value === "walk" && !fits(c, r)) continue;
+    const pcs = pcsOf(c, r), pl = chordPlaces(ch, r), miss = pcs.filter((p) => !nts.includes(p)).length, sil = pl.filter((i) => PL[i].h === 0).length;
+    if (!sil && !miss && pl.length) clean++;
+    h += `<tr data-r="${r}" class="${r === ch.r ? "here" : ""}"><td>${chordName(c, r)}</td><td>${pcs.map((p) => NOTE[p]).join(" ")}</td><td class="num">${pl.map((i) => PL[i].n).join(", ") || "—"}</td><td>${pl.map((i) => PL[i].h).join(" ")}</td><td class="num">${sil}</td><td class="num">${miss || ""}</td></tr>`;
+  }
+  $("tab").innerHTML = h + "</tbody>";
+  const silent = PL.filter((P) => P.h === 0).map((P) => P.n);
+  $("tabNote").innerHTML = ($("layout").value === "walk" ? "With the cycle's own notes only the roots whose whole chord is among its notes are listed. " : "") + `${clean} of ${$("layout").value === "walk" ? [...Array(12).keys()].filter((r) => fits(c, r)).length : 12} roots put every note of ${c.suf ? c.suf : "major"} on a sounding place (no silence${onePerNote() ? "" : ", nothing missing"}), with the voices chosen above. The silent places of this wheel are n = ${silent.join(", ")}.`;
+}
+$("tab").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-r]"); if (!tr) return; $("root").value = tr.dataset.r; drawChord(); playChord(false); });
+
+// ---- hands (as on the playable palindrome) ----
+const SHAPES = { 120: "triangle", 90: "square", 72: "pentagon", 60: "hexagon", 45: "octagon", 36: "decagon", 30: "dodecagon" };
+function drawHands() {
+  const g = layers.hands; g.innerHTML = "";
+  if (!$("oHands").checked) { $("handinfo").textContent = ""; return; }
+  const degOf = (i) => +((mod(i, W) + OFF) * STEP).toFixed(1);
+  const hand = (i, col, dash, knob) => {
+    const a = wang(i), r = 240, c = Math.cos(a), sn = Math.sin(a);
+    el(g, "line", { x1: WCX, y1: WCY, x2: WCX + r * c, y2: WCY + r * sn, stroke: col, "stroke-width": knob ? 3 : 2.2, "stroke-linecap": "round", "stroke-dasharray": dash || "", opacity: 0.85 });
+    const k = el(g, "circle", { cx: WCX + r * c, cy: WCY + r * sn, r: knob ? 11 : 7, fill: col, stroke: "var(--panel)", "stroke-width": 2, style: knob ? "cursor:grab" : "" });
+    if (knob) k.dataset.knob = knob;
+  };
+  const steps = mod(handB - handA, W), deg = +(steps * STEP).toFixed(1);
+  if (steps) { const r = 60, a0 = wang(handA), a1 = wang(handB);
+    el(g, "path", { d: `M ${WCX + r * Math.cos(a0)} ${WCY + r * Math.sin(a0)} A ${r} ${r} 0 ${deg > 180 ? 1 : 0} ${LAY > 0 ? 1 : 0} ${WCX + r * Math.cos(a1)} ${WCY + r * Math.sin(a1)}`, fill: "none", stroke: "var(--accent2)", "stroke-width": 2 }); }
+  const mirror = M.mirror(handA), opp = mod(handA + W / 2, W), th = +$("oPoly").value, poly = [];
+  if (th) {
+    for (let i = 0; i < 360 / th; i++) poly.push(mod(handA + i * th / STEP, W));
+    el(g, "polygon", { points: poly.map((q) => at(q, RP).join(",")).join(" "), fill: "none", stroke: "var(--poly)", "stroke-width": 1.6, "stroke-dasharray": "5 4" });
+  }
+  if ($("oMir").checked) hand(mirror, "var(--mir)", "5 5");
+  if ($("oOpp").checked) hand(opp, "var(--opp)", "2 4");
+  hand(handA, "var(--ink)", "", "A"); hand(handB, "var(--accent2)", "", "B");
+  const nm = (i) => `n = ${PL[i].n} (${PL[i].pc === null ? "no note" : nameAt(i) + (W > 12 ? `, octave ${PL[i].b + 1}` : "")}, H = ${PL[i].h})`;
+  const iv = (i, j) => PL[i].pc === null || PL[j].pc === null ? "" : `: ${INTV[mod(PL[j].pc - PL[i].pc, 12)]}`;
+  $("handinfo").innerHTML = `<strong>A</strong> ${nm(handA)} at ${degOf(handA)}° · <strong style="color:var(--accent2)">B</strong> ${nm(handB)} at ${degOf(handB)}°` +
+    `<br>A→B ${deg}° = ${steps} step${steps === 1 ? "" : "s"}${iv(handA, handB)}${steps ? ` (the other way ${+(360 - deg).toFixed(1)}°)` : ""}` +
+    ($("oMir").checked ? `<br><strong style="color:var(--mir)">mirror</strong> of A (${M.mtxt}): ${nm(mirror)}${iv(handA, mirror)}` : "") +
+    ($("oOpp").checked ? `<br><strong style="color:var(--opp)">opposite</strong> of A: ${nm(opp)}${iv(handA, opp)}${W === 12 && $("layout").value !== "walk" ? " — on every one-note-per-place layout the opposite place is the tritone" : ""}` : "") +
+    (th ? `<br><strong style="color:var(--poly)">${SHAPES[th]}</strong> from A: ` + poly.map((q) => Math.abs(q - Math.round(q)) > 1e-9 ? `between n = ${PL[Math.floor(q)].n} and ${PL[mod(Math.floor(q) + 1, W)].n}` : PL[q].pc === null ? `n = ${PL[q].n} (·)` : `${nameAt(q)} (n = ${PL[q].n}, H = ${PL[q].h})`).join(" · ") : "") +
+    `<br><span class="note">Drag the knobs to move the hands.</span>`;
+}
+const toI = (e) => { const pt = svgW.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svgW.getScreenCTM().inverse());
+  let t = LAY * (Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2 - ROT); t = mod(t, 2 * Math.PI); return mod(Math.round(t / (2 * Math.PI) * W - OFF), W); };
+svgW.addEventListener("pointerdown", (e) => { if (e.target.dataset && e.target.dataset.knob) { dragK = e.target.dataset.knob; svgW.setPointerCapture(e.pointerId); e.preventDefault(); } });
+svgW.addEventListener("pointermove", (e) => { if (!dragK) return; const i = toI(e);
+  if (dragK === "A" && i !== handA) { handA = i; drawHands(); } if (dragK === "B" && i !== handB) { handB = i; drawHands(); } });
+const stopDrag = () => { dragK = null; }; svgW.addEventListener("pointerup", stopDrag); svgW.addEventListener("pointercancel", stopDrag);
+
+function fillInv(k) {
+  const cur = +$("inv").value || 0, ord = ["root position", "1st", "2nd", "3rd", "4th", "5th", "6th"], m = Math.max(1, Math.min(k, 7));
+  $("inv").innerHTML = ord.slice(0, m).map((t, j) => `<option value="${j}">${t}${j ? " inversion" : ""}</option>`).join("");
+  $("inv").value = String(Math.min(cur, m - 1));
+}
+// ---- sound ----
+let ctx = null, master = null;
+function ensureAudio() { if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.2; master.connect(ctx.destination); } if (ctx.state === "suspended") ctx.resume(); }
+function tone(freq, t, dur, gain) {
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = $("wave").value; o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.02);
+  g.gain.exponentialRampToValueAtTime(gain * 0.5, t + dur * 0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.03);
+}
+const JUST = [1, 16 / 15, 9 / 8, 6 / 5, 5 / 4, 4 / 3, 45 / 32, 3 / 2, 8 / 5, 5 / 3, 9 / 5, 15 / 8];
+const etF = (midi) => 440 * Math.pow(2, (midi - 69) / 12);
+// fixed tunings, built as chains of fifths from the key: C–G–D–A–E–B–F♯–C♯–G♯–D♯–A♯–F–(C), each link given in cents
+const P5 = 1200 * Math.log2(3 / 2), PC = 1200 * Math.log2(531441 / 524288), SC = 1200 * Math.log2(81 / 80), SCH = 1200 * Math.log2(32805 / 32768);
+function chainTable(links) { const t = new Array(12).fill(0); let c = 0; for (let k = 1; k < 12; k++) { c += links[k - 1]; t[mod(7 * k, 12)] = mod(c, 1200); } return t; }
+const TUNINGS = {
+  pyth: { name: "Pythagorean: pure fifths 3:2 from five below the key to six above", t: (() => { const t = []; for (let k = -5; k <= 6; k++) t[mod(7 * k, 12)] = mod(k * P5, 1200); return t; })() },
+  mean: { name: "¼-comma meantone: fifths narrowed by ¼ of the syntonic comma, from E♭ to G♯ (the wolf between them)", t: (() => { const f = P5 - SC / 4, t = []; for (let k = -3; k <= 8; k++) t[mod(7 * k, 12)] = mod(k * f, 1200); return t; })() },
+  werck: { name: "Werckmeister III (1691): C–G, G–D, D–A and B–F♯ narrowed by ¼ Pythagorean comma, the rest pure", t: chainTable([P5 - PC / 4, P5 - PC / 4, P5 - PC / 4, P5, P5, P5 - PC / 4, P5, P5, P5, P5, P5]) },
+  kirn3: { name: "Kirnberger III (1779): C–G–D–A–E narrowed by ¼ syntonic comma, F♯–C♯ by a schisma, the rest pure", t: chainTable([P5 - SC / 4, P5 - SC / 4, P5 - SC / 4, P5 - SC / 4, P5, P5, P5 - SCH, P5, P5, P5, P5]) },
+  vall: { name: "Vallotti: F–C–G–D–A–E–B narrowed by ⅙ Pythagorean comma, the rest pure", t: chainTable([P5 - PC / 6, P5 - PC / 6, P5 - PC / 6, P5 - PC / 6, P5 - PC / 6, P5, P5, P5, P5, P5, P5]) },
+  kfifth: { name: "Kirnberger's fifth 16384/10935 (3:2 less a schisma) from the key: within 0.01¢ of equal", t: (() => { const f = 1200 * Math.log2(16384 / 10935), t = []; for (let k = -5; k <= 6; k++) t[mod(7 * k, 12)] = mod(k * f, 1200); return t; })() },
+};
+// the frequency of an equal-tempered midi note moved by the tuning; pc is the note, rootMidi the chord's root (for just)
+function tuned(midi, pc, k, rootMidi) {
+  if (isPure() && k !== null && k !== undefined) return etF(midi) * Math.pow(2, pureDev(k) / 1200);
+  const tv = $("tune").value;
+  if (tv === "et" || tv === "pent") return etF(midi);
+  const T = TUNINGS[tv];
+  if (T) { const d = mod(pc - +$("tr").value, 12); let dev = T.t[d] - 100 * d; if (dev > 600) dev -= 1200; if (dev < -600) dev += 1200; return etF(midi) * Math.pow(2, dev / 1200); }
+  const semi = midi - rootMidi; return etF(rootMidi) * JUST[mod(semi, 12)] * Math.pow(2, Math.floor(semi / 12));   // just over the root
+}
+const freqPlace = (i, rootMidi) => tuned(midiOf(i), PL[i].pc, PL[i].k, rootMidi === null ? midiOf(i) : rootMidi);
+// the 12 wheel: semitones above the root, with the inversion and the low root
+function voicing(ch) {
+  let semis;
+  if (ch.c) semis = [...ch.c.semis].sort((a, b) => a - b);
+  else semis = ch.pcs.map((p) => mod(p - ch.r, 12)).sort((a, b) => a - b);
+  const inv = Math.min(+$("inv").value || 0, semis.length - 1);
+  for (let k = 0; k < inv; k++) semis.push(semis.shift() + 12);
+  if ($("voice").value === "bass") semis.unshift(-12);
+  return semis;
+}
+function playChord(arp) {
+  const ch = chordNow(); if (ch.r === null || !ch.pcs.length) return;
+  ensureAudio();
+  const t0 = ctx.currentTime + 0.03;
+  let notes = [];          // [freq, label]
+  if (W === 12 && $("mode").value === "lib") {
+    const rootMidi = 48 + ch.r, kOf = (pc) => { const i = PL.findIndex((P) => P.pc === pc); return i >= 0 ? PL[i].k : null; };
+    notes = voicing(ch).map((s) => { const pc = mod(ch.r + s, 12), i = PL.findIndex((P) => P.pc === pc); return [tuned(rootMidi + s, pc, kOf(pc), rootMidi), i >= 0 ? nameAt(i) : NOTE[pc]]; });
+  } else {
+    const pl = chordPlaces(ch).filter((i) => PL[i].pc !== null).sort((a, b) => midiOf(a) - midiOf(b)); if (!pl.length) return;
+    const ri = pl.find((i) => PL[i].pc === ch.r), rm = ri !== undefined ? midiOf(ri) : midiOf(pl[0]);
+    notes = pl.map((i) => [freqPlace(i, rm), nameAt(i) + (W > 12 ? (PL[i].b + 1) : "")]);
+    notes.sort((a, b) => a[0] - b[0]);
+  }
+  const g = 0.5 / Math.max(2, notes.length);
+  notes.forEach(([f], j) => tone(f, t0 + (arp ? j * 0.2 : 0), arp ? 1.4 : 1.9, arp ? 0.26 : g));
+  $("soundNote").textContent = `Sounding: ${notes.map((x) => x[1]).join(" – ")} (lowest first)` + (isPure() ? (isKirn() ? ", in Kirnberger fifths 16384/10935: within 0.016¢ of equal temperament, so it sounds like it." : ", in pure fifths 3:2 (Pythagorean), each note where its place on the wheel puts it.") : $("tune").value === "just" ? ", in just ratios over the root: 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8." : TUNINGS[$("tune").value] ? `, in ${TUNINGS[$("tune").value].name}, measured from the key note ${NOTE[+$("tr").value]}.` : ", in equal temperament.") +
+    (W === 12 ? " On a 12-place wheel an inversion changes the sound but not the shape: the notes are the same places." : " The small numbers are the octaves of the wheel: each note sounds where its place is.");
+}
+$("pBlock").onclick = () => playChord(false);
+$("pArp").onclick = () => playChord(true);
+
+// ---- controls ----
+$("tr").innerHTML = NOTE.map((nm, i) => `<option value="${i}">${nm}</option>`).join("");
+$("root").innerHTML = NOTE.map((nm, i) => `<option value="${i}">${nm}</option>`).join("");
+$("tr").value = "0"; $("root").value = "0";
+["wmode", "lay", "rot", "layout", "tr", "fifth", "fold"].forEach((id) => $(id).addEventListener("change", () => { freeSet = []; buildWheel(); }));
+$("ctype").addEventListener("change", () => { if ($("layout").value === "walk") chordMenus(); drawChord(); playChord(false); });
+$("root").addEventListener("change", () => { drawChord(); playChord(false); });
+["voice", "oct", "inv"].forEach((id) => $(id).addEventListener("change", () => { drawChord(); playChord(false); }));
+$("mode").addEventListener("change", () => { const lib = $("mode").value === "lib"; $("libRow").classList.toggle("hidden", !lib); $("freeRow").classList.toggle("hidden", lib); freeSet = []; drawChord(); });
+$("clear").onclick = () => { freeSet = []; drawChord(); };
+buildWheel();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", buildWheel);
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
