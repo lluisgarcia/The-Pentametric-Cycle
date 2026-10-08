@@ -36,8 +36,8 @@
 
   <div class="controls panel" style="padding:12px 16px">
     <button id="play" class="primary">▶ Play</button>
-    <label><input id="retro" type="checkbox"> play backwards (retrograde)</label>
-    <label><input id="loop" type="checkbox" checked> loop</label>
+    <label>start <select id="dir"><option value="cw">clockwise</option><option value="ccw">counterclockwise (retrograde)</option></select></label>
+    <label>repeat <select id="rep"><option value="once">once</option><option value="loop" selected>loop: always the same way</option><option value="swing">swing: turn back after each cycle</option></select></label>
     <label><input id="drone" type="checkbox"> drone on the fundamental</label>
     <label>tempo <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmOut">120</output></label>
     <label>fundamental
@@ -65,7 +65,6 @@
           <option value="full">the palindrome: n = 0–50 (50 places)</option>
           <option value="inner">the inner palindrome: n = 1–24 (24 places)</option>
           <option value="quarter">a quarter: n = 1–12 (12 places)</option></select></label>
-        <label id="swingL" class="hidden">play <select id="swing"><option value="swing">swing: 1→12, then back 12→1</option><option value="loop">loop: 1→12, 1→12 …</option></select></label>
         <label><input id="oVal" type="checkbox" checked> values in the ring</label>
         <label><input id="oPro" type="checkbox"> protractor</label>
         <label><input id="oHands" type="checkbox"> two hands</label>
@@ -151,7 +150,7 @@ $("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:va
 const MODES = {
   full: { W: 50, first: 0, axes: [0, 25], lab: 5, A: 12, B: 38, title: ["Ὁ Πενταμετρικὸς", "Παλίνδρομος"], sub: "mirror axis through 0 = 50 and 25" },
   inner: { W: 24, first: 1, axes: [11.5, 23.5], lab: 2, A: 11, B: 17, title: ["the inner", "palindrome"], sub: "mirror between 12 | 13 and 24 | 1" },
-  quarter: { W: 12, first: 1, axes: [11.5], lab: 1, A: 0, B: 6, title: ["a quarter", "of the palindrome"], sub: "swinging back plays n = 13 … 24" },
+  quarter: { W: 12, first: 1, axes: [11.5], lab: 1, A: 0, B: 6, title: ["a quarter", "of the palindrome"], sub: "swinging back reads like n = 13 … 24" },
 };
 let M = MODES.full, W = 50, STEP = 7.2;
 const wheelSegs = [];
@@ -204,11 +203,10 @@ function buildWheel() {
   el(layers.centre, "text", { x: WCX, y: WCY - 6, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, M.title[0]);
   el(layers.centre, "text", { x: WCX, y: WCY + 18, "text-anchor": "middle", "font-size": 21, style: "font-family:var(--serif)" }, M.title[1]);
   el(layers.centre, "text", { x: WCX, y: WCY + 42, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, M.sub);
-  $("swingL").classList.toggle("hidden", W !== 12);
   $("wheelNote").textContent = {
     full: "Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.",
     inner: "The 24 terms n = 1 … 24 read the same backwards: they mirror between the pair of fifths at 12 | 13 and across the join 24 | 1. Each place is 15°. Going round, the silence at n = 25 (and 0) is left out.",
-    quarter: "The 12 terms n = 1 … 12 are a quarter of the palindrome; they do not mirror on their own. Swinging back over them plays n = 13 … 24, because that half is the first half reversed: the swing is the inner palindrome. Each place is 30°.",
+    quarter: "The 12 terms n = 1 … 12 are a quarter of the palindrome; they do not mirror on their own. Choose repeat: swing, and the way back sounds exactly like n = 13 … 24, because that half is the first half reversed: the swing is the inner palindrome. Each place is 30°.",
   }[$("wmode").value];
   applyOptions();
 }
@@ -359,20 +357,29 @@ function setDrone(on) {
 }
 
 let timer = null, nextTime = 0, step = 0, queue = [], raf = 0;
-// One pass plays all 51 terms. When looping, the last silence (n = 50) is the first silence (n = 0) of the
-// next palindrome, so it is played only once: the loop repeats 50 steps.
-const order = () => {
-  const md = $("wmode").value; let seq;
-  if (md === "full") { const len = $("loop").checked ? 50 : N; seq = [...Array(len).keys()]; return $("retro").checked ? seq.map((i) => (50 - i)) : seq; }
-  if (md === "inner" || $("swing").value === "swing") seq = Array.from({ length: 24 }, (_, i) => i + 1);   // the swing 1→12→1 is n = 1 … 24
-  else seq = Array.from({ length: 12 }, (_, i) => i + 1);
-  return $("retro").checked ? seq.reverse() : seq;
-};
+// One cycle of the chosen wheel, in one direction. The full wheel plays the 51 terms 0 … 50; when looping the
+// same way, n = 50 is the n = 0 of the next palindrome, so the loop repeats 50 steps. Counterclockwise is the
+// retrograde. "Swing" reverses the direction after each cycle, touching the end place twice like a pendulum.
+function cycle(cw) {
+  const md = $("wmode").value, rep = $("rep").value;
+  if (md === "full") {
+    if (rep === "loop") { const s = [...Array(50).keys()]; return cw ? s : [0, ...s.slice(1).reverse()]; }
+    const s = [...Array(N).keys()]; return cw ? s : s.reverse();
+  }
+  const s = Array.from({ length: W }, (_, i) => i + 1);
+  return cw ? s : s.reverse();
+}
+let playDir = true, seqNow = [];
 function schedule() {
-  const spb = 60 / +$("bpm").value, seq = order();
+  const spb = 60 / +$("bpm").value;
   while (nextTime < ctx.currentTime + 0.12) {
-    if (step >= seq.length) { if ($("loop").checked) step = 0; else { stop(); return; } }
-    const n = seq[step];
+    if (step >= seqNow.length) {
+      const rep = $("rep").value;
+      if (rep === "once") { stop(); return; }
+      if (rep === "swing") playDir = !playDir;
+      seqNow = cycle(playDir); step = 0;
+    }
+    const n = seqNow[step];
     playStep(n, nextTime, spb * 0.92);
     queue.push({ n, t: nextTime });
     nextTime += spb; step++;
@@ -384,7 +391,7 @@ function animate() {
 }
 function start() {
   ensureAudio();
-  step = 0; queue = []; nextTime = ctx.currentTime + 0.08;
+  step = 0; queue = []; nextTime = ctx.currentTime + 0.08; playDir = $("dir").value === "cw"; seqNow = cycle(playDir);
   if ($("drone").checked) setDrone(true);
   timer = setInterval(schedule, 25); schedule();
   raf = requestAnimationFrame(animate);
