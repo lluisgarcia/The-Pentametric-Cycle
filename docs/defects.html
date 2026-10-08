@@ -20,7 +20,7 @@
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The ±0.8 correction</h1>
   <p class="lede">A square of side n·√0.2 has area n²/5, which is almost never a whole number. The Pentametric Formula moves that area by exactly +0.8, −0.8 or 0 to reach the integer P(n), and the matching circles move by exactly ±2π/5. Which way it moves is decided by the last digit of n.</p>
-  <p class="formula">P(n) − n²/5 = <span style="color:var(--accent2)">⁴⁄₅ · (n/5)</span> ∈ {0, +0.8, −0.8}</p>
+  <p class="formula">P(n) − n²/5 = <span style="color:var(--accent2)">⁴⁄₅ · <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span></span> ∈ {0, +0.8, −0.8}</p>
 
   <div class="grid2">
     <div class="panel">
@@ -55,7 +55,7 @@
   <h2>The last-digit rule</h2>
   <div class="panel scroll-x">
     <table class="data" id="digits" style="table-layout:fixed;min-width:620px"></table>
-    <p class="note">The sign comes from the last digit of the double square 2n² (2, 8, 18, 32, 50, …): it ends in 2 for +0.8, in 8 for −0.8 and in 0 for no correction. This is the Legendre symbol (n/5) in disguise.</p>
+    <p class="note">The sign comes from the last digit of the double square 2n² (2, 8, 18, 32, 50, …): it ends in 2 for +0.8, in 8 for −0.8 and in 0 for no correction. This is the Legendre symbol <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span> in disguise.</p>
   </div>
 </main>
 
@@ -102,7 +102,7 @@ function drawSquares() {
   const k = Pent.lucasIndex(n);
   const rows = [
     ["last digit of n", String(n % 10)],
-    ["(n/5) Legendre symbol", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
+    ["<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span> Legendre symbol", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
     ["n²/5", Pent.fmt(A, 1)],
     ["P(n)", `${Pn}`],
     ["P(n) − n²/5", `<span style="color:${colorOf(chi)};font-weight:600">${signStr(chi)}</span>`],

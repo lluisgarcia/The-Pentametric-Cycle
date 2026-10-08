@@ -29,7 +29,7 @@
         <select id="mode">
           <option value="H">H(n) = P(n) mod 5 (the consonances)</option>
           <option value="D">last digit of P(n) (period 50)</option>
-          <option value="L">(n/5), the sign of the correction</option>
+          <option value="L">(n | 5), the sign of the correction</option>
         </select>
       </label>
       <label>rows <input id="rows" type="range" min="6" max="60" value="24"><output id="rowsOut">24</output></label>
@@ -104,7 +104,7 @@ function draw() {
 $("tap").addEventListener("mousemove", (e) => {
   const n = e.target.dataset && e.target.dataset.n; if (n === undefined) return;
   const k = +n, h = Pent.H(k);
-  $("info").textContent = `n = ${k}: P(n) = ${Pent.P(k).toLocaleString("en-US")}, last digit ${Pent.P(k) % 10}, H(n) = ${h} (${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}), (n/5) = ${Pent.leg(k)}`;
+  $("info").textContent = `n = ${k}: P(n) = ${Pent.P(k).toLocaleString("en-US")}, last digit ${Pent.P(k) % 10}, H(n) = ${h} (${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}), (n | 5) = ${Pent.leg(k)}`;
 });
 // ---- download as PNG: redraw the current tapestry on a canvas with a caption ----
 function resolve(c) {                         // turn "var(--c3)" into the colour actually in use
@@ -120,7 +120,7 @@ $("png").addEventListener("click", () => {
   const g = cv.getContext("2d");
   g.fillStyle = resolve("var(--panel)"); g.fillRect(0, 0, cw, ch);
   const ink = resolve("var(--ink)"), muted = resolve("var(--muted)");
-  const label = { H: "H(n) = P(n) mod 5", D: "last digit of P(n)", L: "(n/5), the sign of the ±0.8 correction" }[mode];
+  const label = { H: "H(n) = P(n) mod 5", D: "last digit of P(n)", L: "(n | 5), the sign of the ±0.8 correction" }[mode];
   g.fillStyle = ink; g.font = "600 22px Georgia, serif";
   g.fillText("The Pentametric Cycle · residue tapestry", pad, 36);
   g.fillStyle = muted; g.font = "15px system-ui, sans-serif";
@@ -134,7 +134,7 @@ $("png").addEventListener("click", () => {
     }
   }
   g.textAlign = "left"; g.fillStyle = muted; g.font = "13px system-ui, sans-serif";
-  g.fillText("P(n) = (n² + 4·(n/5))/5 · Lluis Garcia Torcal · doi:10.5281/zenodo.23183108 · lluisgarcia.github.io/The-Pentametric-Cycle", pad, ch - 24);
+  g.fillText("P(n) = (n² + 4·(n | 5))/5 · Lluis Garcia Torcal · doi:10.5281/zenodo.23183108 · lluisgarcia.github.io/The-Pentametric-Cycle", pad, ch - 24);
   cv.toBlob((blob) => {
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
     a.download = `pentametric_tapestry_${mode}_w${W}.png`;

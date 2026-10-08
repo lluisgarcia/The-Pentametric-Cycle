@@ -23,13 +23,13 @@
 <main>
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>Ten forms of one formula</h1>
-  <p class="lede">The same areas were reached in the spreadsheets by ten different routes: through digits, floors, a polynomial, cosines, a golden rotation and the angles of the pentagon. Each route is a different way of computing the Legendre symbol (n/5), so all ten always agree. Choose n and watch them agree.</p>
+  <p class="lede">The same areas were reached in the spreadsheets by ten different routes: through digits, floors, a polynomial, cosines, a golden rotation and the angles of the pentagon. Each route is a different way of computing the Legendre symbol <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span>, so all ten always agree. Choose n and watch them agree.</p>
 
   <div class="panel">
     <div class="controls">
       <label>n <input id="n" type="number" min="0" max="1000000" value="7" style="width:11ch"></label>
       <button id="minus">−1</button><button id="plus">+1</button>
-      <span class="note">d = 2n² mod 10 = <strong id="d"></strong>, r = n² mod 10 = <strong id="r"></strong>, (n/5) = <strong id="chi"></strong>, P(n) = <strong id="P"></strong></span>
+      <span class="note">d = 2n² mod 10 = <strong id="d"></strong>, r = n² mod 10 = <strong id="r"></strong>, <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span> = <strong id="chi"></strong>, P(n) = <strong id="P"></strong></span>
     </div>
     <div class="scroll-x">
       <table class="data" id="tab" style="min-width:680px"></table>
@@ -76,7 +76,7 @@ function golden(n) {            // z^n = C_n + i D_n by the recurrence of multip
 const FORMS = [
   { id: "F1", name: "Interval Map", f: "(n² + 4·C(4n² mod 10)) / 5", note: "C(m) = (26m − 5m²)/24; the original spreadsheet construction",
     v: (n) => (n * n + 4 * C((4 * n * n) % 10)) / 5 },
-  { id: "F2", name: "Legendre symbol", f: "(n² + 4·(n/5)) / 5", note: "the closed form",
+  { id: "F2", name: "Legendre symbol", f: "(n² + 4·<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>) / 5", note: "the closed form",
     v: (n) => (n * n + 4 * Pent.leg(n)) / 5 },
   { id: "F3", name: "Double-square digit", f: "n²/5 + p(d)", note: "p(d) = −d²/12 + 17d/30, d = last digit of 2n²; p(d) = ±0.8 or 0",
     v: (n) => n * n / 5 + p((2 * n * n) % 10) },
@@ -127,7 +127,7 @@ $("check").addEventListener("click", () => {
     if (bad.length > 5) break;
   }
   $("res").innerHTML = bad.length === 0
-    ? `<span class="ok">All ten forms agree with (n² + 4(n/5))/5 for every n from 0 to ${M.toLocaleString("en-US")}</span>${M > 1400 ? " (F9 checked up to n = 1400)" : ""}.`
+    ? `<span class="ok">All ten forms agree with (n² + 4<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>)/5 for every n from 0 to ${M.toLocaleString("en-US")}</span>${M > 1400 ? " (F9 checked up to n = 1400)" : ""}.`
     : `Disagreements: ${bad.join(", ")}`;
 });
 $("n").addEventListener("input", update);

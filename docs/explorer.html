@@ -102,8 +102,8 @@ function update() {
   const chi = Pent.leg(n), k = Pent.lucasIndex(n), isSq = Pent.isSquare(Pn);
   const s = [
     ["n mod 5", String(n % 5)],
-    ["(n/5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
-    ["closed form", `(n² + 4(n/5))/5 = ${big(Pn)}`],
+    ["<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"],
+    ["closed form", `(n² + 4<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>)/5 = ${big(Pn)}`],
     ["n²/5", Pent.fmt(sq / 5, 1)],
     ["perfect square?", isSq ? `<span class="ok">yes, ${big(Math.round(Math.sqrt(Pn)))}²</span>` : "no"],
     ["Lucas number?", k >= 0 ? `<span class="ok">yes, n = L<sub>${k}</sub>, P(n) = F<sub>${k}</sub><sup>2</sup></span>` : "no"],

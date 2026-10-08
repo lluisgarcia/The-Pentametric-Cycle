@@ -150,3 +150,9 @@ body.no-anim nav.drawer, body.no-anim .nav-scrim { transition: none !important; 
   body.menu-open nav.drawer { box-shadow: none; }
   .drawer .menu-close { display: none; }
 }
+
+/* Legendre symbol (n over 5 in tall brackets, no fraction bar), so it is never read as n ÷ 5 */
+.leg { display: inline-flex; align-items: center; vertical-align: middle; white-space: nowrap; line-height: 1; margin: 0 .05em; }
+.leg::before, .leg::after { font-size: 1.75em; font-weight: 300; line-height: 1; transform: scaleX(.8); }
+.leg::before { content: "("; } .leg::after { content: ")"; }
+.leg .st { display: inline-flex; flex-direction: column; align-items: center; font-size: .72em; line-height: 1.05; padding: 0 .05em; }

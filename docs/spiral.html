@@ -177,7 +177,7 @@ function draw() {
     ["difference", `<span class="ok">${sign}4/5 = ${sign}0.8</span>`],
     ["circle Γ<sub>k</sub> − circle Ω<sub>k</sub>", `<span class="ok">${sign}2π/5</span> = ${Pent.fmt(Math.PI * (Lk * Lk / 10 - Fk * Fk / 2), 4)}`],
     ["√2 · |C<sub>k</sub>P|", `${Pent.fmt(Math.SQRT2 * d, 4)} → rounds to ${Math.round(Math.SQRT2 * d)}` + (k >= 2 ? ` = F<sub>${k}</sub>` : "")],
-    ["P(L<sub>k</sub>) = (L<sub>k</sub><sup>2</sup> + 4(L<sub>k</sub>/5))/5", `${Pent.P(Lk)} = ${Fk}<sup>2</sup>`],
+    ["P(L<sub>k</sub>) = (L<sub>k</sub><sup>2</sup> + 4<span class='leg' title='Legendre symbol: 0 if 5 divides Lk, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>L<sub>k</sub></span><span>5</span></span></span>)/5", `${Pent.P(Lk)} = ${Fk}<sup>2</sup>`],
   ];
   document.getElementById("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }

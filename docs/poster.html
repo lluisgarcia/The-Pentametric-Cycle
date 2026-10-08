@@ -172,7 +172,7 @@ function poster() {
     parts.push(`<text x="${tx}" y="${ty}" font-family="${serif}" font-size="${big}" font-weight="${fw}" fill="${P.ink}" text-anchor="${anchor}">Ὁ Πενταμετρικὸς Κύκλος</text>`);
     parts.push(`<text x="${tx}" y="${ty + big * 0.85}" font-family="${serif}" font-size="${big * 0.5}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.muted}" text-anchor="${anchor}">The Pentametric Cycle</text>`);
     const fy = W > Hh ? ty + big * 2.2 : Hh - m - (cr ? Hh * 0.04 : 0);
-    parts.push(`<text x="${tx}" y="${fy}" font-family="${serif}" font-size="${big * 0.48}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.ink}" text-anchor="${anchor}">P(n) = (n² + 4·(n/5)) / 5</text>`);
+    parts.push(`<text x="${tx}" y="${fy}" font-family="${serif}" font-size="${big * 0.48}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.ink}" text-anchor="${anchor}">P(n) = (n² + 4·(n | 5)) / 5</text>`);
     const leg = ["silence", "unison 1:1", "octave 2:1", "fifth 3:2", "fourth 4:3"];
     if (design !== "spiral") {
       const ly = W > Hh ? fy + big * 1.1 : fy + big * 0.75, fs = big * 0.26;

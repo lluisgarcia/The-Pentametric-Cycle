@@ -268,7 +268,7 @@ $("card").onclick = () => {
   g.fillText(line.length > 90 ? line.slice(0, 88) + "…" : line, 60, ty);
   if ($("useDate").checked && $("date").value) g.fillText("date " + $("date").value, 60, ty + 34);
   g.font = "16px system-ui, sans-serif";
-  g.fillText("P(n) = (n² + 4·(n/5))/5 · H(n) = P(n) mod 5 · lluisgarcia.github.io/The-Pentametric-Cycle", 60, H - 40);
+  g.fillText("P(n) = (n² + 4·(n | 5))/5 · H(n) = P(n) mod 5 · lluisgarcia.github.io/The-Pentametric-Cycle", 60, H - 40);
   cv.toBlob((b) => download(b, `pentametric_${slug()}.png`), "image/png");
 };
 

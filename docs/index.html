@@ -29,14 +29,16 @@
     <p class="en">The Pentametric Cycle</p>
   </div>
   <style>
-    .fx { font-family: var(--serif); text-align: center; margin: 8px 0 18px; line-height: 1.3; }
+    .fx { font-family: var(--serif); text-align: center; margin: 14px auto 24px; line-height: 1.3;
+          background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 14px 18px 4px; }
     .fx .big { font-size: 2.6rem; display: flex; justify-content: center; gap: 1.6em; margin: 6px 0 12px; }
     .fx .row { font-size: 1.3rem; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .4em 1.6em; margin: 6px 0; }
     .fx .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 .15em; }
     .fx .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 .2em; }
     .fx .m { font-family: "Cambria Math", "STIX Two Math", "Noto Sans Math", "Segoe UI Symbol", var(--serif); font-style: normal; }
     .fx i { font-style: italic; }
-    .fx .note { font-family: var(--sans); font-size: .9rem; margin: 2px 0 10px; }
+    .fx .note { font-family: var(--sans); font-size: .85rem; margin: 2px 0 10px; }
+    @media (min-width: 1100px) { .fx .note { white-space: nowrap; } }
   </style>
   <div class="fx" aria-label="The Pentametric Formula">
     <div class="big"><span><span class="m">𝔓</span>(<i>n</i>)</span><span>♪(<i>n</i>)</span></div>
@@ -46,8 +48,8 @@
       <span><i>C</i>(<i>m</i>) = <span class="frac"><span>26<i>m</i> − 5<i>m</i>²</span><span>24</span></span></span>
     </div>
     <div class="row"><span><span class="m">𝔓</span>(<i>L<sub>k</sub></i>) = <i>F<sub>k</sub></i>²</span></div>
-    <p class="note">The formula as found. On every n, C(m) equals the Legendre symbol (n/5), so equivalently
-      <span class="m">𝔓</span>(n) = (n² + 4·(n/5)) / 5. ♪(n) is the interval of 𝔓(n) mod 5.</p>
+    <p class="note">The formula as found. C(m) equals the Legendre symbol <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span> (0 or ±1, not a fraction), so
+      <span class="m">𝔓</span>(n) = (n² + 4·<span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span>) / 5. ♪(n) is the interval of 𝔓(n) mod 5.</p>
   </div>
   <p class="lede">A formula found by experiment on the squares of the Fibonacci spiral. At every Lucas number 1, 3, 4, 7, 11, 18, … it returns the square of the matching Fibonacci number, and nowhere else is it a perfect square. Reduced modulo 5, it becomes a palindrome of the four Pythagorean consonances: unison, octave, fifth and fourth.</p>
 

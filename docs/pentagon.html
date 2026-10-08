@@ -19,7 +19,7 @@
 <main>
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The pentagon clock</h1>
-  <p class="lede">Everything in the formula is decided by where n lands on a regular pentagon. Step n around the circle by 72° at a time: the vertex it lands on gives the sign of the correction, +0.8, −0.8 or 0. This is the Legendre symbol (n/5), and it is why the cosine form F8 and the angle form F10 give the same areas.</p>
+  <p class="lede">Everything in the formula is decided by where n lands on a regular pentagon. Step n around the circle by 72° at a time: the vertex it lands on gives the sign of the correction, +0.8, −0.8 or 0. This is the Legendre symbol <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span>, and it is why the cosine form F8 and the angle form F10 give the same areas.</p>
 
   <div class="panel controls">
     <label>n <input id="n" type="number" min="0" max="100000" value="1" style="width:10ch"></label>
@@ -47,7 +47,7 @@
   <h2>Why the palindrome</h2>
   <div class="grid2">
     <div class="panel">
-      <p style="margin-top:0">The pentagon is symmetric about its horizontal axis. Reflecting it sends the vertex for n to the vertex for −n, and the colours match: vertices 1 and 4 are both +, vertices 2 and 3 are both −. So (−n/5) = (n/5), hence P(−n) = P(n), and the residues read the same backwards. Combined with the period 25, this gives the mirror at n = 25 and the 51-term palindrome.</p>
+      <p style="margin-top:0">The pentagon is symmetric about its horizontal axis. Reflecting it sends the vertex for n to the vertex for −n, and the colours match: vertices 1 and 4 are both +, vertices 2 and 3 are both −. So (−n/5) = <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span>, hence P(−n) = P(n), and the residues read the same backwards. Combined with the period 25, this gives the mirror at n = 25 and the 51-term palindrome.</p>
       <p class="note" style="margin-bottom:0">In number theory this is the fact that −1 is a square modulo 5 (since 2² = 4 ≡ −1).</p>
     </div>
     <div class="panel scroll-x">
@@ -115,14 +115,14 @@ function draw(n) {
     ["first hand 72n°", `${Pent.mod(72 * n, 360)}°  → cos = ${Pent.fmt(c1, 4)}`],
     ["second hand 144n°", `${Pent.mod(144 * n, 360)}° → cos = ${Pent.fmt(c2, 4)}`],
     ["difference", `${Pent.fmt(diff, 4)} = ${chi === 0 ? "0" : (chi > 0 ? "+" : "−") + "√5/2"}`],
-    ["(n/5)", `<span style="color:${col(chi)};font-weight:600">${chi > 0 ? "+1" : chi < 0 ? "−1" : "0"}</span>`],
-    ["correction 4/5 · (n/5)", chi > 0 ? "+0.8" : chi < 0 ? "−0.8" : "0"],
-    ["P(n) = (n² + 4(n/5))/5", `(${(n * n).toLocaleString("en-US")} ${chi < 0 ? "−" : "+"} ${Math.abs(4 * chi)})/5 = ${Pent.P(n).toLocaleString("en-US")}`],
+    ["<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>", `<span style="color:${col(chi)};font-weight:600">${chi > 0 ? "+1" : chi < 0 ? "−1" : "0"}</span>`],
+    ["correction 4/5 · <span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>", chi > 0 ? "+0.8" : chi < 0 ? "−0.8" : "0"],
+    ["P(n) = (n² + 4<span class='leg' title='Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>n</span><span>5</span></span></span>)/5", `(${(n * n).toLocaleString("en-US")} ${chi < 0 ? "−" : "+"} ${Math.abs(4 * chi)})/5 = ${Pent.P(n).toLocaleString("en-US")}`],
   ];
   $("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }
 
-$("tab").innerHTML = "<tr><th class=num>vertex</th><th class=num>angle</th><th class=num>cos 72k°</th><th class=num>cos 144k°</th><th class=num>difference</th><th class=num>(k/5)</th></tr>" +
+$("tab").innerHTML = "<tr><th class=num>vertex</th><th class=num>angle</th><th class=num>cos 72k°</th><th class=num>cos 144k°</th><th class=num>difference</th><th class=num><span class='leg' title='Legendre symbol: 0 if 5 divides k, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>k</span><span>5</span></span></span></th></tr>" +
   [0, 1, 2, 3, 4].map((k) => { const c1 = Math.cos(2 * Math.PI * k / 5), c2 = Math.cos(4 * Math.PI * k / 5), chi = Pent.leg(k);
     return `<tr><td class=num>${k}</td><td class=num>${72 * k}°</td><td class=num>${Pent.fmt(c1, 3)}</td><td class=num>${Pent.fmt(c2, 3)}</td><td class=num>${Pent.fmt(c1 - c2, 3)}</td><td class=num style="color:${col(chi)};font-weight:600">${chi > 0 ? "+1" : chi < 0 ? "−1" : "0"}</td></tr>`; }).join("");
 
