@@ -65,6 +65,7 @@
           <option value="full">the palindrome: n = 0–50 (50 places)</option>
           <option value="inner">the inner palindrome: n = 1–24 (24 places)</option>
           <option value="quarter">a quarter: n = 1–12 (12 places)</option></select></label>
+        <label>numbers run <select id="lay"><option value="1">clockwise</option><option value="-1">counterclockwise (like a chart)</option></select></label>
         <label>start at <select id="rot"><option value="0">the top</option><option value="90">the right (90°)</option><option value="180">the bottom (180°)</option><option value="270">the left (270°, like Aries on a chart)</option></select></label>
         <label><input id="oVal" type="checkbox" checked> values in the ring</label>
         <label><input id="oPro" type="checkbox"> protractor</label>
@@ -153,22 +154,28 @@ const MODES = {
   inner: { W: 24, first: 1, axes: [11.5, 23.5], lab: 2, A: 11, B: 17, title: ["the inner", "palindrome"], sub: "mirror between 12 | 13 and 24 | 1" },
   quarter: { W: 12, first: 1, axes: [11.5], lab: 1, A: 0, B: 6, title: ["a quarter", "of the palindrome"], sub: "start and end meet at the top" },
 };
-let M = MODES.full, W = 50, STEP = 7.2, OFF = 0, ROT = 0;   // OFF = ½ place on the 24 and 12 wheels, so the start/end seam is exactly on the start line
+let M = MODES.full, W = 50, STEP = 7.2, OFF = 0, ROT = 0, LAY = 1;   // LAY = −1: the numbers run counterclockwise   // OFF = ½ place on the 24 and 12 wheels, so the start/end seam is exactly on the start line
 const wheelSegs = [];
 const WCX = 300, WCY = 300, R1 = 158, R2 = 214;
-const wang = (i) => -Math.PI / 2 + ROT + ((i + OFF) / W) * 2 * Math.PI;   // the start at the top (or turned by ROT), clockwise
+const wang = (i) => -Math.PI / 2 + ROT + LAY * ((i + OFF) / W) * 2 * Math.PI;   // the start at the top (or turned by ROT), clockwise
 const nAt = (i) => M.first + (((Math.round(i) % W) + W) % W);
-function posOf(n) {                                                  // the place on the wheel that shows step n
-  if ($("wmode").value === "full") return n % 50;
-  if ($("wmode").value === "inner") return n >= 1 && n <= 24 ? n - 1 : -1;
-  return n >= 1 && n <= 12 ? n - 1 : n >= 13 && n <= 24 ? 24 - n : -1;   // quarter: n = 13…24 is 12…1 swung back
+// The place that shows step n of the endless cycle. In "swing" the cycle is folded at its own walls:
+// the full wheel at n = 0 and 50 (walls on a step), the inner wheel at n = 25 (a silence that is not on it),
+// the quarter at 12 | 13 (a wall between steps, so 12 sounds twice) and at n = 0 (a silence not on it).
+function posOf(n) {
+  const md = $("wmode").value, sw = $("rep").value === "swing";
+  if (md === "full") { if (!sw) return ((n % 50) + 50) % 50; const m = ((n % 100) + 100) % 100; return m <= 50 ? m % 50 : 100 - m; }
+  if (md === "inner") { const m = ((n % 50) + 50) % 50; if (m === 0 || m === 25) return -1; return sw ? (m < 25 ? m - 1 : 49 - m) : (m < 25 ? m - 1 : m - 26); }
+  const m = ((n % 25) + 25) % 25; if (m === 0) return -1; return m <= 12 ? m - 1 : 24 - m;
 }
 let handA = 12, handB = 38, layers = {};
 const svgW = $("wheel");
 const toN = (e) => { const pt = svgW.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svgW.getScreenCTM().inverse());
-  let t = Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2 - ROT; t = ((t % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); return ((Math.round(t / (2 * Math.PI) * W - OFF) % W) + W) % W; };
+  let t = LAY * (Math.atan2(q.y - WCY, q.x - WCX) + Math.PI / 2 - ROT); t = ((t % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); return ((Math.round(t / (2 * Math.PI) * W - OFF) % W) + W) % W; };
 function buildWheel() {
-  M = MODES[$("wmode").value]; W = M.W; STEP = 360 / W; handA = M.A; handB = M.B; OFF = W === 50 ? 0 : 0.5; ROT = (+$("rot").value) * Math.PI / 180;
+  M = MODES[$("wmode").value]; W = M.W; STEP = 360 / W; handA = M.A; handB = M.B; OFF = W === 50 ? 0 : 0.5; ROT = (+$("rot").value) * Math.PI / 180; LAY = +$("lay").value;
+  $("dir").options[0].text = LAY > 0 ? "clockwise (n going up)" : "counterclockwise (n going up)";
+  $("dir").options[1].text = LAY > 0 ? "counterclockwise (retrograde)" : "clockwise (retrograde)";
   const svg = svgW; svg.innerHTML = ""; wheelSegs.length = 0;
   layers.pro = el(svg, "g", {}); layers.ring = el(svg, "g", {}); layers.labels = el(svg, "g", {});
   layers.axis = el(svg, "g", {}); layers.centre = el(svg, "g", {}); layers.hands = el(svg, "g", {});
@@ -177,7 +184,7 @@ function buildWheel() {
   const fs = W > 30 ? 13 : 16;
   for (let i = 0; i < W; i++) {
     const n = nAt(i), a0 = wang(i - gap), a1 = wang(i + gap);
-    const d = `M ${p(R1, a0)} L ${p(R2, a0)} A ${R2} ${R2} 0 0 1 ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 0 ${p(R1, a0)} Z`;
+    const sw = LAY > 0 ? 1 : 0, d = `M ${p(R1, a0)} L ${p(R2, a0)} A ${R2} ${R2} 0 0 ${sw} ${p(R2, a1)} L ${p(R1, a1)} A ${R1} ${R1} 0 0 ${1 - sw} ${p(R1, a0)} Z`;
     const seg = el(layers.ring, "path", { d, fill: `var(--c${Hs[n]})`, class: "seg", stroke: "var(--panel)", "stroke-width": 1 });
     seg.addEventListener("click", () => { ensureAudio(); playStep(n, ctx.currentTime + 0.02, 0.6); show(n); handA = i; drawHands(); });
     el(seg, "title", {}, `n = ${n}: H = ${Hs[n]}, ${IV[Hs[n]].name}`);
@@ -207,7 +214,7 @@ function buildWheel() {
   $("wheelNote").textContent = {
     full: "Going round the circle, n = 50 lands on n = 0: each palindrome ends with the silence that starts the next one, so the wheel has 50 places. The roll below shows all 51 terms, from 0 to 50.",
     inner: "The 24 terms n = 1 … 24 read the same backwards: they mirror between the pair of fifths at 12 | 13 and across the join 24 | 1. Each place is 15°. Going round, the silence at n = 25 (and 0) is left out.",
-    quarter: "The 12 terms n = 1 … 12 are a quarter of the palindrome; they do not mirror on their own. With repeat: swing it bounces, 1 → 12 → 1 → 12 …; the way back, 11 … 1, sounds like n = 14 … 24, because the second half of the inner palindrome is the first half reversed (n = 13 repeats the fifth of n = 12). Each place is 30°.",
+    quarter: "The 12 terms n = 1 … 12 are a quarter of the palindrome; they do not mirror on their own. With repeat: swing it plays the endless cycle folded onto this wheel at the cycle's own walls: 1 → 12, 12 → 1 (the wall at 12 | 13 falls between steps, so the fifth sounds twice), then one silent beat (the wall at n = 0 is a silence that is not on this wheel), and again. That is exactly the cycle: one period = silence + the quarter + the quarter reversed. Each place is 30°.",
   }[$("wmode").value];
   applyOptions();
 }
@@ -250,7 +257,7 @@ function drawHands() {
   const steps = ((handB - handA) % W + W) % W, deg = steps * STEP;
   if (steps) {
     const r = 70, a0 = wang(handA), a1 = wang(handB), large = deg > 180 ? 1 : 0;
-    el(g, "path", { d: `M ${WCX + r * Math.cos(a0)} ${WCY + r * Math.sin(a0)} A ${r} ${r} 0 ${large} 1 ${WCX + r * Math.cos(a1)} ${WCY + r * Math.sin(a1)}`, fill: "none", stroke: "var(--accent2)", "stroke-width": 2 });
+    el(g, "path", { d: `M ${WCX + r * Math.cos(a0)} ${WCY + r * Math.sin(a0)} A ${r} ${r} 0 ${large} ${LAY > 0 ? 1 : 0} ${WCX + r * Math.cos(a1)} ${WCY + r * Math.sin(a1)}`, fill: "none", stroke: "var(--accent2)", "stroke-width": 2 });
   }
   const mirror = W === 50 ? (W - handA) % W : W - 1 - handA, opp = (handA + W / 2) % W;
   const th = +$("oPoly").value, poly = [];
@@ -311,13 +318,13 @@ const rollCols = [];
 let shown = -1;
 function show(n) {
   wheelSegs.forEach((sg) => { sg.setAttribute("stroke", "var(--panel)"); sg.setAttribute("stroke-width", 1); });
-  if (shown >= 0) rollCols[shown].setAttribute("fill", "transparent");
+  rollCols.forEach((c) => c.setAttribute("fill", "transparent"));
   shown = n;
   const i = posOf(n); if (i >= 0 && wheelSegs[i]) { wheelSegs[i].setAttribute("stroke", "var(--ink)"); wheelSegs[i].setAttribute("stroke-width", 3); }
-  rollCols[n].setAttribute("fill", "var(--fill)");
-  const iv = IV[Hs[n]];
+  const r = ((n % 50) + 50) % 50; if (rollCols[r]) rollCols[r].setAttribute("fill", "var(--fill)");
+  const h = Pent.H(n), iv = IV[h];
   $("pos").textContent = n;
-  $("vals").textContent = `P(${n}) = ${Pent.P(n)},  H(${n}) = ${Hs[n]}`;
+  $("vals").textContent = `P(${n}) = ${Pent.P(n).toLocaleString("en-US")},  H(${n}) = ${h}`;
   $("iname").textContent = iv.ratio ? `${iv.name} ${iv.ratio}` : "silence";
   $("igreek").textContent = iv.greek;
 }
@@ -341,7 +348,7 @@ function tone(freq, t, dur, gain) {
   o.connect(g).connect(master); o.start(t); o.stop(t + dur + 0.02);
 }
 function playStep(n, t, dur) {
-  const iv = IV[Hs[n]];
+  const iv = IV[Pent.H(n)];
   if (!iv.ratio) return;
   const f0 = +$("f0").value;
   tone(f0, t, dur, 0.5);
@@ -360,7 +367,7 @@ function setDrone(on) {
 let timer = null, nextTime = 0, step = 0, queue = [], raf = 0;
 // One cycle of the chosen wheel, in one direction. The full wheel plays the 51 terms 0 … 50; when looping the
 // same way, n = 50 is the n = 0 of the next palindrome, so the loop repeats 50 steps. Counterclockwise is the
-// retrograde. "Swing" bounces: after the end place the very next step goes back the other way.
+// retrograde. "Swing" is handled in schedule(): it plays the endless cycle, folded at its own walls (posOf).
 function cycle(cw, bounce) {
   const md = $("wmode").value, rep = $("rep").value;
   let seq;
@@ -371,10 +378,14 @@ function cycle(cw, bounce) {
   if (!cw) seq.reverse();
   return bounce ? seq.slice(1) : seq;          // a bounce: the end place is not repeated, the next step already goes back
 }
-let playDir = true, seqNow = [];
+let playDir = true, seqNow = [], swingN = 0;
 function schedule() {
   const spb = 60 / +$("bpm").value;
   while (nextTime < ctx.currentTime + 0.12) {
+    if ($("rep").value === "swing") {                // the endless cycle itself, folded onto the wheel at its walls
+      const n = swingN; swingN += playDir ? 1 : -1;
+      playStep(n, nextTime, spb * 0.92); queue.push({ n, t: nextTime }); nextTime += spb; continue;
+    }
     if (step >= seqNow.length) {
       const rep = $("rep").value;
       if (rep === "once") { stop(); return; }
@@ -394,6 +405,7 @@ function animate() {
 function start() {
   ensureAudio();
   step = 0; queue = []; nextTime = ctx.currentTime + 0.08; playDir = $("dir").value === "cw"; seqNow = cycle(playDir);
+  swingN = playDir ? M.first : (W === 50 ? 50 : W);   // start at the first place, or at the last going back
   if ($("drone").checked) setDrone(true);
   timer = setInterval(schedule, 25); schedule();
   raf = requestAnimationFrame(animate);
@@ -409,6 +421,7 @@ $("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").val
 $("drone").addEventListener("change", () => { if (timer) setDrone($("drone").checked); });
 $("f0").addEventListener("change", () => { if (droneNodes) droneNodes.o.frequency.value = +$("f0").value / 2; });
 $("wmode").addEventListener("change", () => { if (timer) stop(); buildWheel(); show(nAt(handA)); });
+$("lay").addEventListener("change", () => { const a = handA, b = handB; buildWheel(); handA = a; handB = b; drawHands(); show(shown >= 0 ? shown : nAt(handA)); });
 $("rot").addEventListener("change", () => { const a = handA, b = handB; buildWheel(); handA = a; handB = b; drawHands(); show(shown >= 0 ? shown : nAt(handA)); });
 buildWheel();
 show(12);
