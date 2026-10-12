@@ -19,13 +19,13 @@
 <main>
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>The Epitetartic Rhombus</h1>
-  <p class="lede">A rhombus whose diagonals are in the ratio 5 : 4, with angles 2·arctan(4/5) = 77.32° and 2·arctan(5/4) = 102.68°. Lluis found it where Holden's line meets an arc of the Fibonacci spiral, then found that every square holds it. Its half-angle is <a href="angle.html">the angle of 0.8</a>, the ±0.8 correction drawn as a slope. This page is an exploration beyond the papers.</p>
+  <p class="lede">A rhombus whose diagonals are in the ratio 5 : 4, with angles 2·arctan(4/5) = 77.32° and 2·arctan(5/4) = 102.68°. Lluis found it where Holden's line meets an arc of the Fibonacci spiral, then found that every square holds it. Its half-angle is <a href="angle.html">the angle of 0.8</a>, the ±0.8 correction drawn as a slope. This page is an exploration beyond the papers; the results are written up, with proofs, in the note <a href="https://doi.org/10.5281/zenodo.23325443">The Epitetartic Rhombus (Zenodo, doi:10.5281/zenodo.23325443)</a>.</p>
 
   <h2>1 · Found: where Holden's line meets the arc</h2>
   <div class="panel">
     <p style="margin-top:0">On <a href="angle.html">the angle of 0.8</a>, a search that joins marked points (corners, centres, the Origin) finds arctan(4/5) nowhere special. Lluis found it where that search never looked: where one of <b>Holden's lines crosses an arc</b> of the spiral. In his GeoGebra frame (E at the origin of the axes, the arc of radius 1 centred at (0, −1)), Holden's green line x + 3y = −2 runs through C₂ = (1, −1) on the arc and leaves it again at one more point, Q₅.</p>
     <div class="controls">
-      <label><input id="hGrid" type="checkbox" checked> the √0.1 grid</label>
+      <label><input id="hGrid" type="checkbox" checked> Holden's grid (h = √0.1)</label>
       <label><input id="hBig" type="checkbox" checked> the rhombus from Q₅</label>
       <label><input id="hHalf" type="checkbox"> the half rhombus on the grid</label>
     </div>
@@ -39,7 +39,26 @@
     <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> Put the line into the circle: x² + (y + 1)² = 1 with y + 1 = (1 − x)/3 gives 5x² − x − 4 = 0, that is (5x + 4)(x − 1) = 0. So the line meets the arc at C₂ (x = 1) and at <b>Q₅ = (−4/5, −2/5) exactly</b>. Seen from the arc's centre, Q₅ is the 3-4-5 point (−4/5, 3/5): a chord of slope 1/3 through the edge of a circle doubles its angle at the centre, tan 2θ₁ = (2/3)/(1 − 1/9) = 3/4. Holden's arctan(1/3) makes the 3-4-5 triangle, and the 0.8 comes with it.</p>
   </div>
 
-  <h2>2 · The Epitetartic Rhombus</h2>
+  <h2>2 · The same crossing in every square</h2>
+  <div class="panel">
+    <p style="margin-top:0">Q₅ is not alone. Lluis found that in <b>every</b> square of the tiling Holden's lines cross the spiral exactly once, and always at a whole number of <b>Holden units</b> (h = √0.1, the side of Holden's grid) from the Origin: <b>twice the next Fibonacci number</b>. Square 1 crosses at 2h (that is Q₅), then 4h, 6h, 10h, 16h, 26h, 42h, … for ever. And seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by the side of the square and turned a quarter turn from one square to the next: the Epitetartic Rhombus grows with the spiral.</p>
+    <div class="controls">
+      <label>squares up to <input id="xk" type="range" min="1" max="9" value="5"><output id="xkOut">5</output></label>
+      <label><input id="xRh" type="checkbox" checked> rhombus in the last square</label>
+      <label><input id="xGrid" type="checkbox"> Holden's grid</label>
+    </div>
+    <div class="grid2">
+      <div><svg id="xsq" viewBox="0 0 600 600" role="img" aria-label="Fibonacci squares, the spiral, Holden's lines and the crossing in every square"></svg></div>
+      <div>
+        <dl class="readout" id="xread"></dl>
+        <div class="scroll-x"><table class="data" id="xtab"></table></div>
+        <p class="note">This section uses Gardiner's coordinates, as in the note: P = (1/10, 3/10) is the Origin, the first square is centred at (0, 0), and the centre of the square of side F<sub>k</sub> is C<sub>k</sub> = P + i<sup>k−1</sup>L<sub>k</sub>w with w = −(1 + 3i)/10 (Holden's centres, L<sub>k</sub> Holden units from P). The crossing is X<sub>k</sub> = P + 2F<sub>k+1</sub>i<sup>k−1</sup>w: on the same ray as the centre, F<sub>k</sub> units further out (2F<sub>k+1</sub> = L<sub>k</sub> + F<sub>k</sub>). In this frame Q₅ of section 1 is X₁ = −P.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> for every k: with the arc's centre M<sub>k</sub> = C<sub>k</sub> + F<sub>k</sub>i<sup>k−1</sup>(1 + i)/2, X<sub>k</sub> − M<sub>k</sub> = F<sub>k</sub>i<sup>k−1</sup>(w − (1 + i)/2) = F<sub>k</sub>i<sup>k−1</sup>(−3/5 − 4/5·i), of length exactly F<sub>k</sub> and pointing into the arc's quarter. <span class="tag">computed</span> that it is the only crossing in each square, for squares 1 to 28. Found by Lluis Garcia Torcal; see the note for the full proof.</p>
+  </div>
+
+  <h2>3 · The Epitetartic Rhombus</h2>
   <div class="panel">
     <p style="margin-top:0">The rhombus of section 1 has its diagonals in the ratio <b>5 : 4</b>, the ratio of the major third, which the Greeks called <span class="greek">ἐπιτέταρτος</span> (epitetartos, “a quarter more”). Lluis named it <b>the Epitetartic Rhombus</b> (<span class="greek">Ὁ Ἐπιτέταρτος Ῥόμβος</span>). Its angles are 2·arctan(4/5) = 77.32° and 2·arctan(5/4) = 102.68°, and its side is √41 times a tenth of the long diagonal. It is not only in the spiral: <b>it can be drawn inside any square</b>.</p>
     <div class="controls">
@@ -61,7 +80,7 @@
     <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> exact fractions: long diagonal (0, 1/3) → (1, 2/3), short diagonal (11/30, 9/10) → (19/30, 1/10), centre (1/2, 1/2); the slope −1/2 line through (1/6, 1), (1/2, 5/6) and (5/6, 2/3) meets the √10 line at (11/30, 9/10). Checked on Lluis's tilted square, it gives exactly M₄ (−1, −1), F (0, −1), E₈ (−0.5, −0.6) and (−0.5, −1.4).</p>
   </div>
 
-  <h2>3 · Halving never finds the corner; threes and fives do</h2>
+  <h2>4 · Halving never finds the corner; threes and fives do</h2>
   <div class="panel">
     <p style="margin-top:0">Lluis tried to catch the corner (11/30, 9/10) by halving the square again and again, to see if it ever becomes the centre or the corner of a small square. It never does: at every halving it falls into a different quarter, for ever. Split it by threes and fives <b>together</b> (15 or 30 parts) instead, and it lands exactly. Threes alone or fives alone are not enough: each catches only part of it.</p>
     <div class="controls">
@@ -134,7 +153,7 @@ function drawHol() {
   s += `<polygon points="${star(X(O[0]), Y(O[1]), 8)}" fill="${C.ink}"/>` + T(X(O[0]) + 12, Y(O[1]) + 12, "Origin", C.ink, 13, "start");
   s += `<circle cx="${f1(X(0))}" cy="${f1(Y(0))}" r="3.5" fill="${C.ink}"/>` + T(X(0) + 8, Y(0) - 10, "E", C.ink, 13, "start");
   $("hol").innerHTML = s;
-  const rows = [["Q₅", "(−4/5, −2/5), exactly"], ["from the arc's centre", "(−4/5, 3/5): a 3-4-5 point"], ["Origin → Q₅", "2·√0.1 along Holden's line"]];
+  const rows = [["Q₅", "(−4/5, −2/5), exactly"], ["from the arc's centre", "(−4/5, 3/5): a 3-4-5 point"], ["Origin → Q₅", "2 Holden units (2·√0.1) along Holden's line"]];
   if ($("hBig").checked) rows.push(["rhombus E G₅ J₅ N₅", "diagonals 2 and 1.6 (5 : 4)"], ["side", "√1.64 = 1.28062…"], ["area", "1.6 (each quarter 0.4)"], ["angles", "77.32° and 102.68°"]);
   if ($("hHalf").checked) rows.push(["half rhombus", "Q₅ (−0.8, −0.4), W₆ (−0.3, 0), N₃₀ (0.2, −0.4), E₇ (−0.3, −0.8)"], ["on the grid", "Q₅ and N₃₀ are grid nodes"], ["Origin → N₃₀", "√0.2: one grid cell across"]);
   $("hread").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
@@ -142,7 +161,62 @@ function drawHol() {
 }
 ["hGrid", "hBig", "hHalf"].forEach((id) => $(id).addEventListener("change", drawHol));
 
-// ---------- 2 · the Epitetartic Rhombus in any square ----------
+// ---------- 2 · the crossing in every square (Gardiner's coordinates) ----------
+const FIBS = [0, 1], LUCS = [2, 1]; for (let i = 0; i < 30; i++) { FIBS.push(FIBS[FIBS.length - 1] + FIBS[FIBS.length - 2]); LUCS.push(LUCS[LUCS.length - 1] + LUCS[LUCS.length - 2]); }
+const cmul = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]], ipow = (n) => [[1, 0], [0, 1], [-1, 0], [0, -1]][((n % 4) + 4) % 4];
+const PG = [0.1, 0.3], WG = [-0.1, -0.3];
+const Cg = (k) => { const v = cmul(ipow(k - 1), [WG[0] * LUCS[k], WG[1] * LUCS[k]]); return [PG[0] + v[0], PG[1] + v[1]]; };
+const Mg = (k) => { const c = Cg(k), v = cmul(ipow(k - 1), [FIBS[k] / 2, FIBS[k] / 2]); return [c[0] + v[0], c[1] + v[1]]; };
+const Xg = (k) => { const v = cmul(ipow(k - 1), [WG[0] * 2 * FIBS[k + 1], WG[1] * 2 * FIBS[k + 1]]); return [PG[0] + v[0], PG[1] + v[1]]; };
+function drawX() {
+  const C = COL(), K = +$("xk").value; $("xkOut").textContent = K;
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let k = 1; k <= K; k++) { const c = Cg(k), h = FIBS[k] / 2; x0 = Math.min(x0, c[0] - h); x1 = Math.max(x1, c[0] + h); y0 = Math.min(y0, c[1] - h); y1 = Math.max(y1, c[1] + h); }
+  if ($("xRh").checked) { const m = Mg(K), F0 = FIBS[K]; x0 = Math.min(x0, m[0] - F0); x1 = Math.max(x1, m[0] + F0); y0 = Math.min(y0, m[1] - F0); y1 = Math.max(y1, m[1] + F0); }
+  const W = 600, pad = 30, span = Math.max(x1 - x0, y1 - y0), sc = (W - 2 * pad) / span, ox = pad + (W - 2 * pad - (x1 - x0) * sc) / 2, oy = pad + (W - 2 * pad - (y1 - y0) * sc) / 2;
+  const X = (x) => ox + (x - x0) * sc, Y = (y) => W - oy - (y - y0) * sc, PT = (p) => `${f1(X(p[0]))},${f1(Y(p[1]))}`;
+  let s = "";
+  if ($("xGrid").checked && Math.sqrt(0.1) * sc >= 3) for (const [a, b] of [[3, -1], [1, 3]]) {
+    const v = [a * x0 + b * y0, a * x1 + b * y0, a * x0 + b * y1, a * x1 + b * y1];
+    for (let m = Math.ceil(Math.min(...v)) - 2; m <= Math.floor(Math.max(...v)) + 2; m++) s += LN(X(x0 - span), Y((m - a * (x0 - span)) / b), X(x1 + span), Y((m - a * (x1 + span)) / b), C.muted, 0.5, 'opacity=".35"');
+  }
+  for (let k = 1; k <= K; k++) { const c = Cg(k), h = FIBS[k] / 2;
+    s += `<rect x="${f1(X(c[0] - h))}" y="${f1(Y(c[1] + h))}" width="${f1(FIBS[k] * sc)}" height="${f1(FIBS[k] * sc)}" fill="${k === K ? C.fill : "none"}" fill-opacity=".5" stroke="${C.muted}" stroke-width="1"/>`;
+    const m = Mg(k), a0 = Math.PI * (1 + (k - 1) / 2), pts = [];
+    for (let t = 0; t <= 32; t++) { const a = a0 + (t / 32) * Math.PI / 2; pts.push(PT([m[0] + FIBS[k] * Math.cos(a), m[1] + FIBS[k] * Math.sin(a)])); }
+    s += `<polyline points="${pts.join(" ")}" fill="none" stroke="${C.adj}" stroke-width="2.4"/>`; }
+  // Holden's lines, through P
+  const big = 3 * span;
+  s += LN(X(PG[0] - big), Y(PG[1] - 3 * big), X(PG[0] + big), Y(PG[1] + 3 * big), C.hyp, 1.6) + LN(X(PG[0] - 3 * big), Y(PG[1] + big), X(PG[0] + 3 * big), Y(PG[1] - big), C.opp, 1.6);
+  const mK = Mg(K), xK = Xg(K), F = FIBS[K];
+  if ($("xRh").checked) { const u = ipow(K - 1), v = cmul(u, [0, 1]);
+    const R = [[mK[0] - F * u[0], mK[1] - F * u[1]], [mK[0] - 0.8 * F * v[0], mK[1] - 0.8 * F * v[1]], [mK[0] + F * u[0], mK[1] + F * u[1]], [mK[0] + 0.8 * F * v[0], mK[1] + 0.8 * F * v[1]]];
+    s += `<polygon points="${R.map(PT).join(" ")}" fill="${C.th}" fill-opacity=".14" stroke="${C.th}" stroke-width="2"/>`;
+    s += LN(X(mK[0]), Y(mK[1]), X(xK[0]), Y(xK[1]), C.ph, 2);
+    const foot = (() => { const d = [xK[0] - mK[0], xK[1] - mK[1]], t = d[0] * u[0] + d[1] * u[1]; return [mK[0] + t * u[0], mK[1] + t * u[1]]; })();
+    s += LN(X(mK[0]), Y(mK[1]), X(foot[0]), Y(foot[1]), C.ph, 1.2, 'stroke-dasharray="4 3"') + LN(X(foot[0]), Y(foot[1]), X(xK[0]), Y(xK[1]), C.ph, 1.2, 'stroke-dasharray="4 3"');
+    s += `<circle cx="${f1(X(mK[0]))}" cy="${f1(Y(mK[1]))}" r="3.5" fill="${C.ph}"/>`; }
+  s += LN(X(PG[0]), Y(PG[1]), X(xK[0]), Y(xK[1]), C.th, 3.5, 'opacity=".55"');
+  for (let k = 1; k <= K; k++) { const c = Cg(k), x = Xg(k), r = Math.max(2.5, Math.min(6, 2 + FIBS[k] * sc / 60));
+    s += `<circle cx="${f1(X(c[0]))}" cy="${f1(Y(c[1]))}" r="${f1(r * 0.6)}" fill="${C.ink}"/>`;
+    s += `<circle cx="${f1(X(x[0]))}" cy="${f1(Y(x[1]))}" r="${f1(r + 1.5)}" fill="${C.th}" stroke="${C.ink}" stroke-width="1"/>`;
+    if (FIBS[k] * sc > 45) s += T(X(x[0]) + 10, Y(x[1]) - 10, `${2 * FIBS[k + 1]}h`, C.ink, 13, "start", 'stroke="var(--bg)" stroke-width="3" paint-order="stroke"'); }
+  const star = (cx, cy, r) => { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; p.push(`${f1(cx + rr * Math.cos(a))},${f1(cy + rr * Math.sin(a))}`); } return p.join(" "); };
+  s += `<polygon points="${star(X(PG[0]), Y(PG[1]), 8)}" fill="${C.ink}"/>`;
+  $("xsq").innerHTML = s;
+  const d = cmul(ipow(K - 1), [-3 / 5, -4 / 5]), fr = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? `${Math.round(v)}` : `${Math.round(v * 5)}/5`);
+  $("xread").innerHTML = [["square", `${K}: side F<sub>${K}</sub> = ${F}, n = L<sub>${K}</sub> = ${LUCS[K]}`], ["centre C<sub>" + K + "</sub>", `${LUCS[K]} Holden unit${LUCS[K] === 1 ? "" : "s"} from P`],
+    ["crossing X<sub>" + K + "</sub>", `<b>${2 * FIBS[K + 1]} Holden units</b> from P = 2 × ${FIBS[K + 1]} (twice F<sub>${K + 1}</sub>)`], ["beyond the centre", `${F} unit${F === 1 ? "" : "s"} (= F<sub>${K}</sub>)`],
+    ["seen from the arc's centre", `X − M = ${F} × (${fr(d[0])}, ${fr(d[1])}): a 3-4-5 point`], ["rhombus here", `diagonals ${2 * F} and ${+(1.6 * F).toFixed(1)} (5 : 4)`]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  let t = "<tr><th>square</th>" + Array.from({ length: K }, (_, i) => `<th class="num">${i + 1}</th>`).join("") + "</tr>";
+  t += "<tr><td>side F<sub>k</sub></td>" + Array.from({ length: K }, (_, i) => `<td class="num">${FIBS[i + 1]}</td>`).join("") + "</tr>";
+  t += "<tr><td>n = L<sub>k</sub> (centre, units)</td>" + Array.from({ length: K }, (_, i) => `<td class="num">${LUCS[i + 1]}</td>`).join("") + "</tr>";
+  t += "<tr><td>crossing, units</td>" + Array.from({ length: K }, (_, i) => `<td class="num"><b>${2 * FIBS[i + 2]}</b></td>`).join("") + "</tr>";
+  $("xtab").innerHTML = t;
+}
+["xk", "xRh", "xGrid"].forEach((id) => $(id).addEventListener("input", drawX));
+
+// ---------- 3 · the Epitetartic Rhombus in any square ----------
 // unit-square coordinates (y up); rhombus 1, then mirrored, turned 90° about the centre, turned and mirrored
 const EPI = { L: [[0, 1 / 3], [1, 2 / 3]], S: [[11 / 30, 9 / 10], [19 / 30, 1 / 10]] };
 const ETR = [(p) => p, (p) => [1 - p[0], p[1]], (p) => [1 - p[1], p[0]], (p) => [p[1], p[0]]];
@@ -181,7 +255,7 @@ function drawEpi() {
 }
 ["eWhich", "eGrid", "eLines", "eRule", "eTenth"].forEach((id) => $(id).addEventListener("change", drawEpi));
 
-// ---------- 3 · halving versus threes and fives ----------
+// ---------- 4 · halving versus threes and fives ----------
 const QN = { "00": "bottom-left", "10": "bottom-right", "01": "top-left", "11": "top-right" };
 function halvState(k) {   // the cell after k halvings: index (a, b) out of 2^k, and the point's place inside it, exactly (numerators over 30)
   let x = 11, y = 27, a = 0, b = 0; const seq = [];   // x/30, y/30
@@ -225,7 +299,7 @@ function drawHalv() {
 }
 ["hk", "hN"].forEach((id) => $(id).addEventListener("input", drawHalv));
 
-function all() { drawHol(); drawEpi(); drawHalv(); }
+function all() { drawHol(); drawX(); drawEpi(); drawHalv(); }
 all();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
 new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
