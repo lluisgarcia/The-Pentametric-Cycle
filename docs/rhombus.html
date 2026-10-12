@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Epitetartic Rhombus · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The Epitetartic Rhombus</h1>
+  <p class="lede">A rhombus whose diagonals are in the ratio 5 : 4, with angles 2·arctan(4/5) = 77.32° and 2·arctan(5/4) = 102.68°. Lluis found it where Holden's line meets an arc of the Fibonacci spiral, then found that every square holds it. Its half-angle is <a href="angle.html">the angle of 0.8</a>, the ±0.8 correction drawn as a slope. This page is an exploration beyond the papers.</p>
+
+  <h2>1 · Found: where Holden's line meets the arc</h2>
+  <div class="panel">
+    <p style="margin-top:0">On <a href="angle.html">the angle of 0.8</a>, a search that joins marked points (corners, centres, the Origin) finds arctan(4/5) nowhere special. Lluis found it where that search never looked: where one of <b>Holden's lines crosses an arc</b> of the spiral. In his GeoGebra frame (E at the origin of the axes, the arc of radius 1 centred at (0, −1)), Holden's green line x + 3y = −2 runs through C₂ = (1, −1) on the arc and leaves it again at one more point, Q₅.</p>
+    <div class="controls">
+      <label><input id="hGrid" type="checkbox" checked> the √0.1 grid</label>
+      <label><input id="hBig" type="checkbox" checked> the rhombus from Q₅</label>
+      <label><input id="hHalf" type="checkbox"> the half rhombus on the grid</label>
+    </div>
+    <div class="grid2">
+      <div><svg id="hol" viewBox="0 0 600 600" role="img" aria-label="Holden's green line meets the unit arc at Q5 = (−4/5, −2/5); the rhombus with diagonals 2 and 1.6"></svg></div>
+      <div>
+        <dl class="readout" id="hread"></dl>
+        <p class="note" id="hnote"></p>
+      </div>
+    </div>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> Put the line into the circle: x² + (y + 1)² = 1 with y + 1 = (1 − x)/3 gives 5x² − x − 4 = 0, that is (5x + 4)(x − 1) = 0. So the line meets the arc at C₂ (x = 1) and at <b>Q₅ = (−4/5, −2/5) exactly</b>. Seen from the arc's centre, Q₅ is the 3-4-5 point (−4/5, 3/5): a chord of slope 1/3 through the edge of a circle doubles its angle at the centre, tan 2θ₁ = (2/3)/(1 − 1/9) = 3/4. Holden's arctan(1/3) makes the 3-4-5 triangle, and the 0.8 comes with it.</p>
+  </div>
+
+  <h2>2 · The Epitetartic Rhombus</h2>
+  <div class="panel">
+    <p style="margin-top:0">The rhombus of section 1 has its diagonals in the ratio <b>5 : 4</b>, the ratio of the major third, which the Greeks called <span class="greek">ἐπιτέταρτος</span> (epitetartos, “a quarter more”). Lluis named it <b>the Epitetartic Rhombus</b> (<span class="greek">Ὁ Ἐπιτέταρτος Ῥόμβος</span>). Its angles are 2·arctan(4/5) = 77.32° and 2·arctan(5/4) = 102.68°, and its side is √41 times a tenth of the long diagonal. It is not only in the spiral: <b>it can be drawn inside any square</b>.</p>
+    <div class="controls">
+      <label>rhombus <select id="eWhich"><option value="0" selected>1</option><option value="1">2 (mirrored)</option><option value="2">3 (turned 90°)</option><option value="3">4 (turned and mirrored)</option><option value="all">all four</option></select></label>
+      <label><input id="eGrid" type="checkbox" checked> 3 × 3 split</label>
+      <label><input id="eLines" type="checkbox" checked> the √10 lines</label>
+      <label><input id="eRule" type="checkbox" checked> ruler construction</label>
+      <label><input id="eTenth" type="checkbox"> tenths</label>
+    </div>
+    <div class="grid2">
+      <div><svg id="epi" viewBox="0 0 600 600" role="img" aria-label="The Epitetartic Rhombus drawn inside a square split 3 by 3"></svg></div>
+      <div>
+        <dl class="readout" id="eread"></dl>
+        <p class="note">Split the square into 3 × 3. The <b>long diagonal</b> is a √10 line: it crosses three small squares, from a third of the way up one side to two thirds up the other (√(1² + 3²) = √10 small sides, slope 1/3, Holden's angle). The <b>short diagonal</b> lies on the perpendicular √10 line (slope −3) but stops <b>one tenth of the side</b> short of each edge, from 1/10 to 9/10 of the height. So it is 8/10 = 4/5 of the long one.</p>
+        <p class="note"><b>With a ruler only:</b> join the middle of the top edge of the top-left small square, the centre of the top-middle one and the middle of the bottom edge of the top-right one. That line has slope −1/2, the paper's other angle θ₂ = arctan(1/2), and it cuts the √10 line exactly at the corner (11/30, 9/10). The opposite corner comes the same way, turned half round the centre. Both of the paper's angles build the rhombus: arctan(1/3) the long diagonal, arctan(1/2) the corners.</p>
+        <p class="note">Every square holds four: the two √10 lines through the centre come in two perpendicular pairs, and either line of a pair can carry the long diagonal. On the tilted squares of the √0.1 grid (side 3·√0.1) the long diagonal joins two nodes of the grid: that is the half rhombus of section 1, from Q₅ to N₃₀, and the Origin sees N₃₀ across exactly one grid cell (√0.2).</p>
+      </div>
+    </div>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> exact fractions: long diagonal (0, 1/3) → (1, 2/3), short diagonal (11/30, 9/10) → (19/30, 1/10), centre (1/2, 1/2); the slope −1/2 line through (1/6, 1), (1/2, 5/6) and (5/6, 2/3) meets the √10 line at (11/30, 9/10). Checked on Lluis's tilted square, it gives exactly M₄ (−1, −1), F (0, −1), E₈ (−0.5, −0.6) and (−0.5, −1.4).</p>
+  </div>
+
+  <h2>3 · Halving never finds the corner; threes and fives do</h2>
+  <div class="panel">
+    <p style="margin-top:0">Lluis tried to catch the corner (11/30, 9/10) by halving the square again and again, to see if it ever becomes the centre or the corner of a small square. It never does: at every halving it falls into a different quarter, for ever. Split it by threes and fives <b>together</b> (15 or 30 parts) instead, and it lands exactly. Threes alone or fives alone are not enough: each catches only part of it.</p>
+    <div class="controls">
+      <label>halvings <input id="hk" type="range" min="0" max="12" value="0"><output id="hkOut">0</output></label>
+      <label>split into <select id="hN"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>9</option><option>10</option><option>12</option><option selected>15</option><option>20</option><option>30</option><option>45</option><option>49</option><option>60</option></select> × the same</label>
+    </div>
+    <div class="scroll-x"><svg id="halv" viewBox="0 0 920 470" style="min-width:640px" role="img" aria-label="Left: the halving cell that holds the corner. Right: the square split by N, where the corner lands"></svg></div>
+    <dl class="readout" id="halvRead"></dl>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> A halving grid can only hit a point whose coordinates have a power of 2 below the line; 11/30 and 9/10 have 3 and 5 there, so the corner never lands. In base 2 both are repeating fractions, so the quarters repeat: after two steps (top-left, top-right) the pattern <b>top-left, bottom-right, bottom-right, top-right</b> comes back for ever, every 4 halvings, because 2⁴ = 16 is one more than 15. The point is the exact centre of a cell when the square is split into 15, 45, … (15 times an odd number) and an exact corner when it is split into 30, 60, … (multiples of 30).</p>
+  </div>
+  <p class="note">The angle of 0.8 lives in the arithmetic (the correction, the doubled angle of the paper's θ₂, the family of triangles on <a href="angle.html">the angle of 0.8</a>) and, as Lluis found, in the geometry too: where Holden's line meets the arc, and in the rhombus every square holds.</p>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const DEG = 180 / Math.PI;
+const f1 = (v) => (+v).toFixed(1);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const COL = () => ({ opp: css("--accent2"), adj: css("--accent"), hyp: css("--ok"), th: css("--c4"), ph: css("--accent3"), ink: css("--ink"), muted: css("--muted"), rule: css("--rule"), fill: css("--fill"), c0: css("--c0") });
+function T(x, y, txt, fill, size, anchor, extra) { return `<text x="${f1(x)}" y="${f1(y)}" fill="${fill}" font-size="${size || 16}" text-anchor="${anchor || "middle"}" dominant-baseline="central" ${extra || ""}>${txt}</text>`; }
+function LN(x1, y1, x2, y2, c, w, extra) { return `<line x1="${f1(x1)}" y1="${f1(y1)}" x2="${f1(x2)}" y2="${f1(y2)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra || ""}/>`; }
+// arc around (cx, cy) between math angles t0 < t1 (counter-clockwise, y up on screen)
+function ARC(cx, cy, r, t0, t1, c, w, extra) {
+  const x0 = cx + r * Math.cos(t0), y0 = cy - r * Math.sin(t0), x1 = cx + r * Math.cos(t1), y1 = cy - r * Math.sin(t1);
+  return `<path d="M${f1(x0)},${f1(y0)} A${r},${r} 0 ${t1 - t0 > Math.PI ? 1 : 0} 0 ${f1(x1)},${f1(y1)}" fill="none" stroke="${c}" stroke-width="${w}" ${extra || ""}/>`;
+}
+function RA(x, y, dx1, dy1, dx2, dy2, s, c) { return `<path d="M${f1(x + dx1 * s)},${f1(y + dy1 * s)} L${f1(x + dx1 * s + dx2 * s)},${f1(y + dy1 * s + dy2 * s)} L${f1(x + dx2 * s)},${f1(y + dy2 * s)}" fill="none" stroke="${c}" stroke-width="1.5"/>`; }
+
+// ---------- 1 · Holden's line meets the arc (Lluis's GeoGebra frame) ----------
+function drawHol() {
+  const C = COL(), W = 600, x0 = -1.35, x1 = 1.35, y0 = -2.3, y1 = 0.4, sc = W / (x1 - x0);
+  const X = (x) => (x - x0) * sc, Y = (y) => (y1 - y) * sc, PT = (p) => `${f1(X(p[0]))},${f1(Y(p[1]))}`;
+  let s = "";
+  if ($("hGrid").checked) for (const [a, b] of [[3, -1], [1, 3]]) {
+    const v = [a * x0 + b * y0, a * x1 + b * y0, a * x0 + b * y1, a * x1 + b * y1];
+    for (let m = Math.ceil(Math.min(...v)); m <= Math.floor(Math.max(...v)); m++) s += LN(X(x0), Y((m - a * x0) / b), X(x1), Y((m - a * x1) / b), C.muted, 0.6, 'opacity=".35"');
+  }
+  s += `<rect x="${f1(X(-1))}" y="${f1(Y(0))}" width="${f1(sc)}" height="${f1(sc)}" fill="none" stroke="${C.adj}" stroke-width="1.2" opacity=".7"/>`;
+  s += `<circle cx="${f1(X(0))}" cy="${f1(Y(-1))}" r="${f1(sc)}" fill="none" stroke="${C.adj}" stroke-width="1" stroke-dasharray="4 5" opacity=".6"/>`;
+  s += `<path d="M${f1(X(0))},${f1(Y(0))} A${f1(sc)},${f1(sc)} 0 0 0 ${f1(X(-1))},${f1(Y(-1))}" fill="none" stroke="${C.adj}" stroke-width="3"/>`;
+  s += T(X(-0.5), Y(-0.15), "unit square", C.muted, 12);
+  // Holden's lines: red y = 3x, green x + 3y = −2
+  s += LN(X(-0.78), Y(-2.34), X(0.13), Y(0.39), C.opp, 2) + LN(X(x0), Y((-2 - x0) / 3), X(x1), Y((-2 - x1) / 3), C.hyp, 2.2);
+  const Q = [-0.8, -0.4], O = [-0.2, -0.6], C2 = [1, -1];
+  if ($("hBig").checked) {
+    const R = [[0, 0], [-0.8, -1], [0, -2], [0.8, -1]];
+    s += `<polygon points="${R.map(PT).join(" ")}" fill="${C.th}" fill-opacity=".14" stroke="${C.th}" stroke-width="2.5"/>`;
+    s += LN(X(-0.8), Y(-1), X(0.8), Y(-1), C.th, 1.2, 'stroke-dasharray="5 4"') + LN(X(0), Y(0), X(0), Y(-2), C.th, 1.2, 'stroke-dasharray="5 4"');
+    s += LN(X(-0.8), Y(-0.4), X(-0.8), Y(-1), C.ph, 1.6, 'stroke-dasharray="3 3"');
+    const th = Math.atan(0.8);
+    s += ARC(X(0), Y(0), 34, -Math.PI / 2 - th, -Math.PI / 2 + th, C.th, 2) + T(X(0) + 44, Y(0) + 40, "77.32°", C.th, 13, "start");
+    s += T(X(-0.8) - 8, Y(-1) + 12, "G₅", C.ink, 13, "end") + T(X(0.8) + 8, Y(-1) + 12, "N₅", C.ink, 13, "start") + T(X(0) + 10, Y(-2) + 4, "J₅", C.ink, 13, "start");
+  }
+  if ($("hHalf").checked) {
+    const H = [[-0.8, -0.4], [-0.3, 0], [0.2, -0.4], [-0.3, -0.8]];
+    s += `<polygon points="${H.map(PT).join(" ")}" fill="${C.ph}" fill-opacity=".14" stroke="${C.ph}" stroke-width="2.2"/>`;
+    s += LN(X(O[0]), Y(O[1]), X(0.2), Y(-0.4), C.ink, 2) + T(X(0.2) + 8, Y(-0.4) - 2, "N₃₀", C.ink, 13, "start");
+    s += `<circle cx="${f1(X(0.2))}" cy="${f1(Y(-0.4))}" r="4" fill="${C.ph}"/>`;
+  }
+  s += `<circle cx="${f1(X(C2[0]))}" cy="${f1(Y(C2[1]))}" r="4" fill="${C.hyp}"/>` + T(X(1) + 8, Y(-1) - 12, "C₂", C.ink, 13, "start");
+  s += `<circle cx="${f1(X(Q[0]))}" cy="${f1(Y(Q[1]))}" r="6" fill="${C.th}" stroke="${C.ink}" stroke-width="1.2"/>` + T(X(Q[0]) - 10, Y(Q[1]) - 12, "Q₅", C.ink, 15, "end");
+  const star = (cx, cy, r) => { const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; p.push(`${f1(cx + rr * Math.cos(a))},${f1(cy + rr * Math.sin(a))}`); } return p.join(" "); };
+  s += `<polygon points="${star(X(O[0]), Y(O[1]), 8)}" fill="${C.ink}"/>` + T(X(O[0]) + 12, Y(O[1]) + 12, "Origin", C.ink, 13, "start");
+  s += `<circle cx="${f1(X(0))}" cy="${f1(Y(0))}" r="3.5" fill="${C.ink}"/>` + T(X(0) + 8, Y(0) - 10, "E", C.ink, 13, "start");
+  $("hol").innerHTML = s;
+  const rows = [["Q₅", "(−4/5, −2/5), exactly"], ["from the arc's centre", "(−4/5, 3/5): a 3-4-5 point"], ["Origin → Q₅", "2·√0.1 along Holden's line"]];
+  if ($("hBig").checked) rows.push(["rhombus E G₅ J₅ N₅", "diagonals 2 and 1.6 (5 : 4)"], ["side", "√1.64 = 1.28062…"], ["area", "1.6 (each quarter 0.4)"], ["angles", "77.32° and 102.68°"]);
+  if ($("hHalf").checked) rows.push(["half rhombus", "Q₅ (−0.8, −0.4), W₆ (−0.3, 0), N₃₀ (0.2, −0.4), E₇ (−0.3, −0.8)"], ["on the grid", "Q₅ and N₃₀ are grid nodes"], ["Origin → N₃₀", "√0.2: one grid cell across"]);
+  $("hread").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
+  $("hnote").innerHTML = "The vertical from Q₅ (x = −0.8) and its mirror (x = +0.8) give four right triangles with legs 1 and 0.8, the ±0.8 triangle of the angle page standing upright; together they make the rhombus. The drops from Q₅ are 0.4 to the top of the unit square and 0.6 to its bottom." + ($("hHalf").checked ? " The half rhombus (diagonals 1 and 0.8) starts at Q₅ too: its long diagonal joins two nodes of the √0.1 grid." : "");
+}
+["hGrid", "hBig", "hHalf"].forEach((id) => $(id).addEventListener("change", drawHol));
+
+// ---------- 2 · the Epitetartic Rhombus in any square ----------
+// unit-square coordinates (y up); rhombus 1, then mirrored, turned 90° about the centre, turned and mirrored
+const EPI = { L: [[0, 1 / 3], [1, 2 / 3]], S: [[11 / 30, 9 / 10], [19 / 30, 1 / 10]] };
+const ETR = [(p) => p, (p) => [1 - p[0], p[1]], (p) => [1 - p[1], p[0]], (p) => [p[1], p[0]]];
+function drawEpi() {
+  const C = COL(), W = 600, pad = 60, S = W - 2 * pad, X = (x) => pad + x * S, Y = (y) => pad + (1 - y) * S, PT = (p) => `${f1(X(p[0]))},${f1(Y(p[1]))}`;
+  const which = $("eWhich").value, list = which === "all" ? [0, 1, 2, 3] : [+which];
+  let s = `<rect x="${pad}" y="${pad}" width="${S}" height="${S}" fill="none" stroke="${C.ink}" stroke-width="2.5"/>`;
+  if ($("eTenth").checked) for (let i = 1; i < 10; i++) s += LN(X(i / 10), Y(0), X(i / 10), Y(1), C.rule, 0.8, 'stroke-dasharray="2 4"') + LN(X(0), Y(i / 10), X(1), Y(i / 10), C.rule, 0.8, 'stroke-dasharray="2 4"');
+  if ($("eGrid").checked) for (const t of [1 / 3, 2 / 3]) s += LN(X(t), Y(0), X(t), Y(1), C.muted, 1.4) + LN(X(0), Y(t), X(1), Y(t), C.muted, 1.4);
+  if ($("eLines").checked) for (const k of list) { const f = ETR[k];
+    s += LN(X(f(EPI.L[0])[0]), Y(f(EPI.L[0])[1]), X(f(EPI.L[1])[0]), Y(f(EPI.L[1])[1]), C.adj, 1.6, 'opacity=".7"');
+    s += LN(X(f([1 / 3, 1])[0]), Y(f([1 / 3, 1])[1]), X(f([2 / 3, 0])[0]), Y(f([2 / 3, 0])[1]), C.adj, 1.6, 'opacity=".7"'); }
+  const cols = [C.th, C.ph, C.opp, C.hyp];
+  for (const k of list) { const f = ETR[k], R = [EPI.L[0], EPI.S[0], EPI.L[1], EPI.S[1]].map(f);
+    s += `<polygon points="${R.map(PT).join(" ")}" fill="${cols[k]}" fill-opacity="${list.length > 1 ? 0.08 : 0.16}" stroke="${cols[k]}" stroke-width="${list.length > 1 ? 2 : 3}"/>`;
+    if (list.length === 1) {
+      s += LN(X(R[0][0]), Y(R[0][1]), X(R[2][0]), Y(R[2][1]), cols[k], 1.2, 'stroke-dasharray="6 4"') + LN(X(R[1][0]), Y(R[1][1]), X(R[3][0]), Y(R[3][1]), cols[k], 1.2, 'stroke-dasharray="6 4"');
+      R.forEach((p) => { s += `<circle cx="${f1(X(p[0]))}" cy="${f1(Y(p[1]))}" r="5" fill="${cols[k]}" stroke="${C.ink}" stroke-width="1"/>`; });
+    } }
+  if ($("eRule").checked) for (const k of list) { const f = ETR[k];
+    for (const line of [[[1 / 6, 1], [1 / 2, 5 / 6], [5 / 6, 2 / 3]], [[5 / 6, 0], [1 / 2, 1 / 6], [1 / 6, 1 / 3]]]) {
+      const P = line.map(f); s += LN(X(P[0][0]), Y(P[0][1]), X(P[2][0]), Y(P[2][1]), C.opp, 1.6, 'stroke-dasharray="7 3 2 3"');
+      P.forEach((p) => { s += `<circle cx="${f1(X(p[0]))}" cy="${f1(Y(p[1]))}" r="3.2" fill="none" stroke="${C.opp}" stroke-width="1.6"/>`; }); } }
+  if (list.length === 1) { const k = list[0], f = ETR[k], c = f([0.5, 0.5]);
+    const a = Math.atan2(f(EPI.S[0])[1] - f(EPI.L[0])[1], f(EPI.S[0])[0] - f(EPI.L[0])[0]), b = Math.atan2(f(EPI.L[1])[1] - f(EPI.L[0])[1], f(EPI.L[1])[0] - f(EPI.L[0])[0]);
+    const p0 = f(EPI.L[0]), lo = Math.min(a, b), hi = Math.max(a, b);
+    s += ARC(X(p0[0]), Y(p0[1]), 40, lo, hi, cols[k], 2) + T(X(p0[0]) + 52 * Math.cos((lo + hi) / 2), Y(p0[1]) - 52 * Math.sin((lo + hi) / 2), "38.66°", cols[k], 13);
+    s += `<circle cx="${f1(X(c[0]))}" cy="${f1(Y(c[1]))}" r="3" fill="${C.ink}"/>`; }
+  s += T(X(0) - 10, Y(1 / 3), "⅓", C.muted, 13, "end") + T(X(0) - 10, Y(2 / 3), "⅔", C.muted, 13, "end") + T(X(1 / 3), Y(0) + 16, "⅓", C.muted, 13) + T(X(2 / 3), Y(0) + 16, "⅔", C.muted, 13);
+  $("epi").innerHTML = s;
+  const fr = (v) => { for (const d of [1, 2, 3, 5, 6, 10, 15, 30]) { const n = Math.round(v * d); if (Math.abs(n / d - v) < 1e-9) return d === 1 ? `${n}` : `${n}/${d}`; } return v.toFixed(4); };
+  const P = (p) => `(${fr(p[0])}, ${fr(p[1])})`;
+  $("eread").innerHTML = list.length > 1
+    ? [["rhombi", "4 in every square"], ["each", "diagonals in the ratio 5 : 4"], ["angles", "77.32° and 102.68°"], ["shared", "the same centre (1/2, 1/2)"]].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")
+    : (() => { const f = ETR[list[0]]; return [["long diagonal", `${P(f(EPI.L[0]))} → ${P(f(EPI.L[1]))}`], ["", "length √10/3 of the side"], ["short diagonal", `${P(f(EPI.S[0]))} → ${P(f(EPI.S[1]))}`], ["", "length 4/5 of the long one"], ["side", "√41/10 of the long diagonal (√410/30 = 0.6749 of the square's side)"], ["area", "(√10/3)²·(4/5)/2 = 4/9 of the square"], ["angles", "77.32° and 102.68°"]].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join(""); })();
+}
+["eWhich", "eGrid", "eLines", "eRule", "eTenth"].forEach((id) => $(id).addEventListener("change", drawEpi));
+
+// ---------- 3 · halving versus threes and fives ----------
+const QN = { "00": "bottom-left", "10": "bottom-right", "01": "top-left", "11": "top-right" };
+function halvState(k) {   // the cell after k halvings: index (a, b) out of 2^k, and the point's place inside it, exactly (numerators over 30)
+  let x = 11, y = 27, a = 0, b = 0; const seq = [];   // x/30, y/30
+  for (let i = 0; i < k; i++) { x *= 2; y *= 2; const bx = x >= 30 ? 1 : 0, by = y >= 30 ? 1 : 0; x -= 30 * bx; y -= 30 * by; a = 2 * a + bx; b = 2 * b + by; seq.push(`${bx}${by}`); }
+  return { x, y, a, b, seq };
+}
+const factor = (n) => { const f = []; for (let d = 2; n > 1; d++) while (n % d === 0) { f.push(d); n /= d; } return f.join(" × ") || "1"; };
+function drawHalv() {
+  const C = COL(), k = +$("hk").value, N = +$("hN").value; $("hkOut").textContent = k;
+  const st = halvState(k), nx = halvState(k + 1).seq[k];
+  let s = "";
+  // left: the cell after k halvings, blown up, split in four
+  const L = 30, Tp = 40, S = 380, X = (u) => L + u * S, Y = (v) => Tp + (1 - v) * S;
+  s += `<rect x="${L}" y="${Tp}" width="${S}" height="${S}" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
+  const qx = +nx[0], qy = +nx[1];
+  s += `<rect x="${f1(X(qx / 2))}" y="${f1(Y(qy / 2 + 0.5))}" width="${S / 2}" height="${S / 2}" fill="${C.fill}" stroke="none" opacity=".9"/>`;
+  s += LN(X(0.5), Y(0), X(0.5), Y(1), C.muted, 1.4) + LN(X(0), Y(0.5), X(1), Y(0.5), C.muted, 1.4);
+  for (const [q, lab] of Object.entries({ "01": "TL", "11": "TR", "00": "BL", "10": "BR" })) s += T(X(+q[0] / 2 + 0.25), Y(+q[1] / 2 + 0.25), lab, q === nx ? C.th : C.rule, 20);
+  s += `<circle cx="${f1(X(st.x / 30))}" cy="${f1(Y(st.y / 30))}" r="7" fill="${C.th}" stroke="${C.ink}" stroke-width="1.5"/>`;
+  s += T(L + S / 2, 20, k === 0 ? "the whole square" : `after ${k} halving${k > 1 ? "s" : ""}: a cell 1/${2 ** k} wide`, C.ink, 14);
+  const rf = (n) => { const g = (a, c) => (c ? g(c, a % c) : a), q = g(n, 30); return 30 / q === 1 ? `${n / q}` : `${n / q}/${30 / q}`; };
+  s += T(L + S / 2, Tp + S + 22, `the corner sits at (${rf(st.x)}, ${rf(st.y)}) of this cell; the shaded quarter holds it next`, C.muted, 13);
+  // right: the square split N × N
+  const R0 = 500, S2 = 380, XR = (u) => R0 + u * S2, YR = (v) => Tp + (1 - v) * S2;
+  s += `<rect x="${R0}" y="${Tp}" width="${S2}" height="${S2}" fill="none" stroke="${C.ink}" stroke-width="2"/>`;
+  for (let i = 1; i < N; i++) s += LN(XR(i / N), YR(0), XR(i / N), YR(1), C.muted, N > 30 ? 0.5 : 0.9, 'opacity=".7"') + LN(XR(0), YR(i / N), XR(1), YR(i / N), C.muted, N > 30 ? 0.5 : 0.9, 'opacity=".7"');
+  const gx = 11 * N / 30, gy = 9 * N / 10, isInt = (v) => Math.abs(v - Math.round(v)) < 1e-9, isHalf = (v) => isInt(v - 0.5);
+  const kind = isInt(gx) && isInt(gy) ? "corner" : isHalf(gx) && isHalf(gy) ? "centre" : "inside";
+  if (kind !== "corner") { const cx = Math.floor(gx), cy = Math.floor(gy); s += `<rect x="${f1(XR(cx / N))}" y="${f1(YR((cy + 1) / N))}" width="${f1(S2 / N)}" height="${f1(S2 / N)}" fill="${kind === "centre" ? C.hyp : C.fill}" fill-opacity="${kind === "centre" ? 0.35 : 0.9}"/>`; }
+  s += `<circle cx="${f1(XR(11 / 30))}" cy="${f1(YR(0.9))}" r="${N > 30 ? 4 : 6}" fill="${C.th}" stroke="${C.ink}" stroke-width="1.5"/>`;
+  s += T(R0 + S2 / 2, 20, `the square split into ${N} × ${N}`, C.ink, 14);
+  const part = (v) => isInt(v) ? "on a grid line" : isHalf(v) ? "half-way across a cell" : "neither";
+  const partial = kind === "inside" && (isInt(gx) || isHalf(gx) || isInt(gy) || isHalf(gy));
+  s += T(R0 + S2 / 2, Tp + S2 + 22, kind === "corner" ? "the corner is exactly a grid corner" : kind === "centre" ? "the corner is exactly the centre of a cell" : partial ? "only half caught: " + (isInt(gx) || isHalf(gx) ? "across " + part(gx) : "up " + part(gy)) + ", the other way not" : "the corner falls inside a cell, off centre", kind === "inside" ? (partial ? C.th : C.muted) : C.hyp, 13);
+  $("halv").innerHTML = s;
+  const seq = halvState(12).seq.map((q, i) => { const t = { "00": "BL", "10": "BR", "01": "TL", "11": "TR" }[q]; return i === k ? `<b style="color:var(--c4)">${t}</b>` : i < k ? t : `<span style="opacity:.55">${t}</span>`; }).join(" · ");
+  const fx = (n, d) => { const g = (a, b) => (b ? g(b, a % b) : a), q = g(Math.abs(n), d); return d / q === 1 ? `${n / q}` : `${n / q}/${d / q}`; };
+  $("halvRead").innerHTML = [["quarters, one per halving", seq + " · …"], ["the pattern", "TL, TR, then TL · BR · BR · TR for ever (every 4 halvings the picture on the left repeats)"],
+    [`in the ${N} × ${N} grid`, `(${fx(11 * N, 30)}, ${fx(9 * N, 10)}) cells from the bottom-left: ${kind === "corner" ? "a corner" : kind === "centre" ? "the centre of a cell" : "inside a cell"}`],
+    ["why", `across, 11/30 is caught when the split is a multiple of 30 (on a line) or 15 times an odd number (half-way); up, 9/10 when it is a multiple of 10 (on a line) or 5 times an odd number (half-way). Here ${N} = ${factor(N)}.`]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+}
+["hk", "hN"].forEach((id) => $(id).addEventListener("input", drawHalv));
+
+function all() { drawHol(); drawEpi(); drawHalv(); }
+all();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+<script src="menu.js"></script>
+</body>
+</html>

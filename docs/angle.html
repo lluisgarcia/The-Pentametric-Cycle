@@ -106,7 +106,7 @@
 
   <h2>5 · And in the geometry?</h2>
   <div class="panel">
-    <p style="margin-top:0">We looked for the angle in the two pictures of the construction, and the honest answer is: <b>nowhere special</b>. See for yourself: choose a picture and a slope, and every segment between two marked points (centres, corners and O) that makes that angle is drawn in gold. With <i>custom</i> you can choose any number of squares, not only multiples of 5 (up to 300 around the pentagon, 40 in the tiling, where the squares grow so fast that the small ones vanish).</p>
+    <p style="margin-top:0">We first looked for the angle between the marked points of the two pictures (centres, corners and O), and there the honest answer is: <b>nowhere special</b>. (It does appear exactly where a line meets an arc: see <a href="rhombus.html">the Epitetartic Rhombus</a>.) See for yourself: choose a picture and a slope, and every segment between two marked points (centres, corners and O) that makes that angle is drawn in gold. With <i>custom</i> you can choose any number of squares, not only multiples of 5 (up to 300 around the pentagon, 40 in the tiling, where the squares grow so fast that the small ones vanish).</p>
     <div class="controls">
       <label>picture <select id="gpic"><option value="pent" selected>The Pentametric spiral</option><option value="tile">Golden-rectangle tiling</option></select></label>
       <label>slope <select id="gsl"><option value="4/5" selected>4/5 (38.66°)</option><option value="3/4">3/4 (36.87°)</option><option value="1/2">1/2 (26.57°)</option><option value="2/3">2/3 (33.69°)</option><option value="1/3">1/3 (18.43°)</option><option value="3/5">3/5 (30.96°)</option></select></label>
@@ -131,7 +131,7 @@
       <li><b>The Pentametric spiral</b> (squares 1 to 60 around the pentagon): fourteen segments make the angle with a spoke or with the line across it, for example from the centre of square 5 to the side corners of square 25 (ratio 20/25). All of them lie on the silent ray. From the centre of square 5, the side corners of square 5(k+1) are seen at exactly θ<sub>k</sub> = arctan(k/(k+1)) from the line across the spoke (they are 5k steps of √0.1 further along it and 5(k+1) steps to the side), so the whole family of section 4 appears there, but so do other slopes. A multiple of 5 has 𝔓(n) = n²/5 exactly, so its square has its inner corner at O, and along that ray every rational slope appears; 1/2 and 1/3 appear even more often.</li>
     </ul>
   </div>
-  <p class="note">The 0.8 lives in the arithmetic, not in the pictures: in the correction, in the doubled angle of the paper's θ₂, and in the family of triangles whose primes give square silences.</p>
+  <p class="note">The 0.8 lives in the arithmetic, in the correction, in the doubled angle of the paper's θ₂ and in the family of triangles whose primes give square silences, and, as Lluis found, in the geometry too: where Holden's line meets an arc of the spiral, and in <a href="rhombus.html">the Epitetartic Rhombus</a> that every square holds.</p>
 </main>
 
 <footer class="site"><div class="inner">
@@ -428,6 +428,7 @@ function drawGeo() {
 $("gN").addEventListener("change", () => { lastN[$("gpic").value] = $("gN").value; $("gCl").classList.toggle("hidden", $("gN").value !== "c"); drawGeo(); });
 $("gC").addEventListener("change", drawGeo);
 fillN();
+
 
 function all() { drawFan(); drawTwo(); drawThree(); drawFam(); drawGeo(); }
 buildTable(); all();
