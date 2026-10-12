@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distance to the Spiral · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<style>
+  .bigd { font-family: var(--mono); font-size: 1.9rem; }
+  #fig { touch-action: none; cursor: crosshair; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>Distance to the spiral</h1>
+  <p class="lede">How far is the Fibonacci spiral from the Origin, the point P where Holden's two lines meet? Move along the spiral (drag on the picture, use the slider, or press play) and watch the distance, measured in <b>Holden units</b> (h&nbsp;=&nbsp;√0.1, the side of Holden's grid). It is a whole number of units exactly where the spiral crosses Holden's lines: 2, 4, 6, 10, 16, 26, … twice the Fibonacci numbers. This page is an exploration beyond the papers.</p>
+
+  <div class="controls panel" style="padding:12px 16px">
+    <button id="play" class="primary">▶ Play</button>
+    <label>position <input id="t" type="range" min="0" max="7" step="0.001" value="1.5903" style="width:220px"></label>
+    <label>squares <select id="K"><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option></select></label>
+    <label><input id="oRing" type="checkbox" checked> circle through the point</label>
+    <label><input id="oUnits" type="checkbox"> whole-unit circles</label>
+    <label><input id="oGrid" type="checkbox"> Holden's grid</label>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="panel"><svg id="fig" viewBox="0 0 600 600" role="img" aria-label="The Fibonacci spiral, Holden's lines, the Origin and the distance to a point on the spiral"></svg>
+      <p class="note" style="margin:6px 0 0">Click or drag anywhere on the picture: the point jumps to the nearest place on the spiral.</p></div>
+    <div class="panel">
+      <div class="note" style="font-family:var(--sans)">distance from the Origin</div>
+      <div class="bigd" id="dbig">—</div>
+      <dl class="readout" id="read" style="margin-top:10px"></dl>
+      <p class="note" id="say"></p>
+    </div>
+  </div>
+
+  <h2>The distance along the spiral</h2>
+  <div class="panel">
+    <div class="controls" style="margin-bottom:6px"><label><input id="oLog" type="checkbox" checked> logarithmic scale</label></div>
+    <div class="scroll-x"><svg id="graph" viewBox="0 0 900 330" style="min-width:600px" role="img" aria-label="Distance from the Origin in Holden units along the spiral"></svg></div>
+    <p class="note" style="margin-bottom:0">Gold: the crossings with Holden's lines (whole numbers of units). Blue: the joins, where one quarter-circle meets the next. On the logarithmic scale the curve becomes almost a straight staircase: each quarter turn multiplies the distance by about φ = 1.618…, the golden ratio, as for a true golden spiral.</p>
+  </div>
+
+  <h2>What the distance shows</h2>
+  <div class="panel">
+    <ul style="margin-top:0">
+      <li><b>Crossings: twice the next Fibonacci number.</b> In the square of side F<sub>k</sub> the spiral crosses Holden's line once, at exactly 2F<sub>k+1</sub> Holden units from the Origin: 2, 4, 6, 10, 16, 26, 42, … Each crossing sits at the same place in its quarter turn, <b>53.13° in</b>, the angle arctan(4/3) of the 3-4-5 triangle: seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by F<sub>k</sub> (<a href="rhombus.html">the Epitetartic Rhombus</a>; note <a href="https://doi.org/10.5281/zenodo.23325443">doi:10.5281/zenodo.23325443</a>). <span class="tag proved">proved</span></li>
+      <li><b>Joins: Pythagoras with two crossings.</b> Where the arc of square j meets the arc of square j + 1, the distance is 2√F<sub>2j+1</sub> units: √8, √20, √52, √136, √356, … Since F<sub>2j+1</sub> = F<sub>j</sub><sup>2</sup> + F<sub>j+1</sub><sup>2</sup>, this is √((2F<sub>j</sub>)<sup>2</sup> + (2F<sub>j+1</sub>)<sup>2</sup>): the hypotenuse of a right triangle whose legs are the distances of the crossings in squares j − 1 and j. <span class="tag proved">proved</span> (the join is the arc's end, M<sub>j</sub> − F<sub>j</sub>i<sup>j</sup>; its squared distance is (2F<sub>j</sub>)² + (F<sub>j</sub> + L<sub>j</sub>)² units², and F<sub>j</sub> + L<sub>j</sub> = 2F<sub>j+1</sub>.) Checked for j ≤ 27.</li>
+      <li><b>The closest point.</b> The spiral starts 2 units from the Origin, comes in to its closest point, √10 − √2 = 1.748 units, at 29.5% of the first quarter turn (where the line from the arc's centre through the Origin meets the arc), and from there on it only moves away. <span class="tag proved">proved</span> for the minimum; <span class="tag">computed</span> that the distance only grows after it.</li>
+      <li><b>Growth by φ.</b> Distances at the same place of successive quarter turns grow in the ratio F<sub>k+2</sub>/F<sub>k+1</sub> → φ: the Fibonacci spiral, made of circle arcs, approaches the golden logarithmic spiral around the Origin.</li>
+    </ul>
+    <p class="note" style="margin-bottom:0">Coordinates as in the note: Gardiner's frame, first square centred at (0, 0), Origin P = (1/10, 3/10), centre of square k at P + i<sup>k−1</sup>L<sub>k</sub>w with w = −(1 + 3i)/10, and its arc centred at the corner M<sub>k</sub> = C<sub>k</sub> + F<sub>k</sub>i<sup>k−1</sup>(1 + i)/2 with radius F<sub>k</sub>. Idea and question: Lluis Garcia Torcal.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const f1 = (v) => (+v).toFixed(1);
+const H = Math.sqrt(0.1), PHI = (1 + Math.sqrt(5)) / 2;
+const FIB = [0, 1], LUC = [2, 1]; for (let i = 0; i < 40; i++) { FIB.push(FIB[FIB.length - 1] + FIB[FIB.length - 2]); LUC.push(LUC[LUC.length - 1] + LUC[LUC.length - 2]); }
+const cm = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]], ip = (n) => [[1, 0], [0, 1], [-1, 0], [0, -1]][((n % 4) + 4) % 4];
+const P = [0.1, 0.3], W = [-0.1, -0.3];
+const Cc = (k) => { const v = cm(ip(k - 1), [W[0] * LUC[k], W[1] * LUC[k]]); return [P[0] + v[0], P[1] + v[1]]; };
+const Mc = (k) => { const c = Cc(k), v = cm(ip(k - 1), [FIB[k] / 2, FIB[k] / 2]); return [c[0] + v[0], c[1] + v[1]]; };
+const Xc = (k) => { const v = cm(ip(k - 1), [W[0] * 2 * FIB[k + 1], W[1] * 2 * FIB[k + 1]]); return [P[0] + v[0], P[1] + v[1]]; };
+// a point of the spiral: t in [0, K]; square k = floor(t) + 1, fraction f of its quarter turn
+function at(t) { const k = Math.min(Math.floor(t) + 1, 39), f = t - (k - 1), m = Mc(k), a = Math.PI * (1 + (k - 1) / 2) + f * Math.PI / 2; return { k, f, p: [m[0] + FIB[k] * Math.cos(a), m[1] + FIB[k] * Math.sin(a)] }; }
+const dist = (p) => Math.hypot(p[0] - P[0], p[1] - P[1]) / H;      // in Holden units
+const T45 = Math.atan2(4, 3) / (Math.PI / 2);                         // 53.13° of 90°: where every crossing sits
+let view = null, playing = false, raf = 0;
+function el(svg, n, a, txt) { const e = document.createElementNS("http://www.w3.org/2000/svg", n); for (const k in a) e.setAttribute(k, a[k]); if (txt !== undefined) e.textContent = txt; svg.appendChild(e); return e; }
+
+function draw() {
+  const K = +$("K").value; $("t").max = K; if (+$("t").value > K) $("t").value = K;
+  let t = +$("t").value;
+  const kc = Math.round(t - T45) + 1, tc = kc - 1 + T45;          // snap to an exact crossing or join when close
+  if (kc >= 1 && Math.abs(t - tc) < 0.004) t = tc; else if (Math.abs(t - Math.round(t)) < 0.004) t = Math.round(t);
+  const cur = at(t), d = dist(cur.p);
+  const C = { ink: css("--ink"), muted: css("--muted"), adj: css("--accent"), opp: css("--accent2"), gold: css("--c4"), fill: css("--fill"), ok: css("--ok"), ph: css("--accent3") };
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (let k = 1; k <= K; k++) { const c = Cc(k), h = FIB[k] / 2; x0 = Math.min(x0, c[0] - h); x1 = Math.max(x1, c[0] + h); y0 = Math.min(y0, c[1] - h); y1 = Math.max(y1, c[1] + h); }
+  const S = 600, pad = 24, span = Math.max(x1 - x0, y1 - y0), sc = (S - 2 * pad) / span, ox = pad + (S - 2 * pad - (x1 - x0) * sc) / 2, oy = pad + (S - 2 * pad - (y1 - y0) * sc) / 2;
+  const X = (x) => ox + (x - x0) * sc, Y = (y) => S - oy - (y - y0) * sc;
+  view = { X, Y, sc, ox, oy, x0, y0, S };
+  const svg = $("fig"); svg.innerHTML = "";
+  if ($("oGrid").checked && H * sc >= 3) for (const [a, b] of [[3, -1], [1, 3]]) {
+    const v = [a * x0 + b * y0, a * x1 + b * y0, a * x0 + b * y1, a * x1 + b * y1];
+    for (let m = Math.ceil(Math.min(...v)) - 3; m <= Math.floor(Math.max(...v)) + 3; m++) el(svg, "line", { x1: X(x0 - span), y1: Y((m - a * (x0 - span)) / b), x2: X(x1 + span), y2: Y((m - a * (x1 + span)) / b), stroke: C.muted, "stroke-width": 0.5, opacity: 0.35 });
+  }
+  if ($("oUnits").checked) { const top = Math.ceil(dist(at(K).p)); const step = Math.max(1, Math.ceil(4 / (H * sc))); for (let u = step; u <= top; u += step) el(svg, "circle", { cx: X(P[0]), cy: Y(P[1]), r: u * H * sc, fill: "none", stroke: C.muted, "stroke-width": u % 2 ? 0.4 : 0.8, opacity: 0.45 }); }
+  for (let k = 1; k <= K; k++) { const c = Cc(k), h = FIB[k] / 2; el(svg, "rect", { x: X(c[0] - h), y: Y(c[1] + h), width: FIB[k] * sc, height: FIB[k] * sc, fill: k === cur.k ? C.fill : "none", "fill-opacity": 0.6, stroke: C.muted, "stroke-width": 0.9 }); }
+  const big = 3 * span;
+  el(svg, "line", { x1: X(P[0] - big), y1: Y(P[1] - 3 * big), x2: X(P[0] + big), y2: Y(P[1] + 3 * big), stroke: C.ok, "stroke-width": 1.4 });
+  el(svg, "line", { x1: X(P[0] - 3 * big), y1: Y(P[1] + big), x2: X(P[0] + 3 * big), y2: Y(P[1] - big), stroke: C.opp, "stroke-width": 1.4 });
+  const pts = []; for (let i = 0; i <= K * 60; i++) { const q = at(i / 60).p; pts.push(`${f1(X(q[0]))},${f1(Y(q[1]))}`); }
+  el(svg, "polyline", { points: pts.join(" "), fill: "none", stroke: C.adj, "stroke-width": 2.6 });
+  if ($("oRing").checked) el(svg, "circle", { cx: X(P[0]), cy: Y(P[1]), r: d * H * sc, fill: "none", stroke: C.gold, "stroke-width": 1.2, "stroke-dasharray": "5 4" });
+  for (let j = 0; j <= K; j++) { const q = at(j).p; el(svg, "circle", { cx: X(q[0]), cy: Y(q[1]), r: 3.5, fill: C.adj }); }
+  for (let k = 1; k <= K; k++) { const x = Xc(k); el(svg, "circle", { cx: X(x[0]), cy: Y(x[1]), r: 5, fill: C.gold, stroke: C.ink, "stroke-width": 1 });
+    if (FIB[k] * sc > 40) el(svg, "text", { x: X(x[0]) + 9, y: Y(x[1]) - 8, "font-size": 12, fill: C.ink, stroke: css("--bg"), "stroke-width": 3, "paint-order": "stroke" }, `${2 * FIB[k + 1]}h`); }
+  el(svg, "line", { x1: X(P[0]), y1: Y(P[1]), x2: X(cur.p[0]), y2: Y(cur.p[1]), stroke: C.ink, "stroke-width": 2.2 });
+  el(svg, "circle", { cx: X(cur.p[0]), cy: Y(cur.p[1]), r: 7, fill: C.ph, stroke: C.ink, "stroke-width": 1.5 });
+  const st = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 3.6 : 8; st.push(`${f1(X(P[0]) + r * Math.cos(a))},${f1(Y(P[1]) + r * Math.sin(a))}`); }
+  el(svg, "polygon", { points: st.join(" "), fill: C.ink });
+  // readout
+  const near = Math.round(d), whole = Math.abs(d - near) < 0.002;
+  const atCross = Math.abs(cur.f - T45) < 1e-9, atJoin = Math.abs(t - Math.round(t)) < 1e-9;
+  $("dbig").textContent = `${d.toFixed(3)} h`;
+  $("read").innerHTML = [["square", `${cur.k} (side F<sub>${cur.k}</sub> = ${FIB[cur.k]})`], ["through its quarter turn", `${(cur.f * 90).toFixed(1)}° of 90°`],
+    ["distance", `${d.toFixed(4)} Holden units = ${(d * H).toFixed(4)}`], ["squared", `${(d * d).toFixed(3)} units²`],
+    ["growth", cur.k > 1 ? `× ${(d / dist(at(t - 1).p)).toFixed(4)} since the same place one quarter earlier (φ = 1.6180)` : "—"]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  $("say").innerHTML = atCross ? `<b style="color:var(--c4)">On Holden's line:</b> exactly ${2 * FIB[cur.k + 1]} units = 2 × F<sub>${cur.k + 1}</sub>, at 53.13° into the quarter turn.`
+    : atJoin ? (Math.round(t) === 0 ? "The start of the spiral: exactly 2 units (a corner of the first square, on Holden's other line)." : `<b style="color:var(--accent)">A join:</b> exactly 2√${FIB[2 * Math.round(t) + 1]} = √(${2 * FIB[Math.round(t)]}² + ${2 * FIB[Math.round(t) + 1]}²) units.`)
+    : whole ? `A whole number of units, ${near}, but not on Holden's lines.` : (Math.abs(t - 0.2952) < 0.003 ? "The closest point of the spiral: √10 − √2 = 1.748 units." : "");
+  drawGraph(K, t);
+}
+function drawGraph(K, t) {
+  const g = $("graph"); g.innerHTML = "";
+  const C = { ink: css("--ink"), muted: css("--muted"), adj: css("--accent"), gold: css("--c4"), rule: css("--rule"), ph: css("--accent3") };
+  const L = 60, R = 880, T = 18, B = 296, log = $("oLog").checked, dmax = dist(at(K).p);
+  const fy = (d) => log ? B - (Math.log(d) - Math.log(1.5)) / (Math.log(dmax * 1.1) - Math.log(1.5)) * (B - T) : B - d / (dmax * 1.05) * (B - T);
+  const fx = (u) => L + u / K * (R - L);
+  const ticks = log ? [2, 4, 6, 10, 16, 26, 42, 68, 110, 178, 288].filter((v) => v <= dmax * 1.1) : Array.from({ length: 6 }, (_, i) => Math.round(dmax * i / 5));
+  for (const v of ticks) { if (!(v > 0) && log) continue; el(g, "line", { x1: L, y1: fy(v), x2: R, y2: fy(v), stroke: C.rule }); el(g, "text", { x: L - 6, y: fy(v) + 4, "text-anchor": "end", "font-size": 11, fill: C.muted }, v); }
+  for (let k = 0; k <= K; k++) { el(g, "line", { x1: fx(k), y1: T, x2: fx(k), y2: B, stroke: C.rule, "stroke-dasharray": "2 4" }); if (k < K) el(g, "text", { x: fx(k + 0.5), y: B + 18, "text-anchor": "middle", "font-size": 11, fill: C.muted }, `square ${k + 1}`); }
+  el(g, "text", { x: 14, y: (T + B) / 2, "font-size": 11, fill: C.muted, transform: `rotate(-90 14 ${(T + B) / 2})`, "text-anchor": "middle" }, "distance (Holden units)");
+  const pts = []; for (let i = 0; i <= K * 120; i++) { const u = i / 120; pts.push(`${f1(fx(u))},${f1(fy(dist(at(u).p)))}`); }
+  el(g, "polyline", { points: pts.join(" "), fill: "none", stroke: C.adj, "stroke-width": 2 });
+  for (let j = 0; j <= K; j++) el(g, "circle", { cx: fx(j), cy: fy(dist(at(j).p)), r: 3.5, fill: C.adj });
+  for (let k = 1; k <= K; k++) { const u = k - 1 + T45; el(g, "circle", { cx: fx(u), cy: fy(2 * FIB[k + 1]), r: 4.5, fill: C.gold, stroke: C.ink, "stroke-width": 0.8 }); el(g, "text", { x: fx(u), y: fy(2 * FIB[k + 1]) - 9, "text-anchor": "middle", "font-size": 11, fill: C.ink }, 2 * FIB[k + 1]); }
+  el(g, "line", { x1: fx(t), y1: T, x2: fx(t), y2: B, stroke: C.ph, "stroke-width": 1.5 });
+  el(g, "circle", { cx: fx(t), cy: fy(dist(at(t).p)), r: 5, fill: C.ph, stroke: C.ink });
+  g.onpointerdown = (e) => { const pt = g.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(g.getScreenCTM().inverse()); $("t").value = Math.max(0, Math.min(K, (q.x - L) / (R - L) * K)); draw(); };
+}
+// drag on the figure: nearest point of the spiral
+function pick(e) {
+  if (!view) return; const svg = $("fig"), pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const K = +$("K").value; let best = 0, bd = Infinity;
+  for (let i = 0; i <= K * 400; i++) { const u = i / 400, p = at(u).p, dx = view.X(p[0]) - q.x, dy = view.Y(p[1]) - q.y, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = u; } }
+  $("t").value = best; draw();
+}
+let dragging = false;
+$("fig").addEventListener("pointerdown", (e) => { dragging = true; $("fig").setPointerCapture(e.pointerId); pick(e); });
+$("fig").addEventListener("pointermove", (e) => { if (dragging) pick(e); });
+$("fig").addEventListener("pointerup", () => (dragging = false));
+["t", "K", "oRing", "oUnits", "oGrid", "oLog"].forEach((id) => $(id).addEventListener("input", draw));
+$("play").onclick = () => { playing = !playing; $("play").textContent = playing ? "■ Stop" : "▶ Play"; if (playing) { if (+$("t").value >= +$("K").value - 0.01) $("t").value = 0; let last = performance.now();
+  const step = (now) => { if (!playing) return; const dt = (now - last) / 1000; last = now; const v = +$("t").value + dt * 0.35; if (v >= +$("K").value) { $("t").value = $("K").value; playing = false; $("play").textContent = "▶ Play"; draw(); return; } $("t").value = v; draw(); raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); } };
+$("t").value = 1 + T45;
+draw();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
