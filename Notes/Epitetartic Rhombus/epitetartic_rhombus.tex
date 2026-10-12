@@ -49,12 +49,12 @@
 \vspace{0.3em}
 {\small Independent researcher, Sabadell, Spain \quad·\quad ORCID \href{https://orcid.org/0009-0007-8570-2536}{0009-0007-8570-2536} \quad·\quad \href{mailto:lluisgarciamusic@gmail.com}{lluisgarciamusic@gmail.com}\par}
 \vspace{0.3em}
-{\small 12 October 2026 \quad·\quad Version 1 \quad·\quad \href{https://doi.org/10.5281/zenodo.23325443}{doi:10.5281/zenodo.23325443}\par}
+{\small Version 2, 13 October 2026 (version 1: 12 October 2026, \href{https://doi.org/10.5281/zenodo.23325443}{doi:10.5281/zenodo.23325443}) \quad·\quad \href{https://doi.org/10.5281/zenodo.23327201}{doi:10.5281/zenodo.23327201}\par}
 \end{center}
 
 \vspace{0.8em}
 \begin{abstract}
-\noindent In the Fibonacci tiling, the centres of the squares lie on two perpendicular lines through a point $P$ (Holden, 1975). We show that one of these lines meets the quarter-circle arc of the first unit square exactly at $Q=-P$, the reflection of $P$ through the centre of that square, and that seen from the centre of the arc, $Q$ is a $3$-$4$-$5$ point. More generally, in every square of side $F_k$ Holden's lines cross the arc of the spiral exactly once, at a node of Holden's grid exactly $2F_{k+1}$ Holden units ($h=\sqrt{0.1}$) from $P$, twice the next Fibonacci number, and seen from the centre of that arc the crossing is always the same $3$-$4$-$5$ point, scaled by $F_k$ and turned through $90^\circ$ from one square to the next. This places the angle $\arctan(4/5)$, the slope of the $\pm 4/5$ correction in the author's Pentametric Formula, in every square of the tiling. The rhombus it determines, which grows with the spiral, has diagonals in the ratio $5:4$; we call it the \emph{Epitetartic Rhombus}, after the Greek name of that ratio. We show that the same rhombus can be drawn in any square, with a ruler, from the square's thirds, using both of the angles $\arctan(1/3)$ and $\arctan(1/2)$ of Holden's construction; and that its corner, though it never lands on a halving grid, lands exactly on grids of $15$ and $30$. All statements are elementary and are verified in exact arithmetic.
+\noindent In the Fibonacci tiling, the centres of the squares lie on two perpendicular lines through a point $P$ (Holden, 1975). We show that one of these lines meets the quarter-circle arc of the first unit square exactly at $Q=-P$, the reflection of $P$ through the centre of that square, and that seen from the centre of the arc, $Q$ is a $3$-$4$-$5$ point. More generally, in every square of side $F_k$ Holden's lines cross the arc of the spiral exactly once, at a node of Holden's grid exactly $2F_{k+1}$ Holden units ($h=\sqrt{0.1}$) from $P$, twice the next Fibonacci number, and seen from the centre of that arc the crossing is always the same $3$-$4$-$5$ point, scaled by $F_k$ and turned through $90^\circ$ from one square to the next. This places the angle $\arctan(4/5)$, the slope of the $\pm 4/5$ correction in the author's Pentametric Formula, in every square of the tiling. The rhombus it determines, which grows with the spiral, has diagonals in the ratio $5:4$; we call it the \emph{Epitetartic Rhombus}, after the Greek name of that ratio. We show that the same rhombus can be drawn in any square, with a ruler, from the square's thirds, using both of the angles $\arctan(1/3)$ and $\arctan(1/2)$ of Holden's construction; and that its corner, though it never lands on a halving grid, lands exactly on grids of $15$ and $30$. Version 2 adds the distances from $P$ along the spiral: the crossings all sit $\arctan(4/3)$ into their quarter turn; the joins between consecutive arcs lie exactly $2\sqrt{F_{2j+1}}$ Holden units from $P$, the hypotenuse of the two neighbouring crossings; and a square of area $\mathfrak{P}(n)$ whose diagonal points at $P$ misses it by $n-\sqrt{n^2+4(n|5)}$ units, exactly $2\psi^k$ at the Lucas numbers. All statements are elementary and are verified in exact arithmetic.
 \end{abstract}
 
 \section{Setting}
@@ -198,16 +198,71 @@ A point is a corner or centre of a cell of a dyadic grid only if its coordinates
 \label{fig:halving}
 \end{figure}
 
+\section{Distances from $P$}
+
+Measure every distance from $P$ in Holden units $h=\sqrt{0.1}$, and parametrise the spiral by $t\ge 0$: for $k-1\le t<k$ the point lies on the arc of the $k$-th square, a fraction $t-(k-1)$ of the way through its quarter turn.
+
+\begin{proposition}[the crossings]\label{prop:angle}
+Every crossing $X_k$ of Theorem~\ref{thm:every} lies at the same place of its quarter turn: $\arctan(4/3)=53.13^\circ$ in, the larger acute angle of the $3$-$4$-$5$ triangle.
+\end{proposition}
+
+\begin{proof}
+Seen from $M_k$ the arc runs from the direction $-i^{\,k-1}$ to $-i^{\,k}$, and $X_k-M_k$ has the direction $i^{\,k-1}(-\tfrac35-\tfrac45 i) = -i^{\,k-1}(\tfrac35+\tfrac45 i)$: the start direction turned by $\arctan(4/3)$.
+\end{proof}
+
+\begin{proposition}[the joins]\label{prop:joins}
+The arc of the $j$-th square ends, and the arc of the $(j+1)$-th begins, at the corner $A_j = M_j - F_j\, i^{\,j}$, and
+\[
+  \frac{|PA_j|^2}{h^2} = 4F_{2j+1} = (2F_j)^2 + (2F_{j+1})^2 .
+\]
+So the joins lie $2\sqrt{F_{2j+1}}$ units from $P$ ($2, \sqrt8, \sqrt{20}, \sqrt{52}, \sqrt{136}, \dots$), and each is the hypotenuse of a right triangle whose legs are the distances $2F_j$ and $2F_{j+1}$ of the crossings in the squares on either side.
+\end{proposition}
+
+\begin{proof}
+$A_j - P = i^{\,j-1}\bigl(L_j w + F_j\tfrac{1+i}{2} - F_j i\bigr) = i^{\,j-1}\bigl(L_j w + F_j\tfrac{1-i}{2}\bigr)$, so
+$10\,|A_j-P|^2 = 10\bigl[(\tfrac{F_j}{2}-\tfrac{L_j}{10})^2 + (\tfrac{F_j}{2}+\tfrac{3L_j}{10})^2\bigr] = 5F_j^2 + 2F_jL_j + L_j^2 = (2F_j)^2 + (F_j+L_j)^2$,
+and $F_j+L_j = 2F_{j+1}$. Finally $F_j^2+F_{j+1}^2 = F_{2j+1}$.
+\end{proof}
+
+\begin{remark}
+The spiral starts at $A_0=(-\tfrac12,\tfrac12)$, $2$ units from $P$, comes closest at $\sqrt{10}-\sqrt2 = 1.748$ units (where the line from $M_1$ through $P$ meets the first arc, $29.5\%$ of the way through it), and from there on moves steadily away (checked by sampling for the first $20$ squares), growing by a factor tending to $\varphi$ per quarter turn, since $F_{k+2}/F_{k+1}\to\varphi$ (Figure~\ref{fig:distance}).
+\end{remark}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.78\textwidth]{fig5_distance.pdf}
+\caption{Distance from $P$ along the spiral, in Holden units (logarithmic scale). Gold: the crossings, $2F_{k+1}$ units, all $\arctan(4/3)$ into their quarter turn. Blue: the joins, $2\sqrt{F_{2j+1}}$ units.}
+\label{fig:distance}
+\end{figure}
+
+\paragraph{The squares of the Pentametric Formula.} In the author's preprint \cite{gt} the square $S_k$ of area $L_k^2/5$ has its centre at $C_k$, $L_k$ Holden units from $P$, and a vertex at $P$. The author's \emph{Pentametric spiral} \cite{site2} extends this to every $n$: a square of area $\mathfrak{P}(n) = (n^2+4\chi(n))/5$, $\chi(n)=(n|5)$, centred $n$ Holden units from $P$ with a diagonal pointing at $P$. A square of area $n^2/5$ in that position would have its near corner exactly at $P$ (its half-diagonal is $n/\sqrt{10}$, that is $n$ units).
+
+\begin{proposition}[the near corner]\label{prop:corner}
+A square of area $\mathfrak{P}(n)$, centred $n$ Holden units from $P$ with a diagonal pointing at $P$, has its near corner
+\[
+  n-\sqrt{n^2+4\chi(n)}
+\]
+units from $P$ along that diagonal: past $P$ if $\chi(n)=1$, short of it if $\chi(n)=-1$, exactly at $P$ if $5\mid n$. At the Lucas numbers the miss is exactly
+\[
+  L_k - \sqrt5\,F_k = 2\psi^k = \pm\frac{2}{\varphi^k}\qquad\Bigl(\psi=\tfrac{1-\sqrt5}{2}\Bigr),
+\]
+that is $-1.236$, $+0.764$, $-0.472$, $+0.292$, $-0.180, \dots$: it changes side every time and shrinks by the golden ratio. For other $n$ it is close to $\mp 2/n$.
+\end{proposition}
+
+\begin{proof}
+The half-diagonal of a square of area $A$ is $\sqrt{A/2}$, that is $\sqrt{5A}$ Holden units; with $A=\mathfrak{P}(n)$ this is $\sqrt{n^2+4\chi(n)}$. For $n=L_k$, $\chi(L_k)=-(-1)^k$ and $L_k^2-4(-1)^k=5F_k^2$, so the half-diagonal is $\sqrt5\,F_k$, and $L_k-\sqrt5F_k=(\varphi^k+\psi^k)-(\varphi^k-\psi^k)=2\psi^k$.
+\end{proof}
+
 \section{Remarks}
 
 \begin{enumerate}[leftmargin=*,itemsep=2pt]
 \item All the ingredients are elementary: lines joining the thirds of a square are classical, and the $3$-$4$-$5$ triangle arises from $\arctan(1/3)$ by doubling. What this note records is where they meet in the Fibonacci tiling: the exact point $Q=-P$ on the first arc, the crossing $X_k$ at $2F_{k+1}$ Holden units in every square with its constant $3$-$4$-$5$ shape, the rhombus it determines, its placement on Holden's grid, and its construction in an arbitrary square.
 \item A search among the corners and centres of the tiling alone finds the slope $4/5$ only incidentally \cite{site}; it appears exactly at the intersection of a line with an arc.
 \item The figures in the author's GeoGebra files use the frame $(x,y)\mapsto(-\tfrac12+y,\,-\tfrac12-x)$ of Gardiner's coordinates, in which $P=(-\tfrac15,-\tfrac35)$, $Q=(-\tfrac45,-\tfrac25)$ and the arc is centred at $(0,-1)$.
-\item Interactive figures: \url{https://lluisgarcia.github.io/The-Pentametric-Cycle/rhombus.html}. GeoGebra files, images and the exact checks (\texttt{verify\_rhombus.py}, \texttt{crossings.py}; figures \texttt{figs\_rhombus.py}, \texttt{fig4.py}): \url{https://github.com/lluisgarcia/The-Pentametric-Cycle}.
+\item Interactive figures: \url{https://lluisgarcia.github.io/The-Pentametric-Cycle/rhombus.html}. GeoGebra files, images and the exact checks (\texttt{verify\_rhombus.py}, \texttt{crossings.py}, \texttt{distances.py}; figures \texttt{figs\_rhombus.py}, \texttt{fig4.py}, \texttt{fig5.py}); the distances interactively: \url{https://lluisgarcia.github.io/The-Pentametric-Cycle/distance.html}: \url{https://github.com/lluisgarcia/The-Pentametric-Cycle}.
 \end{enumerate}
 
-\paragraph{Acknowledgements and use of AI.} The constructions, the observation that Holden's lines cross the arc of every square once, at twice the next Fibonacci number of Holden units from $P$, and the name are the author's, found in GeoGebra. Claude (Anthropic, Opus 5.5) was used to verify the statements in exact arithmetic, to prepare the figures and to help draft the text; the author checked and approved every statement.
+\paragraph{Acknowledgements and use of AI.} The constructions, the question of the distance from $P$ to the spiral, the observation that Holden's lines cross the arc of every square once, at twice the next Fibonacci number of Holden units from $P$, and the name are the author's, found in GeoGebra. Claude (Anthropic, Opus 5.5) was used to verify the statements in exact arithmetic, to prepare the figures and to help draft the text; the author checked and approved every statement.
 
 \paragraph{Licence.} This note is released under CC BY 4.0; the accompanying Python scripts under the MIT licence.
 
@@ -215,6 +270,7 @@ A point is a corner or centre of a cell of a dyadic grid only if its coordinates
 \bibitem{holden} H.~L. Holden, Fibonacci tiles, \emph{The Fibonacci Quarterly} \textbf{13} (1975) 45--49.
 \bibitem{gardiner} T. Gardiner, Note 68.15, \emph{The Mathematical Gazette} \textbf{68} (1984).
 \bibitem{gt} L. Garcia Torcal, \emph{The Pentametric Cycle: A Nested Palindrome Encoding the Pythagorean Consonances}, preprint, Zenodo (2026), \href{https://doi.org/10.5281/zenodo.23183108}{doi:10.5281/zenodo.23183108}.
+\bibitem{site2} L. Garcia Torcal, \emph{The Pentametric spiral}, interactive page, \url{https://lluisgarcia.github.io/The-Pentametric-Cycle/pentaspiral.html} (2026).
 \bibitem{site} L. Garcia Torcal, \emph{The angle of 0.8}, interactive page, \url{https://lluisgarcia.github.io/The-Pentametric-Cycle/angle.html} (2026).
 \end{thebibliography}
 
