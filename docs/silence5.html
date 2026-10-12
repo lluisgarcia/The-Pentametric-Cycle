@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When Silence Becomes 5 · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<style>
+  .strip { display: grid; grid-template-columns: 7.5em repeat(25, minmax(26px, 1fr)); gap: 3px; font-family: var(--mono); font-size: .9rem; min-width: 820px; }
+  .strip div { text-align: center; padding: 4px 0; border-radius: 4px; }
+  .strip .lab { text-align: right; padding-right: 8px; font-family: var(--sans); color: var(--muted); font-size: .85rem; }
+  .strip .n { color: var(--muted); font-size: .78rem; }
+  .strip .on { outline: 2.5px solid var(--ink); }
+  table.data td.c5, .c5 { color: var(--accent3); font-weight: 600; }
+  table.data tr.now td { background: var(--fill); }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>When silence becomes 5</h1>
+  <p class="lede">The consonance indicator H = 𝔓 mod 5 takes the values 0, 1, 2, 3, 4, and 0 is the silence. Lluis reads the groups of five differently: their members are 1, 2, 3, 4, 5, and 5 is the fifth member, not 0 (0 means nothing, or a full cycle). Written as a formula, 1 + MOD(𝔓 − 1; 5): every silence becomes a 5. This page follows what that changes. It is an exploration beyond the papers: the reading is an interpretation; the results below are labelled.</p>
+
+  <h2>1 · Two ways to count to five</h2>
+  <div class="panel">
+    <div class="scroll-x"><div class="strip" id="strip"></div></div>
+    <p class="note" style="margin-bottom:0">One period, n = 0 … 24. The usual remainder H gives 0 at the 9 silences; Lluis's grouping gives 5 there (purple) and leaves every other value unchanged. Nothing is lost: 5 and 0 are the same class mod 5. What changes is that 5 can be <i>used</i>: as a ratio, a harmonic, a note.</p>
+  </div>
+
+  <h2>2 · Reading A: the silences become major thirds</h2>
+  <div class="panel">
+    <p style="margin-top:0">The paper reads H as the ratio H : (H − 1), the consecutive ratios of the tetractys: 1:1, 2:1, 3:2, 4:3, with 0 as silence. Read the silence as 5 and the same rule gives <b>5 : 4, the just major third</b>, the next superparticular ratio after the tetractys. It completes the major triad (1, 5/4, 3/2) and is the arithmetic mean of 1:1 and 3:2. Each period then sounds 9 major thirds and 4 of each of the other intervals.</p>
+    <div class="controls">
+      <button id="playA" class="primary">▶ Play</button>
+      <label><input id="aSil" type="checkbox" checked> silences as 5:4 (untick: silent, as in the paper)</label>
+      <label>tempo <input id="bpmA" type="range" min="60" max="240" value="132"><output id="bpmAOut">132</output></label>
+    </div>
+    <div class="scroll-x"><svg id="rollA" viewBox="0 0 1000 200" style="min-width:640px" role="img" aria-label="The palindrome with every silence read as a major third 5:4"></svg></div>
+    <p class="note" style="margin-bottom:0">n = 0 … 50. Each column sounds two notes in just intonation: the fundamental and the interval above it. <span class="c5">Purple</span>: the major thirds that were silences.</p>
+  </div>
+
+  <h2>3 · Reading B: the steps, and a natural trumpet</h2>
+  <div class="panel">
+    <p style="margin-top:0">Lluis's second reading divides each value by the one before it: i(n)/i(n − 1). With the usual remainder this breaks at every silence (division by 0, or a ratio of 0); with the silence as 5 <b>every step is a ratio</b>. And because the steps multiply in a chain, the note at step n is just <b>i(n) times a fundamental</b>: the cycle plays only the harmonics 1, 2, 3, 4, 5 of one note (in C: C, C, G, C, E going up), like a natural trumpet or a horn call, and each step is a leap between two of them.</p>
+    <div class="controls">
+      <button id="playB" class="primary">▶ Play</button>
+      <label>fundamental <select id="f0"><option value="65.41">C2</option><option value="73.42">D2</option><option value="98.00" selected>G2</option><option value="110.00">A2</option></select></label>
+      <label>tempo <input id="bpmB" type="range" min="60" max="240" value="150"><output id="bpmBOut">150</output></label>
+    </div>
+    <div class="grid2">
+      <div><svg id="ladder" viewBox="0 0 600 300" role="img" aria-label="The harmonic played at each step n, for one period"></svg></div>
+      <div class="scroll-x" style="max-height:420px;overflow-y:auto"><table class="data" id="tabB"></table></div>
+    </div>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> The 25 steps of a period multiply to exactly 1: the melody comes home every 25 steps. (They are i(1)/i(0) · i(2)/i(1) · … · i(25)/i(24) = i(25)/i(0) = 5/5.) Click a row or a point to hear that step.</p>
+  </div>
+
+  <h2>4 · The leaps of the palindrome</h2>
+  <div class="panel">
+    <p style="margin-top:0">The notes of the palindrome read the same backwards, so the horn call is its own retrograde. In its leaps this shows as a mirror with a twist: because i(50 − n) = i(n), the leap at step 51 − n is the <b>reciprocal</b> of the leap at step n, step(51 − n) = i(n − 1)/i(n). The second half makes the leaps of the first half in reverse order and <b>the other way up</b>: every rise of the first half is a fall of the same size in the second. <span class="tag proved">proved</span></p>
+    <svg id="mirror" viewBox="0 0 1000 150" style="width:100%" role="img" aria-label="The 50 leaps of the palindrome, mirrored with opposite sign about the axis"></svg>
+    <p class="note" style="margin-bottom:0">The leaps n = 1 … 50, up (green) or down (red), height in octaves (log₂ of the step). About the axis between 25 and 26, each bar meets a bar of the same size and opposite sign.</p>
+  </div>
+
+  <h2>5 · Which intervals, how often</h2>
+  <div class="panel">
+    <div class="grid2">
+      <div><div class="scroll-x"><table class="data" id="tabC"></table></div></div>
+      <div>
+        <p style="margin-top:0">Brought into one octave, the 25 steps of a period are all consonances of just intonation, and no dissonance. That is not special to the cycle: any ratio of two numbers from 1 to 5 is consonant, which is the old principle of Zarlino's <i>senario</i> (1558, the numbers 1 to 6). What the cycle chooses is <b>which consonances, how often and in what order</b>: thirds and sixths most, the fourth and the fifth once each.</p>
+        <p class="note">The 9 unisons and octaves equal the 9 silences of a period: a coincidence of counting, not a cause (they come from different steps).</p>
+        <p class="note" style="margin-bottom:0">The table is in the spreadsheet too: sheet <i>Silence as 5</i> of <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle/tree/main/Tables">Tables/Pentametric Cycle.xlsx</a>. Idea and reading: Lluis Garcia Torcal.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS = "http://www.w3.org/2000/svg";
+function el(svg, n, a, t) { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (t !== undefined) e.textContent = t; svg.appendChild(e); return e; }
+const H = (n) => Pent.P(n) % 5;
+const I = (n) => 1 + ((Pent.P(n) - 1) % 5 + 5) % 5;           // Lluis's grouping: members 1–5
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+const frac = (a, b) => { const g = gcd(a, b); return b / g === 1 ? `${a / g}` : `${a / g}/${b / g}`; };
+const CLASSES = [[1, "1/1", "unison / octave"], [6 / 5, "6/5", "minor third"], [5 / 4, "5/4", "major third"], [4 / 3, "4/3", "fourth"], [3 / 2, "3/2", "fifth"], [8 / 5, "8/5", "minor sixth"], [5 / 3, "5/3", "major sixth"]];
+function reduce(x) { while (x >= 2 - 1e-12) x /= 2; while (x < 1 - 1e-12) x *= 2; return x; }
+const cls = (x) => CLASSES.find((c) => Math.abs(c[0] - reduce(x)) < 1e-9);
+const colI = (v) => (v === 5 ? "var(--accent3)" : `var(--c${v})`);
+const RATIO_A = { 1: [1, 1], 2: [2, 1], 3: [3, 2], 4: [4, 3], 5: [5, 4] };
+
+// 1 · the strip
+(function () {
+  const s = $("strip"); let h = '<div class="lab">n</div>';
+  for (let n = 0; n < 25; n++) h += `<div class="n">${n}</div>`;
+  h += '<div class="lab">H = 𝔓 mod 5</div>';
+  for (let n = 0; n < 25; n++) { const v = H(n); h += `<div style="background:var(--c${v});color:${v === 0 || v === 4 ? "#1f1f1f" : "#fff"}">${v}</div>`; }
+  h += '<div class="lab">1 + MOD(𝔓 − 1; 5)</div>';
+  for (let n = 0; n < 25; n++) { const v = I(n); h += `<div style="background:${colI(v)};color:${v === 4 ? "#1f1f1f" : "#fff"}">${v}</div>`; }
+  s.innerHTML = h;
+})();
+
+// audio
+let ctx = null, master = null;
+function audio() { if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination); } if (ctx.state === "suspended") ctx.resume(); }
+function tone(f, t, d, g, type) { const o = ctx.createOscillator(), a = ctx.createGain(); o.type = type || "triangle"; o.frequency.value = f; a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + 0.02); a.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(a).connect(master); o.start(t); o.stop(t + d + 0.05); }
+
+// 2 · reading A
+const rollCols = [];
+function drawA() {
+  const svg = $("rollA"); svg.innerHTML = ""; rollCols.length = 0;
+  const left = 70, w = (1000 - left - 8) / 51, rowY = (v) => 20 + (5 - v) * 30, labs = ["", "1:1", "2:1", "3:2", "4:3", "5:4"], sil = $("aSil").checked;
+  for (let v = 1; v <= 5; v++) { el(svg, "line", { x1: left, y1: rowY(v), x2: 992, y2: rowY(v), stroke: "var(--rule)" }); el(svg, "text", { x: left - 8, y: rowY(v) + 4, "text-anchor": "end", "font-size": 12, fill: v === 5 ? "var(--accent3)" : "var(--muted)" }, labs[v]); }
+  for (let n = 0; n <= 50; n++) {
+    const v = I(n), x = left + n * w, g = el(svg, "g", { style: "cursor:pointer" });
+    const bg = el(g, "rect", { x, y: 4, width: w, height: 168, fill: "transparent" }); rollCols.push(bg);
+    if (v === 5 && !sil) el(g, "rect", { x: x + w * 0.35, y: 172 - 6, width: w * 0.3, height: 5, rx: 2, fill: "var(--c0)" });
+    else el(g, "rect", { x: x + w * 0.1, y: rowY(v) - 9, width: w * 0.8, height: 18, rx: 2, fill: colI(v) });
+    if (n % 5 === 0) el(svg, "text", { x: x + w / 2, y: 192, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, n);
+    g.addEventListener("click", () => { audio(); playA(n, ctx.currentTime + 0.02, 0.6); hiA(n); });
+  }
+  el(svg, "line", { x1: left + 25.5 * w, y1: 4, x2: left + 25.5 * w, y2: 172, stroke: "var(--ink)", "stroke-width": 1.4 });
+}
+function hiA(n) { rollCols.forEach((c, i) => c.setAttribute("fill", i === n ? "var(--fill)" : "transparent")); }
+function playA(n, t, d) { const v = I(n); if (v === 5 && !$("aSil").checked) return; const f0 = 196, [a, b] = RATIO_A[v]; tone(f0, t, d, 0.45); if (v !== 1) tone(f0 * a / b, t, d, 0.38); }
+let timerA = null;
+$("playA").onclick = () => {
+  if (timerA) { clearInterval(timerA); timerA = null; $("playA").textContent = "▶ Play"; hiA(-1); return; }
+  audio(); let n = 0, next = ctx.currentTime + 0.05; $("playA").textContent = "■ Stop";
+  timerA = setInterval(() => { const spb = 60 / +$("bpmA").value; while (next < ctx.currentTime + 0.1) { const m = n, at = next; playA(m, at, spb * 0.9); setTimeout(() => hiA(m), Math.max(0, (at - ctx.currentTime) * 1000)); next += spb; n++; if (n > 50) { clearInterval(timerA); timerA = null; setTimeout(() => { $("playA").textContent = "▶ Play"; hiA(-1); }, spb * 1000); break; } } }, 25);
+};
+$("aSil").addEventListener("change", drawA); $("bpmA").addEventListener("input", () => ($("bpmAOut").textContent = $("bpmA").value));
+
+// 3 · reading B: the ladder of harmonics and the table
+let curB = -1;
+function drawB() {
+  const svg = $("ladder"); svg.innerHTML = "";
+  const L = 50, R = 590, T = 20, B = 260, fx = (n) => L + n / 25 * (R - L), fy = (v) => B - (v - 1) / 4 * (B - T);
+  const names = ["", "1 (C)", "2 (C)", "3 (G)", "4 (C)", "5 (E)"];
+  for (let v = 1; v <= 5; v++) { el(svg, "line", { x1: L, y1: fy(v), x2: R, y2: fy(v), stroke: "var(--rule)" }); el(svg, "text", { x: L - 6, y: fy(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, names[v]); }
+  el(svg, "text", { x: 12, y: (T + B) / 2, "font-size": 11, fill: "var(--muted)", transform: `rotate(-90 12 ${(T + B) / 2})`, "text-anchor": "middle" }, "harmonic");
+  const pts = []; for (let n = 0; n <= 25; n++) pts.push(`${fx(n).toFixed(1)},${fy(I(n)).toFixed(1)}`);
+  el(svg, "polyline", { points: pts.join(" "), fill: "none", stroke: "var(--muted)", "stroke-width": 1.4 });
+  for (let n = 0; n <= 25; n++) { const v = I(n), c = el(svg, "circle", { cx: fx(n), cy: fy(v), r: n === curB ? 7 : 5, fill: colI(v), stroke: n === curB ? "var(--ink)" : "none", "stroke-width": 2, style: "cursor:pointer" });
+    c.addEventListener("click", () => { audio(); stepB(n, ctx.currentTime + 0.02, 0.5); });
+    if (n % 5 === 0) el(svg, "text", { x: fx(n), y: B + 20, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, n); }
+  // table
+  let t = "<tr><th class='num'>n</th><th class='num'>𝔓</th><th class='num'>H</th><th class='num'>i</th><th class='num'>step</th><th>in one octave</th></tr>";
+  for (let n = 0; n <= 25; n++) { const v = I(n), st = n ? frac(v, I(n - 1)) : "—", c = n ? cls(v / I(n - 1)) : null;
+    t += `<tr data-n="${n}" class="${n === curB ? "now" : ""}" style="cursor:pointer"><td class="num">${n}</td><td class="num">${Pent.P(n)}</td><td class="num">${H(n)}</td><td class="num ${v === 5 ? "c5" : ""}">${v}</td><td class="num">${st}</td><td>${c ? `${c[1]} ${c[2]}` : "start"}</td></tr>`; }
+  $("tabB").innerHTML = t;
+  $("tabB").querySelectorAll("tr[data-n]").forEach((r) => r.addEventListener("click", () => { audio(); stepB(+r.dataset.n, ctx.currentTime + 0.02, 0.5); }));
+}
+function stepB(n, t, d) { const f0 = +$("f0").value; tone(f0 * I(n), t, d, 0.5, "triangle"); setTimeout(() => { curB = n % 25 === 0 && n > 0 ? 25 : n % 25; drawB(); }, Math.max(0, (t - ctx.currentTime) * 1000)); }
+let timerB = null;
+$("playB").onclick = () => {
+  if (timerB) { clearInterval(timerB); timerB = null; $("playB").textContent = "▶ Play"; return; }
+  audio(); let k = 0, next = ctx.currentTime + 0.05; $("playB").textContent = "■ Stop";
+  timerB = setInterval(() => { const spb = 60 / +$("bpmB").value; while (next < ctx.currentTime + 0.1) { const n = k; stepB(n, next, spb * 0.85); next += spb; k++; if (k > 50) { clearInterval(timerB); timerB = null; setTimeout(() => ($("playB").textContent = "▶ Play"), spb * 1000); break; } } }, 25);
+};
+$("bpmB").addEventListener("input", () => ($("bpmBOut").textContent = $("bpmB").value));
+
+// 4 · mirror
+function drawM() {
+  const svg = $("mirror"); svg.innerHTML = ""; const L = 20, w = (1000 - L - 10) / 50, mid = 70, sc = 22;
+  el(svg, "line", { x1: L, y1: mid, x2: 990, y2: mid, stroke: "var(--rule)" });
+  for (let k = 1; k <= 50; k++) { const v = Math.log2(I(k) / I(k - 1)), x = L + (k - 1) * w + w * 0.15;
+    el(svg, "rect", { x, y: v >= 0 ? mid - v * sc : mid, width: w * 0.7, height: Math.max(1.5, Math.abs(v) * sc), fill: v > 0 ? "var(--ok)" : v < 0 ? "var(--accent2)" : "var(--muted)" });
+    if (k % 5 === 0) el(svg, "text", { x: x + w * 0.35, y: 142, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, k); }
+  el(svg, "line", { x1: L + 25 * w, y1: 8, x2: L + 25 * w, y2: 130, stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 3" });
+}
+// 5 · counts
+(function () {
+  const cnt = CLASSES.map(() => 0); for (let n = 1; n <= 25; n++) cnt[CLASSES.indexOf(cls(I(n) / I(n - 1)))]++;
+  const a = [0, 0, 0, 0, 0, 0]; for (let n = 0; n < 25; n++) a[I(n)]++;
+  let t = "<tr><th>interval (one octave)</th><th>ratio</th><th class='num'>steps per period</th></tr>";
+  CLASSES.forEach((c, i) => (t += `<tr><td>${c[2]}</td><td>${c[1]}</td><td class="num">${cnt[i]}</td></tr>`));
+  t += `<tr><td><b>total</b></td><td></td><td class="num"><b>${cnt.reduce((x, y) => x + y)}</b></td></tr>`;
+  t += "<tr><th>reading A (per period)</th><th></th><th class='num'></th></tr>";
+  [1, 2, 3, 4, 5].forEach((v) => (t += `<tr><td class="${v === 5 ? "c5" : ""}">${RATIO_A[v][0]}:${RATIO_A[v][1]}${v === 5 ? " (the silences)" : ""}</td><td></td><td class="num">${a[v]}</td></tr>`));
+  $("tabC").innerHTML = t;
+})();
+
+function all() { drawA(); drawB(); drawM(); }
+all();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
+new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
