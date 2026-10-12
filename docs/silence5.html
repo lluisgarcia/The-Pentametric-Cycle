@@ -10,9 +10,9 @@
 <link rel="stylesheet" href="style.css">
 <script src="pent.js"></script>
 <style>
-  .strip { display: grid; grid-template-columns: 7.5em repeat(25, minmax(26px, 1fr)); gap: 3px; font-family: var(--mono); font-size: .9rem; min-width: 820px; }
+  .strip { display: grid; grid-template-columns: 10.5em repeat(25, minmax(26px, 1fr)); gap: 3px; font-family: var(--mono); font-size: .9rem; min-width: 820px; }
   .strip div { text-align: center; padding: 4px 0; border-radius: 4px; }
-  .strip .lab { text-align: right; padding-right: 8px; font-family: var(--sans); color: var(--muted); font-size: .85rem; }
+  .strip .lab { white-space: nowrap; text-align: right; padding-right: 8px; font-family: var(--sans); color: var(--muted); font-size: .85rem; }
   .strip .n { color: var(--muted); font-size: .78rem; }
   .strip .on { outline: 2.5px solid var(--ink); }
   table.data td.c5, .c5 { color: var(--accent3); font-weight: 600; }
@@ -28,7 +28,7 @@
 <main>
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>When silence becomes 5</h1>
-  <p class="lede">The consonance indicator H = 𝔓 mod 5 takes the values 0, 1, 2, 3, 4, and 0 is the silence. Lluis reads the groups of five differently: their members are 1, 2, 3, 4, 5, and 5 is the fifth member, not 0 (0 means nothing, or a full cycle). Written as a formula, 1 + MOD(𝔓 − 1; 5): every silence becomes a 5. This page follows what that changes. It is an exploration beyond the papers: the reading is an interpretation; the results below are labelled.</p>
+  <p class="lede">The consonance indicator H = 𝔓 mod 5 takes the values 0, 1, 2, 3, 4, and 0 is the silence. Lluis reads the groups of five differently: their members are 1, 2, 3, 4, 5, and 5 is the fifth member, not 0 (0 means nothing, or a full cycle). Written as a formula, <span style="white-space:nowrap">1 + MOD(𝔓 − 1; 5)</span>: every silence becomes a 5. This page follows what that changes. It is an exploration beyond the papers: the reading is an interpretation; the results below are labelled.</p>
 
   <h2>1 · Two ways to count to five</h2>
   <div class="panel">
@@ -42,6 +42,8 @@
     <div class="controls">
       <button id="playA" class="primary">▶ Play</button>
       <label><input id="aSil" type="checkbox" checked> silences as 5:4 (untick: silent, as in the paper)</label>
+      <label><input id="aLoop" type="checkbox"> loop</label>
+      <label id="aPPl" style="opacity:.45"><input id="aPP" type="checkbox" disabled> ping-pong</label>
       <label>tempo <input id="bpmA" type="range" min="60" max="240" value="132"><output id="bpmAOut">132</output></label>
     </div>
     <div class="scroll-x"><svg id="rollA" viewBox="0 0 1000 200" style="min-width:640px" role="img" aria-label="The palindrome with every silence read as a major third 5:4"></svg></div>
@@ -53,6 +55,8 @@
     <p style="margin-top:0">Lluis's second reading divides each value by the one before it: i(n)/i(n − 1). With the usual remainder this breaks at every silence (division by 0, or a ratio of 0); with the silence as 5 <b>every step is a ratio</b>. And because the steps multiply in a chain, the note at step n is just <b>i(n) times a fundamental</b>: the cycle plays only the harmonics 1, 2, 3, 4, 5 of one note (in C: C, C, G, C, E going up), like a natural trumpet or a horn call, and each step is a leap between two of them.</p>
     <div class="controls">
       <button id="playB" class="primary">▶ Play</button>
+      <label><input id="bLoop" type="checkbox"> loop</label>
+      <label id="bPPl" style="opacity:.45"><input id="bPP" type="checkbox" disabled> ping-pong</label>
       <label>fundamental <select id="f0"><option value="65.41">C2</option><option value="73.42">D2</option><option value="98.00" selected>G2</option><option value="110.00">A2</option></select></label>
       <label>tempo <input id="bpmB" type="range" min="60" max="240" value="150"><output id="bpmBOut">150</output></label>
     </div>
@@ -66,8 +70,14 @@
   <h2>4 · The leaps of the palindrome</h2>
   <div class="panel">
     <p style="margin-top:0">The notes of the palindrome read the same backwards, so the horn call is its own retrograde. In its leaps this shows as a mirror with a twist: because i(50 − n) = i(n), the leap at step 51 − n is the <b>reciprocal</b> of the leap at step n, step(51 − n) = i(n − 1)/i(n). The second half makes the leaps of the first half in reverse order and <b>the other way up</b>: every rise of the first half is a fall of the same size in the second. <span class="tag proved">proved</span></p>
-    <svg id="mirror" viewBox="0 0 1000 150" style="width:100%" role="img" aria-label="The 50 leaps of the palindrome, mirrored with opposite sign about the axis"></svg>
-    <p class="note" style="margin-bottom:0">The leaps n = 1 … 50, up (green) or down (red), height in octaves (log₂ of the step). About the axis between 25 and 26, each bar meets a bar of the same size and opposite sign.</p>
+    <p>And the mirror repeats, like a fractal (Lluis's observation). Inside the first half the leaps mirror the same way about step 13, the single unison leap where the fifth sounds twice (3, 3 at n = 12 | 13): step(26 − k) = 1/step(k). Step 12 goes down, step 14 goes up; step 10 goes up, step 16 goes down; and so on. So the first 12 leaps, taken together, go <b>down</b> (×3/5, from harmonic 5 to harmonic 3) and the next 12 go <b>up</b> by the same amount (×5/3). The second half does the same about step 38. Then the whole block of 24 around step 13 is mirrored again by the block around step 38, across the big axis: step 12 (down) meets step 39 (up), and the inner part 14–37 mirrors itself. <span class="tag proved">proved</span></p>
+    <div class="ctl" style="display:flex;flex-wrap:wrap;gap:.4em 1.2em;align-items:center;margin:.4em 0">
+      <label>leaps shown <select id="mN"><option value="50">50</option><option value="100">100</option></select></label>
+      <span class="note" style="margin:0">Touch or hover a bar to see its mirror partners.</span>
+    </div>
+    <svg id="mirror" viewBox="0 0 1000 230" style="width:100%;touch-action:manipulation" role="img" aria-label="The leaps of the palindrome, with the mirror partners of a chosen leap joined by arcs"></svg>
+    <p class="note">The leaps, up (green) or down (red), height in octaves (log₂ of the step). Each shaded column or dashed line is a mirror: across it every bar meets a bar of the same size and opposite sign. <span style="color:#e6c229">Yellow</span> arcs cross the small mirrors (steps 13, 38, 63, 88), <span style="color:#4f8df7">blue</span> arcs the mirrors between halves (25|26, 75|76), <span style="color:#e0605a">red</span> arcs the mirror between blocks of 50 (50|51).</p>
+    <p style="margin-bottom:0"><b>Why, and how far it goes.</b> The notes have two mirrors: i(−n) = i(n), because 𝔓(−n) = 𝔓(n), and i(25 − n) = i(n), because 𝔓(25 − n) − 𝔓(n) = 125 − 10n, a multiple of 5. Two mirrors 12½ apart make a repeat of 25 and an endless row of mirrors, one every 12½ notes: on the silences (n = 0, 25, 50, …) and between the repeated fifths (12½, 37½, …). For the leaps that puts a mirror at 13, 25½, 38, 50½, 63, … for ever. So the block of 25 mirrors the next 25, the block of 50 the next 50, the block of 100 the next 100, ad infinitum, as Lluis says (checked by computer to 1000 notes). <span class="tag proved">proved</span> Strictly, a fractal also repeats at smaller and smaller sizes. Here the mirrors repeat at every larger size but stop at 12½: the first 12 leaps are not a mirror of themselves. So it is self-similar upwards, like a frieze of mirrors. <span class="tag interp">interpretation</span></p>
   </div>
 
   <h2>5 · Which intervals, how often</h2>
@@ -139,11 +149,26 @@ function drawA() {
 }
 function hiA(n) { rollCols.forEach((c, i) => c.setAttribute("fill", i === n ? "var(--fill)" : "transparent")); }
 function playA(n, t, d) { const v = I(n); if (v === 5 && !$("aSil").checked) return; const f0 = 196, [a, b] = RATIO_A[v]; tone(f0, t, d, 0.45); if (v !== 1) tone(f0 * a / b, t, d, 0.38); }
+// the order of play: n = 0 … 50; loop goes round again (50 is the 0 of the next palindrome); ping-pong bounces back at the ends
+function sequencer(loopId, ppId) {
+  let n = -1, dir = 1;
+  return () => {
+    const loop = $(loopId).checked, pp = loop && $(ppId).checked;
+    if (n < 0) { n = 0; return n; }
+    let m = n + dir;
+    if (m > 50) { if (!loop) return null; if (pp) { dir = -1; m = 49; } else m = 1; }
+    if (m < 0) { if (pp) { dir = 1; m = 1; } else return null; }
+    n = m; return n;
+  };
+}
+function linkPP(loopId, ppId, lblId) { const f = () => { const on = $(loopId).checked; $(ppId).disabled = !on; $(lblId).style.opacity = on ? 1 : 0.45; if (!on) $(ppId).checked = false; }; $(loopId).addEventListener("change", f); f(); }
+linkPP("aLoop", "aPP", "aPPl"); linkPP("bLoop", "bPP", "bPPl");
 let timerA = null;
 $("playA").onclick = () => {
   if (timerA) { clearInterval(timerA); timerA = null; $("playA").textContent = "▶ Play"; hiA(-1); return; }
-  audio(); let n = 0, next = ctx.currentTime + 0.05; $("playA").textContent = "■ Stop";
-  timerA = setInterval(() => { const spb = 60 / +$("bpmA").value; while (next < ctx.currentTime + 0.1) { const m = n, at = next; playA(m, at, spb * 0.9); setTimeout(() => hiA(m), Math.max(0, (at - ctx.currentTime) * 1000)); next += spb; n++; if (n > 50) { clearInterval(timerA); timerA = null; setTimeout(() => { $("playA").textContent = "▶ Play"; hiA(-1); }, spb * 1000); break; } } }, 25);
+  audio(); const nextN = sequencer("aLoop", "aPP"); let next = ctx.currentTime + 0.05; $("playA").textContent = "■ Stop";
+  timerA = setInterval(() => { const spb = 60 / +$("bpmA").value; while (next < ctx.currentTime + 0.1) { const m = nextN(); if (m === null) { clearInterval(timerA); timerA = null; setTimeout(() => { $("playA").textContent = "▶ Play"; hiA(-1); }, spb * 1000); break; }
+    const at = next; playA(m, at, spb * 0.9); setTimeout(() => hiA(m), Math.max(0, (at - ctx.currentTime) * 1000)); next += spb; } }, 25);
 };
 $("aSil").addEventListener("change", drawA); $("bpmA").addEventListener("input", () => ($("bpmAOut").textContent = $("bpmA").value));
 
@@ -166,25 +191,51 @@ function drawB() {
     t += `<tr data-n="${n}" class="${n === curB ? "now" : ""}" style="cursor:pointer"><td class="num">${n}</td><td class="num">${Pent.P(n)}</td><td class="num">${H(n)}</td><td class="num ${v === 5 ? "c5" : ""}">${v}</td><td class="num">${st}</td><td>${c ? `${c[1]} ${c[2]}` : "start"}</td></tr>`; }
   $("tabB").innerHTML = t;
   $("tabB").querySelectorAll("tr[data-n]").forEach((r) => r.addEventListener("click", () => { audio(); stepB(+r.dataset.n, ctx.currentTime + 0.02, 0.5); }));
+  const row = $("tabB").querySelector("tr.now"), box = $("tabB").parentElement;
+  if (row && timerB) { const d = row.getBoundingClientRect().top - box.getBoundingClientRect().top - box.clientHeight / 2 + row.clientHeight / 2; box.scrollTop += d; }
 }
 function stepB(n, t, d) { const f0 = +$("f0").value; tone(f0 * I(n), t, d, 0.5, "triangle"); setTimeout(() => { curB = n % 25 === 0 && n > 0 ? 25 : n % 25; drawB(); }, Math.max(0, (t - ctx.currentTime) * 1000)); }
 let timerB = null;
 $("playB").onclick = () => {
   if (timerB) { clearInterval(timerB); timerB = null; $("playB").textContent = "▶ Play"; return; }
-  audio(); let k = 0, next = ctx.currentTime + 0.05; $("playB").textContent = "■ Stop";
-  timerB = setInterval(() => { const spb = 60 / +$("bpmB").value; while (next < ctx.currentTime + 0.1) { const n = k; stepB(n, next, spb * 0.85); next += spb; k++; if (k > 50) { clearInterval(timerB); timerB = null; setTimeout(() => ($("playB").textContent = "▶ Play"), spb * 1000); break; } } }, 25);
+  audio(); const nextN = sequencer("bLoop", "bPP"); let next = ctx.currentTime + 0.05; $("playB").textContent = "■ Stop";
+  timerB = setInterval(() => { const spb = 60 / +$("bpmB").value; while (next < ctx.currentTime + 0.1) { const n = nextN(); if (n === null) { clearInterval(timerB); timerB = null; setTimeout(() => ($("playB").textContent = "▶ Play"), spb * 1000); break; } stepB(n, next, spb * 0.85); next += spb; } }, 25);
 };
 $("bpmB").addEventListener("input", () => ($("bpmBOut").textContent = $("bpmB").value));
 
 // 4 · mirror
+let mSel = 12;
 function drawM() {
-  const svg = $("mirror"); svg.innerHTML = ""; const L = 20, w = (1000 - L - 10) / 50, mid = 70, sc = 22;
-  el(svg, "line", { x1: L, y1: mid, x2: 990, y2: mid, stroke: "var(--rule)" });
-  for (let k = 1; k <= 50; k++) { const v = Math.log2(I(k) / I(k - 1)), x = L + (k - 1) * w + w * 0.15;
-    el(svg, "rect", { x, y: v >= 0 ? mid - v * sc : mid, width: w * 0.7, height: Math.max(1.5, Math.abs(v) * sc), fill: v > 0 ? "var(--ok)" : v < 0 ? "var(--accent2)" : "var(--muted)" });
-    if (k % 5 === 0) el(svg, "text", { x: x + w * 0.35, y: 142, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, k); }
-  el(svg, "line", { x1: L + 25 * w, y1: 8, x2: L + 25 * w, y2: 130, stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "4 3" });
+  const svg = $("mirror"); svg.innerHTML = ""; const N = +$("mN").value, L = 12, w = (1000 - L - 8) / N, mid = 74, sc = 21, X = (k) => L + (k - 1) * w, cx = (k) => X(k) + w / 2;
+  const lv = (k) => Math.log2(I(k) / I(k - 1));
+  // mirrors of the leaps: 13 + 12.5 m. Odd multiples of 12.5 + 0.5 fall on a step (13, 38, ...), the others between steps.
+  const axes = []; for (let a2 = 26; a2 <= 2 * N; a2 += 25) axes.push(a2 / 2);
+  const kind = (a) => (Number.isInteger(a) ? "y" : (a - 0.5) % 50 === 0 ? "r" : "b");
+  const COL = { y: "#e6c229", b: "#4f8df7", r: "#e0605a" };
+  for (const a of axes) { if (Number.isInteger(a)) el(svg, "rect", { x: X(a), y: 14, width: w, height: 122, fill: "var(--fill)" });
+    else el(svg, "line", { x1: X(a + 0.5), y1: 8, x2: X(a + 0.5), y2: 140, stroke: kind(a) === "r" ? COL.r : "var(--ink)", "stroke-width": kind(a) === "r" ? 2 : 1.4, "stroke-dasharray": "5 3" }); }
+  el(svg, "line", { x1: L, y1: mid, x2: 992, y2: mid, stroke: "var(--rule)" });
+  for (let k = 1; k <= N; k++) { const v = lv(k), x = X(k) + w * 0.15, on = k === mSel;
+    el(svg, "rect", { x, y: v >= 0 ? mid - v * sc : mid, width: w * 0.7, height: Math.max(1.5, Math.abs(v) * sc), fill: v > 0 ? "var(--ok)" : v < 0 ? "var(--accent2)" : "var(--muted)", stroke: on ? "var(--ink)" : "none", "stroke-width": 1.5 });
+    const step = N === 50 ? 5 : 10;
+    if (k % step === 0 || (N === 50 && (k === 13 || k === 38))) el(svg, "text", { x: cx(k), y: 152, "text-anchor": "middle", "font-size": 10, fill: Number.isInteger(axes.find((a) => a === k)) ? "var(--ink)" : "var(--muted)" }, k);
+    const hit = el(svg, "rect", { x: X(k), y: 0, width: w, height: 145, fill: "transparent", style: "cursor:pointer" });
+    const pick = () => { if (mSel !== k) { mSel = k; drawM(); } };
+    hit.addEventListener("mouseenter", pick); hit.addEventListener("click", pick); }
+  // arcs from the chosen leap to its partner across each mirror
+  const base = 160; let row = { y: 0, b: 0, r: 0 };
+  for (const a of axes) { const p = 2 * a - mSel; if (p < 1 || p > N || p === mSel) continue;
+    const t = kind(a), x1 = cx(mSel), x2 = cx(p), d = Math.min(62, 10 + Math.abs(x2 - x1) * 0.12);
+    el(svg, "path", { d: `M${x1},${base} Q${(x1 + x2) / 2},${base + 2 * d} ${x2},${base}`, fill: "none", stroke: COL[t], "stroke-width": 2 });
+    for (const x of [x1, x2]) el(svg, "line", { x1: x, y1: 144, x2: x, y2: base, stroke: COL[t], "stroke-width": 1.2 });
+    el(svg, "text", { x: x2, y: base - 1, "text-anchor": "middle", "font-size": 9, fill: COL[t] }, p); }
+  const f = (x) => frac(I(x), I(x - 1));
+  el(svg, "text", { x: 992, y: 226, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, `step ${mSel} = ${f(mSel)} · each partner is the reciprocal`);
+  if (N === 50) { const lab = (k0, k1, t) => el(svg, "text", { x: (X(k0) + X(k1 + 1)) / 2, y: 10, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, t);
+    lab(1, 12, "12 leaps: net down ×3/5"); lab(14, 25, "12 leaps: net up ×5/3"); lab(26, 37, "down ×3/5"); lab(39, 50, "up ×5/3");
+    for (const b of [12, 37]) for (const c of [b + 1, b + 2]) el(svg, "line", { x1: X(c), y1: 14, x2: X(c), y2: 136, stroke: "var(--muted)", "stroke-dasharray": "2 3" }); }
 }
+$("mN").addEventListener("change", drawM);
 // 5 · counts
 (function () {
   const cnt = CLASSES.map(() => 0); for (let n = 1; n <= 25; n++) cnt[CLASSES.indexOf(cls(I(n) / I(n - 1)))]++;
