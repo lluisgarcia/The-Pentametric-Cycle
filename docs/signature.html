@@ -32,6 +32,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Name and date signature</h1>
   <p class="lede">Every name and every date has its own short piece in the Pentametric Cycle. Each letter becomes a number, the number goes through the formula to its residue, and the residue becomes silence, a unison, an octave, a fifth or a fourth. Listen, then download it as a MIDI file or as a card to share.</p>
+  <div id="silHost"></div>
 
   <div class="grid2">
     <div class="panel">
@@ -55,6 +56,7 @@
           <select id="root"><option value="48">C3</option><option value="55" selected>G3</option><option value="57">A3</option><option value="60">C4</option></select>
         </label>
         <label>tempo <input id="bpm" type="range" min="40" max="200" value="96"><output id="bpmOut">96</output></label>
+        <label title="Used for the sound here and for the MIDI file (with pitch bends)">tuning <select id="tuning"></select></label>
       </div>
       <div class="controls" style="margin-bottom:0">
         <button id="play" class="primary">▶ Play</button>
@@ -90,9 +92,13 @@
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
-const IV = Pent.INTERVALS;
-const SEMI = [null, 0, 12, 7, 5];
-const COLORS = ["#9a9a9a", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b"];
+const IV = Pent.INTERVALS5;            // index 5: the silence read as 5, the major third 5:4 (switch)
+const SEMI = [null, 0, 12, 7, 5, 4];
+const COLORS = ["#9a9a9a", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b", "#6b5a9e"];
+// tuning: the cycle's own ratios over the root (just), or one of the shared 12-note tunings, measured from the root
+const JUST = [["just", "the cycle's own ratios (just)"]];
+Pent.tuningOptions($("tuning"), JUST);
+function devOf(h, root) { const id = $("tuning").value; if (id === "just") return h ? 1200 * Math.log2(IV[h].num / IV[h].den) - 100 * SEMI[h] : 0; return Pent.devCents(id, root + SEMI[h], root); }
 
 // ---- letters to numbers ----
 const GREEK = { α: 1, β: 2, γ: 3, δ: 4, ε: 5, ϛ: 6, ζ: 7, η: 8, θ: 9, ι: 10, κ: 20, λ: 30, μ: 40, ν: 50, ξ: 60, ο: 70, π: 80, ϙ: 90, ρ: 100, σ: 200, ς: 200, τ: 300, υ: 400, φ: 500, χ: 600, ψ: 700, ω: 800 };
@@ -130,13 +136,13 @@ function piece() {
   let sum = 0;
   words.forEach((w, i) => {
     if (i) ev.push({ kind: "gap", label: "", sub: "rest", h: 0, beats: 0.5 });
-    for (const { ch, n } of w) { sum += n; ev.push({ kind: "letter", label: ch, sub: `${n} · ${IV[Pent.H(n)].ratio || "rest"}`, n, h: Pent.H(n), beats: 1 }); }
+    for (const { ch, n } of w) { sum += n; ev.push({ kind: "letter", label: ch, sub: `${n} · ${IV[Pent.V(n)].ratio || "rest"}`, n, h: Pent.V(n), beats: 1 }); }
   });
-  if (sum > 0) ev.push({ kind: "sum", label: "Σ", sub: `${sum} · ${IV[Pent.H(sum)].ratio || "rest"}`, n: sum, h: Pent.H(sum), beats: 2 });
+  if (sum > 0) ev.push({ kind: "sum", label: "Σ", sub: `${sum} · ${IV[Pent.V(sum)].ratio || "rest"}`, n: sum, h: Pent.V(sum), beats: 2 });
   if ($("useDate").checked && $("date").value) {
     const [y, m, d] = $("date").value.split("-").map(Number);
     ev.push({ kind: "gap", label: "", sub: "rest", h: 0, beats: 1 });
-    for (const [lab, n] of [["day", d], ["month", m], ["year", y]]) ev.push({ kind: "date", label: String(n), sub: `${lab} · ${IV[Pent.H(n)].ratio || "rest"}`, n, h: Pent.H(n), beats: 2 });
+    for (const [lab, n] of [["day", d], ["month", m], ["year", y]]) ev.push({ kind: "date", label: String(n), sub: `${lab} · ${IV[Pent.V(n)].ratio || "rest"}`, n, h: Pent.V(n), beats: 2 });
   }
   return { ev, sum, words };
 }
@@ -161,9 +167,9 @@ function render() {
     }
     html += "</div>";
   }
-  const counts = [0, 0, 0, 0, 0]; ev.filter((e) => e.kind !== "gap").forEach((e) => counts[e.h]++);
+  const counts = [0, 0, 0, 0, 0, 0]; ev.filter((e) => e.kind !== "gap").forEach((e) => counts[e.h]++);
   const pl = (k, w) => `${k} ${w}${k === 1 ? "" : "s"}`;
-  html += `<p class="note" style="margin-bottom:0">${pl(ev.filter((e) => e.kind !== "gap").length, "sound")}: ${pl(counts[0], "silence")}, ${pl(counts[1], "unison")}, ${pl(counts[2], "octave")}, ${pl(counts[3], "fifth")}, ${pl(counts[4], "fourth")}.</p>`;
+  html += `<p class="note" style="margin-bottom:0">${pl(ev.filter((e) => e.kind !== "gap").length, "sound")}: ${Pent.silence5() ? "" : pl(counts[0], "silence") + ", "}${pl(counts[1], "unison")}, ${pl(counts[2], "octave")}, ${pl(counts[3], "fifth")}, ${pl(counts[4], "fourth")}${Pent.silence5() ? ", " + pl(counts[5], "major third") : ""}.</p>`;
   $("out").innerHTML = html;
   $("out").querySelectorAll(".tok").forEach((t) => (tokEls[+t.dataset.i] = t));
   const iso = words.flat().reduce((a, x) => a + (x.iso || 0), 0);
@@ -193,7 +199,7 @@ $("play").onclick = () => {
     const dur = e.beats * spb;
     if (e.kind !== "gap" && e.h > 0) {
       tone(f0, t, dur * 0.92, 0.16);
-      if (e.h !== 1) tone(f0 * IV[e.h].num / IV[e.h].den, t, dur * 0.92, 0.14);
+      if (e.h !== 1) { const rt = +$("root").value; tone(midiHz(rt + SEMI[e.h]) * 2 ** (devOf(e.h, rt) / 1200), t, dur * 0.92, 0.14); }
     }
     timers.push(setTimeout(() => { tokEls.forEach((x) => x && x.classList.remove("now")); if (tokEls[i]) tokEls[i].classList.add("now"); }, (t - t0) * 1000 + 80));
     t += dur;
@@ -209,19 +215,18 @@ function buildMidi(ev) {
   out.push([0, [0xff, 0x51, 0x03, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255]]);
   const nm = Array.from(new TextEncoder().encode("Pentametric signature: " + $("name").value.trim())).slice(0, 120);
   out.push([0, [0xff, 0x03, nm.length, ...nm]]);
-  out.push([0, [0xc0, 0x00]]);
-  let t = 0;
+  let t = 0; const notes = [];
   for (const e of ev) {
     const len = Math.round(e.beats * PPQ);
     if (e.kind !== "gap" && e.h > 0) {
-      out.push([t, [0x90, root, 84]]); out.push([t + len - 24, [0x80, root, 0]]);
-      if (e.h !== 1) { const up = root + SEMI[e.h]; out.push([t, [0x90, up, 78]]); out.push([t + len - 24, [0x80, up, 0]]); }
+      notes.push({ t, d: len - 24, m: root, vel: 84, dev: 0 });
+      if (e.h !== 1) notes.push({ t, d: len - 24, m: root + SEMI[e.h], vel: 78, dev: devOf(e.h, root) });
     }
     t += len;
   }
-  out.sort((a, b) => a[0] - b[0] || (a[1][0] === 0x80 ? -1 : 1));
+  out.push(...Pent.tunedEvents(notes, [0, 1, 2, 3], 0));   // one channel per sounding note, with its pitch bend
   const tr = []; let last = 0;
-  for (const [tt, bytes] of out) { tr.push(...vlq(tt - last), ...bytes); last = tt; }
+  for (const [tt, bytes] of Pent.sortMidi(out)) { tr.push(...vlq(tt - last), ...bytes); last = tt; }
   tr.push(0x00, 0xff, 0x2f, 0x00);
   const L = tr.length;
   return new Uint8Array([0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, 1, 224, 0x4d, 0x54, 0x72, 0x6b, (L >>> 24) & 255, (L >>> 16) & 255, (L >>> 8) & 255, L & 255, ...tr]);
@@ -268,12 +273,14 @@ $("card").onclick = () => {
   g.fillText(line.length > 90 ? line.slice(0, 88) + "…" : line, 60, ty);
   if ($("useDate").checked && $("date").value) g.fillText("date " + $("date").value, 60, ty + 34);
   g.font = "16px system-ui, sans-serif";
-  g.fillText("P(n) = (n² + 4·(n | 5))/5 · H(n) = P(n) mod 5 · lluisgarcia.github.io/The-Pentametric-Cycle", 60, H - 40);
+  g.fillText("P(n) = (n² + 4·(n | 5))/5 · " + (Pent.silence5() ? "1 + MOD(P(n) − 1; 5)" : "H(n) = P(n) mod 5") + " · lluisgarcia.github.io/The-Pentametric-Cycle", 60, H - 40);
   cv.toBlob((b) => download(b, `pentametric_${slug()}.png`), "image/png");
 };
 
 for (const id of ["name", "mode", "date", "useDate"]) $(id).addEventListener("input", () => { stop(); render(); });
 $("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").value));
+Pent.silenceSwitch($("silHost"), "the silences sound as major thirds 5:4 (Lluis's reading, exploratory); the MIDI file follows the tuning you choose");
+window.addEventListener("pent-silence", () => { Pent.tuningOptions($("tuning"), JUST); stop(); render(); });
 render();
 </script>
 <script src="menu.js"></script>

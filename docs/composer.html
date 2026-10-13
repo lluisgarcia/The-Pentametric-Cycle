@@ -28,6 +28,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Composer</h1>
   <p class="lede">Turn any list of numbers into music. Each number n is sent through the formula to its residue H(n), which becomes silence, a unison, an octave, a fifth or a fourth above a root note. Listen in just intonation, then download the result as a MIDI file to open in any music software.</p>
+  <div id="silHost"></div>
 
   <div class="grid2">
     <div class="panel">
@@ -60,13 +61,14 @@
             </select>
           </label>
           <label>tempo <input id="bpm" type="range" min="40" max="240" value="120"><output id="bpmOut">120</output></label>
+          <label title="Used for the sound here and for the MIDI file (with pitch bends)">tuning <select id="tuning"></select></label>
         </div>
       </fieldset>
       <div class="controls" style="margin:0">
         <button id="play" class="primary">▶ Play</button>
         <button id="midi">⤓ Download MIDI</button>
       </div>
-      <p class="note" style="margin-bottom:0">MIDI files use equal temperament, so in the download the fifth and fourth are 2 cents away from the pure ratios you hear here; unison and octave are exact.</p>
+      <p class="note" style="margin-bottom:0">The tuning is used here and in the MIDI file. MIDI notes are equal-tempered, so the file gives each sounding note its own channel with a pitch bend (range ±2 semitones, set in the file), and any General MIDI synthesizer plays the tuning. The cycle's own ratios are measured from the root; the 12-note tunings are measured from the root as tonic, so in <i>Pentametric fifths</i> the fourth above the root is reached by eleven fifths up and sounds 21.5 cents high.</p>
     </div>
     <div class="panel">
       <h2 style="margin-top:0">Your piece</h2>
@@ -85,9 +87,13 @@
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
-const IV = Pent.INTERVALS;
-const SEMI = [null, 0, 12, 7, 5];          // equal-tempered size of each interval in semitones (for MIDI)
-const COLORS = ["#9a9a9a", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b"];
+const IV = Pent.INTERVALS5;            // index 5: the silence read as 5, the major third 5:4 (switch)
+const SEMI = [null, 0, 12, 7, 5, 4];          // equal-tempered size of each interval in semitones (for MIDI)
+// tuning: the cycle's own ratios over the root (just), or one of the shared 12-note tunings, measured from the root
+Pent.tuningOptions($("tuning"), [["just", "the cycle's own ratios (just)"]]);
+const cents = (r) => 1200 * Math.log2(r);
+function devOf(h, root) { const id = $("tuning").value; if (id === "just") return h ? cents(IV[h].num / IV[h].den) - 100 * SEMI[h] : 0; return Pent.devCents(id, root + SEMI[h], root); }
+const COLORS = ["#9a9a9a", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b", "#6b5a9e"];
 
 // presets
 const primes = []; for (let k = 2; primes.length < 40; k++) if (primes.every((q) => k % q)) primes.push(k);
@@ -113,18 +119,18 @@ function numbers() {
 }
 let cells = [];
 function refresh() {
-  const ns = numbers(), hs = ns.map((n) => Pent.H(n));
+  const ns = numbers(), hs = ns.map((n) => Pent.V(n));
   const seq = $("seq"); seq.innerHTML = ""; cells = [];
   for (let i = 0; i < ns.length; i++) {
     const s = document.createElement("span"); s.style.background = COLORS[hs[i]];
     s.title = `n = ${ns[i]}: ${IV[hs[i]].name}`; s.textContent = hs[i] === 0 ? "·" : IV[hs[i]].ratio;
     seq.appendChild(s); cells.push(s);
   }
-  const count = [0, 0, 0, 0, 0]; hs.forEach((h) => count[h]++);
+  const count = [0, 0, 0, 0, 0, 0]; hs.forEach((h) => count[h]++);
   const pal = ns.length > 1 && hs.every((h, i) => h === hs[hs.length - 1 - i]);
   $("stats").innerHTML = [
     ["notes", String(ns.length)],
-    ["silences", String(count[0])],
+    Pent.silence5() ? ["major thirds 5:4 (the silences)", String(count[5])] : ["silences", String(count[0])],
     ["unison / octave", `${count[1]} / ${count[2]}`],
     ["fifth / fourth", `${count[3]} / ${count[4]}`],
     ["length at this tempo", `${(ns.length * 60 / +$("bpm").value).toFixed(1)} s`],
@@ -146,7 +152,7 @@ function tone(f, t, dur, g0) {
 }
 function voice(h, t, spb) {
   if (h === 0) return;
-  const f0 = midiHz(+$("root").value), up = f0 * IV[h].num / IV[h].den, v = $("voice").value;
+  const rt = +$("root").value, f0 = midiHz(rt), up = midiHz(rt + SEMI[h]) * 2 ** (devOf(h, rt) / 1200), v = $("voice").value;
   if (v === "dyad") { tone(f0, t, spb * 0.9, 0.16); if (h !== 1) tone(up, t, spb * 0.9, 0.14); }
   else if (v === "melody") tone(up, t, spb * 0.9, 0.18);
   else { tone(f0, t, spb * 0.45, 0.16); tone(up, t + spb / 2, spb * 0.45, 0.16); }
@@ -186,18 +192,17 @@ function buildMidi(hs) {
   ev.push([0, [0xff, 0x51, 0x03, (tempo >> 16) & 255, (tempo >> 8) & 255, tempo & 255]]);
   const name = Array.from(new TextEncoder().encode("The Pentametric Cycle"));
   ev.push([0, [0xff, 0x03, name.length, ...name]]);
-  ev.push([0, [0xc0, 0x00]]);
-  const note = (t, len, key, vel) => { ev.push([t, [0x90, key, vel]]); ev.push([t + len, [0x80, key, 0]]); };
+  const notes = [], note = (t, len, key, vel, h) => notes.push({ t, d: len, m: key, vel, dev: h ? devOf(h, root) : 0 });
   hs.forEach((h, i) => {
     if (h === 0) return;
     const t = i * PPQ, up = root + SEMI[h];
-    if (v === "dyad") { note(t, PPQ - 24, root, 84); if (h !== 1) note(t, PPQ - 24, up, 78); }
-    else if (v === "melody") note(t, PPQ - 24, up, 88);
-    else { note(t, PPQ / 2 - 12, root, 84); note(t + PPQ / 2, PPQ / 2 - 12, up, 84); }
+    if (v === "dyad") { note(t, PPQ - 24, root, 84, 0); if (h !== 1) note(t, PPQ - 24, up, 78, h); }
+    else if (v === "melody") note(t, PPQ - 24, up, 88, h);
+    else { note(t, PPQ / 2 - 12, root, 84, 0); note(t + PPQ / 2, PPQ / 2 - 12, up, 84, h); }
   });
-  ev.sort((a, b) => a[0] - b[0] || (a[1][0] === 0x80 ? -1 : 1));
+  ev.push(...Pent.tunedEvents(notes, [0, 1, 2, 3, 4, 5, 6, 7], 0));   // one channel per sounding note, with its pitch bend
   const track = []; let last = 0;
-  for (const [t, bytes] of ev) { track.push(...vlq(t - last), ...bytes); last = t; }
+  for (const [t, bytes] of Pent.sortMidi(ev)) { track.push(...vlq(t - last), ...bytes); last = t; }
   track.push(0x00, 0xff, 0x2f, 0x00);
   const len = track.length;
   const header = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 0, 0, 1, (PPQ >> 8) & 255, PPQ & 255];
@@ -213,6 +218,8 @@ $("midi").onclick = () => {
 $("bpm").addEventListener("input", () => { $("bpmOut").textContent = $("bpm").value; refresh(); });
 $("list").addEventListener("input", refresh);
 $("list").value = PRESETS["One palindrome (0–50)"].join(", ");
+Pent.silenceSwitch($("silHost"), "the silences sound as major thirds 5:4 (Lluis's reading, exploratory); the MIDI file follows the tuning chosen below");
+window.addEventListener("pent-silence", () => { Pent.tuningOptions($("tuning"), [["just", "the cycle's own ratios (just)"]]); refresh(); });
 refresh();
 </script>
 <script src="menu.js"></script>

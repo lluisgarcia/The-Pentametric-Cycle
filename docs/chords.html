@@ -36,6 +36,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Chord progressions</h1>
   <p class="lede">Let the cycle write the harmony. Each step n moves the root of the chord by its interval: a fifth goes up a fifth, a fourth up a fourth, the unison and the octave stay, and silence rests. With the Pentametric cycle this gives only three chords, I, IV and V, and the root comes home after every period. Play it, then download it as MIDI with smooth voice leading, a bass line and, in flamenco style, palmas.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="row">
@@ -52,7 +53,7 @@
       <label>length <select id="len"></select></label>
       <label id="lenCL" class="hidden">steps <input id="lenC" type="number" min="1" max="2000" step="1" value="8" style="width:7ch"></label>
       <label title="where in the palindrome (n = 0–50) the window begins">start at n = <input id="start" type="number" min="0" step="1" value="1" style="width:7ch"></label>
-      <label>silence <select id="sil"><option value="rest">rests</option><option value="hold" selected>holds the chord</option><option value="drone">keeps a drone on the tonic</option></select></label>
+      <label id="silL">silence <select id="sil"><option value="rest">rests</option><option value="hold" selected>holds the chord</option><option value="drone">keeps a drone on the tonic</option></select></label>
       <label id="beatsL">beats per chord <select id="beats"><option>1</option><option selected>2</option><option>4</option></select></label>
       <label>voicing <select id="voicing"><option value="smooth">smooth voice leading</option><option value="root">root position blocks</option></select></label>
       <label><input id="bass" type="checkbox" checked> bass line</label>
@@ -61,16 +62,7 @@
       <button id="play" class="primary">▶ Play</button>
       <label><input id="loop" type="checkbox"> loop</label>
       <label>tempo <input id="bpm" type="range" min="40" max="220" value="96"><output id="bpmOut">96</output></label>
-      <label title="How the playback is tuned. The MIDI file is always equal-tempered.">tuning <select id="tuning">
-        <option value="et" selected>equal</option>
-        <option value="p5">Pentametric fifths (pure 3:2)</option>
-        <option value="p4">Pentametric fourths (pure 4:3)</option>
-        <option value="pyth">Pythagorean (3:2 up and 4:3 up, as the cycle walks)</option>
-        <option value="kfifth">Kirnberger fifth (≈ equal)</option>
-        <option value="mean">¼-comma meantone</option>
-        <option value="werck">Werckmeister III</option>
-        <option value="kirn3">Kirnberger III</option>
-        <option value="vall">Vallotti</option></select></label>
+      <label title="How the playback and the MIDI file are tuned (the file uses pitch bends)">tuning <select id="tuning"></select></label>
       <button id="midi">⤓ MIDI</button>
       <button id="txt">⤓ Chord chart (.txt)</button>
     </div>
@@ -94,8 +86,9 @@
     <p style="margin-top:0">The cycle gives intervals, not chords, so a rule turns one into the other. Here the rule moves the <em>root</em>: H(n) = 3 (the fifth, 3:2) moves it up a fifth, H(n) = 4 (the fourth, 4:3) up a fourth, H(n) = 1 and 2 (unison and octave) leave it where it is, and H(n) = 0 is a rest. On each root the page builds the chord of the chosen scale, and the voicing moves each voice to the nearest note of the next chord.</p>
     <p>Starting from the tonic, fifths and fourths alone can only reach the fourth and fifth degrees, so the Pentametric cycle plays I, IV and V and nothing else: the harmony of the blues, folk and early rock, produced by the formula without being chosen. Each period of 25 holds four fifths and four fourths, and a fifth plus a fourth is an octave, so the root is back home after every period (the musical face of “the consonances multiply to 2⁸”).</p>
     <p><strong>Flamenco.</strong> The box switches to the Spanish minor (in A by default): i and iv from the natural minor and a major V, so the same rule gives Am, Dm and E (Am7, Dm7 and E7 with a minor ninth when sevenths are on). That is the backbone of a lot of rumba flamenca. Choose <em>rumba</em> for a 4/4 strum with palmas on 2 and 4, or <em>compás de 12</em> for one step per beat with palmas accenting 3, 6, 8, 10 and 12, as in soleá and bulerías. A period has 24 transitions, exactly two compases of 12; this is a numerical coincidence, recorded as such. Between the blues and flamenco there is a structural resemblance: a 12-bar blues is three 4-bar phrases, and heard one bar to a beat it becomes a 12-beat cycle like the compás, with its phrases grouped differently (4 + 4 + 4 against 3 + 3 + 2 + 2 + 2), like the same language spoken with two accents. Choose 12 steps with 4 beats per chord for a 12-bar form, then switch flamenco on to hear it as compás. The classic flamenco cadence Am–G–F–E steps downwards and does not come from the formula.</p>
+    <p id="how5" hidden style="border-left:3px solid var(--accent3);padding-left:10px"><strong style="color:var(--accent3)">With the silence as 5</strong> (Lluis's reading, exploratory). The 9 silences of a period become major thirds 5:4, and a third moves the root up 4 semitones. The harmony is then no longer only I, IV and V: chains of thirds reach nine roots (in C: C, E, G♯/A♭, C♯/D♭, F, A, D♯/E♭, G and B), many outside the scale, the <i>chromatic mediants</i> of Romantic and film music. The root still comes home after every period: 4 fifths, 4 fourths and 9 thirds make 4·7 + 4·5 + 9·4 = 84 semitones, exactly 7 octaves. <span class="tag proved">proved</span> The root walk counts semitones, so here it closes exactly. With pure intervals it would not: nine pure thirds 5:4 fall 123 cents short of three octaves (each is 14 cents narrower than the equal-tempered third), so a walk in pure thirds would sink by more than a semitone every period. <span class="tag">computed</span></p>
     <p class="note"><strong>13-cycle (exploratory).</strong> Uses ⌊n²/13⌋ mod 13 with the same rule H : (H − 1), so the root can move by every ratio from 2:1 to 12:11, each rounded to the nearest semitone (5:4 → 4, 6:5 and 7:6 → 3, 8:7 to 12:11 → 2). It visits all twelve roots and also comes home after each period of 169. Roots outside the scale get a major chord (a dominant seventh with sevenths on). Chords sound in equal temperament, so they can be played on any instrument.</p>
-    <p class="note" style="margin-bottom:0"><strong>Tuning</strong> (playback only; the MIDI file is always equal-tempered). <i>Pentametric fifths</i> tunes every note by the cycle's own pure fifth 3:2 stacked up from the tonic, <i>Pentametric fourths</i> by its pure fourth 4:3 (as on <a href="chordwheel.html">The chord wheel</a>); both are Pythagorean tunings that go only one way round the circle, so the comma falls inside these progressions: with fifths the IV chord is reached by eleven fifths up (its root is E♯ in C, 21.5¢ high, and its fifth is a wolf), with fourths the V chord likewise (its root is A𝄫, 21.5¢ low). Listen for it. <i>Pythagorean</i> goes both ways from the tonic, a fifth up and a fourth up, as the cycle's own root walk does, so I, IV and V all keep pure fifths and pure roots (five fifths below the tonic, six above). <i>Kirnberger fifth</i> narrows each pure fifth by one schisma, which is exactly (√10/3 ÷ 256/243)², the gap between the <a href="curiosity.html">√10/3 curiosity</a> and the limma; it sounds like equal. Meantone, Werckmeister III, Kirnberger III and Vallotti are the historical temperaments, measured from the tonic.</p>
+    <p class="note" style="margin-bottom:0"><strong>Tuning</strong> (playback and MIDI file: the file gives each sounding note its own channel with a pitch bend, range ±2 semitones, so any General MIDI synthesizer plays the tuning). <i>Pentametric fifths</i> tunes every note by the cycle's own pure fifth 3:2 stacked up from the tonic, <i>Pentametric fourths</i> by its pure fourth 4:3 (as on <a href="chordwheel.html">The chord wheel</a>); both are Pythagorean tunings that go only one way round the circle, so the comma falls inside these progressions: with fifths the IV chord is reached by eleven fifths up (its root is E♯ in C, 21.5¢ high, and its fifth is a wolf), with fourths the V chord likewise (its root is A𝄫, 21.5¢ low). Listen for it. <i>Pythagorean</i> goes both ways from the tonic, a fifth up and a fourth up, as the cycle's own root walk does, so I, IV and V all keep pure fifths and pure roots (five fifths below the tonic, six above). <i>Kirnberger fifth</i> narrows each pure fifth by one schisma, which is exactly (√10/3 ÷ 256/243)², the gap between the <a href="curiosity.html">√10/3 curiosity</a> and the limma; it sounds like equal. Meantone, Werckmeister III, Kirnberger III and Vallotti are the historical temperaments, measured from the tonic.</p>
   </div>
 </main>
 
@@ -116,9 +109,9 @@ const SCALES = { major: [0, 2, 4, 5, 7, 9, 11], minor: [0, 2, 3, 5, 7, 8, 10], h
 const ROMAN = ["I", "♭II", "II", "♭III", "III", "IV", "♯IV", "V", "♭VI", "VI", "♭VII", "VII"];
 
 // ---- the cycle ----
-const val = (mode, n) => (mode === 5 ? Pent.H(n) : Math.floor(n * n / 13) % 13);
+const val = (mode, n) => (mode === 5 ? Pent.V(n) : Math.floor(n * n / 13) % 13);   // Pent.V: H(n), or 5 for a silence with the switch on 5
 const ratioOf = (v) => (v === 0 ? "silence" : v === 1 ? "1:1" : `${v}:${v - 1}`);
-const INAME = { 0: "silence", 1: "unison", 2: "octave", 3: "fifth", 4: "fourth" };
+const INAME = { 0: "silence", 1: "unison", 2: "octave", 3: "fifth", 4: "fourth", 5: "major third" };
 // root motion in semitones: up by the interval v:(v−1), rounded to the nearest semitone; unison and octave stay
 const move = (v) => (v <= 2 ? 0 : Math.round(12 * Math.log2(v / (v - 1))));
 
@@ -302,27 +295,9 @@ function ac() {
   return ctx;
 }
 const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
-// tunings as cents of each note above the tonic (d = 0 … 11 semitones), the same tunings as on The chord wheel
-const P5c = 1200 * Math.log2(3 / 2), PCc = 1200 * Math.log2(531441 / 524288), SCc = 1200 * Math.log2(81 / 80), SCHc = 1200 * Math.log2(32805 / 32768), KF5 = 1200 * Math.log2(16384 / 10935);
-const md = (a, m) => ((a % m) + m) % m;
-const byFifths = (f, lo, hi) => { const t = []; for (let k = lo; k <= hi; k++) t[md(7 * k, 12)] = md(k * f, 1200); return t; };
-function chainT(links) { const t = new Array(12).fill(0); let c = 0; for (let k = 1; k < 12; k++) { c += links[k - 1]; t[md(7 * k, 12)] = md(c, 1200); } return t; }
-const q = P5c - PCc / 4, m4 = P5c - SCc / 4, v6 = P5c - PCc / 6;
-const TUNE = {
-  p5: byFifths(P5c, 0, 11),                 // every note pure fifths above the tonic (sharps)
-  p4: byFifths(P5c, -11, 0),                // every note pure fourths above the tonic (flats)
-  pyth: byFifths(P5c, -5, 6),
-  kfifth: byFifths(KF5, -5, 6),
-  mean: byFifths(P5c - SCc / 4, -3, 8),
-  werck: chainT([q, q, q, P5c, P5c, q, P5c, P5c, P5c, P5c, P5c]),
-  kirn3: chainT([m4, m4, m4, m4, P5c, P5c, P5c - SCHc, P5c, P5c, P5c, P5c]),
-  vall: chainT([v6, v6, v6, v6, v6, P5c, P5c, P5c, P5c, P5c, P5c]),
-};
-function hzT(m) {
-  const T = TUNE[$("tuning").value]; if (!T) return hz(m);
-  const d = md(m - +$("key").value, 12); let dev = T[d] - 100 * d; if (dev > 600) dev -= 1200; if (dev < -600) dev += 1200;
-  return hz(m) * Math.pow(2, dev / 1200);
-}
+// tunings: shared with the other pages (pent.js), as cents of each note above the tonic
+Pent.tuningOptions($("tuning"));
+function hzT(m) { return hz(m) * Math.pow(2, Pent.devCents($("tuning").value, m, +$("key").value) / 1200); }
 function playNote(t, m, d, vel, kind) {
   const o = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter(), a = vel / 127;
   const pluck = $("flam").checked && kind === "chords";
@@ -383,7 +358,7 @@ function audition(i) {
 function vlq(n) { const out = [n & 0x7f]; while ((n >>= 7)) out.unshift((n & 0x7f) | 0x80); return out; }
 const txt = (s) => Array.from(new TextEncoder().encode(s));
 function trackBytes(ev) {
-  ev.sort((a, b) => a[0] - b[0] || ((a[1][0] & 0xf0) === 0x80 ? -1 : 1));
+  ev = Pent.sortMidi(ev);
   const out = []; let last = 0;
   for (const [t, bytes] of ev) { out.push(...vlq(Math.max(0, t - last)), ...bytes); last = Math.max(last, t); }
   out.push(0x00, 0xff, 0x2f, 0x00);
@@ -395,15 +370,16 @@ function buildMidi() {
   if (E.rhythm === "compas") t0.push([0, [0xff, 0x58, 0x04, 12, 2, 24, 8]]); else t0.push([0, [0xff, 0x58, 0x04, 4, 2, 24, 8]]);
   // chord names as markers
   E.P.steps.forEach((s, i) => { if (!s.rest) { const a = txt(s.name); t0.push([T(i * E.beats), [0xff, 0x06, a.length, ...a]]); } });
-  const chan = (ch, name, prog, list) => {
-    const ev = [[0, [0xff, 0x03, ...[txt(name)].map((a) => [a.length, ...a]).flat()]], [0, [0xc0 | ch, prog]]];
-    for (const x of list) { ev.push([T(x.t), [0x90 | ch, x.m, Math.max(1, Math.min(127, x.vel))]]); ev.push([T(x.t + x.d), [0x80 | ch, x.m, 0]]); }
-    return trackBytes(ev);
-  };
+  // each sounding note gets a channel of its pool with its pitch bend, so the file keeps the chosen tuning
+  const tun = $("tuning").value, key = +$("key").value;
+  const chan = (pool, name, prog, list) => trackBytes([[0, [0xff, 0x03, ...[txt(name)].map((a) => [a.length, ...a]).flat()]],
+    ...Pent.tunedEvents(list.map((x) => ({ t: T(x.t), d: Math.max(1, T(x.t + x.d) - T(x.t)), m: x.m, vel: x.vel, dev: Pent.devCents(tun, x.m, key) })), pool, prog)]);
   const tracks = [trackBytes(t0),
-    chan(0, fl ? "Guitar" : "Chords", fl ? 24 : 0, E.notes.filter((x) => x.tr === "chords")),
-    chan(1, "Bass", 32, E.notes.filter((x) => x.tr === "bass"))];
-  if (E.claps.length) tracks.push(chan(9, "Palmas", 0, E.claps.map((c) => ({ t: c.t, d: 0.1, m: 39, vel: c.vel }))));
+    chan([0, 1, 2, 3, 4, 5, 6, 7], fl ? "Guitar" : "Chords", fl ? 24 : 0, E.notes.filter((x) => x.tr === "chords")),
+    chan([8, 10], "Bass", 32, E.notes.filter((x) => x.tr === "bass"))];
+  if (E.claps.length) { const ev = [[0, [0xff, 0x03, ...[txt("Palmas")].map((a) => [a.length, ...a]).flat()]]];   // drums: channel 10, no tuning
+    for (const c of E.claps) ev.push([T(c.t), [0x99, 39, Math.max(1, Math.min(127, c.vel))]], [T(c.t + 0.1), [0x89, 39, 0]]);
+    tracks.push(trackBytes(ev)); }
   const head = [0x4d, 0x54, 0x68, 0x64, 0, 0, 0, 6, 0, 1, 0, tracks.length, (PPQ >> 8) & 255, PPQ & 255];
   return new Uint8Array([...head, ...tracks.flat()]);
 }
@@ -431,6 +407,10 @@ for (const id of ["mode", "key", "scale", "size", "flamR", "len", "lenC", "start
 $("bpm").addEventListener("input", () => { $("bpmOut").textContent = $("bpm").value; render(); });
 $("play").onclick = play;
 $("mode").addEventListener("change", () => { $("start").value = 1; render(); });
+function applySil() { const on = Pent.silence5(); $("how5").hidden = !on; $("sil").disabled = on; $("silL").style.opacity = on ? 0.45 : 1; $("silL").title = on ? "with the silence as 5 there are no rests" : ""; }
+Pent.silenceSwitch($("silHost"), "the silences become major thirds 5:4 and move the root up a third (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { Pent.tuningOptions($("tuning")); applySil(); stop(); render(); });
+applySil();
 fillLengths(); render();
 </script>
 <script src="menu.js"></script>

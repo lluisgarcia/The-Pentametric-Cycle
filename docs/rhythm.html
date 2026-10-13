@@ -20,6 +20,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Rhythm generator</h1>
   <p class="lede">The cycle as a drum pattern. Each step n plays the drum assigned to its residue H(n), and silence is a rest. A period of 25 steps does not fit evenly into bars of 4, 8 or 16, so the pattern drifts against the beat and only lines up again after many bars, like a slow phase.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="controls">
@@ -76,9 +77,14 @@ function el(parent, name, attrs, text) {
   parent.appendChild(e); return e;
 }
 // residue -> drum: [label, General MIDI key]
-const DRUMS = [null, ["kick (unison 1:1)", 36], ["snare (octave 2:1)", 38], ["closed hi-hat (fifth 3:2)", 42], ["open hi-hat (fourth 4:3)", 46]];
-$("map").innerHTML = "<tr><th>H</th><th>interval</th><th>drum</th><th class=num>MIDI key</th></tr>" +
-  [0, 1, 2, 3, 4].map((h) => `<tr><td>${h}</td><td>${Pent.INTERVALS[h].name}${Pent.INTERVALS[h].ratio ? " " + Pent.INTERVALS[h].ratio : ""}</td><td>${h ? DRUMS[h][0].split(" (")[0] : "rest"}</td><td class=num>${h ? DRUMS[h][1] : "—"}</td></tr>`).join("");
+const DRUMS = [null, ["kick (unison 1:1)", 36], ["snare (octave 2:1)", 38], ["closed hi-hat (fifth 3:2)", 42], ["open hi-hat (fourth 4:3)", 46], ["low tom (major third 5:4)", 45]];
+const ROWS = () => (Pent.silence5() ? 5 : 4);   // with the switch on 5 the silences become a fifth drum
+function drawMap() {
+  const IV = Pent.INTERVALS5, hs = Pent.silence5() ? [1, 2, 3, 4, 5] : [0, 1, 2, 3, 4];
+  $("map").innerHTML = `<tr><th>${Pent.silence5() ? "value" : "H"}</th><th>interval</th><th>drum</th><th class=num>MIDI key</th></tr>` +
+    hs.map((h) => `<tr><td>${h === 5 ? "5 (H = 0)" : h}</td><td>${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}</td><td>${h ? DRUMS[h][0].split(" (")[0] : "rest"}</td><td class=num>${h ? DRUMS[h][1] : "—"}</td></tr>`).join("");
+}
+drawMap();
 
 let ns = [], grid = [];                   // grid[row 1..4][step] = on/off
 function make() {
@@ -88,27 +94,27 @@ function make() {
     const a = Math.round(+$("a").value || 0), d = Math.round(+$("d").value || 1), N = Math.min(256, Math.max(2, Math.round(+$("N").value || 32)));
     ns = Array.from({ length: N }, (_, i) => a + i * d);
   } else ns = [...Array(+mode).keys()];
-  grid = [null, ...[1, 2, 3, 4].map((r) => ns.map((n) => Pent.H(n) === r))];
+  grid = [null, ...[1, 2, 3, 4, 5].slice(0, ROWS()).map((r) => ns.map((n) => Pent.V(n) === r))];
   draw();
 }
 let cells = [], heads = [];
 function draw() {
-  const svg = $("grid"), lw = 120, cw = Math.max(16, Math.min(30, Math.floor(1000 / ns.length))), rh = 30, W = lw + ns.length * cw + 10, H = 4 * rh + 50;
+  const svg = $("grid"), lw = 120, cw = Math.max(16, Math.min(30, Math.floor(1000 / ns.length))), rh = 30, NR = ROWS(), W = lw + ns.length * cw + 10, H = NR * rh + 50;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.minWidth = Math.min(W, 1600) + "px"; svg.innerHTML = "";
   cells = []; heads = [];
   const spb = +$("spb").value;
-  for (let r = 1; r <= 4; r++) el(svg, "text", { x: lw - 8, y: 20 + (r - 1) * rh + rh / 2 + 4, "text-anchor": "end", "font-size": 12, fill: "var(--muted)" }, DRUMS[r][0].split(" (")[0]);
+  for (let r = 1; r <= NR; r++) el(svg, "text", { x: lw - 8, y: 20 + (r - 1) * rh + rh / 2 + 4, "text-anchor": "end", "font-size": 12, fill: "var(--muted)" }, DRUMS[r][0].split(" (")[0]);
   ns.forEach((n, i) => {
     const x = lw + i * cw;
-    if (i % (spb * 4) === 0) el(svg, "rect", { x, y: 14, width: Math.min(cw * spb * 4, (ns.length - i) * cw), height: 4 * rh + 12, fill: "var(--bg)" });
-    heads.push(el(svg, "rect", { x, y: 14, width: cw, height: 4 * rh + 12, fill: "transparent" }));
-    for (let r = 1; r <= 4; r++) {
+    if (i % (spb * 4) === 0) el(svg, "rect", { x, y: 14, width: Math.min(cw * spb * 4, (ns.length - i) * cw), height: NR * rh + 12, fill: "var(--bg)" });
+    heads.push(el(svg, "rect", { x, y: 14, width: cw, height: NR * rh + 12, fill: "transparent" }));
+    for (let r = 1; r <= NR; r++) {
       const on = grid[r][i];
       const c = el(svg, "rect", { x: x + 2, y: 20 + (r - 1) * rh + 3, width: cw - 4, height: rh - 6, rx: 3, fill: on ? `var(--c${r})` : "var(--c0)", opacity: on ? 1 : 0.35, style: "cursor:pointer" });
       c.addEventListener("click", () => { grid[r][i] = !grid[r][i]; draw(); });
       cells.push(c);
     }
-    if (i % spb === 0) el(svg, "text", { x: x + cw / 2, y: 4 * rh + 42, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, n);
+    if (i % spb === 0) el(svg, "text", { x: x + cw / 2, y: NR * rh + 42, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, n);
   });
 }
 
@@ -134,6 +140,8 @@ function drum(r, t) {
   else if (r === 2) { noise(t, 0.18, 1200, 0.5); const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = 190; g.gain.setValueAtTime(0.35, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.15); }
   else if (r === 3) noise(t, 0.05, 7000, 0.25);
   else if (r === 4) noise(t, 0.3, 6000, 0.22);
+  else if (r === 5) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(110, t + 0.25);
+    g.gain.setValueAtTime(0.6, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.45); }
 }
 function click(t, strong) { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = strong ? 1800 : 1200; g.gain.setValueAtTime(0.15, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.04); }
 
@@ -145,7 +153,7 @@ $("play").onclick = () => {
   timer = setInterval(() => {
     const dt = 60 / +$("bpm").value / +$("spb").value;
     while (next < ctx.currentTime + 0.1) {
-      for (let r = 1; r <= 4; r++) if (grid[r][step]) drum(r, next);
+      for (let r = 1; r < grid.length; r++) if (grid[r][step]) drum(r, next);
       if ($("metro").checked && abs % +$("spb").value === 0) click(next, abs % (+$("spb").value * 4) === 0);
       queue.push({ i: step, t: next });
       next += dt; step = (step + 1) % ns.length; abs++;
@@ -175,7 +183,7 @@ $("midi").onclick = () => {
   ev.push([0, [0xff, 0x03, nm.length, ...nm]]);
   for (let s = 0; s < total; s++) {
     const i = s % ns.length;
-    for (let r = 1; r <= 4; r++) if (grid[r][i]) { ev.push([s * tick, [0x99, DRUMS[r][1], r === 1 ? 110 : 90]]); ev.push([s * tick + tick - 10, [0x89, DRUMS[r][1], 0]]); }
+    for (let r = 1; r < grid.length; r++) if (grid[r][i]) { ev.push([s * tick, [0x99, DRUMS[r][1], r === 1 ? 110 : 90]]); ev.push([s * tick + tick - 10, [0x89, DRUMS[r][1], 0]]); }
   }
   ev.sort((a, b) => a[0] - b[0] || ((a[1][0] & 0xf0) === 0x80 ? -1 : 1));
   const tr = []; let last = 0;
@@ -188,6 +196,8 @@ $("midi").onclick = () => {
 };
 for (const id of ["len", "a", "d", "N", "spb"]) $(id).addEventListener("input", make);
 $("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").value));
+Pent.silenceSwitch($("silHost"), "the silences play a fifth drum, a low tom for the major third 5:4 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { drawMap(); make(); });
 make();
 </script>
 <script src="menu.js"></script>

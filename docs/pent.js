@@ -60,12 +60,26 @@ const Pent = (() => {
   // Groups of five have members 1–5: H = 0 is read as 5, the fifth member, and sounds as the major third 5:4.
   const FIVE = { h: 5, name: "major third", ratio: "5:4", num: 5, den: 4, greek: "ἐπιτέταρτος", translit: "epitetartos" };
   const INTERVALS5 = [...INTERVALS, FIVE];
+  // The choice travels in two ways, because some browsers keep a separate storage for every local file:
+  // in localStorage, and as ?silence=5 on the links between pages (also handy to share a page in this reading).
   let s5 = false;
   try { s5 = localStorage.getItem("pent.silence") === "5"; } catch (e) { /* storage blocked: start at 0 */ }
+  try { const q = new URLSearchParams(location.search).get("silence"); if (q === "5" || q === "0") s5 = q === "5"; } catch (e) { /* no query */ }
+  try { localStorage.setItem("pent.silence", s5 ? "5" : "0"); } catch (e) { /* not remembered */ }
   const silence5 = () => s5;
+  function withSilence(href) {           // add or remove ?silence=5 on a link to another page of the site
+    if (!href || /^([a-z][a-z0-9+.-]*:|#|\/\/)/i.test(href) || !/\.html([?#]|$)/.test(href)) return href;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "", rest = hash ? href.slice(0, href.indexOf("#")) : href;
+    const [path, qs] = rest.split("?"), ps = new URLSearchParams(qs || "");
+    ps.set("silence", s5 ? "5" : "0");    // always explicit: a page's own old storage must not win over the choice
+    const q = ps.toString(); return path + (q ? "?" + q : "") + hash;
+  }
+  const tag = (e) => { const a = e.target && e.target.closest && e.target.closest("a[href]"); if (a) { const h = withSilence(a.getAttribute("href")); if (h !== a.getAttribute("href")) a.setAttribute("href", h); } };
+  if (typeof document !== "undefined") for (const ev of ["pointerdown", "focusin", "click", "contextmenu"]) document.addEventListener(ev, tag, true);
   function setSilence5(v) {
     s5 = !!v;
     try { localStorage.setItem("pent.silence", s5 ? "5" : "0"); } catch (e) { /* not remembered */ }
+    try { const u = new URL(location.href); u.searchParams.set("silence", s5 ? "5" : "0"); history.replaceState(history.state, "", u); } catch (e) { /* keep the address */ }
     document.querySelectorAll(".sil-switch").forEach(syncSwitch);
     window.dispatchEvent(new CustomEvent("pent-silence", { detail: s5 }));
   }
@@ -85,5 +99,57 @@ const Pent = (() => {
     syncSwitch(box); host.appendChild(box); return box;
   }
 
-  return { mod, leg, P, H, C, INTERVALS, INTERVALS5, colorVar, L, F, lucasIndex, isSquare, fmt, silence5, setSilence5, V, I5, IV, silenceSwitch };
+  // ---- tunings, shared by the pages that play or write MIDI ----
+  // cents of each note above the tonic (d = 0 … 11 semitones); the same tunings as on The chord wheel
+  const cts = (r) => 1200 * Math.log2(r), md = (a, m) => ((a % m) + m) % m;
+  const P5c = cts(3 / 2), PCc = cts(531441 / 524288), SCc = cts(81 / 80), SCHc = cts(32805 / 32768), KF5 = cts(16384 / 10935);
+  const byFifths = (f, lo, hi) => { const t = []; for (let k = lo; k <= hi; k++) t[md(7 * k, 12)] = md(k * f, 1200); return t; };
+  function chainT(links) { const t = new Array(12).fill(0); let c = 0; for (let k = 1; k < 12; k++) { c += links[k - 1]; t[md(7 * k, 12)] = md(c, 1200); } return t; }
+  const q4 = P5c - PCc / 4, m4 = P5c - SCc / 4, v6 = P5c - PCc / 6;
+  const TUNINGS = [
+    { id: "et", name: "equal temperament", cents: null },
+    { id: "p5", name: "Pentametric fifths (pure 3:2)", cents: byFifths(P5c, 0, 11) },
+    { id: "p4", name: "Pentametric fourths (pure 4:3)", cents: byFifths(P5c, -11, 0) },
+    { id: "pyth", name: "Pythagorean (3:2 up and 4:3 up)", cents: byFifths(P5c, -5, 6) },
+    { id: "p35", name: "Pentametric with thirds (3:2 and 5:4)", five: true, cents: [1, 16 / 15, 9 / 8, 6 / 5, 5 / 4, 4 / 3, 45 / 32, 3 / 2, 8 / 5, 5 / 3, 9 / 5, 15 / 8].map(cts) },
+    { id: "kfifth", name: "Kirnberger fifth (≈ equal)", cents: byFifths(KF5, -5, 6) },
+    { id: "mean", name: "¼-comma meantone", cents: byFifths(P5c - SCc / 4, -3, 8) },
+    { id: "werck", name: "Werckmeister III", cents: chainT([q4, q4, q4, P5c, P5c, q4, P5c, P5c, P5c, P5c, P5c]) },
+    { id: "kirn3", name: "Kirnberger III", cents: chainT([m4, m4, m4, m4, P5c, P5c, P5c - SCHc, P5c, P5c, P5c, P5c]) },
+    { id: "vall", name: "Vallotti", cents: chainT([v6, v6, v6, v6, v6, P5c, P5c, P5c, P5c, P5c, P5c]) },
+  ];
+  const tuning = (id) => TUNINGS.find((t) => t.id === id);
+  /** Deviation in cents from equal temperament of MIDI note m, in tuning id, with the tonic on pitch class tonic. */
+  function devCents(id, m, tonic) {
+    const T = tuning(id); if (!T || !T.cents) return 0;
+    const d = md(m - tonic, 12); let dev = T.cents[d] - 100 * d; if (dev > 600) dev -= 1200; if (dev < -600) dev += 1200; return dev;
+  }
+  /** Fill a <select> with the tunings (the "with thirds" one only when the switch is on 5); extra = [[value, text], …] first. */
+  function tuningOptions(sel, extra) {
+    const keep = sel.value; sel.innerHTML = "";
+    for (const [v, t] of extra || []) sel.add(new Option(t, v));
+    for (const T of TUNINGS) if (!T.five || s5) sel.add(new Option(T.name + (T.five ? " · silence as 5" : ""), T.id));
+    if ([...sel.options].some((o) => o.value === keep)) sel.value = keep;
+  }
+  /** MIDI events for tuned notes, as [tick, bytes]: each note gets a channel of its own from the pool with a pitch bend
+   *  (range ±2 semitones), so any synthesizer plays the tuning. notes: {t, d (ticks), m (MIDI key), dev (cents), vel}. */
+  function tunedEvents(notes, pool, program) {
+    const ev = [], free = pool.map((ch) => ({ ch, until: -1, bend: null }));
+    for (const ch of pool) { ev.push([0, [0xb0 | ch, 101, 0]], [0, [0xb0 | ch, 100, 0]], [0, [0xb0 | ch, 6, 2]], [0, [0xb0 | ch, 38, 0]], [0, [0xb0 | ch, 101, 127]], [0, [0xb0 | ch, 100, 127]]);
+      if (program !== undefined) ev.push([0, [0xc0 | ch, program]]); }
+    for (const x of [...notes].sort((a, b) => a.t - b.t)) {
+      const b = Math.max(0, Math.min(16383, Math.round(8192 + (x.dev || 0) / 200 * 8192)));
+      let c = free.find((f) => f.until <= x.t && f.bend === b) || free.find((f) => f.until <= x.t) || free.reduce((a, f) => (f.until < a.until ? f : a));
+      if (c.bend !== b) { ev.push([x.t, [0xe0 | c.ch, b & 127, (b >> 7) & 127]]); c.bend = b; }
+      ev.push([x.t, [0x90 | c.ch, x.m, Math.max(1, Math.min(127, x.vel))]], [x.t + x.d, [0x80 | c.ch, x.m, 0]]); c.until = x.t + x.d;
+    }
+    return ev;
+  }
+
+  /** Sort MIDI events [tick, bytes] for one track: at the same tick, note-offs, then controllers and meta, then bends, then note-ons. */
+  function sortMidi(ev) {
+    const pr = (b) => { const st = b[0] & 0xf0; return st === 0x80 ? 0 : st === 0xe0 ? 2 : st === 0x90 ? 3 : 1; };
+    return ev.map((e, i) => [e, i]).sort((x, y) => x[0][0] - y[0][0] || pr(x[0][1]) - pr(y[0][1]) || x[1] - y[1]).map((x) => x[0]);
+  }
+  return { mod, leg, P, H, C, INTERVALS, INTERVALS5, TUNINGS, tuning, devCents, tuningOptions, tunedEvents, sortMidi, colorVar, L, F, lucasIndex, isSquare, fmt, silence5, setSilence5, V, I5, IV, silenceSwitch };
 })();

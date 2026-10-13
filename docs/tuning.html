@@ -25,6 +25,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Tuning file maker</h1>
   <p class="lede">Play in the tunings of the Pentametric Cycle on your own instruments. Choose a scale, listen to it here, and download it as a Scala (.scl) file, the standard tuning format read by many software synthesizers and samplers (for example Surge XT).</p>
+  <div id="silHost"></div>
 
   <div class="grid2">
     <div class="panel">
@@ -79,14 +80,38 @@ const SCALES = [
   { id: "chromatic", file: "pentametric_pythagorean_12", name: "Pythagorean chromatic (12 steps)",
     about: "Twelve notes from a chain of pure fifths 3:2, folded into one octave. Its semitones are the limma 256:243 (90.2 cents) and the apotome 2187:2048 (113.7 cents).",
     steps: [R(256, 243), R(9, 8), R(32, 27), R(81, 64), R(4, 3), R(729, 512), R(3, 2), R(128, 81), R(27, 16), R(16, 9), R(243, 128), R(2, 1)] },
+  { id: "pfifths", file: "pentametric_chromatic_pure_fifths", name: "Pentametric chromatic, pure 3:2 (12 steps)",
+    about: "The notes of the Pentametric circle of fifths on the chord wheel: eleven pure fifths 3:2 going up from the base note (C, G, D, A, E, B, F♯, C♯, G♯, D♯, A♯, E♯), folded into one octave. They go one way round the circle, so every note is a little sharp of equal temperament and the last one, E♯, sits a Pythagorean comma (23.5 cents) above F.",
+    steps: [R(2187, 2048), R(9, 8), R(19683, 16384), R(81, 64), R(177147, 131072), R(729, 512), R(3, 2), R(6561, 4096), R(27, 16), R(59049, 32768), R(243, 128), R(2, 1)] },
+  { id: "pfourths", file: "pentametric_chromatic_pure_fourths", name: "Pentametric chromatic, pure 4:3 (12 steps)",
+    about: "The notes of the Pentametric circle of fourths on the chord wheel: eleven pure fourths 4:3 going up from the base note (F, B♭, E♭, A♭, D♭, G♭, C♭, F♭, B𝄫, E𝄫, A𝄫), folded into one octave. The mirror image of the pure-fifths scale: every note a little flat of equal temperament.",
+    steps: [R(256, 243), R(65536, 59049), R(32, 27), R(8192, 6561), R(4, 3), R(1024, 729), R(262144, 177147), R(128, 81), R(32768, 19683), R(16, 9), R(4096, 2187), R(2, 1)] },
   { id: "thirteen", file: "pentametric_13_cycle", name: "13-cycle superparticular set (11 steps, exploratory)",
     about: "From the exploratory page on other primes: with 13 in place of 5, the rule H : (H − 1) gives every ratio from 12:11 up to 2:1. Sorted by size they form this 11-step scale.",
     steps: [R(12, 11), R(11, 10), R(10, 9), R(9, 8), R(8, 7), R(7, 6), R(6, 5), R(5, 4), R(4, 3), R(3, 2), R(2, 1)] },
   { id: "sqrt10", file: "pentametric_sqrt10_3_nonoctave", name: "√10/3 non-octave scale (13 steps, exploratory)",
     about: "From the curiosity page: equal steps of √10/3 (91.20 cents, within 1 cent of the Pythagorean limma). It does not close at the octave: 13 steps reach 1185.6 cents, so the scale repeats at that interval instead of 2:1. Every second step is exactly 10:9.",
     steps: Array.from({ length: 13 }, (_, i) => C(600 * Math.log2(10 / 9) * (i + 1))) },
+  // with the switch on 5 (Lluis's reading, exploratory): the 5 enters, and with it the pure major third 5:4
+  { id: "tetr5", five: true, file: "pentametric_tetractys_and_5", name: "Tetractys with the 5 (4 steps, silence as 5)",
+    about: "Lluis's reading: the silence is the fifth member, 5, and sounds as 5:4. The tetractys consonances gain the pure major third: 5:4, 4:3, 3:2 and 2:1 above the base note.",
+    steps: [R(5, 4), R(4, 3), R(3, 2), R(2, 1)] },
+  { id: "seven5", five: true, file: "pentametric_seven_consonances", name: "The seven consonances (7 steps, silence as 5)",
+    about: "The intervals the cycle plays when the silence is read as 5 and each value is divided by the one before (page When silence becomes 5): every consonance of just intonation, 6:5, 5:4, 4:3, 3:2, 8:5, 5:3 and the octave.",
+    steps: [R(6, 5), R(5, 4), R(4, 3), R(3, 2), R(8, 5), R(5, 3), R(2, 1)] },
+  { id: "diat5", five: true, file: "pentametric_just_diatonic", name: "Just diatonic, 5-limit (7 steps, silence as 5)",
+    about: "The major scale built from the fifth 3:2 and the pure third 5:4 (Ptolemy's intense diatonic, Zarlino's scale): its thirds are pure, 21.5 cents narrower than Pythagorean ones and 14 cents narrower than equal-tempered ones. The whole tones come in two sizes, 9:8 and 10:9, which differ by the syntonic comma 81:80.",
+    steps: [R(9, 8), R(5, 4), R(4, 3), R(3, 2), R(5, 3), R(15, 8), R(2, 1)] },
+  { id: "chrom5", five: true, file: "pentametric_just_chromatic", name: "Pentametric chromatic with thirds, 3:2 and 5:4 (12 steps, silence as 5)",
+    about: "Twelve notes from pure fifths 3:2 and pure thirds 5:4, folded into one octave: the usual 5-limit just chromatic scale. Four pure fifths overshoot the pure third by the syntonic comma, 81:80 (21.5 cents).",
+    steps: [R(16, 15), R(9, 8), R(6, 5), R(5, 4), R(4, 3), R(45, 32), R(3, 2), R(8, 5), R(5, 3), R(9, 5), R(15, 8), R(2, 1)] },
 ];
-for (const s of SCALES) { const o = document.createElement("option"); o.value = s.id; o.textContent = s.name; $("scale").appendChild(o); }
+function fillScales() {
+  const keep = $("scale").value, list = SCALES.filter((s) => !s.five || Pent.silence5());
+  $("scale").innerHTML = ""; for (const s of list) { const o = document.createElement("option"); o.value = s.id; o.textContent = s.name; $("scale").appendChild(o); }
+  if (list.some((s) => s.id === keep)) $("scale").value = keep; else if (Pent.silence5() && keep !== "") $("scale").value = "tetr5";
+}
+fillScales();
 const cur = () => SCALES.find((s) => s.id === $("scale").value);
 
 function sclText(s) {
@@ -129,6 +154,8 @@ $("dl").onclick = () => {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 };
 $("scale").addEventListener("input", render);
+Pent.silenceSwitch($("silHost"), "four more scales with the pure major third 5:4 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { fillScales(); if (Pent.silence5()) $("scale").value = "tetr5"; render(); });
 render();
 </script>
 <script src="menu.js"></script>
