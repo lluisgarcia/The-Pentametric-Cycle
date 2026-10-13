@@ -15,6 +15,7 @@
   --fill: #e9eef4;
   --ok: #2e7d4f;
   --accent3: #6b5a9e;     /* exploratory */
+  --c5: var(--accent3);   /* the silence read as 5 (major third 5:4) */
   --accent4: #9a6b12;     /* exotic */
   --serif: "EB Garamond", "Garamond", "Georgia", serif;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -162,3 +163,11 @@ body.no-anim nav.drawer, body.no-anim .nav-scrim { transition: none !important; 
 
 /* hide an element (used by pages to show controls only when they apply) */
 .hidden { display: none !important; }
+
+/* the "silence: 0 · 5" switch (Lluis's reading, shared by all pages) */
+.sil-switch { display: inline-flex; align-items: center; gap: 6px; font-size: .9rem; color: var(--muted); margin: 0 0 12px; flex-wrap: wrap; }
+.sil-switch .seg2 { display: inline-flex; border: 1px solid var(--accent3); border-radius: 999px; overflow: hidden; }
+.sil-switch .seg2 button { border: 0; border-radius: 0; padding: 2px 14px; background: transparent; color: var(--accent3); font-weight: 600; min-height: 0; }
+.sil-switch .seg2 button.on { background: var(--accent3); color: var(--panel); }
+.sil-switch .why { font-size: .85rem; }
+.sil-switch .now5 { color: var(--accent3); }

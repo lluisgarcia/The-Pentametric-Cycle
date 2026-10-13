@@ -55,5 +55,35 @@ const Pent = (() => {
     return s;
   }
 
-  return { mod, leg, P, H, C, INTERVALS, colorVar, L, F, lucasIndex, isSquare, fmt };
+
+  // ---- Lluis's reading: the silence as 5 (exploratory; see silence5.html) ----
+  // Groups of five have members 1–5: H = 0 is read as 5, the fifth member, and sounds as the major third 5:4.
+  const FIVE = { h: 5, name: "major third", ratio: "5:4", num: 5, den: 4, greek: "ἐπιτέταρτος", translit: "epitetartos" };
+  const INTERVALS5 = [...INTERVALS, FIVE];
+  let s5 = false;
+  try { s5 = localStorage.getItem("pent.silence") === "5"; } catch (e) { /* storage blocked: start at 0 */ }
+  const silence5 = () => s5;
+  function setSilence5(v) {
+    s5 = !!v;
+    try { localStorage.setItem("pent.silence", s5 ? "5" : "0"); } catch (e) { /* not remembered */ }
+    document.querySelectorAll(".sil-switch").forEach(syncSwitch);
+    window.dispatchEvent(new CustomEvent("pent-silence", { detail: s5 }));
+  }
+  /** The value as the page reads it: H(n), or 5 for a silence when the switch is on 5. */
+  const V = (n) => { const h = H(n); return s5 && h === 0 ? 5 : h; };
+  /** 1 + MOD(P − 1; 5): the members 1–5 of each group of five. */
+  const I5 = (n) => 1 + mod(P(n) - 1, 5);
+  /** The interval of a value v (0–5). */
+  const IV = (v) => INTERVALS5[v];
+  function syncSwitch(box) { box.querySelectorAll("button").forEach((b) => b.classList.toggle("on", (b.dataset.v === "5") === s5)); const t = box.querySelector(".now5"); if (t) t.hidden = !s5; }
+  /** Put the switch into a host element. */
+  function silenceSwitch(host, note) {
+    const box = document.createElement("div"); box.className = "sil-switch";
+    box.innerHTML = '<span>silence:</span><span class="seg2" role="group" aria-label="read the silence as 0 or as 5"><button type="button" data-v="0" title="the papers: 0 is silence">0</button><button type="button" data-v="5" title="Lluis\'s reading: the silence is 5, the major third 5:4">5</button></span>' +
+      '<span class="now5">' + (note || "the silences sound as major thirds 5:4 (Lluis's reading, exploratory)") + '</span> <a class="why" href="silence5.html">why 5?</a>';
+    box.querySelectorAll("button").forEach((b) => b.addEventListener("click", () => setSilence5(b.dataset.v === "5")));
+    syncSwitch(box); host.appendChild(box); return box;
+  }
+
+  return { mod, leg, P, H, C, INTERVALS, INTERVALS5, colorVar, L, F, lucasIndex, isSquare, fmt, silence5, setSilence5, V, I5, IV, silenceSwitch };
 })();
