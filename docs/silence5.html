@@ -92,6 +92,25 @@
       </div>
     </div>
   </div>
+
+  <h2>6 · Why 5? Other moduli</h2>
+  <div class="panel">
+    <p style="margin-top:0">The same reading works with any modulus m: i<sub>m</sub>(n) = 1 + MOD(𝔓 − 1; m), and play the harmonics i<sub>m</sub>(n) of one fundamental. Lluis tried other moduli in his spreadsheet; here they are side by side. Choose one and listen: the steps that are not consonances of just intonation are marked in red.</p>
+    <div class="controls">
+      <span id="mods" style="display:inline-flex;flex-wrap:wrap;gap:4px"></span>
+      <button id="playW" class="primary">▶ Play</button>
+      <label><input id="wLoop" type="checkbox"> loop</label>
+      <label>tempo <input id="bpmW" type="range" min="60" max="240" value="160"><output id="bpmWOut">160</output></label>
+    </div>
+    <svg id="whyS" viewBox="0 0 1000 200" style="width:100%" role="img" aria-label="One period of the chosen modulus: the harmonic at each step, with dissonant steps in red"></svg>
+    <p id="whyL" class="note" style="margin-top:.2em"></p>
+    <div class="scroll-x"><table class="data" id="tabW"></table></div>
+    <p><b>Every modulus makes a palindrome.</b> 𝔓(−n) = 𝔓(n), and 𝔓(n + 5m) − 𝔓(n) = 2mn + 5m², a multiple of m, so the notes repeat after at most 5m steps. A pattern that repeats and reads the same from 0 backwards also reads the same backwards from half its period: the infinite mirror of section 4 is there for every m. <span class="tag proved">proved</span> So the palindrome is not what makes 5 special (see also <a href="primes.html">Other primes</a>).</p>
+    <p><b>The sound is.</b> Every ratio of two whole numbers from 1 to 6 is a consonance (Zarlino's <i>senario</i> again), and 7 is the first number that brings a dissonance. So the moduli 2 to 6 sound only consonances, and from 7 on dissonances come in: 8/7, 7/4, 7/5 with m = 7, then 9/8, 16/9, 11/8 and more. (m = 8 stays consonant only because it uses just the harmonics 1, 4, 5 and 8.) <span class="tag proved">proved</span></p>
+    <p><b>Among the consonant ones, only 5 and 6 use all seven consonances, with opposite characters.</b> Mod 6 is open, made mostly of fourths and fifths (14 of its 30 steps). Mod 5 is sweet: thirds and sixths lead (14 of its 25 steps), the fourth and the fifth sound once each, the fifth only at the inner wall of the palindrome, and it has the most silences, 9 in 25 notes. Mod 3 has no thirds at all; 2 and 4 are only octaves. <span class="tag">computed</span></p>
+    <p><b>And 5 is the number of the formula itself:</b> 𝔓 is built by dividing by 5, and H = 𝔓 mod 5 is the consonance indicator of the papers. Of the moduli that stay fully consonant, 5 is the largest prime. That is why we take 5 as <i>the one</i>. <span class="tag">interpretation</span></p>
+    <p class="note" style="margin-bottom:0">Mod 10 repeats after exactly 50 notes: the 50-note palindrome is the natural cycle of base 10, played twice over by mod 5. <span class="tag">computed</span> In Lluis's view of numbers this is structural: base 10 has nine symbols and the 0, and 10 is one full cycle, of which mod 5 is the half.</p>
+  </div>
 </main>
 
 <footer class="site"><div class="inner">
@@ -249,7 +268,50 @@ $("mN").addEventListener("change", drawM);
   $("tabC").innerHTML = t;
 })();
 
-function all() { drawA(); drawB(); drawM(); }
+
+// 6 · other moduli
+const IM = (m, n) => 1 + ((Pent.P(n) - 1) % m + m) % m;
+function modInfo(m) {
+  let T = 1; while (T < 5 * m && ![...Array(5 * m).keys()].every((n) => IM(m, n) === IM(m, n + T))) T++;
+  const vals = [...new Set([...Array(T).keys()].map((n) => IM(m, n)))].sort((a, b) => a - b);
+  const steps = []; for (let n = 1; n <= T; n++) steps.push([IM(m, n), IM(m, n - 1)]);
+  const c = cls; let cons = 0, used = new Set(), ts = 0, ff = 0;
+  for (const [a, b] of steps) { const k = c(a / b); if (k) { cons++; used.add(k[1]); if (["6/5", "5/4", "8/5", "5/3"].includes(k[1])) ts++; if (["4/3", "3/2"].includes(k[1])) ff++; } }
+  const sil = [...Array(T).keys()].filter((n) => IM(m, n) === m).length;
+  return { T, vals, steps, cons, used: used.size, ts, ff, sil };
+}
+let modW = 5, timerW = null;
+(function () {
+  const box = $("mods"); for (let m = 2; m <= 12; m++) { const b = document.createElement("button"); b.textContent = "mod " + m; b.dataset.m = m; b.addEventListener("click", () => { modW = m; drawW(); }); box.appendChild(b); }
+  let t = "<tr><th>m</th><th class='num'>period</th><th>harmonics used</th><th class='num'>consonant steps</th><th class='num'>consonances used (of 7)</th><th class='num'>thirds &amp; sixths</th><th class='num'>fourths &amp; fifths</th><th class='num'>silences</th></tr>";
+  for (let m = 2; m <= 12; m++) { const f = modInfo(m); t += `<tr data-m="${m}" style="cursor:pointer"><td>${m}</td><td class="num">${f.T}</td><td>${f.vals.join(" ")}</td><td class="num">${f.cons} / ${f.T}</td><td class="num">${f.used}</td><td class="num">${f.ts}</td><td class="num">${f.ff}</td><td class="num">${f.sil}</td></tr>`; }
+  $("tabW").innerHTML = t; $("tabW").querySelectorAll("tr[data-m]").forEach((r) => r.addEventListener("click", () => { modW = +r.dataset.m; drawW(); }));
+})();
+let curW = -1;
+function drawW() {
+  const m = modW, f = modInfo(m), svg = $("whyS"); svg.innerHTML = "";
+  $("mods").querySelectorAll("button").forEach((b) => b.classList.toggle("primary", +b.dataset.m === m));
+  $("tabW").querySelectorAll("tr[data-m]").forEach((r) => (r.style.background = +r.dataset.m === m ? "var(--fill)" : ""));
+  const L = 34, R = 992, top = 14, bot = 176, N = f.T, w = (R - L) / (N + 1), y = (v) => bot - ((v - 1) / Math.max(1, m - 1)) * (bot - top);
+  for (let v = 1; v <= m; v++) { el(svg, "line", { x1: L, y1: y(v), x2: R, y2: y(v), stroke: "var(--rule)", "stroke-width": f.vals.includes(v) ? 1 : 0.3 }); if (m <= 8 || v % 2 === 1 || v === m) el(svg, "text", { x: L - 6, y: y(v) + 4, "text-anchor": "end", "font-size": 11, fill: v === m ? "var(--accent3)" : "var(--muted)" }, v); }
+  const X = (n) => L + (n + 0.5) * w;
+  for (let n = 1; n <= N; n++) { const [a, b] = f.steps[n - 1], ok = !!cls(a / b);
+    el(svg, "line", { x1: X(n - 1), y1: y(b), x2: X(n), y2: y(a), stroke: ok ? "var(--muted)" : "var(--accent2)", "stroke-width": ok ? 1.2 : 3 }); }
+  for (let n = 0; n <= N; n++) { const v = IM(m, n); el(svg, "circle", { cx: X(n), cy: y(v), r: n === curW ? 6 : 3.2, fill: v === m ? "var(--accent3)" : "var(--ink)" }); }
+  el(svg, "line", { x1: X(N / 2), y1: 6, x2: X(N / 2), y2: bot + 6, stroke: "var(--ink)", "stroke-dasharray": "5 3" });
+  el(svg, "text", { x: X(N / 2), y: 194, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)" }, "mirror");
+  const bad = f.T - f.cons;
+  $("whyL").innerHTML = `Mod ${m}: one period is ${f.T} notes, harmonics ${f.vals.join(", ")}; ${bad ? `<b style="color:var(--accent2)">${bad} dissonant step${bad > 1 ? "s" : ""}</b>` : "every step a consonance"}; ${f.used} of the 7 consonances used.`;
+}
+$("bpmW").addEventListener("input", () => ($("bpmWOut").textContent = $("bpmW").value));
+$("playW").onclick = () => {
+  if (timerW) { clearInterval(timerW); timerW = null; $("playW").textContent = "▶ Play"; curW = -1; drawW(); return; }
+  audio(); let n = 0, next = ctx.currentTime + 0.05; const m0 = () => modW; $("playW").textContent = "■ Stop";
+  timerW = setInterval(() => { const spb = 60 / +$("bpmW").value, m = m0(), T = modInfo(m).T; while (next < ctx.currentTime + 0.1) {
+    if (n > T) { if ($("wLoop").checked) n = 1; else { clearInterval(timerW); timerW = null; setTimeout(() => { $("playW").textContent = "▶ Play"; curW = -1; drawW(); }, spb * 1000); break; } }
+    const k = n, f0 = m > 8 ? 65.41 : 98; tone(f0 * IM(m, k), next, spb * 0.85, 0.42, "triangle"); setTimeout(() => { curW = k; drawW(); }, Math.max(0, (next - ctx.currentTime) * 1000)); n++; next += spb; } }, 25);
+};
+function all() { drawA(); drawB(); drawM(); drawW(); }
 all();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", all);
 new MutationObserver(all).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
