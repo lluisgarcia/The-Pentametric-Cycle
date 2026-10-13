@@ -20,6 +20,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>The residue tapestry</h1>
   <p class="lede">Weave the sequence into rows. Each cell is one n, read left to right and top to bottom, coloured by its residue. When the row length matches the period, every row is the same and the palindrome appears as a mirror down the middle; any other width turns the same sequence into diagonal patterns.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="controls">
@@ -62,18 +63,18 @@
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
 const DIG = ["#d9d9d9", "#4f7cac", "#7aa6c2", "#8fb996", "#d99a5b", "#2b5d8a", "#b4532a", "#9c6fb0", "#c9b458", "#6b6b6b"];
-const IV = Pent.INTERVALS;
+const IV = Pent.INTERVALS5;          // index 5: the silence read as 5 (switch)
 for (const w of [5, 10, 24, 25, 26, 50]) {
   const b = document.createElement("button"); b.textContent = w;
   b.onclick = () => { $("W").value = w; draw(); }; $("chips").appendChild(b);
 }
 function colour(mode, n) {
-  if (mode === "H") return `var(--c${Pent.H(n)})`;
+  if (mode === "H") return `var(--c${Pent.V(n)})`;
   if (mode === "D") return DIG[Pent.P(n) % 10];
   const c = Pent.leg(n); return c > 0 ? "var(--c3)" : c < 0 ? "var(--c2)" : "var(--c0)";
 }
 function legend(mode) {
-  if (mode === "H") return IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.h}: ${iv.name}</span>`).join("");
+  if (mode === "H") return IV.filter((iv) => (Pent.silence5() ? iv.h : iv.h !== 5)).map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.h}: ${iv.name}</span>`).join("");
   if (mode === "D") return DIG.map((c, d) => `<span><i class="sw" style="background:${c}"></i>${d}</span>`).join("") + "<span>· last digit of P(n)</span>";
   return `<span><i class="sw" style="background:var(--c3)"></i>+1 (+0.8)</span><span><i class="sw" style="background:var(--c2)"></i>−1 (−0.8)</span><span><i class="sw" style="background:var(--c0)"></i>0</span>`;
 }
@@ -103,8 +104,8 @@ function draw() {
 }
 $("tap").addEventListener("mousemove", (e) => {
   const n = e.target.dataset && e.target.dataset.n; if (n === undefined) return;
-  const k = +n, h = Pent.H(k);
-  $("info").textContent = `n = ${k}: P(n) = ${Pent.P(k).toLocaleString("en-US")}, last digit ${Pent.P(k) % 10}, H(n) = ${h} (${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}), (n | 5) = ${Pent.leg(k)}`;
+  const k = +n, h = Pent.V(k);
+  $("info").textContent = `n = ${k}: P(n) = ${Pent.P(k).toLocaleString("en-US")}, last digit ${Pent.P(k) % 10}, ${h === 5 ? "H(n) = 0, read as 5" : "H(n) = " + h} (${IV[h].name}${IV[h].ratio ? " " + IV[h].ratio : ""}), (n | 5) = ${Pent.leg(k)}`;
 });
 // ---- download as PNG: redraw the current tapestry on a canvas with a caption ----
 function resolve(c) {                         // turn "var(--c3)" into the colour actually in use
@@ -142,6 +143,8 @@ $("png").addEventListener("click", () => {
   }, "image/png");
 });
 for (const id of ["W", "mode", "rows"]) $(id).addEventListener("input", draw);
+Pent.silenceSwitch($("silHost"), "the silences take the colour of 5, the major third 5:4, so the tapestry has no holes (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", draw);
 draw();
 </script>
 <script src="menu.js"></script>

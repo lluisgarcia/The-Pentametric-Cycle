@@ -24,6 +24,7 @@
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The monochord and the tetractys</h1>
   <p class="lede">The Pythagoreans tested consonance on a single string with a movable bridge. Stopping the string at half its length sounds the octave, at two thirds the fifth, at three quarters the fourth. These ratios, 2:1, 3:2 and 4:3, are the ratios of neighbouring rows of the tetractys, the triangle of 1 + 2 + 3 + 4 = 10 points. The Pentametric Cycle produces exactly these ratios: the residue H picks rows H and H − 1.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="controls">
@@ -31,6 +32,7 @@
       <button class="ivbtn" data-h="2">octave 2:1</button>
       <button class="ivbtn" data-h="3">fifth 3:2</button>
       <button class="ivbtn" data-h="4">fourth 4:3</button>
+      <button class="ivbtn" data-h="5" id="b5" hidden style="border-color:var(--accent3)">major third 5:4</button>
       <button id="pluck" class="primary">▶ Pluck</button>
       <label>open string
         <select id="f0">
@@ -45,8 +47,9 @@
   <div class="grid2" style="margin-top:18px">
     <div class="panel">
       <h2 style="margin-top:0">The tetractys</h2>
-      <svg id="tet" viewBox="0 0 400 300" role="img" aria-label="The tetractys: rows of 1, 2, 3 and 4 points"></svg>
+      <svg id="tet" viewBox="0 0 400 360" role="img" aria-label="The tetractys: rows of 1, 2, 3 and 4 points"></svg>
       <p class="note" id="tetnote" style="margin-bottom:0"></p>
+      <p class="note" id="tetnote5" hidden style="margin-bottom:0;color:var(--accent3)">With the silence read as 5 the triangle has a fifth row: 1 + 2 + 3 + 4 + 5 = 15 points. The historical tetractys stops at 4 (10 points); the fifth row is Lluis's reading, and it brings the one consonance the four rows cannot make, the pure major third 5:4 of just intonation (Zarlino's <i>senario</i> goes on to 6).</p>
     </div>
     <div class="panel">
       <h2 style="margin-top:0">The sounding length</h2>
@@ -78,7 +81,8 @@ function el(parent, name, attrs, text) {
   if (text !== undefined) e.textContent = text;
   parent.appendChild(e); return e;
 }
-const IV = Pent.INTERVALS;
+const IV = Pent.INTERVALS5;               // index 5: the major third 5:4, with the switch on 5
+const NH = () => (Pent.silence5() ? 5 : 4);   // rows of the tetractys: 4, or 5 with the fifth member
 const X0 = 70, X1 = 930, SY = 110;               // string ends and height
 let len = 1, current = 1;                          // sounding length (fraction) and selected H
 
@@ -88,11 +92,16 @@ el(svg, "rect", { x: 40, y: 130, width: 920, height: 52, rx: 10, fill: "var(--fi
 el(svg, "circle", { cx: 500, cy: 156, r: 14, fill: "var(--panel)", stroke: "var(--rule)" });
 el(svg, "rect", { x: X0 - 8, y: SY - 2, width: 8, height: 26, fill: "var(--muted)" });
 el(svg, "rect", { x: X1, y: SY - 2, width: 8, height: 26, fill: "var(--muted)" });
-for (const [f, t] of [[1 / 2, "½"], [2 / 3, "⅔"], [3 / 4, "¾"]]) {
-  const x = X0 + f * (X1 - X0);
-  el(svg, "line", { x1: x, y1: 182, x2: x, y2: 196, stroke: "var(--muted)" });
-  el(svg, "text", { x, y: 212, "text-anchor": "middle", "font-size": 13, fill: "var(--muted)" }, t);
+const marks = el(svg, "g", {});
+function drawMarks() {
+  marks.innerHTML = "";
+  for (const [f, t] of [[1 / 2, "½"], [2 / 3, "⅔"], [3 / 4, "¾"], ...(Pent.silence5() ? [[4 / 5, "⅘"]] : [])]) {
+    const x = X0 + f * (X1 - X0), five = t === "⅘";
+    el(marks, "line", { x1: x, y1: 182, x2: x, y2: 196, stroke: five ? "var(--accent3)" : "var(--muted)" });
+    el(marks, "text", { x, y: 212, "text-anchor": "middle", "font-size": 13, fill: five ? "var(--accent3)" : "var(--muted)" }, t);
+  }
 }
+drawMarks();
 const vib = el(svg, "path", { fill: "none", stroke: "var(--accent2)", "stroke-width": 2.4 });
 const rest = el(svg, "line", { y1: SY, y2: SY, stroke: "var(--muted)", "stroke-width": 1.5, "stroke-dasharray": "4 3" });
 const bridge = el(svg, "polygon", { id: "bridge", fill: "var(--ink)" });
@@ -115,14 +124,19 @@ function animate() {
 }
 
 // ---- tetractys ----
-const tet = $("tet"), dots = [];
-for (let r = 1; r <= 4; r++) {
-  dots[r] = [];
-  for (let i = 0; i < r; i++) dots[r].push(el(tet, "circle", { cx: 200 + (i - (r - 1) / 2) * 62, cy: 40 + (r - 1) * 66, r: 17, fill: "var(--c0)" }));
-  el(tet, "text", { x: 20, y: 46 + (r - 1) * 66, "font-size": 14, fill: "var(--muted)" }, r);
+const tet = $("tet"); let dots = [];
+function buildTet() {
+  tet.innerHTML = ""; dots = []; const N = NH(), gap = N === 5 ? 62 : 66, sp = N === 5 ? 58 : 62, rr = N === 5 ? 16 : 17;
+  for (let r = 1; r <= N; r++) {
+    dots[r] = [];
+    for (let i = 0; i < r; i++) dots[r].push(el(tet, "circle", { cx: 200 + (i - (r - 1) / 2) * sp, cy: 40 + (r - 1) * gap, r: rr, fill: "var(--c0)", stroke: r === 5 ? "var(--accent3)" : "none", "stroke-width": 1.5 }));
+    el(tet, "text", { x: 20, y: 46 + (r - 1) * gap, "font-size": 14, fill: r === 5 ? "var(--accent3)" : "var(--muted)" }, r);
+  }
+  if (N === 5) el(tet, "text", { x: 380, y: 352, "text-anchor": "end", "font-size": 12, fill: "var(--accent3)" }, "1 + 2 + 3 + 4 + 5 = 15");
 }
+buildTet();
 function lightTet(h) {
-  for (let r = 1; r <= 4; r++) for (const d of dots[r]) d.setAttribute("fill", "var(--c0)");
+  for (let r = 1; r < dots.length; r++) for (const d of dots[r]) d.setAttribute("fill", "var(--c0)");
   const rows = h === 1 ? [1] : [h, h - 1];
   for (const r of rows) for (const d of dots[r]) d.setAttribute("fill", `var(--c${h})`);
   $("tetnote").innerHTML = h === 1
@@ -134,7 +148,7 @@ function lightTet(h) {
 function readout() {
   const r = 1 / len, c = 1200 * Math.log2(r);
   let best = 1, bd = Infinity;
-  for (let h = 1; h <= 4; h++) { const d = Math.abs(c - 1200 * Math.log2(IV[h].num / IV[h].den)); if (d < bd) { bd = d; best = h; } }
+  for (let h = 1; h <= NH(); h++) { const d = Math.abs(c - 1200 * Math.log2(IV[h].num / IV[h].den)); if (d < bd) { bd = d; best = h; } }
   $("read").innerHTML = [
     ["sounding length", len.toFixed(4)],
     ["pitch ratio to open string", `${r.toFixed(4)} : 1`],
@@ -142,7 +156,7 @@ function readout() {
     ["nearest consonance", `${IV[best].name} ${IV[best].ratio}` + (bd < 0.5 ? " (exact)" : ` (${bd.toFixed(1)} cents away)`)],
   ].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }
-$("map").innerHTML = [1, 2, 3, 4].map((h) => `<tr><td>${h}</td><td>${h === 1 ? "1 and 1" : h + " and " + (h - 1)}</td><td>${IV[h].ratio}</td><td>${h === 1 ? "1" : (h - 1) + "/" + h}</td><td class="greek">${IV[h].greek}</td></tr>`).join("");
+const drawMap = () => $("map").innerHTML = [1, 2, 3, 4, 5].slice(0, NH()).map((h) => `<tr><td>${h}</td><td>${h === 1 ? "1 and 1" : h + " and " + (h - 1)}</td><td>${IV[h].ratio}</td><td>${h === 1 ? "1" : (h - 1) + "/" + h}</td><td class="greek">${IV[h].greek}</td></tr>`).join("");
 
 // ---- audio ----
 let ctx = null;
@@ -183,12 +197,19 @@ bridge.addEventListener("pointerdown", (e) => { dragging = true; bridge.setPoint
 bridge.addEventListener("pointermove", (e) => {
   if (!dragging) return;
   len = toLen(e);
-  for (let h = 1; h <= 4; h++) { const L = IV[h].den / IV[h].num; if (Math.abs(len - L) < 0.006) len = L; }   // gentle snap
+  for (let h = 1; h <= NH(); h++) { const L = IV[h].den / IV[h].num; if (Math.abs(len - L) < 0.006) len = L; }   // gentle snap
   document.querySelectorAll(".ivbtn").forEach((b) => b.classList.remove("on"));
   readout(); render();
 });
 bridge.addEventListener("pointerup", () => { dragging = false; });
-select(3);
+function applySil() {
+  $("b5").hidden = !Pent.silence5(); buildTet(); drawMarks(); drawMap();
+  $("tetnote5").hidden = !Pent.silence5();
+  if (current === 5 && !Pent.silence5()) select(3); else select(current);
+}
+Pent.silenceSwitch($("silHost"), "the tetractys gains a fifth row, and rows 5 and 4 give the major third 5:4 at four fifths of the string (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", applySil);
+drawMap(); select(3); applySil();
 </script>
 <script src="menu.js"></script>
 </body>

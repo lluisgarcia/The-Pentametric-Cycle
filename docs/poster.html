@@ -26,6 +26,7 @@
   <span class="kind p">⤓ Use it · make something and download it</span>
   <h1>Poster maker</h1>
   <p class="lede">Turn the mathematics into a print, a wallpaper or an album cover. Pick a design, a colour palette and a format, then download it as SVG (for printing at any size) or PNG.</p>
+  <div id="silHost"></div>
 
   <div class="grid2">
     <div class="panel">
@@ -75,19 +76,19 @@
 <script>
 "use strict";
 const $ = (id) => document.getElementById(id);
-// palettes: background, ink, muted, then colours for H = 0..4
+// palettes: background, ink, muted, then colours for H = 0..4 and for 5 (the silence read as 5, with the switch)
 const PAL = {
-  classic: { name: "Classic", bg: "#f7f4ee", ink: "#000000", muted: "#222222", c: ["#d9d9d9", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b"] },
-  night: { name: "Night", bg: "#15141a", ink: "#ece8e1", muted: "#9a948b", c: ["#34333b", "#7fa8d4", "#4f86c0", "#e08a5e", "#e8b77f"] },
-  ink: { name: "Ink", bg: "#ffffff", ink: "#000000", muted: "#222222", c: ["#e6e6e6", "#9a9a9a", "#555555", "#111111", "#bdbdbd"] },
-  sunset: { name: "Sunset", bg: "#fff6ec", ink: "#000000", muted: "#2a1a14", c: ["#f3e2d3", "#f2a65a", "#e06c4c", "#a8324a", "#5c2a5e"] },
-  ocean: { name: "Ocean", bg: "#eef6f7", ink: "#000000", muted: "#142a33", c: ["#d7e7ea", "#7cc6c9", "#2a9d8f", "#1d4e89", "#e9c46a"] },
-  gold: { name: "Gold on black", bg: "#0d0d0d", ink: "#e9d8a6", muted: "#a08f5d", c: ["#262626", "#6d5d2e", "#b08d3c", "#e9c46a", "#f4e3b2"] },
+  classic: { name: "Classic", bg: "#f7f4ee", ink: "#000000", muted: "#222222", c: ["#d9d9d9", "#4f7cac", "#2b5d8a", "#b4532a", "#d99a5b", "#6b5a9e"] },
+  night: { name: "Night", bg: "#15141a", ink: "#ece8e1", muted: "#9a948b", c: ["#34333b", "#7fa8d4", "#4f86c0", "#e08a5e", "#e8b77f", "#b3a2e0"] },
+  ink: { name: "Ink", bg: "#ffffff", ink: "#000000", muted: "#222222", c: ["#e6e6e6", "#9a9a9a", "#555555", "#111111", "#bdbdbd", "#777777"] },
+  sunset: { name: "Sunset", bg: "#fff6ec", ink: "#000000", muted: "#2a1a14", c: ["#f3e2d3", "#f2a65a", "#e06c4c", "#a8324a", "#5c2a5e", "#d4a373"] },
+  ocean: { name: "Ocean", bg: "#eef6f7", ink: "#000000", muted: "#142a33", c: ["#d7e7ea", "#7cc6c9", "#2a9d8f", "#1d4e89", "#e9c46a", "#8e7dbe"] },
+  gold: { name: "Gold on black", bg: "#0d0d0d", ink: "#e9d8a6", muted: "#a08f5d", c: ["#262626", "#6d5d2e", "#b08d3c", "#e9c46a", "#f4e3b2", "#8a7a4a"] },
 };
 for (const [k, p] of Object.entries(PAL)) { const o = document.createElement("option"); o.value = k; o.textContent = p.name; $("pal").appendChild(o); }
 
 const FMT = { a: [1000, 1414], sq: [1200, 1200], wide: [1920, 1080] };
-const H = (n) => Pent.H(n);
+const H = (n) => Pent.V(n);          // H(n), or 5 for a silence with the switch on 5
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 
 function arcPath(cx, cy, r1, r2, a0, a1) {
@@ -173,11 +174,11 @@ function poster() {
     parts.push(`<text x="${tx}" y="${ty + big * 0.85}" font-family="${serif}" font-size="${big * 0.5}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.muted}" text-anchor="${anchor}">The Pentametric Cycle</text>`);
     const fy = W > Hh ? ty + big * 2.2 : Hh - m - (cr ? Hh * 0.04 : 0);
     parts.push(`<text x="${tx}" y="${fy}" font-family="${serif}" font-size="${big * 0.48}" font-weight="${fw === 700 ? 600 : 400}" fill="${P.ink}" text-anchor="${anchor}">P(n) = (n² + 4·(n | 5)) / 5</text>`);
-    const leg = ["silence", "unison 1:1", "octave 2:1", "fifth 3:2", "fourth 4:3"];
+    const leg = ["silence", "unison 1:1", "octave 2:1", "fifth 3:2", "fourth 4:3", "third 5:4"], legI = Pent.silence5() ? [1, 2, 3, 4, 5] : [0, 1, 2, 3, 4];
     if (design !== "spiral") {
       const ly = W > Hh ? fy + big * 1.1 : fy + big * 0.75, fs = big * 0.26;
-      let lx = W > Hh ? m : W / 2 - leg.reduce((a, s) => a + s.length * fs * 0.55 + fs * 2.2, 0) / 2;
-      leg.forEach((s, i) => { parts.push(`<rect x="${lx}" y="${ly - fs * 0.85}" width="${fs}" height="${fs}" rx="${fs * 0.2}" fill="${P.c[i]}"/><text x="${lx + fs * 1.4}" y="${ly}" font-family="${sans}" font-size="${fs}" font-weight="600" fill="${P.muted}">${s}</text>`); lx += s.length * fs * 0.55 + fs * 2.2; });
+      let lx = W > Hh ? m : W / 2 - legI.map((i) => leg[i]).reduce((a, s) => a + s.length * fs * 0.55 + fs * 2.2, 0) / 2;
+      legI.forEach((i) => { const s = leg[i]; parts.push(`<rect x="${lx}" y="${ly - fs * 0.85}" width="${fs}" height="${fs}" rx="${fs * 0.2}" fill="${P.c[i]}"/><text x="${lx + fs * 1.4}" y="${ly}" font-family="${sans}" font-size="${fs}" font-weight="600" fill="${P.muted}">${s}</text>`); lx += s.length * fs * 0.55 + fs * 2.2; });
     }
   }
   if (cr) parts.push(`<text x="${W / 2}" y="${Hh - m * 0.45}" font-family="${sans}" font-size="${Math.min(W, Hh) * 0.016}" fill="${P.muted}" text-anchor="middle">${esc("Lluis Garcia Torcal · lluisgarcia.github.io/The-Pentametric-Cycle · doi:10.5281/zenodo.23183108")}</text>`);
@@ -204,6 +205,8 @@ $("png").onclick = () => {
   img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 };
 for (const id of ["design", "pal", "font", "fmt", "txt", "credit"]) $(id).addEventListener("input", render);
+Pent.silenceSwitch($("silHost"), "the silences take their own colour, the 5 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", render);
 render();
 </script>
 <script src="menu.js"></script>

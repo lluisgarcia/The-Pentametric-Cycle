@@ -25,6 +25,7 @@
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>The 24 transitions</h1>
   <p class="lede">Inside one period the cycle moves 24 times from one value to the next. The papers note that these 24 steps use only 17 different pairs. Here they are as a table of “which interval follows which”, and as a map you can listen to.</p>
+  <div id="silHost"></div>
 
   <div class="panel controls">
     <label>range
@@ -65,8 +66,10 @@
 "use strict";
 const NS = "http://www.w3.org/2000/svg";
 const $ = (id) => document.getElementById(id);
-const IV = Pent.INTERVALS;
-const short = (h) => (h === 0 ? "silence" : `${IV[h].name} ${IV[h].ratio}`);
+const IV = Pent.INTERVALS5;
+// the table keeps the five residues 0–4; with the switch on 5 the residue 0 is read as 5, the major third 5:4
+const dv = (h) => (h === 0 && Pent.silence5() ? 5 : h);
+const short = (h) => (dv(h) === 0 ? "silence" : `${IV[dv(h)].name} ${IV[dv(h)].ratio}`);
 function el(parent, name, attrs, text) {
   const e = document.createElementNS(NS, name);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
@@ -76,7 +79,7 @@ function el(parent, name, attrs, text) {
 let ctx = null;
 function ac() { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); return ctx; }
 function tone(f, t, d) { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.15, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + d + 0.03); }
-function sound(h, t) { if (!h) return; tone(196, t, 0.6); if (h > 1) tone(196 * IV[h].num / IV[h].den, t, 0.6); }
+function sound(h, t) { h = dv(h); if (!h) return; tone(196, t, 0.6); if (h > 1) tone(196 * IV[h].num / IV[h].den, t, 0.6); }
 function hear(a, b) { const t = ac().currentTime + 0.05; sound(a, t); sound(b, t + 0.65); }
 
 function render() {
@@ -85,12 +88,13 @@ function render() {
   for (let n = 0; n < N; n++) M[H[n]][H[n + 1]]++;
   const distinct = M.flat().filter((x) => x > 0).length, max = Math.max(...M.flat());
   // matrix
-  let html = "<tr><th>from ↓ / to →</th>" + [0, 1, 2, 3, 4].map((b) => `<th>${short(b)}</th>`).join("") + "</tr>";
-  for (let a = 0; a < 5; a++) {
+  const ORD = Pent.silence5() ? [1, 2, 3, 4, 0] : [0, 1, 2, 3, 4];   // with the switch on 5 the 5 goes last, as the fifth member
+  let html = "<tr><th>from ↓ / to →</th>" + ORD.map((b) => `<th>${short(b)}</th>`).join("") + "</tr>";
+  for (const a of ORD) {
     html += `<tr><th style="text-align:left">${short(a)}</th>`;
-    for (let b = 0; b < 5; b++) {
+    for (const b of ORD) {
       const c = M[a][b];
-      html += c ? `<td data-a="${a}" data-b="${b}" style="background:color-mix(in srgb, var(--c${Math.max(a, b) || 1}) ${20 + 60 * c / max}%, transparent)">${c}</td>` : `<td class="zero">·</td>`;
+      html += c ? `<td data-a="${a}" data-b="${b}" style="background:color-mix(in srgb, var(--c${Math.max(dv(a), dv(b)) || 1}) ${20 + 60 * c / max}%, transparent)">${c}</td>` : `<td class="zero">·</td>`;
     }
     html += "</tr>";
   }
@@ -122,20 +126,22 @@ function render() {
     g.addEventListener("click", () => hear(a, b));
   }
   pos.forEach(([x, y], h) => {
-    el(svg, "circle", { cx: x, cy: y, r: 24, fill: `var(--c${h})`, stroke: "var(--panel)", "stroke-width": 3 });
-    el(svg, "text", { x, y: y + 5, "text-anchor": "middle", "font-size": 13, fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff", style: "font-weight:600" }, h ? IV[h].ratio : "·");
+    el(svg, "circle", { cx: x, cy: y, r: 24, fill: `var(--c${dv(h)})`, stroke: "var(--panel)", "stroke-width": 3 });
+    el(svg, "text", { x, y: y + 5, "text-anchor": "middle", "font-size": 13, fill: dv(h) === 0 || h === 4 ? "#1f1f1f" : "#fff", style: "font-weight:600" }, dv(h) ? IV[dv(h)].ratio : "·");
   });
   // notes
   const fromSil = [0, 1, 2, 3, 4].filter((b) => M[0][b]).map(short);
   $("notes").innerHTML = [
     `In ${N} transitions only ${distinct} of the 25 possible pairs occur.`,
-    `After a silence the cycle can move to: ${fromSil.join(", ")}.`,
+    Pent.silenceSwitch && Pent.silence5() ? `After a 5 (the former silence, now a major third) the cycle can move to: ${fromSil.join(", ")}. The table is the same as with 0: reading the silence as 5 renames one value, it does not change which moves happen.` : `After a silence the cycle can move to: ${fromSil.join(", ")}.`,
     `The unison 1:1 is ${M[1][1] ? "" : "never"} followed directly by another unison${M[1][1] ? ` ${M[1][1]} times` : ""}; the octave and the fifth do repeat (octave → octave ${M[2][2]}×, fifth → fifth ${M[3][3]}×), which is where the paired values of the period come from (2, 2 and 3, 3).`,
     N === 50 ? "Over the whole palindrome every move a → b is matched by the reverse move b → a, because the palindrome reads the same backwards." : "Within one period the table is almost symmetric; over the whole palindrome it becomes exactly symmetric (switch the range to see it).",
   ].map((s) => `<li>${s}</li>`).join("");
 }
 $("mx").addEventListener("click", (e) => { const td = e.target.closest("td[data-a]"); if (td) hear(+td.dataset.a, +td.dataset.b); });
 $("rng").addEventListener("input", render);
+Pent.silenceSwitch($("silHost"), "the silence is read as 5 and sounds as the major third 5:4 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", render);
 render();
 </script>
 <script src="menu.js"></script>

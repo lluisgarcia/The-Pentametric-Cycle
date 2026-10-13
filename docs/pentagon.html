@@ -20,6 +20,7 @@
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The pentagon clock</h1>
   <p class="lede">Everything in the formula is decided by where n lands on a regular pentagon. Step n around the circle by 72° at a time: the vertex it lands on gives the sign of the correction, +0.8, −0.8 or 0. This is the Legendre symbol <span class="leg" title="Legendre symbol: 0 if 5 divides n, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5"><span class="st"><span>n</span><span>5</span></span></span>, and it is why the cosine form F8 and the angle form F10 give the same areas.</p>
+  <div id="silHost"></div>
 
   <div class="panel controls">
     <label>n <input id="n" type="number" min="0" max="100000" value="1" style="width:10ch"></label>
@@ -102,7 +103,7 @@ function draw(n) {
   for (let j = 0; j < 5; j++) {
     const chi = Pent.leg(j), [px, py] = pts[j];
     el(svg, "circle", { cx: px, cy: py, r: j === k ? 15 : 11, fill: col(chi), stroke: j === k ? "var(--ink)" : "var(--panel)", "stroke-width": 3 });
-    el(svg, "text", { x: px, y: py + 4.5, "text-anchor": "middle", "font-size": 12, fill: "#fff", style: "font-weight:600" }, j);
+    el(svg, "text", { x: px, y: py + 4.5, "text-anchor": "middle", "font-size": 12, fill: "#fff", style: "font-weight:600" }, j === 0 && Pent.silence5() ? 5 : j);
     const lx = cx + (R + 34) * Math.cos(2 * Math.PI * j / 5), ly = cy - (R + 34) * Math.sin(2 * Math.PI * j / 5);
     el(svg, "text", { x: lx, y: ly + 4, "text-anchor": "middle", "font-size": 13, fill: col(chi), style: "font-weight:600" }, chi > 0 ? "+" : chi < 0 ? "−" : "0");
   }
@@ -111,7 +112,7 @@ function draw(n) {
   const c1 = Math.cos(a1), c2 = Math.cos(a2), diff = c1 - c2, chi = Pent.leg(n);
   $("nn").textContent = n;
   const rows = [
-    ["n mod 5 (vertex)", String(k)],
+    Pent.silence5() ? ["vertex, 1 + MOD(n − 1; 5)", k === 0 ? "5 (n mod 5 = 0)" : String(k)] : ["n mod 5 (vertex)", String(k)],
     ["first hand 72n°", `${Pent.mod(72 * n, 360)}°  → cos = ${Pent.fmt(c1, 4)}`],
     ["second hand 144n°", `${Pent.mod(144 * n, 360)}° → cos = ${Pent.fmt(c2, 4)}`],
     ["difference", `${Pent.fmt(diff, 4)} = ${chi === 0 ? "0" : (chi > 0 ? "+" : "−") + "√5/2"}`],
@@ -122,9 +123,9 @@ function draw(n) {
   $("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }
 
-$("tab").innerHTML = "<tr><th class=num>vertex</th><th class=num>angle</th><th class=num>cos 72k°</th><th class=num>cos 144k°</th><th class=num>difference</th><th class=num><span class='leg' title='Legendre symbol: 0 if 5 divides k, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>k</span><span>5</span></span></span></th></tr>" +
+const drawTab = () => $("tab").innerHTML = "<tr><th class=num>vertex</th><th class=num>angle</th><th class=num>cos 72k°</th><th class=num>cos 144k°</th><th class=num>difference</th><th class=num><span class='leg' title='Legendre symbol: 0 if 5 divides k, +1 if it is ±1 mod 5, −1 if it is ±2 mod 5'><span class='st'><span>k</span><span>5</span></span></span></th></tr>" +
   [0, 1, 2, 3, 4].map((k) => { const c1 = Math.cos(2 * Math.PI * k / 5), c2 = Math.cos(4 * Math.PI * k / 5), chi = Pent.leg(k);
-    return `<tr><td class=num>${k}</td><td class=num>${72 * k}°</td><td class=num>${Pent.fmt(c1, 3)}</td><td class=num>${Pent.fmt(c2, 3)}</td><td class=num>${Pent.fmt(c1 - c2, 3)}</td><td class=num style="color:${col(chi)};font-weight:600">${chi > 0 ? "+1" : chi < 0 ? "−1" : "0"}</td></tr>`; }).join("");
+    return `<tr><td class=num>${k === 0 && Pent.silence5() ? 5 : k}</td><td class=num>${72 * k}°</td><td class=num>${Pent.fmt(c1, 3)}</td><td class=num>${Pent.fmt(c2, 3)}</td><td class=num>${Pent.fmt(c1 - c2, 3)}</td><td class=num style="color:${col(chi)};font-weight:600">${chi > 0 ? "+1" : chi < 0 ? "−1" : "0"}</td></tr>`; }).join("");
 
 let timer = null;
 const get = () => Math.max(0, Math.round(+$("n").value || 0));
@@ -137,6 +138,9 @@ $("play").onclick = () => {
   if (timer) { clearInterval(timer); timer = null; $("play").textContent = "▶ Run the clock"; return; }
   timer = setInterval(() => set(get() + 1), 900); $("play").textContent = "■ Stop";
 };
+drawTab();
+Pent.silenceSwitch($("silHost"), "the vertex 0 is the fifth member, 5 (Lluis's reading: a full turn, not nothing); the mathematics is unchanged");
+window.addEventListener("pent-silence", () => { drawTab(); draw(get()); });
 draw(get());
 </script>
 <script src="menu.js"></script>

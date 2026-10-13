@@ -32,6 +32,7 @@
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>The chord wheel</h1>
   <p class="lede">Put the twelve notes on the twelve places of a quarter of the palindrome, and every chord becomes a polygon inside the wheel, as on the circle of fifths. The inner palindrome (24 places) and the whole palindrome (50 places) hold two and four octaves of twelve, so there the chords get voices. Here you can choose how the notes are laid out, build any chord, hear it, measure its shape, and see which values of the palindrome lie under its notes. Which note goes on which place is a choice, not something the formula gives, so this page is an exploration.</p>
+  <div id="silHost"></div>
 
   <div class="panel" style="margin-bottom:18px">
   <div class="controls">
@@ -50,6 +51,9 @@
       <option value="purechrom">Pentametric chromatic (pure 3:2)</option>
       <option value="purefourths">Pentametric circle of fourths (pure 4:3)</option>
       <option value="walk">the cycle's own notes</option>
+      <option value="thirdsF" hidden>Pentametric circle of fifths with thirds (3:2 and 5:4) · silence as 5</option>
+      <option value="thirdsQ" hidden>Pentametric circle of fourths with thirds (3:2 and 5:4) · silence as 5</option>
+      <option value="thirds" hidden>Pentametric chromatic with thirds (3:2 and 5:4) · silence as 5</option>
 </select></label>
     <label><span id="tLab">key: the note at n = 0</span> <select id="tr"></select></label>
     <label id="fifthL" class="hidden"><span id="fifthLab">fifth</span> <select id="fifth"><option value="pure" selected>pure 3:2</option><option value="kirn">3:2 less a schisma (Kirnberger, from √10/3)</option></select></label>
@@ -70,6 +74,7 @@
       <option value="kirn3">Kirnberger III</option>
       <option value="vall">Vallotti</option>
       <option value="kfifth">Kirnberger fifth (≈ equal)</option>
+      <option value="p35" hidden>Pentametric with thirds (3:2 and 5:4) · silence as 5</option>
       <option value="pent" hidden>Pentametric</option></select></label>
     <label>tone <select id="wave"><option value="sine">sine</option><option value="triangle" selected>triangle</option><option value="sawtooth">bright</option></select></label>
   </div>
@@ -138,10 +143,12 @@ function el(parent, name, attrs, text) {
   parent.appendChild(e); return e;
 }
 const mod = (a, m) => ((a % m) + m) % m;
-const IV = Pent.INTERVALS;
+const IV = Pent.INTERVALS5;          // index 5: the silence read as 5, the major third 5:4 (switch)
+const S5 = () => Pent.silence5();
+const legendIV = () => IV.filter((iv) => (S5() ? iv.h : iv.h !== 5));
 const NOTE = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
 const INTV = ["unison", "minor second", "major second", "minor third", "major third", "perfect fourth", "tritone", "perfect fifth", "minor sixth", "major sixth", "minor seventh", "major seventh"];
-$("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
+$("legend").innerHTML = legendIV().map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
 
 // ---- the chord list (as on the circle-of-fifths chord-shape map), written as degrees ----
 const DEG = { "1": 0, "b9": 13, "2": 2, "9": 14, "#9": 15, "b3": 3, "3": 4, "4": 5, "11": 17, "b5": 6, "#11": 18, "5": 7, "#5": 8, "6": 9, "13": 21, "bb7": 9, "b7": 10, "7": 11 };
@@ -224,13 +231,16 @@ function layoutPlaces() {
   PL = [];
   let cur = t;                                       // the cycle's own root walk, along n
   for (let i = 0; i < W; i++) {
-    const n0 = M.first + i, n = mod(n0 + WIN, 50), h = Pent.H(n), s = slotOf(n0), P = { n, h, b: s ? s.b : null, j: s ? s.j : null, pc: null, k: null, semi: null };
-    if (L === "walk") { if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); if (h !== 0 && s) { P.pc = cur; P.semi = mod(cur - t, 12); } }
+    const n0 = M.first + i, n = mod(n0 + WIN, 50), h = Pent.V(n), s = slotOf(n0), P = { n, h, b: s ? s.b : null, j: s ? s.j : null, pc: null, k: null, semi: null };
+    if (L === "walk") { if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); if (h === 5) cur = mod(cur + 4, 12); if (h !== 0 && s) { P.pc = cur; P.semi = mod(cur - t, 12); } }
     else if (s) {
       const lap = f ? 0 : s.b;                       // a pure layout goes on round its spiral, one comma per octave, unless folded
       const q = s.j - 1;                             // stacked layouts start with the key on the first place of each octave
       if (L === "fifths" || L === "pure") { P.pc = mod(t + 7 * q, 12); P.semi = mod(7 * q, 12); P.k = q + 12 * lap; }
       else if (L === "fourths" || L === "purefourths") { P.pc = mod(t + 5 * q, 12); P.semi = mod(5 * q, 12); P.k = -(q + 12 * lap); }
+      else if (L === "thirds") { P.pc = mod(t + q, 12); P.semi = q; P.k = null; }
+      else if (L === "thirdsF") { P.pc = mod(t + 7 * q, 12); P.semi = mod(7 * q, 12); P.k = null; }
+      else if (L === "thirdsQ") { P.pc = mod(t + 5 * q, 12); P.semi = mod(5 * q, 12); P.k = null; }
       else { P.pc = mod(t + q, 12); P.semi = q; P.k = mod(7 * q, 12) + 12 * lap; }
     }
     PL.push(P);
@@ -311,7 +321,7 @@ function buildWheel() {
   if (handA >= W) handA = 0; if (handB >= W) handB = Math.floor(W / 2);
   fillVoices();
   layoutPlaces();
-  $("legend").innerHTML = IV.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
+  $("legend").innerHTML = legendIV().map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("") + '<span><i class="sw" style="background:var(--chord)"></i>chord</span>';
   const svg = svgW; svg.innerHTML = "";
   layers = {}; ["pro", "ring", "labels", "chord", "hands", "notes", "vals"].forEach((k) => { layers[k] = el(svg, "g", k === "vals" || k === "notes" ? { "pointer-events": "none" } : {}); });
   const p = (r, a) => `${WCX + r * Math.cos(a)},${WCY + r * Math.sin(a)}`, gap = W > 30 ? 0.45 : 0.47, fs = W === 50 ? 12 : W === 24 ? 14 : 16, nfs = W === 50 ? 10.5 : W === 24 ? 13.5 : 17;
@@ -349,8 +359,8 @@ function buildWheel() {
   if (W !== 50 && (WIN === 0 || $("layout").value === "walk")) { const a = wang(-0.5), t = +$("tr").value;
     el(layers.labels, "line", { x1: WCX + (R1 - 6) * Math.cos(a), y1: WCY + (R1 - 6) * Math.sin(a), x2: WCX + (R2 + 6) * Math.cos(a), y2: WCY + (R2 + 6) * Math.sin(a), stroke: "var(--ink)", "stroke-width": 1.4, "stroke-dasharray": "3 3" });
     const g0 = el(layers.labels, "g", {}), lab = $("layout").value === "walk" ? (WIN ? "start = " : "0 = ") + NOTE[t] : (W === 12 ? "0" : "0|25"), rr = $("layout").value === "walk" ? (WIN ? 30 : 20) : W === 12 ? 10 : 16, RB = W === 12 ? R2 + 15 : R2 + 32;
-    el(g0, "rect", { x: WCX + RB * Math.cos(a) - rr, y: WCY + RB * Math.sin(a) - 9, width: 2 * rr, height: 18, rx: 9, fill: "var(--c0)", stroke: "var(--ink)", "stroke-width": 1 });
-    el(g0, "text", { x: WCX + RB * Math.cos(a), y: WCY + RB * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: "#1f1f1f", style: "font-weight:600" }, lab);
+    el(g0, "rect", { x: WCX + RB * Math.cos(a) - rr, y: WCY + RB * Math.sin(a) - 9, width: 2 * rr, height: 18, rx: 9, fill: S5() ? "var(--c5)" : "var(--c0)", stroke: "var(--ink)", "stroke-width": 1 });
+    el(g0, "text", { x: WCX + RB * Math.cos(a), y: WCY + RB * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: S5() ? "#fff" : "#1f1f1f", style: "font-weight:600" }, lab);
     el(g0, "title", {}, $("layout").value === "walk" ? `n = 0: the silence that starts the cycle; the walk starts here on ${NOTE[t]}` : W === 12 ? "n = 0: the silence that starts the cycle, between n = 12 and n = 1" : "n = 0 and n = 25: the two silences that frame the inner palindrome");
     if (isPure() && !isKirn() && (W === 12 || !isFold())) el(layers.labels, "text", { x: WCX + (RB + 22) * Math.cos(a), y: WCY + (RB + 22) * Math.sin(a) + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--accent2)", stroke: "var(--panel)", "stroke-width": 3, "paint-order": "stroke" }, ($("layout").value === "purefourths" ? "−" : "") + `${W === 12 ? "" : "2 × "}comma`); }
   const L = $("layout").value;
@@ -366,13 +376,19 @@ function buildWheel() {
     fifths: "Going round, each place is a fifth (7 semitones) above the one before, so the twelve notes close after twelve fifths, as in equal temperament. The other way round, each step is a fourth.",
     fourths: "Going round, each place is a fourth (5 semitones) above the one before: the circle of fifths read the other way.",
     chrom: "Going round, each place is a semitone above the one before: the twelve tones in order.",
-    walk: "The notes the cycle makes itself (the rule of the <a href=\"chords.html\">Chord progressions</a> page): a fifth moves the root up a fifth, a fourth up a fourth, unison and octave keep it, a silence is a rest (·). Only three roots ever appear, the key, a fourth above and a fifth above; after each period of 25 the walk is home again.",
+    thirds: "With the silence read as 5 the cycle has a third interval, the pure major third 5:4, beside its fifth 3:2. Built from both, the twelve notes are those of 5-limit just intonation (C, D♭ 16/15, D 9/8, E♭ 6/5, E 5/4, F 4/3, F♯ 45/32, G 3/2, A♭ 8/5, A 5/3, B♭ 9/5, B 15/8 over the key). Every major triad on the key, the fourth and the fifth is now pure, 4:5:6. The price is the syntonic comma 81/80: four pure fifths overshoot the pure third by 21.5¢, so the whole tones come in two sizes, 9/8 and 10/9. (Lluis's reading, exploratory.)",
+    thirdsF: "The circle of fifths, with every note tuned from the key by the cycle's fifth 3:2 and, read as 5, its pure major third 5:4 (5-limit just intonation: G 3/2, D 9/8, A 5/3, E 5/4, B 15/8, F♯ 45/32, C♯ 16/15, G♯ 8/5, D♯ 6/5, B♭ 9/5, F 4/3). Nine of the twelve steps round the circle are pure fifths; three are not: D–A and B♭–F are 40/27 (680.4¢, a syntonic comma narrow) and F♯–C♯ is 1024/675 (721.5¢). That is the price of pure thirds: the comma 81/80 has to sit somewhere. (Lluis's reading, exploratory.)",
+    thirdsQ: "The circle of fourths, the circle of fifths read the other way, with the same notes tuned by 3:2 and the pure third 5:4 (5-limit just intonation, measured from the key). Nine steps are pure fourths 4:3; A–D and F–B♭ are 27/20 (519.6¢) and C♯–F♯ is 675/512 (478.5¢). (Lluis's reading, exploratory.)",
+    walk: "The notes the cycle makes itself (the rule of the <a href=\"chords.html\">Chord progressions</a> page): a fifth moves the root up a fifth, a fourth up a fourth, unison and octave keep it, a silence is a rest (·). Only three roots ever appear, the key, a fourth above and a fifth above; after each period of 25 the walk is home again." + (S5() ? " <strong style=\"color:var(--accent3)\">With the silence as 5</strong> there are no rests: a 5 moves the root up a major third, so many more roots appear, and the walk still comes home after each period (4 fifths, 4 fourths and 9 thirds make 84 semitones, 7 octaves)." : ""),
   }[L] + " " + wheelTxt + (WIN ? ` <strong>Palindrome window moved by ${WIN}:</strong> the places now show n = ${PL[0].n}…${PL[W - 1].n}. ` + (L === "walk" ? "With the cycle's own notes the walk starts on the key at the beginning of the window, so this section of the palindrome makes its own notes." : "The notes stay on their places and the palindrome's values slide under them.") : (L === "walk" ? " Use the palindrome window ◀ ▶ ⏭ to walk another section of the cycle." : ""));
   if (isPure() && isKirn()) $("wheelNote").innerHTML += " <strong>Kirnberger fifth:</strong> each pure fifth narrowed by one schisma 32805/32768 (1.954¢). The schisma is exactly the square of √10/3 ÷ 256/243, the gap between the <a href=\"curiosity.html\">√10/3 curiosity</a> and the limma, so (√10/3)² = 10/9 = limma² × schisma. The fifth becomes 16384/10935 = 700.0013¢, and twelve of them land only 0.0154¢ (the “atom of Kirnberger”) above seven octaves: the comma all but disappears. It can never be exactly zero, because no fraction of whole numbers is a 12th root of 2.";
   if (isPure()) { if ($("tune").value !== "pent") lastTune = $("tune").value; $("tune").value = "pent";
     $("tune").options[$("tune").options.length - 1].text = isKirn() ? (L === "purefourths" ? "Pentametric (Kirnberger fourth)" : "Pentametric (Kirnberger fifth)") : L === "purefourths" ? "Pentametric (pure 4:3 = Pythagorean)" : "Pentametric (pure 3:2 = Pythagorean)"; }
   else if ($("tune").value === "pent") $("tune").value = lastTune;
-  $("tune").disabled = isPure();
+  const isTh = ["thirds", "thirdsF", "thirdsQ"].includes(L);
+  if (isTh) { if ($("tune").value !== "p35") lastTune = $("tune").value === "pent" ? lastTune : $("tune").value; $("tune").value = "p35"; }
+  else if ($("tune").value === "p35" && !S5()) $("tune").value = lastTune;
+  $("tune").disabled = isPure() || isTh;
   $("fifthL").classList.toggle("hidden", !isPure());
   const fo = L === "purefourths"; $("fifthLab").textContent = fo ? "fourth" : "fifth";
   $("fifth").options[0].text = fo ? "pure 4:3" : "pure 3:2"; $("fifth").options[1].text = fo ? "4:3 plus a schisma (Kirnberger, from √10/3)" : "3:2 less a schisma (Kirnberger, from √10/3)";
@@ -557,6 +573,7 @@ function tuned(midi, pc, k, rootMidi) {
   if (isPure() && k !== null && k !== undefined) return etF(midi) * Math.pow(2, pureDev(k) / 1200);
   const tv = $("tune").value;
   if (tv === "et" || tv === "pent") return etF(midi);
+  if (tv === "p35") return etF(midi) * Math.pow(2, Pent.devCents("p35", midi, +$("tr").value) / 1200);
   const T = TUNINGS[tv];
   if (T) { const d = mod(pc - +$("tr").value, 12); let dev = T.t[d] - 100 * d; if (dev > 600) dev -= 1200; if (dev < -600) dev += 1200; return etF(midi) * Math.pow(2, dev / 1200); }
   const semi = midi - rootMidi; return etF(rootMidi) * JUST[mod(semi, 12)] * Math.pow(2, Math.floor(semi / 12));   // just over the root
@@ -588,7 +605,7 @@ function playChord(arp) {
   }
   const g = 0.5 / Math.max(2, notes.length);
   notes.forEach(([f], j) => tone(f, t0 + (arp ? j * 0.2 : 0), arp ? 1.4 : 1.9, arp ? 0.26 : g));
-  $("soundNote").textContent = `Sounding: ${notes.map((x) => x[1]).join(" – ")} (lowest first)` + (isPure() ? (isKirn() ? ", in Kirnberger fifths 16384/10935: within 0.016¢ of equal temperament, so it sounds like it." : ", in pure fifths 3:2 (Pythagorean), each note where its place on the wheel puts it.") : $("tune").value === "just" ? ", in just ratios over the root: 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8." : TUNINGS[$("tune").value] ? `, in ${TUNINGS[$("tune").value].name}, measured from the key note ${NOTE[+$("tr").value]}.` : ", in equal temperament.") +
+  $("soundNote").textContent = `Sounding: ${notes.map((x) => x[1]).join(" – ")} (lowest first)` + (isPure() ? (isKirn() ? ", in Kirnberger fifths 16384/10935: within 0.016¢ of equal temperament, so it sounds like it." : ", in pure fifths 3:2 (Pythagorean), each note where its place on the wheel puts it.") : $("tune").value === "just" ? ", in just ratios over the root: 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8." : $("tune").value === "p35" ? `, in the Pentametric tuning with thirds (pure 3:2 and 5:4, 5-limit just intonation), measured from the key note ${NOTE[+$("tr").value]}.` : TUNINGS[$("tune").value] ? `, in ${TUNINGS[$("tune").value].name}, measured from the key note ${NOTE[+$("tr").value]}.` : ", in equal temperament.") +
     (W === 12 ? " On a 12-place wheel an inversion changes the sound but not the shape: the notes are the same places." : " The small numbers are the octaves of the wheel: each note sounds where its place is.");
 }
 $("pBlock").onclick = () => playChord(false);
@@ -608,6 +625,13 @@ $("scL").onclick = () => { WIN = mod(WIN - 1, 50); freeSet = []; buildWheel(); }
 $("scR").onclick = () => { WIN = mod(WIN + 1, 50); freeSet = []; buildWheel(); };
 $("scO").onclick = () => { const st = W === 24 ? [1, 26] : [1, 13, 26, 38], cur = PL[0].n === 0 ? 0.5 : PL[0].n, nx = st.find((x) => x > cur) || st[0]; WIN = mod(nx - M.first, 50); freeSet = []; buildWheel(); };
 $("sc0").onclick = () => { WIN = 0; freeSet = []; buildWheel(); };
+function applySil() {
+  const on = S5();
+  for (const [sel, v, back] of [["layout", "thirds", "chrom"], ["layout", "thirdsF", "pure"], ["layout", "thirdsQ", "purefourths"], ["tune", "p35", "et"]]) { const o = [...$(sel).options].find((x) => x.value === v); o.hidden = !on; if (!on && $(sel).value === v) $(sel).value = back; }
+}
+Pent.silenceSwitch($("silHost"), "the silences become 5: major thirds 5:4 on the wheel, a walk that moves by thirds, and the Pentametric chromatic with thirds (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { applySil(); freeSet = []; buildWheel(); });
+applySil();
 buildWheel();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", buildWheel);
 </script>

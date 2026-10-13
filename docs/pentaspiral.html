@@ -40,6 +40,7 @@
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The Pentametric spiral</h1>
   <p class="lede">Square n sits at distance n·√0.1 (n Holden units) from Holden's point O and has the Pentametric area P(n). In the <strong>golden rectangle</strong> arrangement every square turns around O step by step: the Lucas squares fall exactly into the Fibonacci tiling, and the steps in between are shadow squares. In the <strong>pentagon</strong> arrangement every square turns 72°, a fifth of a turn, onto the corners of a pentagon. Choose “only the Fibonacci squares” to isolate the Fibonacci spiral contained in it, growing square by square with its golden arcs. Everything starts from nothing, at n = 0.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="row">
@@ -162,7 +163,7 @@ function geo(n) {
   const d = n * S01, area = Pent.P(n), side = Math.sqrt(area), half = side / Math.SQRT2;   // half-diagonal = circumradius
   const c = { x: u.x * d, y: u.y * d };
   const corners = [[1, 0], [0, 1], [-1, 0], [0, -1]].map(([p, q]) => ({ x: c.x + half * (p * u.x + q * v.x), y: c.y + half * (p * u.y + q * v.y) }));
-  return { n, a, u, v, d, area, side, half, c, corners, chi: Pent.leg(n), gap: d - half, h: Pent.H(n) };
+  return { n, a, u, v, d, area, side, half, c, corners, chi: Pent.leg(n), gap: d - half, h: Pent.V(n) };   // h: H(n), or 5 for a silence with the switch on 5
 }
 // where square n is drawn: on the pentagon (gold = 0) or, for a Lucas number, swung round O into the golden rectangle (gold = 1)
 let gold = 1, goldAnim = null;           // the golden-rectangle arrangement is the default
@@ -260,7 +261,7 @@ function shown() {
 }
 function legend() {
   const items = $("colour").value === "h"
-    ? Pent.INTERVALS.map((iv) => [`var(--c${iv.h})`, iv.ratio ? `${iv.name} ${iv.ratio}` : "silence"])
+    ? Pent.INTERVALS5.filter((iv) => (Pent.silence5() ? iv.h : iv.h !== 5)).map((iv) => [`var(--c${iv.h})`, iv.ratio ? `${iv.name} ${iv.ratio}` : "silence"])
     : [["var(--accent)", "+0.8 (n ≡ 1, 4): corner passes beyond O"], ["var(--accent2)", "−0.8 (n ≡ 2, 3): corner stops short"], ["var(--muted)", "0 (n ≡ 0): exact"]];
   $("legend").innerHTML = items.map(([c, t]) => `<span><i class="sw" style="background:${c}"></i>${t}</span>`).join("");
 }
@@ -502,7 +503,7 @@ function readout() {
     $("read").innerHTML = "<dt>P(0)</dt><dd>0: nothing yet</dd>";
     $("iv").innerHTML = '<div class="note">Everything starts from nothing. Press +1 or play.</div>'; $("iv").style.background = "transparent"; return;
   }
-  const g = geo(n), iv = Pent.INTERVALS[g.h], f = (x, k = 4) => Pent.fmt(+x.toFixed(k)), sgn = g.chi > 0 ? "+0.8" : g.chi < 0 ? "−0.8" : "0";
+  const g = geo(n), iv = Pent.INTERVALS5[g.h], f = (x, k = 4) => Pent.fmt(+x.toFixed(k)), sgn = g.chi > 0 ? "+0.8" : g.chi < 0 ? "−0.8" : "0";
   const rows = [
     ["angle 72n", `${(72 * n) % 360}° (corner n ≡ ${n % 5})`],
     ["distance n·√0.1", f(g.d)],
@@ -521,7 +522,8 @@ function readout() {
     rows.push(["to the golden rectangle", LUCAS.get(n) >= 1 ? `turn ${sw}° around O: fits exactly` : b ? `turn ${sw}° around O: a shadow between L${toSub(b[0])} and L${toSub(b[1])}` : `turn ${sw}° around O`]);
     const t = tiltOf(n);
     rows.push(["tilt in the rectangle", t.step === 0 ? "0°: level, a Fibonacci square" : `${Pent.fmt(+t.deg.toFixed(4))}° (step ${t.step} of ${t.steps}, 90°/${t.steps} each)`]); }
-  rows.push(["H(n) = P(n) mod 5", String(g.h)]);
+  rows.push(["H(n) = P(n) mod 5", String(Pent.H(n))]);
+  if (Pent.silence5()) rows.push(["1 + MOD(P(n) − 1; 5)", `<span style="color:var(--accent3)">${Pent.I5(n)}</span>`]);
   $("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   $("iv").style.background = g.h ? `color-mix(in srgb, var(--c${g.h}) 16%, transparent)` : "transparent";
   $("iv").innerHTML = `<div style="font-family:var(--serif);font-size:1.5rem">${iv.ratio ? iv.name + " " + iv.ratio : "silence"}</div><div class="greek" style="color:var(--muted)">${iv.greek}</div>`;
@@ -537,9 +539,9 @@ function tone(f, t, dur, g0) {
 }
 function sound(m) {
   if (!$("oSound").checked || m < 1) return;
-  const h = Pent.H(m); if (h === 0) return;
+  const h = Pent.V(m); if (h === 0) return;
   if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === "suspended") actx.resume();
-  const iv = Pent.INTERVALS[h], t = actx.currentTime + 0.02, f0 = 196, dur = Math.min(1.4, Math.max(0.35, stepDelay() / 1000 * 0.95));
+  const iv = Pent.INTERVALS5[h], t = actx.currentTime + 0.02, f0 = 196, dur = Math.min(1.4, Math.max(0.35, stepDelay() / 1000 * 0.95));
   tone(f0, t, dur, 0.16); if (h !== 1) tone(f0 * iv.num / iv.den, t, dur, 0.14);
 }
 
@@ -627,6 +629,8 @@ $("png").onclick = () => {
 };
 window.addEventListener("resize", () => (view3 ? render3() : draw2()));
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => update(false));
+Pent.silenceSwitch($("silHost"), "the silent squares take the colour and the sound of the major third 5:4 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { legend(); update(false); });
 legend(); update(false);
 </script>
 <script src="menu.js"></script>

@@ -20,6 +20,7 @@
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>The 13-cycle as music</h1>
   <p class="lede">On the page about other primes, the sequence Q<sub>p</sub>(n) = ⌊n²/p⌋ mod p keeps the palindrome for every prime, and for p = 13 its counts make the triple 5² + 12² = 13². Here the same musical rule is applied: a residue H becomes the ratio H : (H − 1), so with 13 the cycle sounds every superparticular ratio from 2:1 down to 12:11, a much larger “tetractys”.</p>
+  <div id="silHost"></div>
 
   <div class="panel controls">
     <label>prime
@@ -27,7 +28,7 @@
     </label>
     <button id="play" class="primary">▶ Play</button>
     <label>tempo <input id="bpm" type="range" min="60" max="480" value="240"><output id="bpmOut">240</output></label>
-    <label><input id="skip" type="checkbox" checked> skip silences</label>
+    <label id="skipL"><input id="skip" type="checkbox" checked> skip silences</label>
     <span class="note" id="now"></span>
   </div>
 
@@ -45,6 +46,7 @@
       <h2 style="margin-top:0">What you hear</h2>
       <p style="margin-top:0">Each step sounds its interval over a fixed root. For p = 5 the ratios are the four consonances of the tetractys. For p = 13 they include the just major third 5:4, the minor third 6:5, the septimal intervals 7:6 and 8:7, and smaller and smaller steps down to 12:11, the kind of ratio (n + 1 : n) that Greek theorists called superparticular.</p>
       <p>Every non-zero value occurs exactly p − 1 times per period and silence 2p − 1 times, so every interval of the set is heard equally often, and the whole period reads the same backwards.</p>
+      <p id="why13" hidden style="border-left:3px solid var(--accent3);padding-left:10px"><b style="color:var(--accent3)">The silence as p.</b> With 5 the silence becomes 5:4, a consonance. With 13 it becomes 13:12 (138.6 cents), between a semitone and a whole tone and no consonance at all, and with 41 it becomes 41:40 (42.7 cents), smaller than a quarter tone. This is why the reading belongs to 5: see <a href="silence5.html#why5">Why 5?</a></p>
       <p class="note" style="margin-bottom:0">For p = 5 this floor sequence has the same counts as the Pentametric Cycle but is not identical to it; the Pentametric formula itself works only for 5 (see Other primes).</p>
     </div>
   </div>
@@ -68,33 +70,36 @@ function el(parent, name, attrs, text) {
 }
 const hue = (v, p) => (v === 0 ? "var(--c0)" : `hsl(${Math.round(300 * (v - 1) / Math.max(1, p - 2))} 60% 50%)`);
 const ratio = (h) => (h === 0 ? "—" : h === 1 ? "1:1" : `${h}:${h - 1}`);
+const S5 = () => Pent.silence5();      // the switch: the silence read as the last member, p, sounding p:(p − 1)
 let seq = [], p = 13, cols = [];
 function make() {
   p = +$("p").value;
-  seq = Array.from({ length: p * p + 1 }, (_, n) => Math.floor(n * n / p) % p);
-  const svg = $("roll"), N = seq.length, cw = p === 41 ? 1.2 : p === 13 ? 6 : 24, rh = p === 41 ? 4 : p === 13 ? 14 : 26, lw = 60;
-  const W = lw + N * cw + 10, H = (p - 1) * rh + 40;
+  seq = Array.from({ length: p * p + 1 }, (_, n) => { const v = Math.floor(n * n / p) % p; return v === 0 && S5() ? p : v; });
+  const svg = $("roll"), N = seq.length, cw = p === 41 ? 1.2 : p === 13 ? 6 : 24, rh = p === 41 ? 4 : p === 13 ? 14 : 26, lw = 60, NR = S5() ? p : p - 1;
+  const W = lw + N * cw + 10, H = NR * rh + 40;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.minWidth = Math.min(W, 1800) + "px"; svg.innerHTML = "";
   cols = [];
-  for (let v = 1; v < p; v++) if (p < 41 || v % 5 === 0 || v === 1) el(svg, "text", { x: lw - 6, y: 10 + (p - 1 - v) * rh + rh * 0.75, "text-anchor": "end", "font-size": Math.min(11, rh + 2), fill: "var(--muted)" }, ratio(v));
+  for (let v = 1; v <= NR; v++) if (p < 41 || v % 5 === 0 || v === 1 || v === p) el(svg, "text", { x: lw - 6, y: 10 + (NR - v) * rh + rh * 0.75, "text-anchor": "end", "font-size": Math.min(11, rh + 2), fill: "var(--muted)" }, ratio(v));
   seq.forEach((v, n) => {
     const x = lw + n * cw;
-    cols.push(el(svg, "rect", { x, y: 8, width: cw, height: (p - 1) * rh + 4, fill: "transparent" }));
-    if (v > 0) el(svg, "rect", { x, y: 10 + (p - 1 - v) * rh, width: Math.max(1, cw - (cw > 3 ? 1 : 0)), height: rh - (rh > 5 ? 1 : 0), fill: hue(v, p) });
+    cols.push(el(svg, "rect", { x, y: 8, width: cw, height: NR * rh + 4, fill: "transparent" }));
+    if (v > 0) el(svg, "rect", { x, y: 10 + (NR - v) * rh, width: Math.max(1, cw - (cw > 3 ? 1 : 0)), height: rh - (rh > 5 ? 1 : 0), fill: v === p ? "var(--c5)" : hue(v, p) });
   });
   const axis = lw + (N - 1) / 2 * cw + cw / 2;
-  el(svg, "line", { x1: axis, y1: 4, x2: axis, y2: (p - 1) * rh + 16, stroke: "var(--ink)", "stroke-dasharray": "3 3" });
-  el(svg, "text", { x: axis, y: (p - 1) * rh + 32, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, `mirror at n = ${(p * p) / 2}`);
+  el(svg, "line", { x1: axis, y1: 4, x2: axis, y2: NR * rh + 16, stroke: "var(--ink)", "stroke-dasharray": "3 3" });
+  el(svg, "text", { x: axis, y: NR * rh + 32, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, `mirror at n = ${(p * p) / 2}`);
   // counts
-  const c = new Array(p).fill(0); seq.slice(0, p * p).forEach((v) => c[v]++);
+  const c = new Array(p + 1).fill(0); seq.slice(0, p * p).forEach((v) => c[v % p]++);
   const m = Math.round(Math.sqrt(2 * p - 1)), triple = m * m === 2 * p - 1;
-  $("counts").innerHTML = [["period", `${p * p} = ${p}²`], ["silences", `${c[0]} = 2·${p} − 1`], ["each interval", `${c[1]} times = ${p} − 1`],
+  $("counts").innerHTML = [["period", `${p * p} = ${p}²`], [S5() ? `${p}:${p - 1} (the silences)` : "silences", `${c[0]} = 2·${p} − 1`], ["each interval", `${c[1]} times = ${p} − 1`],
     ["identity", `${c[0]} + ${(p - 1) ** 2} = ${p * p}` + (triple ? `, i.e. ${m}² + ${p - 1}² = ${p}²` : "")],
     ["palindrome", seq.every((v, n) => v === seq[p * p - n]) ? '<span class="ok">yes</span>' : "no"]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   $("tab").innerHTML = "<tr><th class=num>H</th><th class=num>ratio</th><th class=num>cents</th><th class=num>times per period</th></tr>" +
     Array.from({ length: p - 1 }, (_, i) => i + 1).filter((v) => p < 41 || v <= 12 || v === p - 1).map((v) =>
       `<tr><td class=num>${v}</td><td class=num>${ratio(v)}</td><td class=num>${v === 1 ? "0.0" : (1200 * Math.log2(v / (v - 1))).toFixed(1)}</td><td class=num>${c[v]}</td></tr>`).join("") +
-    (p === 41 ? "<tr><td colspan=4 class=note>… (values 13 to 39 omitted)</td></tr>" : "");
+    (p === 41 ? "<tr><td colspan=4 class=note>… (values 13 to 39 omitted)</td></tr>" : "") +
+    (S5() ? `<tr><td class=num style="color:var(--accent3)">${p}</td><td class=num>${ratio(p)}</td><td class=num>${(1200 * Math.log2(p / (p - 1))).toFixed(1)}</td><td class=num>${c[0]}</td></tr>` : "");
+  $("why13").hidden = !S5();
 }
 
 let ctx = null, timer = null, i = 0, next = 0, lit = -1;
@@ -119,6 +124,10 @@ $("play").onclick = () => {
   $("play").textContent = "■ Stop";
 };
 $("p").addEventListener("input", () => { stop(); make(); });
+const applySil = () => { $("skip").disabled = S5(); $("skipL").style.opacity = S5() ? 0.45 : 1; };
+Pent.silenceSwitch($("silHost"), "the silence is read as the last member, p, and sounds p:(p − 1), so for 13 it is 13:12 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { stop(); applySil(); make(); });
+applySil();
 $("bpm").addEventListener("input", () => ($("bpmOut").textContent = $("bpm").value));
 make();
 </script>

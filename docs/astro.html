@@ -31,6 +31,7 @@
   <span class="kind x">✧ Exotic exploration · symbolic and playful, not a claim</span>
   <h1>The sky wheel</h1>
   <p class="lede">The twelve signs of the zodiac on a wheel of twelve places, like the quarter of the palindrome on the chord wheel. For any date and place, the page computes where the Sun, the Moon and the planets are, draws their aspects, lays the palindrome's values under the signs, and turns the signs the planets occupy into notes: the chord the sky makes. Astrology is a symbolic tradition, not science; this page is a playful exploration, and the astronomy under it is real.</p>
+  <div id="silHost"></div>
 
   <div class="panel" style="margin-bottom:18px">
     <div class="controls">
@@ -49,7 +50,10 @@
         <option value="purefourths">Pentametric circle of fourths (pure 4:3)</option>
         <option value="chrom">chromatic (12 tones)</option>
         <option value="purechrom">Pentametric chromatic (pure 3:2)</option>
-        <option value="walk">the cycle's own notes</option></select></label>
+        <option value="walk">the cycle's own notes</option>
+        <option value="thirdsF" hidden>Pentametric circle of fifths with thirds (3:2 and 5:4) · silence as 5</option>
+        <option value="thirdsQ" hidden>Pentametric circle of fourths with thirds (3:2 and 5:4) · silence as 5</option>
+        <option value="thirds" hidden>Pentametric chromatic with thirds (3:2 and 5:4) · silence as 5</option></select></label>
       <label><span id="keyLab">key on Aries</span> <select id="key"></select></label>
       <label id="winL">palindrome window <button id="scL" title="scroll back">◀</button> <span id="scTxt" style="font-family:var(--mono)"></span> <button id="scR" title="scroll on">▶</button> <button id="scO" title="jump to the next section of the palindrome: n = 1, 13, 26, 38">⏭ section</button></label>
       <label>aspect orb ± <input id="orb" type="number" min="0" max="12" step="0.5" value="6" style="width:6ch">°</label>
@@ -115,7 +119,7 @@ const ZOD = [["♈", "Aries"], ["♉", "Taurus"], ["♊", "Gemini"], ["♋", "Ca
 const ELEM = ["fire", "earth", "air", "water"], MODE = ["cardinal", "fixed", "mutable"];
 const GLYPH = { Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇", Node: "☊" };
 const ASP = [[0, "conjunction", "☌", "var(--ink)"], [60, "sextile", "⚹", "var(--water)"], [90, "square", "□", "var(--fire)"], [120, "trine", "△", "var(--earth)"], [180, "opposition", "☍", "var(--fire)"]];
-const IV = Pent.INTERVALS;
+const IV = Pent.INTERVALS5;          // index 5: the silence read as 5, the major third 5:4 (switch)
 const dms = (x) => { const d = Math.floor(x), m = Math.floor((x - d) * 60 + 1e-9); return `${d}°${String(m).padStart(2, "0")}′`; };
 $("key").innerHTML = NOTE.map((n, i) => `<option value="${i}">${n}</option>`).join("");
 
@@ -141,12 +145,15 @@ function noteOf(z) {          // { pc, k } for sign z (k: fifths above the key, 
   if (L === "fifths" || L === "pure") return { pc: mod(t + 7 * z, 12), k: z };
   if (L === "fourths" || L === "purefourths") return { pc: mod(t + 5 * z, 12), k: -z };
   if (L === "chrom" || L === "purechrom") return { pc: mod(t + z, 12), k: mod(7 * z, 12) };
+  if (L === "thirds") return { pc: mod(t + z, 12), k: null };
+  if (L === "thirdsF") return { pc: mod(t + 7 * z, 12), k: null };
+  if (L === "thirdsQ") return { pc: mod(t + 5 * z, 12), k: null };
   return null;
 }
 let walkNotes = [];
 function computeWalk() {      // the cycle's own notes: start on the key at the step before the window, then walk
   const t = +$("key").value; let cur = t; walkNotes = [];
-  for (let z = 0; z < 12; z++) { const h = Pent.H(nOf(z)); if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); walkNotes.push(h === 0 ? null : { pc: cur, k: null }); }
+  for (let z = 0; z < 12; z++) { const h = Pent.V(nOf(z)); if (h === 3) cur = mod(cur + 7, 12); if (h === 4) cur = mod(cur + 5, 12); if (h === 5) cur = mod(cur + 4, 12); walkNotes.push(h === 0 ? null : { pc: cur, k: null }); }
 }
 const signNote = (z) => $("layout").value === "walk" ? walkNotes[z] : noteOf(z);
 const LOF = { 0: 0, 7: 1, 2: 2, 9: 3, 4: 4, 11: 5, 6: 6, 1: -5, 8: -4, 3: -3, 10: -2, 5: -1 };
@@ -194,7 +201,7 @@ function draw() {
     const [gx, gy] = P((R_Z + R_OUT) / 2, a0 + 15); const t = el(svg, "text", { x: gx, y: gy + 8, "text-anchor": "middle", "font-size": 22, fill: col, class: "glyph" }, ZOD[z][0] + VS); el(t, "title", {}, `${ZOD[z][1]} (${ELEM[z % 4]}, ${MODE[z % 3]})`);
     el(svg, "path", { d: arc(R_H, R_Z), fill: "none", stroke: "var(--rule)", "stroke-width": 1 });
     const [hx, hy] = P((R_H + R_Z) / 2, a0 + 15); el(svg, "text", { x: hx, y: hy + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, z + 1);
-    const n = nOf(z), h = Pent.H(n);   // (with the window at its start: n = 1 … 12 under Aries … Pisces)
+    const n = nOf(z), h = Pent.V(n);   // (with the window at its start: n = 1 … 12 under Aries … Pisces)
     if ($("oVal").checked) { el(svg, "path", { d: arc(R_V - 13, R_H - 4), fill: `var(--c${h})`, stroke: "var(--panel)", "stroke-width": 1, "fill-opacity": 0.9 });
       const [vx, vy] = P((R_V - 13 + R_H - 4) / 2, a0 + 15); const tv = el(svg, "text", { x: vx, y: vy + 5, "text-anchor": "middle", "font-size": 14, style: "font-weight:600", fill: h === 0 || h === 4 ? "#1f1f1f" : "#fff" }, h); el(tv, "title", {}, `n = ${n}: H = ${h}, ${IV[h].name}`);
       const [nx, ny] = P(R_H + 2, a0 + 3); el(svg, "text", { x: nx, y: ny + 3, "text-anchor": "middle", "font-size": 8, fill: "var(--muted)" }, n); }
@@ -234,7 +241,7 @@ function draw() {
 function tables(AS, B, occ) {
   let h = '<thead><tr><th></th><th>body</th><th class="num">longitude</th><th>sign</th><th></th><th>note</th><th class="num">H</th></tr></thead><tbody>';
   for (const b of CH.bodies) { const z = Math.floor(b.lon / 30);
-    h += `<tr><td class="glyph" style="font-size:1.15rem">${GLYPH[b.name]}${VS}</td><td>${b.name === "Node" ? "North node" : b.name}</td><td class="num">${b.lon.toFixed(3)}°</td><td><span class="glyph">${ZOD[z][0]}${VS}</span> ${dms(mod(b.lon, 30))} ${ZOD[z][1]}</td><td class="r">${b.retro ? "R" : ""}</td><td>${noteName(z)}</td><td class="num">${Pent.H(nOf(z))}</td></tr>`; }
+    h += `<tr><td class="glyph" style="font-size:1.15rem">${GLYPH[b.name]}${VS}</td><td>${b.name === "Node" ? "North node" : b.name}</td><td class="num">${b.lon.toFixed(3)}°</td><td><span class="glyph">${ZOD[z][0]}${VS}</span> ${dms(mod(b.lon, 30))} ${ZOD[z][1]}</td><td class="r">${b.retro ? "R" : ""}</td><td>${noteName(z)}</td><td class="num">${Pent.V(nOf(z))}</td></tr>`; }
   for (const [lon, nm] of [[CH.asc, "Ascendant"], [CH.mc, "Midheaven"]]) { const z = Math.floor(lon / 30); h += `<tr><td></td><td>${nm}</td><td class="num">${lon.toFixed(3)}°</td><td><span class="glyph">${ZOD[z][0]}${VS}</span> ${dms(mod(lon, 30))} ${ZOD[z][1]}</td><td></td><td></td><td></td></tr>`; }
   $("tab").innerHTML = h + "</tbody>";
   $("aspTab").innerHTML = '<thead><tr><th>aspect</th><th>between</th><th class="num">angle</th><th class="num">off exact</th><th>signs</th><th>notes</th></tr></thead><tbody>' +
@@ -249,7 +256,7 @@ function tables(AS, B, occ) {
   $("cread").innerHTML = [["signs", occ.map((z) => `<span class="glyph">${ZOD[z][0]}${VS}</span> ${ZOD[z][1]}`).join(", ")],
     ["notes", notes.map((x) => x.N ? noteName(x.z) : `${ZOD[x.z][1]}: silence`).join(" ")],
     ["root", `${rb.name === "Node" ? "the node" : "the " + rb.name}'s sign, ${ZOD[sun][1]}${signNote(sun) ? ": " + noteName(sun) : " (a silence here, so the first note is used)"}`],
-    ["values under them", occ.map((z) => `${Pent.H(nOf(z))}`).join(" ")]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+    ["values under them", occ.map((z) => `${Pent.V(nOf(z))}`).join(" ")]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }
 // ---- chord names (the main chord types) ----
 const TYPES = [["", [0, 4, 7]], ["m", [0, 3, 7]], ["sus4", [0, 5, 7]], ["sus2", [0, 2, 7]], ["dim", [0, 3, 6]], ["aug", [0, 4, 8]], ["7", [0, 4, 7, 10]], ["maj7", [0, 4, 7, 11]], ["m7", [0, 3, 7, 10]], ["m7♭5", [0, 3, 6, 10]], ["dim7", [0, 3, 6, 9]], ["6", [0, 4, 7, 9]], ["m6", [0, 3, 7, 9]], ["add9", [0, 4, 7, 2]], ["9", [0, 4, 7, 10, 2]], ["maj9", [0, 4, 7, 11, 2]], ["m9", [0, 3, 7, 10, 2]], ["5", [0, 7]], ["7sus4", [0, 5, 7, 10]], ["6/9", [0, 4, 7, 9, 2]], ["11", [0, 4, 7, 10, 2, 5]], ["13", [0, 4, 7, 10, 2, 5, 9]]];
@@ -267,6 +274,7 @@ const etF = (m) => 440 * Math.pow(2, (m - 69) / 12);
 function freqOfSign(z, octave) {     // the note of sign z, in the octave above the key (pure layouts: in pure fifths or fourths)
   const N = signNote(z), t = +$("key").value; if (!N) return null;
   const semi = mod(N.pc - t, 12), midi = 48 + t + semi + 12 * (octave || 0);
+  if (["thirds", "thirdsF", "thirdsQ"].includes($("layout").value)) return etF(midi) * Math.pow(2, Pent.devCents("p35", midi, t) / 1200);   // pure 3:2 and 5:4 from the key
   return isPure() ? etF(midi) * Math.pow(2, N.k * (FIFTH - 700) / 1200) : etF(midi);
 }
 $("pChord").onclick = () => { ensure(); const B = chordBodies(), occ = [...new Set(B.map((b) => Math.floor(b.lon / 30)))], t0 = ctx.currentTime + 0.03, fs = occ.map((z) => freqOfSign(z)).filter((f) => f).sort((a, b) => a - b), g = 0.5 / Math.max(2, fs.length); fs.forEach((f) => tone(f, t0, 2.2, g)); $("soundNote").textContent = `Sounding the signs the bodies occupy, ${fs.length} notes, ${isPure() ? "in pure " + ($("layout").value === "purefourths" ? "fourths" : "fifths") : "in equal temperament"}.`; };
@@ -280,6 +288,12 @@ $("bAll").onclick = () => setTicks(BNAMES.slice(0, 10)); $("bFast").onclick = ()
 $("scO").onclick = () => { const st = [1, 13, 26, 38], cur = sc + 1, nx = st.find((x) => x > cur) || st[0]; sc = nx - 1; draw(); };
 fillRoot();
 ["layout", "key", "oAsp", "oChord", "oVal", "oNote", "oDeg"].forEach((id) => $(id).addEventListener("change", draw));
+function applySil() {
+  for (const [v, back] of [["thirds", "chrom"], ["thirdsF", "pure"], ["thirdsQ", "purefourths"]]) { const o = [...$("layout").options].find((x) => x.value === v); o.hidden = !Pent.silence5(); if (!Pent.silence5() && $("layout").value === v) $("layout").value = back; }
+}
+Pent.silenceSwitch($("silHost"), "the silent signs become 5, major thirds 5:4; the cycle's own notes move by thirds too, and the chromatic with pure thirds joins the layouts (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", () => { applySil(); draw(); });
+applySil();
 draw();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 </script>

@@ -20,6 +20,7 @@
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>Formula explorer</h1>
   <p class="lede">Type any whole number and follow the seven steps that take it to an area, a residue and a musical interval. At the Lucas numbers the area is always a perfect square: the square of the matching Fibonacci number.</p>
+  <div id="silHost"></div>
 
   <div class="panel">
     <div class="controls">
@@ -86,7 +87,7 @@ function update() {
   if (!Number.isFinite(n) || n < 0) n = 0;
   if (n > 1e7) n = 1e7;
   const sq = n * n, m = (4 * sq) % 10, Cm = Pent.C(m), Pn = (sq + 4 * Cm) / 5, two = 2 * Pn, d = two % 10, H = d / 2;
-  const iv = Pent.INTERVALS[H];
+  const S5 = Pent.silence5(), V = S5 && H === 0 ? 5 : H, iv = Pent.INTERVALS5[V];
   const rows = [
     ["1", "residue", "m = 4n² mod 10", `4 · ${big(sq)} mod 10 = ${m}`],
     ["2", "Interval Map", "C(m) = (26m − 5m²)/24", `(${26 * m} − ${5 * m * m})/24 = ${Pent.fmt(Cm)}`],
@@ -94,8 +95,9 @@ function update() {
     ["4", "doubling (octave)", "2P(n)", big(two)],
     ["5", "last digit", "2P(n) mod 10", String(d)],
     ["6", "halved digit", "H = (2P(n) mod 10)/2", String(H)],
-    ["7", "ratio", "H : (H − 1), with 1 ↦ 1:1", iv.ratio ? `${iv.ratio} (${iv.name})` : "— (silence)"],
+    ["7", "ratio", "H : (H − 1), with 1 ↦ 1:1", H ? `${Pent.INTERVALS[H].ratio} (${Pent.INTERVALS[H].name})` : "— (silence)"],
   ];
+  if (S5) rows.push(["5", "<span style='color:var(--accent3)'>silence as 5</span>", "i = 1 + MOD(P(n) − 1; 5), i : (i − 1)", `i = ${Pent.I5(n)}${H === 0 ? " → 5:4 (major third)" : ", the same as H"}`]);
   $("chain").innerHTML = "<tr><th>step</th><th>name</th><th>operation</th><th class=num>value</th></tr>" +
     rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td></tr>`).join("");
 
@@ -121,7 +123,7 @@ function drawStrip(n) {
   const w = 1000 / 25;
   for (let i = -12; i <= 12; i++) {
     const m = n + i; const x = (i + 12) * w;
-    const h = Pent.H(m);
+    const h = Pent.V(m);
     const g = el(svg, "g", { style: "cursor:pointer" });
     g.addEventListener("click", () => { $("n").value = Math.abs(m); update(); });
     el(g, "rect", { x: x + 2, y: 22, width: w - 4, height: 50, rx: 4, fill: `var(--c${h})`, stroke: i === 0 ? "var(--ink)" : "none", "stroke-width": 3 });
@@ -129,7 +131,7 @@ function drawStrip(n) {
     el(g, "text", { x: x + w / 2, y: 92, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, Pent.fmt(m).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     if (m % 25 === 0) el(svg, "line", { x1: x + w / 2, y1: 8, x2: x + w / 2, y2: 20, stroke: "var(--ink)", "stroke-width": 2 });
   }
-  el(svg, "text", { x: 500, y: 114, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, "H(n) for the 25 numbers around n · ticks mark multiples of 25 (mirror axes)");
+  el(svg, "text", { x: 500, y: 114, "text-anchor": "middle", "font-size": 12, fill: "var(--muted)" }, Pent.silence5() ? "1 + MOD(P(n) − 1; 5) for the 25 numbers around n (5 = the silence) · ticks mark multiples of 25 (mirror axes)" : "H(n) for the 25 numbers around n · ticks mark multiples of 25 (mirror axes)");
 }
 
 $("search").addEventListener("click", () => {
@@ -146,6 +148,8 @@ $("search").addEventListener("click", () => {
 $("n").addEventListener("input", update);
 $("minus").onclick = () => { $("n").value = Math.max(0, +$("n").value - 1); update(); };
 $("plus").onclick = () => { $("n").value = +$("n").value + 1; update(); };
+Pent.silenceSwitch($("silHost"), "an eighth step reads the silence as 5, the major third 5:4 (Lluis's reading, exploratory)");
+window.addEventListener("pent-silence", update);
 update();
 </script>
 <script src="menu.js"></script>
