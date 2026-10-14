@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<script src="pent.js"></script>
-<script src="library.js"></script>
+<link rel="stylesheet" href="style.css?v=ece18ca5">
+<script src="pent.js?v=fd480162"></script>
+<script src="library.js?v=33a23884"></script>
 </head>
 <body>
 <header class="site"><div class="inner">
@@ -32,7 +32,7 @@
   <div id="groups"></div>
   <h2>All the files</h2>
   <div class="panel">
-    <p style="margin-top:0">The repository holds <span id="nall"></span> GeoGebra files, including the working studies. Each opens in GeoGebra Classic (free, <a href="https://www.geogebra.org/download">geogebra.org/download</a>) or online at <a href="https://www.geogebra.org/classic">geogebra.org/classic</a> (menu → Open).</p>
+    <p style="margin-top:0">The repository holds <span id="nall"></span> GeoGebra files, including the working studies. Click a name to open it here; ⤓ downloads it. Downloaded files open in GeoGebra Classic (free, <a href="https://www.geogebra.org/download">geogebra.org/download</a>) or online at <a href="https://www.geogebra.org/classic">geogebra.org/classic</a> (menu → Open).</p>
     <ul class="filelist" id="all"></ul>
   </div>
 </main>
@@ -48,12 +48,12 @@ const flat = [];
 document.getElementById("groups").innerHTML = LIB.ggb.map((g) => `<h2>${esc(g.group)}</h2><div class="libgrid">` +
   g.items.map((it) => { const i = flat.push(it) - 1; return `<button class="libcard" data-i="${i}"><img src="library/thumbs/${it.thumb}" alt="${esc(it.cap)}" loading="lazy"><span class="cap"><b>${esc(nice(it.file))}</b>${esc(it.cap)}</span></button>`; }).join("") + "</div>").join("");
 document.getElementById("nall").textContent = LIB.allggb.length;
-document.getElementById("all").innerHTML = LIB.allggb.map((f) => `<li><a href="${CDN("Geometry/" + f.file)}" download>${esc(nice(f.file))}</a> <span class="note">${f.kb} kB</span></li>`).join("");
+document.getElementById("all").innerHTML = LIB.allggb.map((f, j) => `<li><a href="#stage" data-j="${j}" title="Open it here">${esc(nice(f.file))}</a> <span class="note">${f.kb} kB · <a href="${CDN("Geometry/" + f.file)}" download title="Download the .ggb file">⤓</a></span></li>`).join("");
 let api = null, loading = null;
 function loadDeploy() { if (window.GGBApplet) return Promise.resolve();
   if (!loading) loading = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://www.geogebra.org/apps/deployggb.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
   return loading; }
-function open(i) { const it = flat[i], url = CDN("Geometry/" + it.file), st = document.getElementById("stage");
+function openGgb(it) { const url = CDN("Geometry/" + it.file), st = document.getElementById("stage");
   st.hidden = false; document.getElementById("gtitle").textContent = nice(it.file); document.getElementById("gcap").textContent = it.cap;
   document.getElementById("gdl").href = url; const msg = document.getElementById("gmsg"); msg.textContent = "Loading GeoGebra… (it needs an internet connection)";
   st.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -66,9 +66,11 @@ function open(i) { const it = flat[i], url = CDN("Geometry/" + it.file), st = do
     new GGBApplet(p, true).inject("ggbApplet");
   }).catch(() => { msg.innerHTML = 'GeoGebra could not be loaded (offline?). <a href="' + url + '" download>Download the file</a> and open it in GeoGebra.'; });
 }
-document.getElementById("groups").addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) open(+b.dataset.i); });
+document.getElementById("groups").addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) openGgb(flat[+b.dataset.i]); });
+document.getElementById("all").addEventListener("click", (e) => { const a = e.target.closest("[data-j]"); if (!a) return; e.preventDefault();
+  const f = LIB.allggb[+a.dataset.j], cur = flat.find((x) => x.file === f.file); openGgb(cur || { file: f.file, cap: "" }); });
 document.getElementById("gclose").onclick = () => { document.getElementById("stage").hidden = true; document.getElementById("ggbBox").innerHTML = ""; };
 </script>
-<script src="menu.js"></script>
+<script src="menu.js?v=62a93e04"></script>
 </body>
 </html>
