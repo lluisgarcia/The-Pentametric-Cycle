@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The GeoGebra files · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<script src="library.js"></script>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind l">◇ Library · the papers, images and GeoGebra files</span>
+  <h1>The GeoGebra files</h1>
+  <p class="lede">The constructions themselves, live. Choose a file and it opens here in GeoGebra: drag the points, zoom with the mouse wheel, and read the measurements. Download any file to keep working on it in GeoGebra.</p>
+  <div class="panel" id="stage" hidden>
+    <div class="controls" style="margin-top:0"><strong id="gtitle" style="font-family:var(--serif);font-size:1.15rem;font-weight:500"></strong>
+      <a class="button" id="gdl" href="#" download style="padding:4px 12px;border:1px solid var(--rule);border-radius:6px;text-decoration:none;color:var(--ink)">⤓ Download .ggb</a>
+      <button id="gclose">✕ Close</button></div>
+    <p class="note" id="gcap" style="margin:0 0 8px"></p>
+    <div id="ggbBox"></div>
+    <p class="note" id="gmsg" style="margin-bottom:0">Loading GeoGebra… (it needs an internet connection)</p>
+  </div>
+  <div id="groups"></div>
+  <h2>All the files</h2>
+  <div class="panel">
+    <p style="margin-top:0">The repository holds <span id="nall"></span> GeoGebra files, including the working studies. Each opens in GeoGebra Classic (free, <a href="https://www.geogebra.org/download">geogebra.org/download</a>) or online at <a href="https://www.geogebra.org/classic">geogebra.org/classic</a> (menu → Open).</p>
+    <ul class="filelist" id="all"></ul>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const flat = [];
+document.getElementById("groups").innerHTML = LIB.ggb.map((g) => `<h2>${esc(g.group)}</h2><div class="libgrid">` +
+  g.items.map((it) => { const i = flat.push(it) - 1; return `<button class="libcard" data-i="${i}"><img src="library/thumbs/${it.thumb}" alt="${esc(it.cap)}" loading="lazy"><span class="cap"><b>${esc(nice(it.file))}</b>${esc(it.cap)}</span></button>`; }).join("") + "</div>").join("");
+document.getElementById("nall").textContent = LIB.allggb.length;
+document.getElementById("all").innerHTML = LIB.allggb.map((f) => `<li><a href="${CDN("Geometry/" + f.file)}" download>${esc(nice(f.file))}</a> <span class="note">${f.kb} kB</span></li>`).join("");
+let api = null, loading = null;
+function loadDeploy() { if (window.GGBApplet) return Promise.resolve();
+  if (!loading) loading = new Promise((res, rej) => { const s = document.createElement("script"); s.src = "https://www.geogebra.org/apps/deployggb.js"; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+  return loading; }
+function open(i) { const it = flat[i], url = CDN("Geometry/" + it.file), st = document.getElementById("stage");
+  st.hidden = false; document.getElementById("gtitle").textContent = nice(it.file); document.getElementById("gcap").textContent = it.cap;
+  document.getElementById("gdl").href = url; const msg = document.getElementById("gmsg"); msg.textContent = "Loading GeoGebra… (it needs an internet connection)";
+  st.scrollIntoView({ behavior: "smooth", block: "start" });
+  const box = document.getElementById("ggbBox"), w = Math.max(320, box.clientWidth), h = Math.round(Math.min(window.innerHeight * 0.75, w * 0.62));
+  box.innerHTML = '<div id="ggbApplet"></div>';
+  loadDeploy().then(() => {
+    const p = { appName: "classic", width: w, height: h, filename: url, showToolBar: false, showMenuBar: false, showAlgebraInput: false,
+      showResetIcon: true, enableShiftDragZoom: true, showZoomButtons: true, showFullscreenButton: true, enableRightClick: false, borderColor: "#ffffff",
+      appletOnLoad: (a) => { api = a; msg.textContent = "Drag the points, zoom with the wheel or the buttons; ↺ resets the drawing."; } };
+    new GGBApplet(p, true).inject("ggbApplet");
+  }).catch(() => { msg.innerHTML = 'GeoGebra could not be loaded (offline?). <a href="' + url + '" download>Download the file</a> and open it in GeoGebra.'; });
+}
+document.getElementById("groups").addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) open(+b.dataset.i); });
+document.getElementById("gclose").onclick = () => { document.getElementById("stage").hidden = true; document.getElementById("ggbBox").innerHTML = ""; };
+</script>
+<script src="menu.js"></script>
+</body>
+</html>

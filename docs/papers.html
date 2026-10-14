@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The papers · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<script src="library.js"></script>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind l">◇ Library · the papers, images and GeoGebra files</span>
+  <h1>The papers</h1>
+  <p class="lede">The written work behind the site: the preprint, the note on the Epitetartic Rhombus and the palindrome data sheet. Read them here, download them, or follow the DOI to their permanent record on Zenodo.</p>
+  <div id="papers"></div>
+  <div id="viewer" class="panel" hidden style="margin-top:18px">
+    <div class="controls" style="margin-top:0"><strong id="vtitle" style="font-family:var(--serif);font-size:1.15rem;font-weight:500"></strong><button id="vclose">✕ Close</button></div>
+    <iframe id="vframe" class="pdfview" title="PDF viewer"></iframe>
+    <p class="note" style="margin-bottom:0">If the PDF does not show in your browser, use <a id="vopen" href="#" target="_blank" rel="noopener">open in a new tab</a>.</p>
+  </div>
+  <p class="note">Papers under journal review are not shown here; their published versions will be linked once they appear. The OEIS entry for the Pentametric areas is <a href="https://oeis.org/A400796">A400796</a>.</p>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const box = document.getElementById("papers");
+box.innerHTML = LIB.papers.map((p) => `<div class="panel paper" style="margin-bottom:14px">
+  <img src="library/thumbs/${p.thumb}" alt="First page of ${esc(p.title)}" loading="lazy">
+  <div><h2 style="margin-top:0">${esc(p.title)}</h2>
+    <p class="note" style="margin:0 0 6px">${esc(p.kind)} · ${esc(p.date)}${p.doi ? ` · <a href="https://doi.org/${p.doi}">doi:${p.doi}</a>` : ""}</p>
+    <p style="margin:0">${esc(p.abstract)}</p>
+    <div class="btnrow"><button class="primary" data-read="${p.key}">Read here</button>
+      <a class="button" href="${CDN(p.path)}" download>⤓ Download PDF</a>
+      ${p.doi ? `<a class="button" href="https://doi.org/${p.doi}">Zenodo record</a>` : ""}
+      <a class="button" href="${GH(p.path)}">On GitHub</a></div></div></div>`).join("");
+box.addEventListener("click", (e) => { const b = e.target.closest("[data-read]"); if (!b) return;
+  const p = LIB.papers.find((x) => x.key === b.dataset.read), v = document.getElementById("viewer");
+  document.getElementById("vtitle").textContent = p.title; document.getElementById("vframe").src = CDN(p.path); document.getElementById("vopen").href = CDN(p.path);
+  v.hidden = false; v.scrollIntoView({ behavior: "smooth", block: "start" }); });
+document.getElementById("vclose").onclick = () => { document.getElementById("viewer").hidden = true; document.getElementById("vframe").src = "about:blank"; };
+</script>
+<script src="menu.js"></script>
+</body>
+</html>

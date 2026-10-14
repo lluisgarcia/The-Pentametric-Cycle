@@ -17,6 +17,7 @@
   --accent3: #6b5a9e;     /* exploratory */
   --c5: var(--accent3);   /* the silence read as 5 (major third 5:4) */
   --accent4: #9a6b12;     /* exotic */
+  --accent5: #2e7d73;     /* library */
   --serif: "EB Garamond", "Garamond", "Georgia", serif;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
@@ -25,13 +26,13 @@
   :root:not([data-theme="light"]) {
     --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
     --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c;
+    --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c; --accent5: #6cc3b5;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
   --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
-  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c;
+  --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c; --accent5: #6cc3b5;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }
@@ -53,6 +54,7 @@ header.site .brand-sep { color: var(--muted); }
 .kind.p { color: var(--accent2); border: 1px solid var(--accent2); }
 .kind.e { color: var(--accent3); border: 1px solid var(--accent3); }
 .kind.x { color: var(--accent4); border: 1px solid var(--accent4); }
+.kind.l { color: var(--accent5); border: 1px solid var(--accent5); }
 .kind + h1 { margin-top: 4px; }
 main { padding-top: 28px; padding-bottom: 40px; }
 h1 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; line-height: 1.15; margin: 0 0 6px; }
@@ -137,6 +139,7 @@ body.menu-open nav.drawer { transform: none; visibility: visible; }
 .drawer details.e summary { border-left-color: var(--accent3); } .drawer details.e .sec { color: var(--accent3); }
 .drawer details.x summary { border-left-color: var(--accent4); } .drawer details.x .sec { color: var(--accent4); }
 .drawer details.p summary { border-left-color: var(--accent2); } .drawer details.p .sec { color: var(--accent2); }
+.drawer details.l summary { border-left-color: var(--accent5); } .drawer details.l .sec { color: var(--accent5); }
 .drawer ul { list-style: none; margin: 0; padding: 0 0 6px; }
 .drawer li a { display: block; padding: 7px 12px 7px 16px; border-top: 1px solid var(--rule); }
 .drawer li a small { display: block; color: var(--muted); font-size: .8rem; line-height: 1.35; }
@@ -171,3 +174,27 @@ body.no-anim nav.drawer, body.no-anim .nav-scrim { transition: none !important; 
 .sil-switch .seg2 button.on { background: var(--accent3); color: var(--panel); }
 .sil-switch .why { font-size: .85rem; }
 .sil-switch .now5 { color: var(--accent3); }
+
+/* library pages (papers, images, GeoGebra) */
+.libgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.libcard { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; text-align: left; padding: 0; color: var(--ink); font: inherit; }
+.libcard:hover, .libcard:focus-visible { border-color: var(--accent5); }
+.libcard img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: center; background: #fff; display: block; border-bottom: 1px solid var(--rule); }
+.libcard .cap { padding: 8px 10px 10px; font-size: .9rem; line-height: 1.35; }
+.libcard .cap b { display: block; font-weight: 600; font-size: .82rem; color: var(--muted); margin-bottom: 3px; word-break: break-word; }
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.82); z-index: 200; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 16px; }
+.lightbox.on { display: flex; }
+.lightbox img { max-width: 100%; max-height: calc(100vh - 150px); background: #fff; border-radius: 6px; }
+.lightbox .lbcap { color: #f2efe9; max-width: 900px; text-align: center; margin: 10px 0 6px; font-size: .95rem; }
+.lightbox .lbbar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.lightbox .lbbar a, .lightbox .lbbar button { color: #fff; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3); border-radius: 6px; padding: 5px 12px; font: inherit; font-size: .9rem; text-decoration: none; cursor: pointer; }
+.paper { display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: start; }
+.paper img { width: 150px; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+@media (max-width: 620px) { .paper { grid-template-columns: 1fr; } .paper img { width: 120px; } }
+.pdfview { width: 100%; height: 80vh; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+.btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.btnrow a.button, .btnrow button { display: inline-block; padding: 6px 14px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); color: var(--ink); text-decoration: none; font: inherit; font-size: .92rem; cursor: pointer; }
+.btnrow .primary { background: var(--accent5); border-color: var(--accent5); color: #fff; }
+#ggbBox { width: 100%; min-height: 200px; background: #fff; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.filelist { columns: 2 320px; font-size: .9rem; margin: 0; padding-left: 18px; }
+.filelist li { break-inside: avoid; margin-bottom: 3px; }

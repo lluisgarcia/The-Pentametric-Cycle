@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The images · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="pent.js"></script>
+<script src="library.js"></script>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind l">◇ Library · the papers, images and GeoGebra files</span>
+  <h1>The images</h1>
+  <p class="lede">The drawings the findings came from, made by Lluis in GeoGebra. Click any picture to see it large, step through them with the arrows, and download the full image.</p>
+  <div id="groups"></div>
+  <p class="note">All images are in the <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle/tree/main/Images">Images folder</a> of the repository (CC BY 4.0). The live GeoGebra files behind most of them are on <a href="geogebra.html">the GeoGebra page</a>.</p>
+  <div class="lightbox" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <img id="lbimg" alt="">
+    <div class="lbcap" id="lbcap"></div>
+    <div class="lbbar"><button id="lbprev">◀ previous</button><a id="lbdl" href="#" download>⤓ download</a><a id="lbgh" href="#">on GitHub</a><button id="lbnext">next ▶</button><button id="lbclose">✕ close</button></div>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const flat = [];
+document.getElementById("groups").innerHTML = LIB.images.map((g) => `<h2>${esc(g.group)}</h2><div class="libgrid">` +
+  g.items.map((it) => { const i = flat.push(it) - 1; return `<button class="libcard" data-i="${i}"><img src="library/thumbs/${it.thumb}" alt="${esc(it.cap)}" loading="lazy"><span class="cap">${esc(it.cap)}</span></button>`; }).join("") + "</div>").join("");
+let cur = 0;
+const lb = document.getElementById("lb");
+function show(i) { cur = (i + flat.length) % flat.length; const it = flat[cur], p = "Images/" + it.file;
+  const im = document.getElementById("lbimg"); im.src = "library/thumbs/" + it.thumb; im.alt = it.cap;   // the thumbnail at once, then the full image
+  const full = new Image(); full.onload = () => { if (flat[cur] === it) im.src = full.src; }; full.src = CDN(p);
+  document.getElementById("lbcap").textContent = it.cap + "  (" + (cur + 1) + " / " + flat.length + ")";
+  document.getElementById("lbdl").href = CDN(p); document.getElementById("lbgh").href = GH(p); lb.classList.add("on"); }
+document.getElementById("groups").addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) show(+b.dataset.i); });
+document.getElementById("lbprev").onclick = () => show(cur - 1);
+document.getElementById("lbnext").onclick = () => show(cur + 1);
+document.getElementById("lbclose").onclick = () => lb.classList.remove("on");
+lb.addEventListener("click", (e) => { if (e.target === lb) lb.classList.remove("on"); });
+document.addEventListener("keydown", (e) => { if (!lb.classList.contains("on")) return;
+  if (e.key === "Escape") lb.classList.remove("on"); if (e.key === "ArrowLeft") show(cur - 1); if (e.key === "ArrowRight") show(cur + 1); });
+</script>
+<script src="menu.js"></script>
+</body>
+</html>
