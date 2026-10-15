@@ -87,6 +87,8 @@
     <a class="card" href="distance.html"><span class="k">Exploratory</span><h3>Distance to the spiral</h3><p>Move along the Fibonacci spiral and watch its distance from the Origin in Holden units: whole numbers exactly on Holden's lines (2, 4, 6, 10, 16, …), Pythagoras at the joins, growth by φ.</p></a>
     <a class="card" href="silence5.html"><span class="k">Exploratory</span><h3>When silence becomes 5</h3><p>Lluis reads the groups of five as 1–5: the silences become major thirds 5:4, and the steps between values play the harmonics 1–5, like a natural trumpet.</p></a>
     <a class="card" href="chordwheel.html"><span class="k">Exploratory · sound</span><h3>The chord wheel</h3><p>Lay the twelve notes on a quarter of the palindrome: every chord becomes a polygon. Measure its angles, hear it, and see which values lie under its notes.</p></a>
+    <a class="card" href="euler.html"><span class="k">Exploratory · sound</span><h3>The palindrome on Euler's lattice</h3><p>The notes of just intonation as a lattice of fifths and thirds: watch the palindrome walk on it, every leap paired with its mirror, and the comma open between just and 12-tone roots.</p></a>
+    <a class="card" href="fretboard.html"><span class="k">Exploratory · tool</span><h3>The mirror fretboard</h3><p>In all-fourths tuning the guitar is a mirror: reflect the board through a root and every interval lands on its inversion. Play the palindrome on it.</p></a>
   </div>
 
   <h2 style="color:var(--accent4)">✧ Exotic explorations</h2>
@@ -146,6 +148,6 @@ for (let n = 0; n <= 50; n++) {
 document.getElementById("legend").innerHTML = Pent.INTERVALS.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("")
   + `<span>· n = 0 … 50, mirrored at n = 25</span>`;
 </script>
-<script src="menu.js?v=62a93e04"></script>
+<script src="menu.js?v=f1555a14"></script>
 </body>
 </html>

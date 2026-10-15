@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Mirror Fretboard · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=ece18ca5">
+<script src="pent.js?v=fd480162"></script>
+<script src="fretboard.js?v=0a9446e4"></script>
+<style>
+  .pairs { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--sans); font-size: .95rem; margin: .4em 0 .2em; }
+  .pairs span b { display: inline-block; min-width: 1.6em; text-align: center; border-radius: 4px; padding: 0 4px; color: var(--panel); }
+  .fb-warn { color: #c0392b; }
+  #nowStep { font-family: var(--mono); }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The mirror fretboard</h1>
+  <p class="lede">A guitar's fretboard is several monochords side by side, and the frets measure the string logarithmically: every fret shortens the sounding length by the same ratio, so equal steps of pitch are unequal steps of length. In <a href="https://en.wikipedia.org/wiki/All_fourths_tuning">all-fourths tuning</a> (E A D G C F) every string is a fourth above the one before, and the pattern of intervals repeats the same way all over the board. Lluis noticed something more: <b>the board is a mirror</b>. Reflect it through any root and every interval lands on its inversion, as in the palindrome.</p>
+
+  <h2>1 · The board</h2>
+  <div class="panel">
+    <div id="board"></div>
+    <div class="pairs" id="pairs"></div>
+    <div id="sil"></div>
+    <div class="controls">
+      <button id="play" class="primary">▶ Play the palindrome</button>
+      <label><input id="loop" type="checkbox"> loop</label>
+      <label>tempo <input id="bpm" type="range" min="50" max="200" value="104"><output id="bpmOut">104</output></label>
+      <span id="nowStep" class="note"></span>
+    </div>
+  </div>
+
+  <h2>2 · Why it is a mirror</h2>
+  <div class="panel">
+    <p style="margin-top:0">On string s (counting from the lowest, s = 0) at fret f, an all-fourths board sounds the note <b>low + 5s + f</b> semitones. Reflecting a place through a centre (s₀, f₀) sends (s, f) to (2s₀ − s, 2f₀ − f), and the two notes add up to twice the centre: one lies exactly as far below the centre as the other lies above it. When the centre is a root, an interval of x semitones above the root is reflected to x below it, which is <b>12 − x above</b>: its inversion. So the mirror partners are R ↔ R, ♭2 ↔ 7, 2 ↔ ♭7, ♭3 ↔ 6, 3 ↔ ♭6, 4 ↔ 5, and the tritone ♭5 is its own partner. <span class="tag proved">proved</span></p>
+    <p>Every root of the board is such a centre, and the pattern also repeats every 12 frets (the octave) and one string up, five frets back (the same note). <span class="tag proved">proved</span> All-fifths tuning (C G D A E B) is the same board with the strings a fifth apart; it is still a mirror. Standard tuning is not: its B string is a major third above G, so tick <i>check the whole mirror</i> with standard tuning and the pairs across that string turn red. <span class="tag proved">proved</span></p>
+    <p style="margin-bottom:0"><b>The link to the palindrome.</b> A pattern that goes round a circle of N places and reads the same backwards from 0 always has a second mirror half way round. On the 12 notes the two mirrors are the root and the tritone (0 and 6, which stay where they are); in the Pentametric palindrome they are n = 0 and n = 25 in every 50 (and the inner ones 12½ apart). In both, an interval and its inversion are partners across the mirror: on this board 4 ↔ 5, the fourth and the fifth, which are exactly the two leaps that the palindrome turns into each other (see <a href="euler.html">The palindrome on Euler's lattice</a>). <span class="tag interp">interpretation</span></p>
+  </div>
+
+  <h2>3 · The palindrome on the board</h2>
+  <div class="panel">
+    <p style="margin-top:0">Each step of the cycle sounds the interval H : (H − 1) above the root: the unison and the octave are the root (R), the fifth 3:2 is <b>5</b>, the fourth 4:3 is <b>4</b>, and with the silence read as 5 the major third 5:4 is <b>3</b>. The board lights every place of that interval. The fifth and the fourth, the two consonances the cycle balances (four of each in every period), are mirror partners on the board. Use <b>▶ Play the palindrome</b> under the board (section 1).</p>
+    <p class="note" style="margin-bottom:0">n = 0 … 50, equal temperament (a fretboard is tempered). For the just ratios hear <a href="palindrome.html">The playable palindrome</a>.</p>
+  </div>
+
+  <p class="note">All-fourths tuning and its regular pattern are known to guitarists, and regular tunings are a case of what theorists call isomorphic layouts: the same shape plays the same interval everywhere. The mirror reading, and its link to the palindrome, are Lluis's (from his 2024 study of the matrix of fifths, the all-fourths fretboard and Coltrane's circle). This page is a tool that will grow.</p>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const fb = Fretboard.create($("board"), { strings: 6, frets: 24, tuning: "fourths", root: 0 });
+const PAIR = [[0, 0], [1, 11], [2, 10], [3, 9], [4, 8], [5, 7], [6, 6]];
+const COLV = ["var(--ink)", "var(--accent4)", "var(--accent)", "var(--accent5)", "var(--accent3)", "var(--c3)", "var(--muted)"];
+$("pairs").innerHTML = "<span style='color:var(--muted)'>mirror partners:</span>" + PAIR.map(([a, b], k) =>
+  `<span><b style="background:${COLV[k]}">${Fretboard.INT[a]}</b>${a === b ? " itself" : ` ↔ <b style="background:var(--panel);color:${COLV[k]};outline:2px solid ${COLV[k]}">${Fretboard.INT[b]}</b>`}</span>`).join("");
+
+// ---- the palindrome on the board ----
+Pent.silenceSwitch($("sil"), "the silences sound as major thirds 5:4, the 3 of the board (Lluis's reading, exploratory)");
+const SEMI = { 1: 0, 2: 12, 3: 7, 4: 5, 5: 4 };
+const NAME = { 0: "silence", 1: "unison", 2: "octave", 3: "fifth", 4: "fourth", 5: "major third" };
+let timer = null, n = 0;
+$("bpm").oninput = () => ($("bpmOut").textContent = $("bpm").value);
+function stop() { clearTimeout(timer); timer = null; $("play").textContent = "▶ Play the palindrome"; fb.light(null); $("nowStep").textContent = ""; }
+function step() {
+  if (n > 50) { if ($("loop").checked) n = 1; else return stop(); }
+  const v = Pent.V(n), dur = 60 / +$("bpm").value;
+  $("nowStep").textContent = `n = ${n} · H = ${Pent.H(n)}${v === 5 ? " → 5" : ""} · ${NAME[v]}`;
+  if (v === 0) fb.light(null);
+  else { fb.light(SEMI[v] % 12); const ctx = fb.audio(), t = ctx.currentTime + 0.02, base = 48 + fb.root;
+    fb.play(base, t, dur * 1.6, 0.32); if (v !== 1) fb.play(base + SEMI[v], t, dur * 1.6, 0.3); }
+  n++; timer = setTimeout(step, dur * 1000);
+}
+$("play").onclick = () => { if (timer) return stop(); n = 0; $("play").textContent = "■ Stop"; step(); };
+</script>
+<script src="menu.js?v=f1555a14"></script>
+</body>
+</html>

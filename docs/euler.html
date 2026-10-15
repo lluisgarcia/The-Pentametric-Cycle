@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Palindrome on Euler's Lattice · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=ece18ca5">
+<script src="pent.js?v=fd480162"></script>
+<script src="fretboard.js?v=0a9446e4"></script>
+<style>
+  svg.lat text { font-family: var(--serif); pointer-events: none; }
+  svg.lat .cell { cursor: pointer; }
+  .turn { transition: transform 1.2s ease; transform-box: view-box; }
+  .turn text { transition: transform 1.2s ease; transform-box: fill-box; transform-origin: center; }
+  .turn.on { transform: rotate(180deg); }
+  .turn.on text { transform: rotate(-180deg); }
+  #latInfo b, #walkInfo b { font-weight: 600; }
+  table.data td, table.data th { text-align: center; }
+  table.data td.l { text-align: left; }
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+  .big { font-family: var(--mono); font-size: .95rem; }
+  .fb-warn { color: #c0392b; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The palindrome on Euler's lattice</h1>
+  <p class="lede">In 1739 Leonhard Euler drew the notes of just intonation as a lattice: one step up is a pure fifth 3:2, one step to the right a pure major third 5:4. Every note made of fifths, thirds and octaves has exactly one place on it. Lluis met this grid years ago under another name, a “matrix of fifths”, and recognised it as Euler’s just-intonation lattice (the ancestor of the Tonnetz) laid out as concentric squares. He found mirrors in it, as in all-fourths tuning. Here the palindrome walks on it, and its mirror becomes a picture.</p>
+
+  <h2>1 · The lattice</h2>
+  <div class="panel">
+    <div class="controls" style="margin-top:0">
+      <button id="turn">⟲ Mirror through C</button>
+      <label><input id="keys" type="checkbox"> show the 12-tone keys</label>
+    </div>
+    <div class="scroll-x"><svg id="lat" class="lat" role="img" aria-label="Euler's lattice of fifths and major thirds, centred on C"></svg></div>
+    <p class="note" id="latInfo" style="margin-bottom:.6em">Click a note to hear it with C, and see its mirror partner through C.</p>
+    <p class="note" style="margin-bottom:0">Up: a fifth 3:2. Right: a pure major third 5:4. The small numbers count syntonic commas (81/80, 21.5 cents), as in the matrix: <b>E₁</b> is the pure third 5/4, a comma below the Pythagorean E 81/64; <b>A¹♭</b> is the minor sixth 8/5, a comma above the Pythagorean A♭ 128/81. Reflecting through C sends every note to its inversion: the major third E₁ and the minor sixth A¹♭, the fifth G and the fourth F, the minor third E¹♭ and the major sixth A₁ swap places. <span class="tag proved">proved</span></p>
+  </div>
+
+  <h2>2 · The melody walks</h2>
+  <div class="panel">
+    <div id="sil1"></div>
+    <div class="controls">
+      <button id="wPlay" class="primary">▶ Play</button>
+      <label>notes <select id="wRead"><option value="A">intervals over C (the papers' rule H : (H − 1))</option><option value="B">harmonics 1–5 (Reading B, needs the 5)</option></select></label>
+      <label>step <input id="wStep" type="range" min="0" max="50" value="50"><output id="wStepOut">50</output></label>
+      <label>tempo <input id="wBpm" type="range" min="50" max="220" value="120"></label>
+    </div>
+    <div class="two">
+      <div class="scroll-x"><svg id="walk" class="lat" role="img" aria-label="The palindrome walking on the lattice"></svg></div>
+      <div><table class="data" id="wTable"></table></div>
+    </div>
+    <p class="note" id="walkInfo"></p>
+    <p style="margin-bottom:.4em">With the silence as <b>0</b> the melody only uses C, G and F: it lives on the column of fifths, and the silences are rests. With the silence as <b>5</b> the major third E₁ joins: the melody opens the second axis of the lattice. Either way the path is retraced backwards in the second half, so <b>every leap comes back as its opposite</b>: a fifth up returns as a fourth up (a fifth down, an octave apart), a major third as a minor sixth. The table counts each leap next to its mirror partner; at n = 50 every pair is equal. <span class="tag proved">proved</span></p>
+    <p class="note" style="margin:0">This is what any palindrome looks like here (the path read backwards); what the lattice adds is that "backwards" is musical inversion, the same mirror as in section 1. In the harmonics reading (with the 5) all the leaps are consonances and every period closes: its 25 leaps add up to zero. <span class="tag">computed</span> The lattice ignores octaves, so a leap is named by its interval within the octave.</p>
+  </div>
+
+  <h2>3 · The chord roots: the comma made visible</h2>
+  <div class="panel">
+    <p style="margin-top:0">The root rule of <a href="chords.html">Chord progressions</a>: a fifth moves the root up a fifth, a fourth up a fourth, the unison and the octave stay, a silence rests, and, with the silence as 5, a 5 moves the root up a pure major third. Play two periods (n = 1 … 50).</p>
+    <div id="sil2"></div>
+    <div class="controls">
+      <button id="rPlay" class="primary">▶ Play</button>
+      <label>tune the root <select id="rTune"><option value="just">just: Euler's lattice</option><option value="et">12-tone equal: the Tonnetz</option></select></label>
+      <label>tempo <input id="rBpm" type="range" min="60" max="260" value="150"></label>
+      <button id="rCompare">Hear the arrival: just against 12-tone</button>
+    </div>
+    <div class="two">
+      <div class="scroll-x"><svg id="roots" class="lat" role="img" aria-label="The chord roots walking on Euler's lattice"></svg><svg id="tonnetz" class="lat" role="img" aria-label="The chord roots walking on the 12-tone Tonnetz" hidden></svg></div>
+      <div><svg id="clock" viewBox="0 0 230 230" role="img" aria-label="The root on the 12-tone circle"></svg></div>
+    </div>
+    <p class="note" id="rView" style="margin:.3em 0"></p>
+    <p class="big" id="rInfo"></p>
+    <p style="margin-bottom:.4em">On <b>0</b> the root walks up and down the column of fifths only, and after every period it is home: four fifths and four fourths are exactly four octaves, in just intonation and in 12 tones alike. <span class="tag proved">proved</span> On <b>5</b> the fifths and fourths still cancel, but the nine major thirds of each period carry the root <b>nine places to the right</b>, and it never comes back: on the lattice no number of pure thirds makes octaves. In 12 tones three major thirds are an octave, so the circle closes and the root is home after every period (left: the 12-tone circle). The gap is the difference between the two worlds: after one period the just root lies <b>123.2 cents</b> below the 12-tone C, after two periods 246.4. <span class="tag">computed</span></p>
+    <p class="note" style="margin-bottom:0">Each pure third 5/4 is 386.3 cents, 13.7 cents smaller than the tempered third: three of them fall short of the octave by the diesis 128/125 (41.1 cents), nine by three dieses. Tunings that want pure thirds, like the 31-tone division of Colonna's <i>Sambuca lincea</i> (1618), have to bend the lattice in a different way; that is for a later exploration.</p>
+  </div>
+
+  <h2>4 · On the guitar</h2>
+  <div class="panel">
+    <p style="margin-top:0">The same mirror on a fretboard in all-fourths tuning: reflect the board through a root and every interval lands on its inversion. Click a note to see its partner. The full tool, with more strings, tunings and the palindrome, is <a href="fretboard.html">The mirror fretboard</a>.</p>
+    <div id="fb"></div>
+  </div>
+
+  <h2>5 · Notes and credits</h2>
+  <div class="panel">
+    <p style="margin-top:0">The lattice is Leonhard Euler's (<i>Tentamen novae theoriae musicae</i>, 1739). Drawn with triangles and folded into the twelve tones, it is the <i>Tonnetz</i> that Arthur von Oettingen and Hugo Riemann took up in the 19th century and that musicians use today to see chords and their neighbours. The small numbers on the notes count syntonic commas.</p>
+    <p style="margin-bottom:0">The mirror of section 1 is the classical inversion of intervals. What is new here is to watch the Pentametric palindrome on the lattice: its notes, its leaps paired with their mirrors, the second axis opened by the 5, and the chord roots drifting by the comma. Lluis saw these mirrors (on the matrix, the all-fourths fretboard and Coltrane's circle) before he found the palindrome. <span class="tag">computed</span></p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const el = (tag, at, txt) => { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]);
+  if ((tag === "text" || tag === "tspan") && at.fill) e.style.fill = at.fill;     // the site's CSS sets svg text fill; a style wins over it
+  if (tag === "text" && at["font-family"]) e.style.fontFamily = at["font-family"];
+  if (txt !== undefined) e.textContent = txt; return e; };
+const md = (a, m) => ((a % m) + m) % m;
+const C5 = 1200 * Math.log2(3 / 2), C3 = 1200 * Math.log2(5 / 4);
+
+// ---- the lattice: f fifths up, t pure thirds right ----
+const LET = "FCGDAEB";
+function acc(a) { if (!a) return ""; const s = a > 0 ? "♯" : "♭"; return Math.abs(a) <= 3 ? s.repeat(Math.abs(a)) : s + "×" + Math.abs(a); }
+function nameParts(f, t) { const q = f + 4 * t + 1; return { letter: LET[md(q, 7)], acc: acc(Math.floor(q / 7)), comma: t }; }
+function nameText(f, t) { const p = nameParts(f, t), sub = "₀₁₂₃₄₅₆₇₈₉", sup = "⁰¹²³⁴⁵⁶⁷⁸⁹";
+  const k = Math.abs(p.comma), digits = String(k).split("").map((d) => (p.comma > 0 ? sub : sup)[+d]).join("");
+  return p.letter + (p.comma ? digits : "") + p.acc; }
+function ratio(f, t) {
+  let num = Math.pow(3, Math.max(f, 0)) * Math.pow(5, Math.max(t, 0)), den = Math.pow(3, Math.max(-f, 0)) * Math.pow(5, Math.max(-t, 0));
+  while (num / den >= 2) den *= 2; while (num / den < 1) num *= 2; return [num, den]; }
+const justC = (f, t) => md(f * C5 + t * C3, 1200);
+const etC = (f, t) => 100 * md(7 * f + 4 * t, 12);
+const IVN = { "0,0": "unison / octave", "1,0": "fifth 3:2", "-1,0": "fourth 4:3", "0,1": "major third 5:4", "0,-1": "minor sixth 8:5", "1,-1": "minor third 6:5",
+  "-1,1": "major sixth 5:3", "2,0": "major tone 9:8", "-2,0": "minor seventh 16:9", "1,1": "major seventh 15:8", "-1,-1": "semitone 16:15", "-1,2": "augmented fifth 25:16", "1,-2": "diminished fourth 32:25" };
+
+function nameNode(x, y, f, t, size, fill) {
+  const p = nameParts(f, t), g = el("text", { x, y, "text-anchor": "middle", "font-size": size, fill: fill || "var(--ink)" });
+  g.appendChild(el("tspan", {}, p.letter));
+  if (p.comma) { const sh = p.comma > 0 ? size * 0.3 : -size * 0.4; g.appendChild(el("tspan", { dy: sh, "font-size": size * 0.6 }, Math.abs(p.comma))); if (p.acc) g.appendChild(el("tspan", { dy: -sh }, p.acc)); else g.appendChild(el("tspan", { dy: -sh }, "")); }
+  else if (p.acc) g.appendChild(el("tspan", {}, p.acc));
+  return g; }
+
+// ---- sound (just: frequencies from the ratios) ----
+let ctx = null, master = null;
+function audio() { if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination); } if (ctx.state === "suspended") ctx.resume(); return ctx; }
+function tone(fr, t, d, g, type) { const o = ctx.createOscillator(), a = ctx.createGain(); o.type = type || "triangle"; o.frequency.value = fr;
+  a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + 0.02); a.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(a).connect(master); o.start(t); o.stop(t + d + 0.05); }
+const CHZ = 261.63;
+
+// ================= 1 · the lattice =================
+(() => {
+  const N = 4, S = 64, M = 22, W = (2 * N + 1) * S + 2 * M, svg = $("lat");
+  svg.setAttribute("viewBox", `0 0 ${W} ${W + 16}`); svg.style.minWidth = "520px"; svg.style.maxWidth = "640px"; svg.style.display = "block"; svg.style.margin = "0 auto";
+  const X = (t) => M + (t + N) * S + S / 2, Y = (f) => M + (N - f) * S + S / 2;
+  const turn = el("g", { class: "turn", style: `transform-origin:${X(0)}px ${Y(0)}px` }); svg.appendChild(turn);
+  const arcs = el("g", {}); turn.appendChild(arcs);
+  // the rings, as in the matrix
+  for (let k = 1; k <= N; k++) turn.appendChild(el("rect", { x: X(-k) - S / 2 + 3, y: Y(k) - S / 2 + 3, width: 2 * k * S + S - 6, height: 2 * k * S + S - 6, fill: "none", stroke: "var(--rule)", "stroke-width": 1.2, rx: 6 }));
+  const cells = {};
+  for (let f = -N; f <= N; f++) for (let t = -N; t <= N; t++) {
+    const g = el("g", { class: "cell", "data-f": f, "data-t": t });
+    const r = el("rect", { x: X(t) - S / 2 + 6, y: Y(f) - S / 2 + 6, width: S - 12, height: S - 12, rx: 8, fill: f === 0 && t === 0 ? "var(--fill)" : "var(--panel)", stroke: "var(--rule)", "stroke-width": 1 });
+    g.appendChild(r); g.appendChild(nameNode(X(t), Y(f) + 7, f, t, f === 0 && t === 0 ? 23 : 19)); turn.appendChild(g); cells[f + "," + t] = r;
+  }
+  svg.appendChild(el("text", { x: M - 6, y: Y(0) + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)", transform: `rotate(-90 ${M - 6} ${Y(0)})` }, "fifths 3:2 →"));
+  svg.appendChild(el("text", { x: X(0), y: W + 8, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "pure major thirds 5:4 →"));
+  let sel = null;
+  function paint() {
+    arcs.innerHTML = "";
+    for (const k in cells) { const [f, t] = k.split(",").map(Number); const c = cells[k]; c.setAttribute("stroke", "var(--rule)"); c.setAttribute("stroke-width", 1);
+      c.setAttribute("fill", f === 0 && t === 0 ? "var(--fill)" : "var(--panel)"); }
+    if (!sel) return;
+    const [f, t] = sel, a = cells[f + "," + t], b = cells[-f + "," + -t];
+    a.setAttribute("stroke", "var(--accent3)"); a.setAttribute("stroke-width", 3); b.setAttribute("stroke", "var(--accent3)"); b.setAttribute("stroke-width", 3); b.setAttribute("stroke-dasharray", "");
+    if (f || t) arcs.appendChild(el("path", { d: `M${X(t)},${Y(f)} Q${X(0) + (Y(f) - Y(0)) * 0.35},${Y(0) - (X(t) - X(0)) * 0.35} ${X(-t)},${Y(-f)}`, fill: "none", stroke: "var(--accent3)", "stroke-width": 2.5, "stroke-dasharray": "6 4" }));
+    if ($("keys").checked) { const pc = md(7 * f + 4 * t, 12);
+      for (const k in cells) { const [g, u] = k.split(",").map(Number); if (md(7 * g + 4 * u, 12) === pc && !(g === f && u === t)) { cells[k].setAttribute("fill", "var(--fill)"); cells[k].setAttribute("stroke", "var(--accent)"); cells[k].setAttribute("stroke-width", 2); } } }
+  }
+  svg.addEventListener("click", (e) => { const g = e.target.closest(".cell"); if (!g) return; const f = +g.dataset.f, t = +g.dataset.t; sel = [f, t]; paint();
+    const [n, d] = ratio(f, t), [n2, d2] = ratio(-f, -t), jc = justC(f, t), ec = etC(f, t); let diff = jc - ec; if (diff > 600) diff -= 1200; if (diff < -600) diff += 1200;
+    const same = []; if ($("keys").checked) { const pc = md(7 * f + 4 * t, 12); for (let g2 = -N; g2 <= N; g2++) for (let u = -N; u <= N; u++) if (md(7 * g2 + 4 * u, 12) === pc && !(g2 === f && u === t)) same.push(nameText(g2, u)); }
+    $("latInfo").innerHTML = `<b>${nameText(f, t)}</b> = ${n}/${d}, ${jc.toFixed(1)} cents above C (12-tone: ${ec}, difference ${Pent.fmt(diff, 1)}). ` +
+      (f || t ? `Its mirror through C is <b>${nameText(-f, -t)}</b> = ${n2}/${d2}: together they make an octave (${n}/${d} × ${n2}/${d2} = 2).` : "C is the centre of the mirror.") +
+      (same.length ? ` In 12 tones the same key as: ${same.join(", ")} (they differ by commas).` : "");
+    const c = audio(), t0 = c.currentTime + 0.02; tone(CHZ, t0, 1.6, 0.3); tone(CHZ * n / d, t0, 1.6, 0.3);
+    if (f || t) { tone(CHZ, t0 + 1.0, 1.6, 0.3); tone(CHZ * n2 / d2, t0 + 1.0, 1.6, 0.3); } });
+  $("keys").onchange = paint;
+  $("turn").onclick = () => turn.classList.toggle("on");
+})();
+
+// ================= 2 · the melody walks =================
+const NOTE_A = { 1: [0, 0], 2: [0, 0], 3: [1, 0], 4: [-1, 0], 5: [0, 1] };
+const NOTE_B = { 1: [0, 0], 2: [0, 0], 3: [1, 0], 4: [0, 0], 5: [0, 1] };
+const RAT_A = { 1: 1, 2: 2, 3: 1.5, 4: 4 / 3, 5: 1.25 };
+const walk = (() => {
+  const N = 2, S = 84, M = 16, W = (2 * N + 1) * S + 2 * M, svg = $("walk");
+  svg.setAttribute("viewBox", `0 0 ${W} ${W}`); svg.style.minWidth = "380px"; svg.style.maxWidth = "520px";
+  const X = (t) => M + (t + N) * S + S / 2, Y = (f) => M + (N - f) * S + S / 2;
+  const defs = el("defs", {}); svg.appendChild(defs);
+  const PAIRS = [["1,0", "-1,0", "var(--c3)"], ["0,1", "0,-1", "var(--accent3)"], ["1,-1", "-1,1", "var(--accent5)"], ["2,0", "-2,0", "var(--accent4)"], ["1,1", "-1,-1", "var(--accent2)"], ["-1,2", "1,-2", "var(--accent)"]];
+  const colOf = (k) => { for (const [a, b, c] of PAIRS) if (k === a || k === b) return c; return "var(--muted)"; };
+  PAIRS.forEach(([, , c], i) => { const m = el("marker", { id: "ah" + i, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }); m.appendChild(el("path", { d: "M0,0 L10,5 L0,10 z", fill: c })); defs.appendChild(m); });
+  const markOf = (k) => { const i = PAIRS.findIndex(([a, b]) => k === a || k === b); return i < 0 ? "" : `url(#ah${i})`; };
+  const back = el("g", {}), arrows = el("g", {}), front = el("g", {}); svg.append(back, arrows, front);
+  const cellR = {};
+  for (let f = -N; f <= N; f++) for (let t = -N; t <= N; t++) {
+    const r = el("rect", { x: X(t) - S / 2 + 8, y: Y(f) - S / 2 + 8, width: S - 16, height: S - 16, rx: 10, fill: "var(--panel)", stroke: "var(--rule)" });
+    back.appendChild(r); back.appendChild(nameNode(X(t), Y(f) + 8, f, t, 22, "var(--muted)")); cellR[f + "," + t] = r; }
+  const dot = el("circle", { r: 13, fill: "var(--accent3)", opacity: 0.85 }); front.appendChild(dot);
+  let seq = [], leaps = [];
+  function build() {
+    const B = $("wRead").value === "B" && Pent.silence5();
+    seq = []; for (let n = 0; n <= 50; n++) { const v = Pent.V(n); if (v === 0) continue; const i = B ? Pent.I5(n) : v; seq.push({ n, v, i, at: (B ? NOTE_B : NOTE_A)[i] }); }
+    leaps = []; for (let j = 1; j < seq.length; j++) { const a = seq[j - 1].at, b = seq[j].at; leaps.push({ n: seq[j].n, from: a, to: b, k: (b[0] - a[0]) + "," + (b[1] - a[1]) }); }
+  }
+  function table(upto) {
+    const cnt = {}, tot = {}; leaps.forEach((L, j) => { tot[L.k] = (tot[L.k] || 0) + 1; if (L.n <= upto) cnt[L.k] = (cnt[L.k] || 0) + 1; });
+    let h = "<tr><th>leap</th><th>now</th><th>↔</th><th>now</th><th>its mirror</th></tr>";
+    const rows = [["0,0", "0,0"], ...PAIRS.map(([a, b]) => [a, b])];
+    for (const [a, b] of rows) { if (!tot[a] && !tot[b]) continue; const c = a === b ? "var(--muted)" : colOf(a);
+      h += `<tr><td class="l" style="color:${c}">${IVN[a]}</td><td>${cnt[a] || 0}</td><td style="color:${c}">↔</td><td>${a === b ? "" : cnt[b] || 0}</td><td class="l" style="color:${c}">${a === b ? "(its own mirror)" : IVN[b]}</td></tr>`; }
+    h += `<tr><td class="l" colspan="5" style="color:var(--muted);font-size:.85em">${leaps.length} leaps between the ${seq.length} sounding notes of n = 0 … 50</td></tr>`;
+    $("wTable").innerHTML = h;
+  }
+  function draw(upto) {
+    arrows.innerHTML = "";
+    for (const k in cellR) { cellR[k].setAttribute("stroke", "var(--rule)"); cellR[k].setAttribute("stroke-width", 1); }
+    for (const s of seq) { const c = cellR[s.at[0] + "," + s.at[1]]; c.setAttribute("stroke", "var(--ink)"); c.setAttribute("stroke-width", 2); }
+    const done = leaps.filter((L) => L.n <= upto), cur = done[done.length - 1];
+    const stays = {};
+    done.forEach((L, j) => {
+      const [f1, t1] = L.from, [f2, t2] = L.to;
+      if (L.k === "0,0") { const key = f1 + "," + t1; stays[key] = (stays[key] || 0) + 1; return; }
+      const x1 = X(t1), y1 = Y(f1), x2 = X(t2), y2 = Y(f2), dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
+      const bend = 22 + 7 * (j % 4), qx = (x1 + x2) / 2 - uy * bend, qy = (y1 + y2) / 2 + ux * bend;
+      const sx = x1 + ux * 20, sy = y1 + uy * 20, ex = x2 - ux * 22, ey = y2 - uy * 22;
+      arrows.appendChild(el("path", { d: `M${sx},${sy} Q${qx},${qy} ${ex},${ey}`, fill: "none", stroke: colOf(L.k), "stroke-width": L === cur ? 3.6 : 1.6, opacity: L === cur ? 1 : 0.5, "marker-end": markOf(L.k) }));
+    });
+    for (const key in stays) { const [f, t] = key.split(",").map(Number); arrows.appendChild(el("circle", { cx: X(t), cy: Y(f), r: 30, fill: "none", stroke: "var(--muted)", "stroke-width": Math.min(1 + stays[key] * 0.5, 6), opacity: 0.45 })); }
+    const last = seq.filter((s) => s.n <= upto).pop();
+    if (last) { dot.setAttribute("cx", X(last.at[1])); dot.setAttribute("cy", Y(last.at[0]) - 26); dot.setAttribute("opacity", 0.85); } else dot.setAttribute("opacity", 0);
+    table(upto);
+    const j = done.length, L = leaps.length;
+    let txt = `n = ${upto}`;
+    if (last && last.n === upto) { const s = last; txt += ` · ${$("wRead").value === "B" && Pent.silence5() ? "harmonic " + s.i : "H = " + Pent.H(upto) + (s.v === 5 ? " → 5" : "")} · note <b>${nameText(s.at[0], s.at[1])}</b>`; }
+    else txt += " · silence (rest)";
+    if (cur && cur.n === upto) { txt += ` · leap ${j} of ${L}: ${IVN[cur.k] || cur.k}`; const m = L + 1 - j; if (m < j) txt += ` — the mirror of leap ${m} (${IVN[leaps[m - 1].k]})`; }
+    $("walkInfo").innerHTML = txt;
+  }
+  return { build, draw, seq: () => seq };
+})();
+Pent.silenceSwitch($("sil1"), "the silences become the pure major third 5:4, the cell E₁ (Lluis's reading, exploratory)");
+Pent.silenceSwitch($("sil2"), "a 5 moves the root up a pure major third (Lluis's reading, exploratory)");
+function syncRead() { const o = $("wRead").options[1]; o.disabled = !Pent.silence5(); if (!Pent.silence5()) $("wRead").value = "A"; }
+let wTimer = null;
+function wStop() { clearInterval(wTimer); wTimer = null; $("wPlay").textContent = "▶ Play"; }
+function wShow(n) { $("wStep").value = n; $("wStepOut").textContent = n; walk.draw(n); }
+function wSound(n) {
+  const v = Pent.V(n); if (v === 0) return; const c = audio(), t = c.currentTime + 0.02, d = 60 / +$("wBpm").value * 1.5;
+  if ($("wRead").value === "B" && Pent.silence5()) tone(130.81 * Pent.I5(n), t, d, 0.3);
+  else { tone(CHZ / 2, t, d, 0.25); tone(CHZ / 2 * RAT_A[v], t, d, 0.3); } }
+$("wPlay").onclick = () => { if (wTimer) return wStop(); let n = +$("wStep").value >= 50 ? 0 : +$("wStep").value; $("wPlay").textContent = "■ Stop";
+  wShow(n); wSound(n); wTimer = setInterval(() => { n++; if (n > 50) return wStop(); wShow(n); wSound(n); }, 60000 / +$("wBpm").value); };
+$("wStep").oninput = () => { wStop(); wShow(+$("wStep").value); };
+$("wRead").onchange = () => { walk.build(); wShow(+$("wStep").value); };
+
+// ================= 3 · the chord roots =================
+const roots = (() => {
+  const T0 = -1, T1 = 19, F = 2, S = 58, M = 12, svg = $("roots");
+  const W = (T1 - T0 + 1) * S + 2 * M, H = (2 * F + 1) * S + 2 * M + 30;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.minWidth = "1050px";
+  const X = (t) => M + (t - T0) * S + S / 2, Y = (f) => M + 18 + (F - f) * S + S / 2;
+  for (let f = -F; f <= F; f++) for (let t = T0; t <= T1; t++) {
+    svg.appendChild(el("rect", { x: X(t) - S / 2 + 4, y: Y(f) - S / 2 + 4, width: S - 8, height: S - 8, rx: 7, fill: f === 0 && t === 0 ? "var(--fill)" : "var(--panel)", stroke: "var(--rule)" }));
+    svg.appendChild(nameNode(X(t), Y(f) + 5, f, t, Math.abs(t) <= 4 ? 14 : Math.abs(t) <= 9 ? 12 : 10.5, "var(--muted)")); }
+  for (let t = T0; t <= T1; t++) svg.appendChild(el("text", { x: X(t), y: H - 3, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", style: "font-family:var(--mono)" }, t));
+  for (const t of [9, 18]) svg.appendChild(el("text", { x: X(t), y: M + 10, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, t === 9 ? "after 1 period (on 5)" : "after 2"));
+  svg.appendChild(el("text", { x: X(T0) - 18, y: H - 3, "font-size": 10, fill: "var(--muted)", style: "font-family:var(--sans)" }, "thirds"));
+  const path = el("polyline", { fill: "none", stroke: "var(--accent3)", "stroke-width": 3, "stroke-linejoin": "round", opacity: 0.8 }); svg.appendChild(path);
+  const dot = el("circle", { r: 11, fill: "var(--accent3)" }); svg.appendChild(dot);
+  // the 12-tone circle
+  const ck = $("clock"), R = 88, cx = 115, cy = 112, N12 = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  ck.appendChild(el("circle", { cx, cy, r: R, fill: "none", stroke: "var(--rule)" }));
+  for (let k = 0; k < 12; k++) { const a = (k / 12) * 2 * Math.PI - Math.PI / 2; ck.appendChild(el("text", { x: cx + (R + 0) * Math.cos(a), y: cy + R * Math.sin(a) + 5, "text-anchor": "middle", "font-size": 14, fill: "var(--muted)", style: "font-family:var(--serif)" }, N12[k])); }
+  ck.appendChild(el("text", { x: cx, y: 226, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "12-tone circle: the root always comes home"));
+  const cdot = el("circle", { r: 9, fill: "var(--accent3)", opacity: 0.75 }); ck.appendChild(cdot);
+  const cpath = el("polyline", { fill: "none", stroke: "var(--accent3)", "stroke-width": 1.5, opacity: 0.5 }); ck.appendChild(cpath);
+  const posC = (pc) => { const a = (pc / 12) * 2 * Math.PI - Math.PI / 2; return [cx + (R - 26) * Math.cos(a), cy + (R - 26) * Math.sin(a)]; };
+  // ---- 12-tone: the Tonnetz (fifths to the right, major thirds up-right, minor thirds down-right) ----
+  const tz = $("tonnetz"), N12T = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"], G0 = -3, G1 = 6, TS = 66, TM = 34;
+  const TW = (G1 - G0) * TS + 1.5 * TS + 2 * TM, TH = 3 * TS * 0.866 + 2 * TM + 26;
+  tz.setAttribute("viewBox", `0 0 ${TW} ${TH}`); tz.style.minWidth = "760px";
+  const TX = (f, t) => TM + (f - G0) * TS + t * TS / 2, TY = (t) => TH - TM - 16 - t * TS * 0.866;
+  const pcOf = (f, t) => md(7 * f + 4 * t, 12);
+  for (let t = 0; t <= 3; t++) for (let f = G0; f <= G1; f++) {         // the major triangles, lightly shaded
+    if (t < 3 && f < G1) tz.appendChild(el("polygon", { points: `${TX(f, t)},${TY(t)} ${TX(f + 1, t)},${TY(t)} ${TX(f, t + 1)},${TY(t + 1)}`, fill: "var(--fill)", opacity: 0.55 }));
+    const lines = [[f + 1, t], [f, t + 1], [f + 1, t - 1]];
+    for (const [g, u] of lines) if (g <= G1 && u >= 0 && u <= 3) tz.appendChild(el("line", { x1: TX(f, t), y1: TY(t), x2: TX(g, u), y2: TY(u), stroke: "var(--rule)", "stroke-width": 1.2, opacity: t === 3 || u === 3 ? 0.4 : 1 }));
+  }
+  for (let t = 0; t <= 3; t++) for (let f = G0; f <= G1; f++) {
+    const home = pcOf(f, t) === 0, dup = t === 3;
+    tz.appendChild(el("circle", { cx: TX(f, t), cy: TY(t), r: 17, fill: home ? "var(--fill)" : "var(--panel)", stroke: home ? "var(--accent3)" : "var(--rule)", "stroke-width": home ? 2.5 : 1.2, opacity: dup ? 0.45 : 1 }));
+    tz.appendChild(el("text", { x: TX(f, t), y: TY(t) + 5, "text-anchor": "middle", "font-size": 15, fill: dup ? "var(--muted)" : "var(--ink)" }, N12T[pcOf(f, t)]));
+  }
+  tz.appendChild(el("text", { x: TX(G1, 3) + 26, y: TY(3) + 4, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "= the bottom row again"));
+  tz.appendChild(el("text", { x: TM, y: TH - 6, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "→ fifths   ↗ major thirds   ↘ minor thirds   · every C ringed"));
+  const tpath = el("g", {}); tz.appendChild(tpath);
+  const tdot = el("circle", { r: 10, fill: "var(--accent3)", opacity: 0.85 }); tz.appendChild(tdot);
+  function drawT(upto) {
+    tpath.innerHTML = "";
+    for (let n = 1; n <= upto; n++) { const a = states[n - 1], b = states[n]; if (a.f === b.f && a.t === b.t) continue;
+      const ta = md(a.t, 3), tb = md(b.t, 3), last = n === upto;
+      const w = last ? 4 : 2.2, op = last ? 1 : 0.55;
+      if (b.t > a.t && tb === 0) {            // a third from the top row: on into the copy row, and the copy is the bottom row
+        tpath.appendChild(el("line", { x1: TX(a.f, ta), y1: TY(ta), x2: TX(b.f, 3), y2: TY(3), stroke: "var(--accent3)", "stroke-width": w, opacity: op }));
+        tpath.appendChild(el("line", { x1: TX(b.f, 3), y1: TY(3), x2: TX(b.f, 0), y2: TY(0), stroke: "var(--accent3)", "stroke-width": 1.4, "stroke-dasharray": "3 5", opacity: 0.7 }));
+      } else tpath.appendChild(el("line", { x1: TX(a.f, ta), y1: TY(ta), x2: TX(b.f, tb), y2: TY(tb), stroke: "var(--accent3)", "stroke-width": w, opacity: op }));
+    }
+    const s = states[upto]; tdot.setAttribute("cx", TX(s.f, md(s.t, 3))); tdot.setAttribute("cy", TY(md(s.t, 3)));
+  }
+  function view() { const et = $("rTune").value === "et"; svg.hidden = et; tz.hidden = !et;
+    $("rView").innerHTML = et ? "<b>12-tone: the Tonnetz.</b> Three major thirds make an octave, so the row above the top is the bottom row again (dashed jumps): the lattice rolls up into a tube, and because four fifths are a major third two octaves up, the tube closes into a torus. Every C is ringed: the root keeps landing on C." :
+      "<b>Just: Euler's lattice.</b> No number of pure fifths and thirds makes octaves, so every place is a different note: the root that moves by thirds never comes back."; }
+  let states = [];
+  function build() { states = [{ n: 0, f: 0, t: 0, just: 0, et: 0 }]; let f = 0, t = 0, j = 0, e = 0;
+    for (let n = 1; n <= 50; n++) { const v = Pent.V(n);
+      if (v === 3) { f++; j += C5; e += 700; } else if (v === 4) { f--; j += 1200 - C5; e += 500; } else if (v === 5) { t++; j += C3; e += 400; }
+      states.push({ n, f, t, just: j, et: e, v }); } }
+  function draw(upto) {
+    const s = states[upto], pts = states.slice(0, upto + 1);
+    path.setAttribute("points", pts.map((p) => `${X(p.t)},${Y(p.f)}`).join(" "));
+    dot.setAttribute("cx", X(s.t)); dot.setAttribute("cy", Y(s.f));
+    const pc = md(7 * s.f + 4 * s.t, 12), [px, py] = posC(pc); cdot.setAttribute("cx", px); cdot.setAttribute("cy", py);
+    cpath.setAttribute("points", pts.map((p) => posC(md(7 * p.f + 4 * p.t, 12)).join(",")).join(" "));
+    drawT(upto); view();
+    const gap = s.just - s.et;
+    $("rInfo").innerHTML = `n = ${upto}${s.v === 0 ? " (rest)" : ""} · root <b>${nameText(s.f, s.t)}</b> (${s.t} pure third${s.t === 1 ? "" : "s"} to the right) · just ${s.just.toFixed(1)}¢ · 12-tone ${s.et}¢ above the start · difference <b>${Pent.fmt(gap, 1)}¢</b>`;
+  }
+  return { build, draw, view, state: (n) => states[n] };
+})();
+let rTimer = null;
+function rStop() { clearInterval(rTimer); rTimer = null; $("rPlay").textContent = "▶ Play"; }
+function rSound(n) { const s = roots.state(n); if (n > 0 && s.v === 0) return; const c = audio(), t = c.currentTime + 0.02, cents = $("rTune").value === "just" ? s.just : s.et;
+  tone(65.41 * Math.pow(2, md(cents, 1200) / 1200), t, 60 / +$("rBpm").value * 1.6, 0.4, "sawtooth"); }
+$("rPlay").onclick = () => { if (rTimer) return rStop(); let n = 0; $("rPlay").textContent = "■ Stop"; roots.draw(0); rSound(0);
+  rTimer = setInterval(() => { n++; if (n > 50) return rStop(); roots.draw(n); rSound(n); }, 60000 / +$("rBpm").value); };
+$("rTune").onchange = () => { roots.view(); };
+$("rCompare").onclick = () => { const s = roots.state(25), c = audio(), t = c.currentTime + 0.02;
+  tone(130.81, t, 3, 0.3, "sawtooth"); tone(130.81 * Math.pow(2, (s.just - s.et) / 1200), t, 3, 0.3, "sawtooth");
+  $("rInfo").innerHTML = `After one period: 12-tone C and the just root together. Difference ${Pent.fmt(s.just - s.et, 1)}¢${Math.abs(s.just - s.et) < 0.01 ? " — the same note (silence as 0)" : " — the beating you hear is the comma made audible"}.`; };
+
+// ================= 4 · the fretboard =================
+Fretboard.create($("fb"), { strings: 6, frets: 24, tuning: "fourths", root: 0, compact: true });
+
+// ---- set up and follow the silence switch ----
+function refresh() { syncRead(); walk.build(); wShow(+$("wStep").value); roots.build(); roots.draw(50); }
+window.addEventListener("pent-silence", () => { wStop(); rStop(); refresh(); });
+refresh();
+</script>
+<script src="menu.js?v=f1555a14"></script>
+</body>
+</html>
