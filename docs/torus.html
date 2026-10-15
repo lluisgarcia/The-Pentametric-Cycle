@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Palindrome on the Tonnetz Torus · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
+<script src="pent.js?v=fd480162"></script>
+<script src="three.min.js?v=eb854986"></script>
+<style>
+  #stage { position: relative; width: 100%; height: min(66vh, 600px); border: 1px solid var(--rule); border-radius: 8px; background: var(--panel); overflow: hidden; touch-action: none; }
+  #stage canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+  .work { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+  .side { position: sticky; top: 72px; max-height: calc(100vh - 90px); overflow: auto; margin: 0; }
+  .side .blk { display: block; margin: .35em 0; }
+  .side .stepbar { display: flex; gap: 6px; margin: .5em 0; }
+  @media (max-width: 980px) { .work { grid-template-columns: 1fr; } .side { position: static; max-height: none; } }
+  #hud { position: absolute; left: 10px; top: 8px; font-size: .85rem; color: var(--muted); pointer-events: none; }
+  .psw { display: inline-block; padding: 0 6px; border-radius: 4px; color: var(--ink); }
+  .stepbar button { min-width: 2.6em; }
+  #info { font-size: .95rem; }
+  #info table td { padding: 1px 8px 1px 0; }
+  table.data td, table.data th { text-align: center; }
+  .tbl { max-height: 360px; overflow: auto; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>The palindrome on the Tonnetz torus</h1>
+  <p class="lede">In twelve-tone equal temperament Euler's lattice closes up on itself: three major thirds make an octave, and so do four minor thirds. Roll the flat <i>Tonnetz</i> one way and it becomes a tube; bend the tube and it becomes a torus, a ring on which all twelve notes and all 24 major and minor triads sit side by side. Here the palindrome, its chord roots and the Pentametric areas walk on that ring.</p>
+
+  <div class="work">
+    <div>
+      <div id="stage"><canvas id="cv"></canvas><div id="hud">drag to turn · wheel or pinch to zoom · click a note to hear it</div></div>
+      <div class="controls">
+        <label>fold <input id="fold" type="range" min="0" max="100" value="100" style="width:170px"> <output id="foldOut">torus</output></label>
+        <button id="foldBtn">▶ Fold from flat</button>
+        <button id="mirBtn">⟲ Mirror through C</button>
+        <label>surface <select id="surfMode"><option value="glass">transparent</option><option value="solid">solid</option><option value="none">lines only</option></select></label>
+        <label><input id="showTri" type="checkbox" checked> major / minor triangles</label>
+        <label><input id="showHex" type="checkbox"> light the six notes of the areas</label>
+        <button id="resetView">reset view</button>
+      </div>
+      <p class="note" style="margin-top:.2em">Notes in Lluis's mirror colours (each interval and its inversion share a colour; C yellow). Warm triangles are major triads, cool ones minor. Lines: <b>along the tube</b> major thirds, <b>around the ring</b> minor thirds, <b>diagonally</b> fifths.</p>
+    </div>
+    <aside class="side panel">
+      <h3 style="margin:0 0 .3em;font-family:var(--serif);font-weight:500">Walk the cycle</h3>
+      <div id="sil"></div>
+      <label class="blk">walk <select id="walk">
+        <option value="mel">the melody: the interval over C</option>
+        <option value="root">the chord roots (I, IV, V; thirds on 5)</option>
+        <option value="area">the Pentametric areas 𝔓(n) mod 12</option>
+      </select></label>
+      <div class="stepbar">
+        <button id="first" title="back to the start">⏮</button>
+        <button id="prev" title="one step back">◀</button>
+        <button id="play" class="primary">▶ Play</button>
+        <button id="next" title="one step forward">▶|</button>
+      </div>
+      <label class="blk">n <input id="nSlider" type="range" min="0" max="50" value="0" style="width:170px"> <output id="nOut">0</output></label>
+      <label class="blk">tempo <input id="bpm" type="range" min="40" max="200" value="96" style="width:150px"></label>
+      <label class="blk"><input id="follow" type="checkbox" checked> the camera follows the note</label>
+      <label class="blk"><input id="trail" type="checkbox" checked> keep the path</label>
+      <div id="info"></div>
+      <p class="note" style="margin-bottom:0" id="walkNote"></p>
+    </aside>
+  </div>
+
+  <h2>1 · Building the torus</h2>
+  <div class="panel">
+    <p style="margin-top:0">Start flat (slide <i>fold</i> to the left, or press <b>Fold from flat</b>). The flat Tonnetz is a grid: one step along the short side is a major third, one step along the long side a minor third, and a diagonal step a fifth. In twelve tones, <b>three major thirds come back to the same note</b> (C, E, A♭, C), so the top edge is the bottom edge again: the sheet rolls into a tube. Then <b>four minor thirds come back too</b> (C, E♭, F♯, A, C), so the two ends of the tube are the same circle: the tube bends into a ring. Every note now appears exactly once, with its six neighbours around it: the fifth above and below, the major thirds above and below, the minor thirds above and below. <span class="tag proved">proved</span></p>
+    <p class="note" style="margin-bottom:0">In just intonation (Euler's lattice, <a href="euler.html">The palindrome on Euler's lattice</a>) none of this closes: the comma keeps every place distinct. The torus is the picture of equal temperament.</p>
+  </div>
+
+  <h2>2 · The mirror on the torus</h2>
+  <div class="panel">
+    <p style="margin-top:0">Press <b>Mirror through C</b>. The mirror that turns every interval into its inversion (C → C, E ↔ A♭, G ↔ F, …) is, on the torus, a half turn about an axis through C and F♯, the two notes that stay where they are (the tritone is its own inversion). Every note lands on a note of its own colour, and every <b>major</b> triangle lands on a <b>minor</b> one: the major and minor triads are mirror images of each other, the old idea of harmonic dualism (Oettingen, Riemann). <span class="tag proved">proved</span> It is the same mirror as on the lattice, the fretboard and the circle, and as in the palindrome, which reads the same backwards.</p>
+  </div>
+
+  <h2>3 · The cycle on the torus</h2>
+  <div class="panel">
+    <p style="margin:0">Use the panel <b>Walk the cycle</b> beside the torus (below it on a narrow screen). Choose what walks: the melody (each step the interval H : (H − 1) over C), the chord roots of <a href="chords.html">Chord progressions</a>, or the Pentametric areas modulo 12. Go step by step with ◀ and ▶|, or press play and let the camera follow the note. At every step the panel shows the note, the step from the last one and its mirror, the six notes around it on the torus, the six triads it belongs to, and what lies across: its mirror through C and its tritone. With the silence switch on 5 the major thirds join, and the chord roots wind around the tube.</p>
+  </div>
+
+  <h2>4 · The Pentametric areas as twelve notes: the hexatonic scale</h2>
+  <div class="panel">
+    <p style="margin-top:0">Read the Pentametric areas 𝔓(n) modulo 12, as notes (0 = C, 1 = C♯, …). Only <b>six notes</b> ever appear: <b>C, C♯, E, F, A♭, A</b>, two augmented triads a semitone apart, the <i>hexatonic</i> (augmented) scale. <span class="tag proved">proved</span></p>
+    <p><b>Why.</b> 5𝔓(n) = n² + 4·(n | 5), and 5 leaves remainder 1 when divided by 4, so 𝔓(n) and n² leave the same remainder: 𝔓(n) ≡ n² (mod 4). A square leaves 0 or 1, never 2 or 3. So 𝔓(n) mod 12 is one of 0, 1, 4, 5, 8, 9, and all six occur.</p>
+    <p><b>Like the cycle.</b> The twelve-note sequence repeats every <b>30</b> steps, because 𝔓(n + 30) − 𝔓(n) = 12n + 180 is a multiple of 12, and it reads the same backwards about n = 0 and n = 15, because 𝔓(−n) = 𝔓(n). <span class="tag proved">proved</span> Every step is an <b>odd</b> number of semitones (𝔓(n) and 𝔓(n + 1) differ in parity, as n² and (n + 1)² do) <span class="tag proved">proved</span>, and in one period of 30 each odd interval, 1, 3, 5, 7, 9, 11 semitones, occurs exactly <b>5 times</b>. <span class="tag">computed</span></p>
+    <p><b>On the torus</b> (tick <i>light the six notes</i>): the six notes are two neighbouring rings around the tube, the augmented triads C–E–A♭ and C♯–F–A. Between them lie exactly six triads, F, f, D♭, c♯, A, a: the hexatonic cycle that Richard Cohn described (1996), in which each chord moves to the next by changing a single note by a semitone. <span class="tag proved">proved</span> The augmented scale is also the sound many musicians link with Coltrane's major-third cycles. <span class="tag interp">interpretation</span></p>
+    <div class="tbl"><table class="data" id="areaTbl"></table></div>
+    <p class="note" style="margin-bottom:0">Choose <i>the Pentametric areas</i> in section 3 to hear the 30-step palindrome and to walk it step by step on the torus.</p>
+  </div>
+
+  <h2>5 · Notes and credits</h2>
+  <div class="panel">
+    <p style="margin:0">The lattice is Leonhard Euler's (1739); its twelve-tone, triangular form is the <i>Tonnetz</i> of Arthur von Oettingen and Hugo Riemann, and its picture as a torus is classical in music theory. The torus on this page is drawn from scratch for the site. The hexatonic reading of the Pentametric areas is new here and exploratory: it has not been checked against the literature yet.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const md = (a, m) => ((a % m) + m) % m;
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const NAMES = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+const IVL = ["unison", "semitone", "tone", "minor third", "major third", "fourth", "tritone", "fifth", "minor sixth", "major sixth", "minor seventh", "major seventh"];
+const pairOf = (pc) => Math.min(pc, 12 - pc);
+// torus coordinates: pc = 3m + 4M (mod 12), m mod 4 (minor thirds, around the ring), M mod 3 (major thirds, around the tube)
+const mOf = (pc) => md(3 * pc, 4), MOf = (pc) => md(pc, 3);
+const pcAt = (m, M) => md(3 * m + 4 * M, 12);
+/** the shortest step on the torus for an interval of d semitones: [dm, dM] */
+function stepOf(d) { d = md(d, 12); let best = null;
+  for (let a = -2; a <= 2; a++) for (let b = -1; b <= 1; b++) if (md(3 * a + 4 * b, 12) === d) { const c = Math.abs(a) + Math.abs(b); if (!best || c < best[2]) best = [a, b, c]; }
+  return [best[0], best[1]]; }
+
+// ---- sound (12-tone equal: the torus is equal temperament) ----
+let actx = null, master = null;
+function audio() { if (!actx) { actx = new (window.AudioContext || window.webkitAudioContext)(); master = actx.createGain(); master.gain.value = 0.22; master.connect(actx.destination); } if (actx.state === "suspended") actx.resume(); return actx; }
+function tone(pc, t, d, g, oct) { const f = 261.63 * Math.pow(2, pc / 12 + (oct || 0)), o = actx.createOscillator(), a = actx.createGain(); o.type = "triangle"; o.frequency.value = f;
+  a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g, t + 0.02); a.gain.exponentialRampToValueAtTime(0.0001, t + d); o.connect(a).connect(master); o.start(t); o.stop(t + d + 0.05); }
+
+// ================= the 3D torus =================
+const T = window.THREE;
+const A = 1.0, B = 1.6;                    // flat lengths: a major third (along the tube), a minor third (around the ring)
+const W4 = 4 * B, H3 = 3 * A;
+let k1 = 1, k2 = 1;                        // roll and bend, 0 … 1
+/** the flat point (X, Y) on the sheet, rolled by k1 and bent by k2 */
+function morph(X, Y) {
+  let y, z;
+  if (k1 < 1e-4) { y = Y - H3 / 2; z = 0; } else { const r = H3 / (2 * Math.PI * k1), th = 2 * Math.PI * k1 * (Y - H3 / 2) / H3; y = r * Math.sin(th); z = r * (1 - Math.cos(th)); }
+  let x;
+  if (k2 < 1e-4) { x = X - W4 / 2; } else { const Rb = W4 / (2 * Math.PI * k2) + 0.0, ps = 2 * Math.PI * k2 * (X - W4 / 2) / W4, rho = Rb + z; x = rho * Math.sin(ps); z = rho * Math.cos(ps) - Rb; }
+  return new T.Vector3(x, y, z);
+}
+const flat = (m, M) => [m * B, M * A];
+
+const cv = $("cv"), renderer = new T.WebGLRenderer({ canvas: cv, antialias: true });
+const scene = new T.Scene(), camera = new T.PerspectiveCamera(38, 1, 0.01, 200);
+scene.add(new T.AmbientLight(0xffffff, 0.8)); const sun = new T.DirectionalLight(0xffffff, 0.55); sun.position.set(3, 5, 6); scene.add(sun);
+const pivot = new T.Group(); scene.add(pivot);            // turned by the mirror
+const world = new T.Group(); pivot.add(world);             // re-centred as it folds
+const view = { th: 0.5, ph: 1.15, dist: 7.5, target: new T.Vector3() };
+function placeCamera() { const t = view.target; camera.position.set(t.x + view.dist * Math.sin(view.ph) * Math.sin(view.th), t.y + view.dist * Math.cos(view.ph), t.z + view.dist * Math.sin(view.ph) * Math.cos(view.th)); camera.lookAt(t); }
+// smooth camera moves (used to follow the note)
+let camAnim = null;
+function animView(to, ms) {
+  cancelAnimationFrame(camAnim); const from = { th: view.th, ph: view.ph, dist: view.dist, target: view.target.clone() }, t0 = performance.now();
+  let dth = (to.th - from.th) % (2 * Math.PI); if (dth > Math.PI) dth -= 2 * Math.PI; if (dth < -Math.PI) dth += 2 * Math.PI;
+  const step = (now) => { const u = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - u, 3);
+    view.th = from.th + dth * e; view.ph = from.ph + (to.ph - from.ph) * e; view.dist = from.dist + (to.dist - from.dist) * e; view.target.lerpVectors(from.target, to.target, e); draw();
+    if (u < 1) camAnim = requestAnimationFrame(step); };
+  camAnim = requestAnimationFrame(step);
+}
+function followNote(pc, ms) {
+  if (!$("follow").checked || pc === null || pc === undefined) return;
+  const n = nodes.find((x) => x.pc === pc && x.m < 4 && x.M < 3); if (!n) return;
+  scene.updateMatrixWorld(true); const v = new T.Vector3(); n.mesh.getWorldPosition(v);
+  if (+$("fold").value < 100) { animView({ th: view.th, ph: view.ph, dist: Math.min(view.dist, 6.5), target: v.clone() }, ms); return; }
+  const d = v.clone().normalize();
+  animView({ th: Math.atan2(d.x, d.z), ph: Math.min(2.4, Math.max(0.5, Math.acos(Math.max(-1, Math.min(1, d.y))) - 0.6)), dist: 5.8, target: v.clone().multiplyScalar(0.35) }, ms);
+}
+function applySurface() { const m = $("surfMode").value, mat = surf.material; surf.visible = m !== "none";
+  mat.transparent = m === "glass"; mat.opacity = m === "glass" ? 0.55 : 1; mat.depthWrite = m !== "glass"; mat.needsUpdate = true;
+  for (const n of nodes) { n.lab.material.depthTest = m === "solid"; n.lab.material.needsUpdate = true; }   // on a solid torus the names behind it hide
+  draw(); }
+function resize() { const w = cv.clientWidth, h = cv.clientHeight; renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); draw(); }
+
+// surface: one triangle per half sub-cell, coloured major (warm) or minor (cool)
+const SUB = 12, NX = 4 * SUB, NY = 3 * SUB;
+const surfGeo = new T.BufferGeometry(), nTri = NX * NY * 2, sPos = new Float32Array(nTri * 9), sCol = new Float32Array(nTri * 9);
+surfGeo.setAttribute("position", new T.BufferAttribute(sPos, 3)); surfGeo.setAttribute("color", new T.BufferAttribute(sCol, 3));
+const surf = new T.Mesh(surfGeo, new T.MeshLambertMaterial({ vertexColors: true, side: T.DoubleSide, transparent: true, opacity: 0.55, depthWrite: false }));
+world.add(surf);
+function colorVec(v) { const c = new T.Color(); try { c.setStyle(css(v) || "#ccc"); } catch (e) { c.set("#cccccc"); } return c; }
+let warm, cool, plain;
+function paintSurface() {
+  warm = new T.Color(0xf2c48a); cool = new T.Color(0x9fbfe6); plain = colorVec("--fill");
+  let k = 0;
+  for (let i = 0; i < NX; i++) for (let j = 0; j < NY; j++) {
+    const a = i % SUB, b = j % SUB;            // within the Tonnetz cell the diagonal splits the major triangle (above) from the minor one
+    for (const up of [true, false]) {          // the two halves of the sub-quad share the cell's diagonal direction
+      const above = up ? b >= a : b > a;
+      const col = !$("showTri").checked ? plain : above ? warm : cool;
+      for (let q = 0; q < 3; q++) { sCol[k++] = col.r; sCol[k++] = col.g; sCol[k++] = col.b; }
+    }
+  }
+  surfGeo.attributes.color.needsUpdate = true;
+}
+function shapeSurface() {
+  let k = 0; const dx = W4 / NX, dy = H3 / NY;
+  for (let i = 0; i < NX; i++) for (let j = 0; j < NY; j++) {
+    const p00 = morph(i * dx, j * dy), p10 = morph((i + 1) * dx, j * dy), p01 = morph(i * dx, (j + 1) * dy), p11 = morph((i + 1) * dx, (j + 1) * dy);
+    for (const p of [p00, p01, p11, p00, p11, p10]) { sPos[k++] = p.x; sPos[k++] = p.y; sPos[k++] = p.z; }
+  }
+  surfGeo.attributes.position.needsUpdate = true; surfGeo.computeVertexNormals(); surfGeo.computeBoundingSphere();
+}
+
+// edges of the Tonnetz (major thirds, minor thirds, fifths) as lines on the surface
+const edgeGeo = new T.BufferGeometry(), edges = new T.LineSegments(edgeGeo, new T.LineBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.8 })); world.add(edges);
+const EDGE_SEG = 10;
+function shapeEdges() {
+  const pts = [];
+  for (let m = 0; m <= 4; m++) for (let M = 0; M <= 3; M++) for (const [dm, dM] of [[0, 1], [1, 0], [1, 1]]) {
+    if (m + dm > 4 || M + dM > 3) continue;
+    const [x0, y0] = flat(m, M), [x1, y1] = flat(m + dm, M + dM);
+    for (let s = 0; s < EDGE_SEG; s++) { const a = morph(x0 + (x1 - x0) * s / EDGE_SEG, y0 + (y1 - y0) * s / EDGE_SEG), b = morph(x0 + (x1 - x0) * (s + 1) / EDGE_SEG, y0 + (y1 - y0) * (s + 1) / EDGE_SEG); pts.push(a, b); }
+  }
+  edgeGeo.setFromPoints(pts);
+}
+
+// nodes and labels (on the sheet every note appears at its places; on the torus the copies meet)
+const nodeGeo = new T.SphereGeometry(0.11, 20, 14), nodes = [];
+function label(text) {
+  const c = document.createElement("canvas"), g = c.getContext("2d"), px = 56; g.font = `600 ${px}px ${css("--serif") || "serif"}`;
+  const w = Math.ceil(g.measureText(text).width) + 20; c.width = w; c.height = px + 18; g.font = `600 ${px}px ${css("--serif") || "serif"}`;
+  g.fillStyle = css("--ink") || "#222"; g.textBaseline = "middle"; g.fillText(text, 10, c.height / 2);
+  const sp = new T.Sprite(new T.SpriteMaterial({ map: new T.CanvasTexture(c), depthTest: false, transparent: true })); const s = 0.3; sp.scale.set(s * w / c.height, s, 1); return sp;
+}
+for (let m = 0; m <= 4; m++) for (let M = 0; M <= 3; M++) {
+  const pc = pcAt(m, M), mesh = new T.Mesh(nodeGeo, new T.MeshLambertMaterial({ color: colorVec(`--p${pairOf(pc)}`) }));
+  const ring = new T.Mesh(new T.TorusGeometry(0.17, 0.022, 8, 32), new T.MeshBasicMaterial({ color: 0x222222 })); ring.visible = false;
+  const lab = label(NAMES[pc]); mesh.userData = { pc, m, M }; world.add(mesh, ring, lab); nodes.push({ mesh, ring, lab, m, M, pc });
+}
+function centreOf() { surfGeo.computeBoundingBox(); const c = new T.Vector3(); surfGeo.boundingBox.getCenter(c); return c; }
+function surfNormal(X, Y) { const p = morph(X, Y), a = morph(X + 0.01, Y), b = morph(X, Y + 0.01); return new T.Vector3().subVectors(a, p).cross(new T.Vector3().subVectors(b, p)).normalize(); }
+function shapeNodes() {
+  for (const n of nodes) { const [X, Y] = flat(n.m, n.M), p = morph(X, Y); let nv = surfNormal(X, Y); if (k1 < 0.05 && k2 < 0.05) nv = new T.Vector3(0, 0, 1);
+    if (nv.z < 0 && k1 < 0.5) nv.negate();
+    n.mesh.position.copy(p); n.ring.position.copy(p); n.ring.lookAt(p.clone().add(nv));
+    const out = p.clone().sub(centreOf()); out.y *= 0.3; if (out.length() < 1e-6) out.set(0, 0, 1); n.lab.position.copy(p).addScaledVector(out.normalize(), 0.27); }
+}
+
+// the walk: a tube along the path, and a marker
+let pathMesh = null; const marker = new T.Mesh(new T.SphereGeometry(0.17, 24, 16), new T.MeshLambertMaterial({ color: colorVec("--accent3") })); world.add(marker);
+let pathFlat = [];                      // list of flat segments [[x0,y0],[x1,y1], current?]
+function shapePath() {
+  if (pathMesh) { world.remove(pathMesh); pathMesh.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); pathMesh = null; }
+  if (!pathFlat.length) return;
+  pathMesh = new T.Group();
+  pathFlat.forEach(([a, b, cur], i) => {
+    const pts = []; for (let s = 0; s <= 12; s++) { const X = a[0] + (b[0] - a[0]) * s / 12, Y = a[1] + (b[1] - a[1]) * s / 12, p = morph(X, Y); pts.push(p.addScaledVector(surfNormal(X, Y), k1 > 0.5 ? -0.03 : 0.03)); }
+    const curve = new T.CatmullRomCurve3(pts), geo = new T.TubeGeometry(curve, 24, cur ? 0.05 : 0.032, 8, false);
+    pathMesh.add(new T.Mesh(geo, new T.MeshLambertMaterial({ color: cur ? colorVec("--accent2") : colorVec("--accent3"), transparent: !cur, opacity: cur ? 1 : 0.75 })));
+  });
+  world.add(pathMesh);
+}
+let markerFlat = null;
+function shapeMarker() { if (!markerFlat) { marker.visible = false; return; } marker.visible = true; marker.position.copy(morph(markerFlat[0], markerFlat[1])); }
+
+function recentre() { surfGeo.computeBoundingBox(); const c = new T.Vector3(); surfGeo.boundingBox.getCenter(c); world.position.set(-c.x, -c.y, -c.z); }
+function reshape() { shapeSurface(); shapeEdges(); shapeNodes(); shapePath(); shapeMarker(); recentre(); draw(); }
+function draw() { placeCamera(); renderer.setClearColor(colorVec("--panel"), 1); renderer.render(scene, camera); }
+
+// ---- fold ----
+function setFold(v) { // 0 … 100: 0–50 roll, 50–100 bend
+  const t = v / 100; k1 = Math.min(1, t * 2); k2 = Math.max(0, t * 2 - 1); $("foldOut").textContent = t < 0.02 ? "flat" : t < 0.5 ? "rolling" : t < 0.51 ? "tube" : t < 0.99 ? "bending" : "torus"; reshape(); }
+$("fold").oninput = () => setFold(+$("fold").value);
+let foldAnim = null;
+function animateFold(to, ms, then) { cancelAnimationFrame(foldAnim); const from = +$("fold").value, t0 = performance.now();
+  const step = (now) => { const u = Math.min(1, (now - t0) / ms), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, v = from + (to - from) * e; $("fold").value = v; setFold(v); if (u < 1) foldAnim = requestAnimationFrame(step); else if (then) then(); };
+  foldAnim = requestAnimationFrame(step); }
+$("foldBtn").onclick = () => { $("fold").value = 0; setFold(0); setTimeout(() => animateFold(100, 4200), 400); };
+
+// ---- mirror: a half turn about the axis through C and F♯ ----
+let mirrored = false, mirAnim = null;
+function mirror() {
+  const go = () => {
+    const c = nodes.find((n) => n.m === 0 && n.M === 0).mesh.position.clone().add(world.position), f = nodes.find((n) => n.m === 2 && n.M === 0).mesh.position.clone().add(world.position);
+    const axis = new T.Vector3().subVectors(f, c).normalize(), q0 = pivot.quaternion.clone(), q1 = new T.Quaternion().setFromAxisAngle(axis, Math.PI).multiply(q0), t0 = performance.now();
+    const step = (now) => { const u = Math.min(1, (now - t0) / 1800), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; pivot.quaternion.copy(q0.clone().slerp(q1, e)); draw(); if (u < 1) mirAnim = requestAnimationFrame(step); };
+    cancelAnimationFrame(mirAnim); mirAnim = requestAnimationFrame(step); mirrored = !mirrored; };
+  if (+$("fold").value < 100) animateFold(100, 1500, go); else go();
+}
+$("mirBtn").onclick = mirror;
+$("surfMode").onchange = applySurface;
+$("resetView").onclick = () => { cancelAnimationFrame(camAnim); Object.assign(view, { th: 0.5, ph: 1.15, dist: 7.5 }); view.target.set(0, 0, 0); pivot.quaternion.identity(); mirrored = false; draw(); };
+$("showTri").onchange = () => { paintSurface(); draw(); };
+
+// ---- turning the view, and clicking notes ----
+let drag = null; const ptrs = new Map();
+cv.addEventListener("pointerdown", (e) => { cancelAnimationFrame(camAnim); cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]); drag = { x: e.clientX, y: e.clientY, th: view.th, ph: view.ph, d: view.dist, moved: false, pinch: ptrs.size === 2 ? pd() : 0 }; });
+const pd = () => { const [a, b] = [...ptrs.values()]; return Math.hypot(a[0] - b[0], a[1] - b[1]); };
+cv.addEventListener("pointermove", (e) => { if (!drag) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 4) drag.moved = true;
+  if (ptrs.size === 2 && drag.pinch) view.dist = Math.min(30, Math.max(2.5, drag.d * drag.pinch / Math.max(20, pd())));
+  else { view.th = drag.th - (e.clientX - drag.x) * 0.008; view.ph = Math.min(Math.PI - 0.05, Math.max(0.05, drag.ph - (e.clientY - drag.y) * 0.008)); }
+  draw(); });
+cv.addEventListener("pointerup", (e) => { ptrs.delete(e.pointerId); if (drag && !drag.moved) pick(e); if (!ptrs.size) drag = null; });
+cv.addEventListener("pointercancel", (e) => { ptrs.delete(e.pointerId); if (!ptrs.size) drag = null; });
+cv.addEventListener("wheel", (e) => { e.preventDefault(); view.dist = Math.min(30, Math.max(2.5, view.dist * Math.exp(e.deltaY * 0.001))); draw(); }, { passive: false });
+const ray = new T.Raycaster();
+function pick(e) { const r = cv.getBoundingClientRect(), v = new T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(v, camera); const hit = ray.intersectObjects(nodes.map((n) => n.mesh))[0]; if (!hit) return;
+  const pc = hit.object.userData.pc; const c = audio(); tone(pc, c.currentTime + 0.02, 1.2, 0.35); showNote(pc, null); highlight(pc); }
+
+// ---- highlights ----
+function highlight(pc, set) { for (const n of nodes) { n.ring.visible = n.pc === pc; n.mesh.scale.setScalar(set && set.has(n.pc) ? 1.45 : 1); } draw(); }
+function hexLight() { const on = $("showHex").checked, S = new Set([0, 1, 4, 5, 8, 9]); for (const n of nodes) { n.mesh.scale.setScalar(on && S.has(n.pc) ? 1.5 : 1); n.mesh.material.opacity = on && !S.has(n.pc) ? 0.35 : 1; n.mesh.material.transparent = on; } draw(); }
+$("showHex").onchange = hexLight;
+
+// ================= the walks =================
+Pent.silenceSwitch($("sil"), "the silences become the major third 5:4 (Lluis's reading, exploratory)");
+const MEL = { 1: 0, 2: 0, 3: 7, 4: 5, 5: 4 };
+const P = (n) => Pent.P(n);
+let seq = [];      // [{n, pc|null, text}]
+function buildWalk() {
+  const w = $("walk").value; seq = [];
+  if (w === "mel") for (let n = 0; n <= 50; n++) { const v = Pent.V(n); seq.push({ n, pc: v === 0 ? null : MEL[v], text: `H = ${Pent.H(n)}${v === 5 ? " → 5" : ""}: ${Pent.IV(v).name}${v ? " " + Pent.IV(v).ratio : ""}` }); }
+  else if (w === "root") { let r = 0; for (let n = 0; n <= 50; n++) { const v = Pent.V(n); if (n > 0) { if (v === 3) r += 7; else if (v === 4) r += 5; else if (v === 5) r += 4; }
+    seq.push({ n, pc: n > 0 && v === 0 ? null : md(r, 12), root: r, text: n === 0 ? "start on C" : v === 0 ? "silence: the root rests" : v === 3 ? "a fifth: root up a fifth" : v === 4 ? "a fourth: root up a fourth" : v === 5 ? "a 5: root up a major third" : "unison / octave: the root stays" }); } }
+  else for (let n = 0; n <= 60; n++) seq.push({ n, pc: md(P(n), 12), text: `𝔓(${n}) = ${P(n)}, mod 12 = ${md(P(n), 12)}` });
+  $("nSlider").max = seq.length - 1; if (+$("nSlider").value > seq.length - 1) $("nSlider").value = seq.length - 1;
+  $("walkNote").innerHTML = w === "mel" ? "Each step sounds the interval over C. With the silence as 0 the melody uses C, G and F only: one diagonal line of fifths; with the 5 the major third E joins, the next note along the tube." :
+    w === "root" ? "On 0 the root goes up and down the diagonal of fifths and is home after every period. On 5 each major third moves it one step along the tube; nine thirds per period are three full turns around the tube, and in twelve tones the root is home again: the path closes (on Euler's lattice it drifts away instead). <span class='tag'>computed</span>" :
+    "The 30-step palindrome of the areas: it never leaves the two rings of the six notes. Every step is an odd interval. <span class='tag proved'>proved</span>";
+}
+function sounding(i) { for (let j = i; j >= 0; j--) if (seq[j].pc !== null) return j; return -1; }
+function show(n) {
+  $("nSlider").value = n; $("nOut").textContent = n;
+  // the path: steps between consecutive sounding notes, up to n (unwrapped on the torus, drawn inside the sheet)
+  pathFlat = []; let prev = null, pos = null, lastStep = null;
+  for (let i = 0; i <= n; i++) { const s = seq[i]; if (s.pc === null) continue;
+    if (prev === null) { pos = [mOf(s.pc), MOf(s.pc)]; prev = s.pc; continue; }
+    const [dm, dM] = stepOf(s.pc - prev); if (dm === 0 && dM === 0) { prev = s.pc; continue; }
+    let a = [mOf(prev), MOf(prev)]; // choose the copy of the start that keeps the step on the sheet
+    for (const [sx, sy] of [[0, 0], [4, 0], [0, 3], [4, 3]]) { const b = [a[0] + sx + dm, a[1] + sy + dM]; if (b[0] >= 0 && b[0] <= 4 && b[1] >= 0 && b[1] <= 3 && a[0] + sx <= 4 && a[1] + sy <= 3) { a = [a[0] + sx, a[1] + sy]; break; } }
+    const seg = [flat(a[0], a[1]), flat(a[0] + dm, a[1] + dM), i === n];
+    if ($("trail").checked || i === n) pathFlat.push(seg); lastStep = [prev, s.pc]; prev = s.pc; }
+  const j = sounding(n); markerFlat = j < 0 ? null : flat(mOf(seq[j].pc), MOf(seq[j].pc));
+  shapePath(); shapeMarker(); draw();
+  const s = seq[n]; showNote(s.pc, s, lastStep && seq[n].pc !== null ? lastStep : null);
+  highlight(s.pc === null ? -1 : s.pc, s.pc === null ? null : new Set(neighbours(s.pc).map((x) => x[1])));
+}
+function neighbours(pc) { return [["a fifth up", md(pc + 7, 12)], ["a fifth down", md(pc - 7, 12)], ["a major third up", md(pc + 4, 12)], ["a major third down", md(pc - 4, 12)], ["a minor third up", md(pc + 3, 12)], ["a minor third down", md(pc - 3, 12)]]; }
+function triads(pc) { const maj = [[pc, "root"], [pc - 4, "third"], [pc - 7, "fifth"]].map(([r, w]) => `${NAMES[md(r, 12)]} major (as ${w})`);
+  const min = [[pc, "root"], [pc - 3, "third"], [pc - 7, "fifth"]].map(([r, w]) => `${NAMES[md(r, 12)].toLowerCase()} minor (as ${w})`); return maj.concat(min); }
+function showNote(pc, s, step) {
+  if (pc === null) { $("info").innerHTML = `<b>n = ${s.n}</b> · ${s.text}`; return; }
+  let h = s ? `<b>n = ${s.n}</b> · ${s.text} · note <b>${NAMES[pc]}</b>` : `<b>${NAMES[pc]}</b>`;
+  if (step) { const d = md(step[1] - step[0], 12); h += ` · step from ${NAMES[step[0]]}: <b>${IVL[d]}</b> (${d} semitone${d === 1 ? "" : "s"} up${d ? `, its mirror ${IVL[12 - d]} down` : ""})`; }
+  if (s && s.root !== undefined) h += ` · ${(s.root / 12).toFixed(2)} octaves climbed in 12 tones`;
+  h += `<table><tr><td style="color:var(--muted)">around it</td><td>${neighbours(pc).map(([w, q]) => `<span class="psw" style="background:var(--p${pairOf(q)})">${NAMES[q]}</span> ${w}`).join(" · ")}</td></tr>` +
+    `<tr><td style="color:var(--muted)">its six triads</td><td>${triads(pc).join(" · ")}</td></tr>` +
+    `<tr><td style="color:var(--muted)">across</td><td>its mirror through C is <span class="psw" style="background:var(--p${pairOf(pc)})">${NAMES[md(-pc, 12)]}</span>; the note opposite on the ring is the tritone <b>${NAMES[md(pc + 6, 12)]}</b></td></tr></table>`;
+  $("info").innerHTML = h;
+}
+let timer = null;
+function stop() { clearInterval(timer); timer = null; $("play").textContent = "▶ Play"; }
+function sound(n) { const s = seq[n]; if (s.pc === null) return; const c = audio(), t = c.currentTime + 0.02, d = 60 / +$("bpm").value * 1.4, w = $("walk").value;
+  if (w === "mel") { tone(0, t, d, 0.22, -1); tone(s.pc, t, d, 0.3, -1 + (s.pc === 0 && Pent.V(n) === 2 ? 1 : 0)); }
+  else if (w === "root") { tone(s.pc, t, d, 0.3, -1); tone(s.pc + 4, t, d, 0.18, -1); tone(s.pc + 7, t, d, 0.18, -1); }
+  else tone(s.pc, t, d, 0.32, 0); }
+function go(n) { stop(); n = Math.max(0, Math.min(seq.length - 1, n)); show(n); sound(n); followNote(seq[n].pc, 600); }
+$("first").onclick = () => go(0); $("prev").onclick = () => go(+$("nSlider").value - 1); $("next").onclick = () => go(+$("nSlider").value + 1);
+$("nSlider").oninput = () => { stop(); show(+$("nSlider").value); };
+$("play").onclick = () => { if (timer) return stop(); let n = +$("nSlider").value >= seq.length - 1 ? 0 : +$("nSlider").value; $("play").textContent = "⏸ Pause"; show(n); sound(n);
+  followNote(seq[n].pc, 500);
+  timer = setInterval(() => { n++; if (n > seq.length - 1) return stop(); show(n); sound(n); followNote(seq[n].pc, Math.min(700, 0.8 * 60000 / +$("bpm").value)); }, 60000 / +$("bpm").value); };
+$("walk").onchange = () => { stop(); buildWalk(); show(0); };
+$("trail").onchange = () => show(+$("nSlider").value);
+window.addEventListener("pent-silence", () => { stop(); buildWalk(); show(+$("nSlider").value); });
+
+// ---- the table of section 4 ----
+(() => { let h = "<tr><th>n</th><th>𝔓(n)</th><th>mod 12</th><th>note</th><th>step</th></tr>";
+  for (let n = 0; n <= 30; n++) { const v = md(P(n), 12), st = n ? md(v - md(P(n - 1), 12), 12) : null;
+    h += `<tr${n === 15 ? ' style="background:var(--fill)"' : ""}><td>${n}</td><td>${P(n)}</td><td>${v}</td><td><span class="psw" style="background:var(--p${pairOf(v)})">${NAMES[v]}</span></td><td>${st === null ? "" : st + " (" + IVL[st] + ")"}</td></tr>`; }
+  $("areaTbl").innerHTML = h + '<tr><td colspan="5" style="color:var(--muted);font-size:.85em">n = 15 (shaded) is the mirror; the 30 steps read the same backwards, and the next 30 repeat them.</td></tr>'; })();
+
+// ---- start ----
+paintSurface(); setFold(100); buildWalk();
+window.addEventListener("resize", resize); resize(); show(0);
+</script>
+<script src="menu.js?v=4133bcd4"></script>
+</body>
+</html>
