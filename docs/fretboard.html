@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=ece18ca5">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
 <script src="pent.js?v=fd480162"></script>
-<script src="fretboard.js?v=0a9446e4"></script>
+<script src="fretboard.js?v=28f4d504"></script>
 <style>
   .pairs { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--sans); font-size: .95rem; margin: .4em 0 .2em; }
   .pairs span b { display: inline-block; min-width: 1.6em; text-align: center; border-radius: 4px; padding: 0 4px; color: var(--panel); }
@@ -67,9 +67,9 @@
 const $ = (id) => document.getElementById(id);
 const fb = Fretboard.create($("board"), { strings: 6, frets: 24, tuning: "fourths", root: 0 });
 const PAIR = [[0, 0], [1, 11], [2, 10], [3, 9], [4, 8], [5, 7], [6, 6]];
-const COLV = ["var(--ink)", "var(--accent4)", "var(--accent)", "var(--accent5)", "var(--accent3)", "var(--c3)", "var(--muted)"];
+const COLV = [0, 1, 2, 3, 4, 5, 6].map((k) => `var(--p${k})`);
 $("pairs").innerHTML = "<span style='color:var(--muted)'>mirror partners:</span>" + PAIR.map(([a, b], k) =>
-  `<span><b style="background:${COLV[k]}">${Fretboard.INT[a]}</b>${a === b ? " itself" : ` ↔ <b style="background:var(--panel);color:${COLV[k]};outline:2px solid ${COLV[k]}">${Fretboard.INT[b]}</b>`}</span>`).join("");
+  `<span><b style="background:${COLV[k]};color:var(--ink)">${Fretboard.INT[a]}</b>${a === b ? " itself" : ` ↔ <b style="background:var(--panel);color:var(--ink);outline:3px solid ${COLV[k]}">${Fretboard.INT[b]}</b>`}</span>`).join("");
 
 // ---- the palindrome on the board ----
 Pent.silenceSwitch($("sil"), "the silences sound as major thirds 5:4, the 3 of the board (Lluis's reading, exploratory)");

@@ -9,8 +9,8 @@ const Fretboard = (() => {
   const LONG = ["root", "minor second", "major second", "minor third", "major third", "fourth", "tritone", "fifth",
     "minor sixth", "major sixth", "minor seventh", "major seventh"];
   // an interval and its inversion share a colour: they are mirror partners (x ↔ 12 − x)
-  const COL = ["var(--ink)", "var(--accent4)", "var(--accent)", "var(--accent5)", "var(--accent3)", "var(--c3)", "var(--muted)",
-    "var(--c3)", "var(--accent3)", "var(--accent5)", "var(--accent)", "var(--accent4)"];
+  // (Lluis's colours: root yellow, 4/5 green, 3/♭6 red, ♭3/6 purple, ♭2/7 blue, 2/♭7 orange, the tritone grey)
+  const COL = [0, 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1].map((k) => `var(--p${k})`);
   const md = (a, m) => ((a % m) + m) % m;
   const TUNINGS = {
     fourths: { name: "all fourths (E A D G C F …)", low: 40, step: () => 5 },
@@ -117,10 +117,10 @@ const Fretboard = (() => {
         const i = ival(s, f), x = cx(f), y = cy(s), r = Math.min(15, geo.rowH * 0.42);
         const g = el("g", { class: "fb-cell", "data-s": s, "data-f": f, style: "cursor:pointer" });
         const filled = i <= 6, c = COL[i], isLit = lit !== null && lit === i;
-        g.appendChild(el("circle", { cx: x, cy: y, r, fill: filled ? c : "var(--panel)", stroke: c, "stroke-width": i === 0 ? 3 : 2, opacity: lit !== null && !isLit ? 0.25 : 1 }));
+        g.appendChild(el("circle", { cx: x, cy: y, r, fill: filled ? c : "var(--panel)", stroke: filled ? (i === 0 ? "var(--ink)" : c) : c, "stroke-width": filled ? (i === 0 ? 2 : 1) : 3.2, opacity: lit !== null && !isLit ? 0.25 : 1 }));
         const lab = S.labels === "notes" ? NAMES[md(midi(s, f), 12)] : INT[i];
-        g.appendChild(el("text", { x, y: y + 4.5, "text-anchor": "middle", "font-size": lab.length > 1 ? 11.5 : 13, "font-weight": 600, "font-family": "var(--sans)", fill: filled ? "var(--panel)" : c, opacity: lit !== null && !isLit ? 0.35 : 1, "pointer-events": "none" }, lab));
-        if (isLit) g.appendChild(el("circle", { cx: x, cy: y, r: r + 4, fill: "none", stroke: c, "stroke-width": 2.5 }));
+        g.appendChild(el("text", { x, y: y + 4.5, "text-anchor": "middle", "font-size": lab.length > 1 ? 11.5 : 13, "font-weight": 600, "font-family": "var(--sans)", fill: "var(--ink)", opacity: lit !== null && !isLit ? 0.35 : 1, "pointer-events": "none" }, lab));
+        if (isLit) g.appendChild(el("circle", { cx: x, cy: y, r: r + 4, fill: "none", stroke: "var(--ink)", "stroke-width": 2.5 }));
         if (S.check) { const [s2, f2] = mirrorOf(s, f); if (inside(s2, f2) && !(s === centre[0] && f === centre[1])) { all++; if (holds(s, f)) good++;
           else g.appendChild(el("circle", { cx: x, cy: y, r: r + 3, fill: "none", stroke: "#c0392b", "stroke-width": 2.5 })); } }
         svg.appendChild(g);
@@ -136,7 +136,7 @@ const Fretboard = (() => {
         if (inside(s2, f2)) {
           const x1 = cx(f), y1 = cy(s), x2 = cx(f2), y2 = cy(s2), mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1;
           const k = 0.35, qx = mx - dy * k, qy = my + dx * k * 0.25 - Math.hypot(dx, dy) * 0.18;
-          arcs.appendChild(el("path", { d: `M${x1},${y1} Q${qx},${qy} ${x2},${y2}`, fill: "none", stroke: holds(s, f) ? COL[ival(s, f)] : "#c0392b", "stroke-width": 3, opacity: 0.85 }));
+          arcs.appendChild(el("path", { d: `M${x1},${y1} Q${qx},${qy} ${x2},${y2}`, fill: "none", stroke: holds(s, f) ? "var(--ink)" : "#c0392b", "stroke-width": 2.6, opacity: 0.8 }));
         }
       }
       // what the board says

@@ -18,6 +18,8 @@
   --c5: var(--accent3);   /* the silence read as 5 (major third 5:4) */
   --accent4: #9a6b12;     /* exotic */
   --accent5: #2e7d73;     /* library */
+  /* mirror pairs (an interval and its inversion), Lluis's colours from his study of the matrix and Coltrane's circle */
+  --p0: #f3d55b; --p1: #8db8ec; --p2: #f2bb86; --p3: #cfa0e6; --p4: #f08f8f; --p5: #9fd69a; --p6: #d0cdc8;
   --serif: "EB Garamond", "Garamond", "Georgia", serif;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
@@ -27,12 +29,14 @@
     --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
     --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
     --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c; --accent5: #6cc3b5;
+    --p0: #8f7a1f; --p1: #2f5f93; --p2: #94602c; --p3: #6d4088; --p4: #923838; --p5: #3d7a39; --p6: #55535a;
   }
 }
 :root[data-theme="dark"] {
   --bg: #17161a; --panel: #201f24; --ink: #ece8e1; --muted: #a8a29a; --rule: #38363c;
   --accent: #7fa8d4; --accent2: #e08a5e; --c0: #4a4950; --c1: #7fa8d4; --c2: #4f86c0;
   --c3: #e08a5e; --c4: #e8b77f; --fill: #26303b; --ok: #6cc391; --accent3: #b3a2e0; --accent4: #e0b45c; --accent5: #6cc3b5;
+    --p0: #8f7a1f; --p1: #2f5f93; --p2: #94602c; --p3: #6d4088; --p4: #923838; --p5: #3d7a39; --p6: #55535a;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--bg); color: var(--ink); }

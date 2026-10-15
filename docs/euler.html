@@ -7,9 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=ece18ca5">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
 <script src="pent.js?v=fd480162"></script>
-<script src="fretboard.js?v=0a9446e4"></script>
+<script src="fretboard.js?v=28f4d504"></script>
 <style>
   svg.lat text { font-family: var(--serif); pointer-events: none; }
   svg.lat .cell { cursor: pointer; }
@@ -24,6 +24,12 @@
   @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
   .big { font-family: var(--mono); font-size: .95rem; }
   .fb-warn { color: #c0392b; }
+  .psw { display: inline-block; padding: 0 6px; border-radius: 4px; color: var(--ink); }
+  svg.lat text.lab { font-family: var(--sans); font-size: 11.5px; paint-order: stroke; stroke: var(--panel); stroke-width: 4px; stroke-linejoin: round; }
+  .circles { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+  .circles figure { margin: 0; text-align: center; }
+  .circles figcaption { font-size: .88rem; color: var(--muted); }
+  img.study { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -41,10 +47,13 @@
   <div class="panel">
     <div class="controls" style="margin-top:0">
       <button id="turn">⟲ Mirror through C</button>
+      <label><input id="cols" type="checkbox" checked> mirror colours</label>
+      <label><input id="arrs" type="checkbox" checked> interval arrows</label>
       <label><input id="keys" type="checkbox"> show the 12-tone keys</label>
     </div>
     <div class="scroll-x"><svg id="lat" class="lat" role="img" aria-label="Euler's lattice of fifths and major thirds, centred on C"></svg></div>
     <p class="note" id="latInfo" style="margin-bottom:.6em">Click a note to hear it with C, and see its mirror partner through C.</p>
+    <p class="note" style="margin-bottom:.6em"><b>Colours</b> (Lluis's, from his study): an interval and its inversion share a colour. <span class="psw" style="background:var(--p0)">C</span> the centre · <span class="psw" style="background:var(--p5)">fifth / fourth</span> · <span class="psw" style="background:var(--p4)">major third / minor sixth</span> · <span class="psw" style="background:var(--p3)">minor third / major sixth</span> · <span class="psw" style="background:var(--p1)">major seventh / semitone</span> · <span class="psw" style="background:var(--p2)">tone / minor seventh</span> · <span class="psw" style="background:var(--p6)">tritone</span>. The colour follows the 12-tone key, so a whole diagonal of the lattice can share it. The arrows show where each interval goes from C; each one continues (dashed) to the same interval again, and its mirror arrow points the opposite way.</p>
     <p class="note" style="margin-bottom:0">Up: a fifth 3:2. Right: a pure major third 5:4. The small numbers count syntonic commas (81/80, 21.5 cents), as in the matrix: <b>E₁</b> is the pure third 5/4, a comma below the Pythagorean E 81/64; <b>A¹♭</b> is the minor sixth 8/5, a comma above the Pythagorean A♭ 128/81. Reflecting through C sends every note to its inversion: the major third E₁ and the minor sixth A¹♭, the fifth G and the fourth F, the minor third E¹♭ and the major sixth A₁ swap places. <span class="tag proved">proved</span></p>
   </div>
 
@@ -86,10 +95,23 @@
     <p class="note" style="margin-bottom:0">Each pure third 5/4 is 386.3 cents, 13.7 cents smaller than the tempered third: three of them fall short of the octave by the diesis 128/125 (41.1 cents), nine by three dieses. Tunings that want pure thirds, like the 31-tone division of Colonna's <i>Sambuca lincea</i> (1618), have to bend the lattice in a different way; that is for a later exploration.</p>
   </div>
 
-  <h2>4 · On the guitar</h2>
+  <h2>4 · The same mirror on the guitar and on the circle</h2>
   <div class="panel">
-    <p style="margin-top:0">The same mirror on a fretboard in all-fourths tuning: reflect the board through a root and every interval lands on its inversion. Click a note to see its partner. The full tool, with more strings, tunings and the palindrome, is <a href="fretboard.html">The mirror fretboard</a>.</p>
+    <p style="margin-top:0"><b>On the guitar.</b> In all-fourths tuning the fretboard is the same kind of lattice, with fourths across the strings and semitones along them, in 12 tones. Reflect it through a root and every interval lands on its inversion, in the same colours. Click a note to see its partner; the full tool, with more strings, tunings, the mirror across fret 12 and the palindrome, is <a href="fretboard.html">The mirror fretboard</a>.</p>
     <div id="fb"></div>
+    <p><b>On the circle.</b> Put the twelve tones on a circle with C at the top and the mirror becomes a line: the vertical line through C and F♯. Every note faces its inversion across it, in the chromatic order and in the order of fifths alike; C and the tritone F♯ are the two places that stay, like the two mirrors of the palindrome. <span class="tag proved">proved</span> </p>
+    <div class="circles"><figure><svg id="circChrom" viewBox="0 0 260 260" width="260" height="260" role="img" aria-label="The chromatic circle coloured by mirror pairs"></svg><figcaption>the chromatic circle</figcaption></figure>
+      <figure><svg id="circFifths" viewBox="0 0 260 260" width="260" height="260" role="img" aria-label="The circle of fifths coloured by mirror pairs"></svg><figcaption>the circle of fifths</figcaption></figure></div>
+    <p><b>Coltrane's circle, as Lluis studied it.</b> John Coltrane's famous circle drawing (the one he gave to Yusef Lateef) writes the chromatic scale five times around a circle in two rows, the two whole-tone scales, with the five C's joined in a pentagram. Below is a circle drawn for this page in that style (not a copy of his drawing), with what Lluis marked on it in his study:</p>
+    <ul style="margin-top:0">
+      <li>the <b style="color:#d23c3c">red path</b> climbs by fourths from C, clockwise: C, F, B♭, E♭, A♭, D♭; the <b style="color:#2f7fd6">blue path</b> climbs by fifths, counterclockwise: C, G, D, A, E, B. They are mirror images across the vertical line, and after five steps they stop on the two neighbours of C, D♭ and B: the semitone and the major seventh, mirror partners again. <span class="tag proved">proved</span></li>
+      <li>the <b>black lines</b> across the top join each note to its mirror: A♭–E, B♭–D, G–F, A–E♭, B–D♭ (in the pair colours);</li>
+      <li>the <b>pentagram</b> joins the five C's (1 to 5), each outer note is <b>grouped with both inner notes beside it</b> (C with B and with D♭, D with D♭ and with E♭, …): a semitone below and a semitone above, the two mirror partners of the semitone pair, so a small mirror sits on every outer note; and the <b>lines across the circle</b> join each place to the opposite one, a tritone away: the other mirror.</li>
+    </ul>
+    <div class="controls" style="justify-content:center"><button id="ctRed">▶ red: up by fourths</button><button id="ctBlue">▶ blue: up by fifths</button><button id="ctBoth">▶ both together</button></div>
+    <div style="text-align:center"><svg id="coltrane" viewBox="0 0 620 620" style="width:100%;max-width:620px" role="img" aria-label="A Coltrane-style double circle with Lluis's mirror paths"></svg></div>
+    <p><b>Lluis's study (2024).</b> His all-fourths fretboard table, where he first marked the mirrors: the boxes are the same notes on neighbouring strings, and the arcs join each pattern to its mirror across the board.</p>
+    <a href="library/study/allfours-mirrors.jpg"><img class="study" src="library/study/allfours-mirrors.jpg" alt="Lluis's spreadsheet of the all-fourths fretboard with the mirrors marked by boxes, arrows and arcs" loading="lazy"></a>
   </div>
 
   <h2>5 · Notes and credits</h2>
@@ -154,10 +176,29 @@ const CHZ = 261.63;
   // the rings, as in the matrix
   for (let k = 1; k <= N; k++) turn.appendChild(el("rect", { x: X(-k) - S / 2 + 3, y: Y(k) - S / 2 + 3, width: 2 * k * S + S - 6, height: 2 * k * S + S - 6, fill: "none", stroke: "var(--rule)", "stroke-width": 1.2, rx: 6 }));
   const cells = {};
+  const pairOf = (f, t) => { const pc = md(7 * f + 4 * t, 12); return Math.min(pc, 12 - pc); };
+  const baseFill = (f, t) => ($("cols").checked ? `var(--p${pairOf(f, t)})` : f === 0 && t === 0 ? "var(--fill)" : "var(--panel)");
   for (let f = -N; f <= N; f++) for (let t = -N; t <= N; t++) {
     const g = el("g", { class: "cell", "data-f": f, "data-t": t });
     const r = el("rect", { x: X(t) - S / 2 + 6, y: Y(f) - S / 2 + 6, width: S - 12, height: S - 12, rx: 8, fill: f === 0 && t === 0 ? "var(--fill)" : "var(--panel)", stroke: "var(--rule)", "stroke-width": 1 });
     g.appendChild(r); g.appendChild(nameNode(X(t), Y(f) + 7, f, t, f === 0 && t === 0 ? 23 : 19)); turn.appendChild(g); cells[f + "," + t] = r;
+  }
+  // the interval arrows from C, as in Lluis's study: each continues (dashed) to the same interval again
+  const arrows = el("g", { "pointer-events": "none" }); turn.appendChild(arrows);
+  const defs = el("defs", {}); svg.appendChild(defs);
+  const mk = el("marker", { id: "latah", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" }); mk.appendChild(el("path", { d: "M0,0 L10,5 L0,10 z", fill: "var(--ink)" })); defs.appendChild(mk);
+  const DIRS = [[1, 0, "fifths 3:2"], [-1, 0, "fourths 4:3"], [0, 1, "major thirds 5:4"], [0, -1, "minor sixths 8:5"], [1, -1, "minor thirds 6:5"], [-1, 1, "major sixths 5:3"], [1, 1, "major sevenths 15:8"], [-1, -1, "semitones 16:15"]];
+  for (const [df, dt, lab] of DIRS) {
+    const x0 = X(0), y0 = Y(0), x1 = X(dt), y1 = Y(df), ux = (x1 - x0), uy = (y1 - y0), L = Math.hypot(ux, uy), ex = ux / L, ey = uy / L;
+    arrows.appendChild(el("line", { x1: x0 + ex * 20, y1: y0 + ey * 20, x2: x1 - ex * 18, y2: y1 - ey * 18, stroke: "var(--ink)", "stroke-width": 2, "marker-end": "url(#latah)" }));
+    let k = 1; while (Math.abs(df * (k + 1)) <= N && Math.abs(dt * (k + 1)) <= N) k++;
+    if (k > 1) arrows.appendChild(el("line", { x1: x1 + ex * 18, y1: y1 + ey * 18, x2: X(dt * k) + ex * 10, y2: Y(df * k) + ey * 10, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "4 5", opacity: 0.6 }));
+    // the label runs along its line, between the first and the second step, a little to one side
+    let ang = Math.atan2(ey, ex) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+    const d = (dt && df ? 1.0 : 1.5) * L, px = -ey, py = ex, side = (dt === 0 ? 1 : -1) * 11;
+    const lx = x0 + ex * d + px * side, ly = y0 + ey * d + py * side;
+    const lg = el("g", { transform: `rotate(${ang.toFixed(1)} ${lx.toFixed(1)} ${ly.toFixed(1)})` });
+    lg.appendChild(el("text", { class: "lab", x: lx, y: ly + 4, "text-anchor": "middle", fill: "var(--ink)" }, lab)); arrows.appendChild(lg);
   }
   svg.appendChild(el("text", { x: M - 6, y: Y(0) + 4, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)", transform: `rotate(-90 ${M - 6} ${Y(0)})` }, "fifths 3:2 →"));
   svg.appendChild(el("text", { x: X(0), y: W + 8, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "pure major thirds 5:4 →"));
@@ -165,13 +206,14 @@ const CHZ = 261.63;
   function paint() {
     arcs.innerHTML = "";
     for (const k in cells) { const [f, t] = k.split(",").map(Number); const c = cells[k]; c.setAttribute("stroke", "var(--rule)"); c.setAttribute("stroke-width", 1);
-      c.setAttribute("fill", f === 0 && t === 0 ? "var(--fill)" : "var(--panel)"); }
+      c.setAttribute("fill", baseFill(f, t)); }
+    arrows.style.display = $("arrs").checked ? "" : "none";
     if (!sel) return;
     const [f, t] = sel, a = cells[f + "," + t], b = cells[-f + "," + -t];
     a.setAttribute("stroke", "var(--accent3)"); a.setAttribute("stroke-width", 3); b.setAttribute("stroke", "var(--accent3)"); b.setAttribute("stroke-width", 3); b.setAttribute("stroke-dasharray", "");
     if (f || t) arcs.appendChild(el("path", { d: `M${X(t)},${Y(f)} Q${X(0) + (Y(f) - Y(0)) * 0.35},${Y(0) - (X(t) - X(0)) * 0.35} ${X(-t)},${Y(-f)}`, fill: "none", stroke: "var(--accent3)", "stroke-width": 2.5, "stroke-dasharray": "6 4" }));
     if ($("keys").checked) { const pc = md(7 * f + 4 * t, 12);
-      for (const k in cells) { const [g, u] = k.split(",").map(Number); if (md(7 * g + 4 * u, 12) === pc && !(g === f && u === t)) { cells[k].setAttribute("fill", "var(--fill)"); cells[k].setAttribute("stroke", "var(--accent)"); cells[k].setAttribute("stroke-width", 2); } } }
+      for (const k in cells) { const [g, u] = k.split(",").map(Number); if (md(7 * g + 4 * u, 12) === pc && !(g === f && u === t)) { cells[k].setAttribute("stroke", "var(--ink)"); cells[k].setAttribute("stroke-width", 2); } } }
   }
   svg.addEventListener("click", (e) => { const g = e.target.closest(".cell"); if (!g) return; const f = +g.dataset.f, t = +g.dataset.t; sel = [f, t]; paint();
     const [n, d] = ratio(f, t), [n2, d2] = ratio(-f, -t), jc = justC(f, t), ec = etC(f, t); let diff = jc - ec; if (diff > 600) diff -= 1200; if (diff < -600) diff += 1200;
@@ -181,7 +223,7 @@ const CHZ = 261.63;
       (same.length ? ` In 12 tones the same key as: ${same.join(", ")} (they differ by commas).` : "");
     const c = audio(), t0 = c.currentTime + 0.02; tone(CHZ, t0, 1.6, 0.3); tone(CHZ * n / d, t0, 1.6, 0.3);
     if (f || t) { tone(CHZ, t0 + 1.0, 1.6, 0.3); tone(CHZ * n2 / d2, t0 + 1.0, 1.6, 0.3); } });
-  $("keys").onchange = paint;
+  $("keys").onchange = paint; $("cols").onchange = paint; $("arrs").onchange = paint; paint();
   $("turn").onclick = () => turn.classList.toggle("on");
 })();
 
@@ -194,14 +236,14 @@ const walk = (() => {
   svg.setAttribute("viewBox", `0 0 ${W} ${W}`); svg.style.minWidth = "380px"; svg.style.maxWidth = "520px";
   const X = (t) => M + (t + N) * S + S / 2, Y = (f) => M + (N - f) * S + S / 2;
   const defs = el("defs", {}); svg.appendChild(defs);
-  const PAIRS = [["1,0", "-1,0", "var(--c3)"], ["0,1", "0,-1", "var(--accent3)"], ["1,-1", "-1,1", "var(--accent5)"], ["2,0", "-2,0", "var(--accent4)"], ["1,1", "-1,-1", "var(--accent2)"], ["-1,2", "1,-2", "var(--accent)"]];
+  const PAIRS = [["1,0", "-1,0", "var(--p5)"], ["0,1", "0,-1", "var(--p4)"], ["1,-1", "-1,1", "var(--p3)"], ["2,0", "-2,0", "var(--p2)"], ["1,1", "-1,-1", "var(--p1)"], ["-1,2", "1,-2", "var(--p6)"]];
   const colOf = (k) => { for (const [a, b, c] of PAIRS) if (k === a || k === b) return c; return "var(--muted)"; };
   PAIRS.forEach(([, , c], i) => { const m = el("marker", { id: "ah" + i, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }); m.appendChild(el("path", { d: "M0,0 L10,5 L0,10 z", fill: c })); defs.appendChild(m); });
   const markOf = (k) => { const i = PAIRS.findIndex(([a, b]) => k === a || k === b); return i < 0 ? "" : `url(#ah${i})`; };
   const back = el("g", {}), arrows = el("g", {}), front = el("g", {}); svg.append(back, arrows, front);
   const cellR = {};
   for (let f = -N; f <= N; f++) for (let t = -N; t <= N; t++) {
-    const r = el("rect", { x: X(t) - S / 2 + 8, y: Y(f) - S / 2 + 8, width: S - 16, height: S - 16, rx: 10, fill: "var(--panel)", stroke: "var(--rule)" });
+    const pc = md(7 * f + 4 * t, 12), r = el("rect", { x: X(t) - S / 2 + 8, y: Y(f) - S / 2 + 8, width: S - 16, height: S - 16, rx: 10, fill: `var(--p${Math.min(pc, 12 - pc)})`, "fill-opacity": 0.45, stroke: "var(--rule)" });
     back.appendChild(r); back.appendChild(nameNode(X(t), Y(f) + 8, f, t, 22, "var(--muted)")); cellR[f + "," + t] = r; }
   const dot = el("circle", { r: 13, fill: "var(--accent3)", opacity: 0.85 }); front.appendChild(dot);
   let seq = [], leaps = [];
@@ -215,7 +257,8 @@ const walk = (() => {
     let h = "<tr><th>leap</th><th>now</th><th>↔</th><th>now</th><th>its mirror</th></tr>";
     const rows = [["0,0", "0,0"], ...PAIRS.map(([a, b]) => [a, b])];
     for (const [a, b] of rows) { if (!tot[a] && !tot[b]) continue; const c = a === b ? "var(--muted)" : colOf(a);
-      h += `<tr><td class="l" style="color:${c}">${IVN[a]}</td><td>${cnt[a] || 0}</td><td style="color:${c}">↔</td><td>${a === b ? "" : cnt[b] || 0}</td><td class="l" style="color:${c}">${a === b ? "(its own mirror)" : IVN[b]}</td></tr>`; }
+      const sw = (t) => a === b ? t : `<span class="psw" style="background:${c}">${t}</span>`;
+      h += `<tr><td class="l">${sw(IVN[a])}</td><td>${cnt[a] || 0}</td><td>↔</td><td>${a === b ? "" : cnt[b] || 0}</td><td class="l">${a === b ? "(its own mirror)" : sw(IVN[b])}</td></tr>`; }
     h += `<tr><td class="l" colspan="5" style="color:var(--muted);font-size:.85em">${leaps.length} leaps between the ${seq.length} sounding notes of n = 0 … 50</td></tr>`;
     $("wTable").innerHTML = h;
   }
@@ -231,7 +274,8 @@ const walk = (() => {
       const x1 = X(t1), y1 = Y(f1), x2 = X(t2), y2 = Y(f2), dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy), ux = dx / len, uy = dy / len;
       const bend = 22 + 7 * (j % 4), qx = (x1 + x2) / 2 - uy * bend, qy = (y1 + y2) / 2 + ux * bend;
       const sx = x1 + ux * 20, sy = y1 + uy * 20, ex = x2 - ux * 22, ey = y2 - uy * 22;
-      arrows.appendChild(el("path", { d: `M${sx},${sy} Q${qx},${qy} ${ex},${ey}`, fill: "none", stroke: colOf(L.k), "stroke-width": L === cur ? 3.6 : 1.6, opacity: L === cur ? 1 : 0.5, "marker-end": markOf(L.k) }));
+      arrows.appendChild(el("path", { d: `M${sx},${sy} Q${qx},${qy} ${ex},${ey}`, fill: "none", stroke: "var(--ink)", "stroke-width": L === cur ? 6.5 : 4.2, opacity: L === cur ? 0.9 : 0.45 }));
+      arrows.appendChild(el("path", { d: `M${sx},${sy} Q${qx},${qy} ${ex},${ey}`, fill: "none", stroke: colOf(L.k), "stroke-width": L === cur ? 4.5 : 2.6, opacity: 1, "marker-end": markOf(L.k) }));
     });
     for (const key in stays) { const [f, t] = key.split(",").map(Number); arrows.appendChild(el("circle", { cx: X(t), cy: Y(f), r: 30, fill: "none", stroke: "var(--muted)", "stroke-width": Math.min(1 + stays[key] * 0.5, 6), opacity: 0.45 })); }
     const last = seq.filter((s) => s.n <= upto).pop();
@@ -268,7 +312,7 @@ const roots = (() => {
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.style.minWidth = "1050px";
   const X = (t) => M + (t - T0) * S + S / 2, Y = (f) => M + 18 + (F - f) * S + S / 2;
   for (let f = -F; f <= F; f++) for (let t = T0; t <= T1; t++) {
-    svg.appendChild(el("rect", { x: X(t) - S / 2 + 4, y: Y(f) - S / 2 + 4, width: S - 8, height: S - 8, rx: 7, fill: f === 0 && t === 0 ? "var(--fill)" : "var(--panel)", stroke: "var(--rule)" }));
+    { const pc = md(7 * f + 4 * t, 12); svg.appendChild(el("rect", { x: X(t) - S / 2 + 4, y: Y(f) - S / 2 + 4, width: S - 8, height: S - 8, rx: 7, fill: `var(--p${Math.min(pc, 12 - pc)})`, "fill-opacity": 0.4, stroke: f === 0 && t === 0 ? "var(--ink)" : "var(--rule)" })); }
     svg.appendChild(nameNode(X(t), Y(f) + 5, f, t, Math.abs(t) <= 4 ? 14 : Math.abs(t) <= 9 ? 12 : 10.5, "var(--muted)")); }
   for (let t = T0; t <= T1; t++) svg.appendChild(el("text", { x: X(t), y: H - 3, "text-anchor": "middle", "font-size": 10, fill: "var(--muted)", style: "font-family:var(--mono)" }, t));
   for (const t of [9, 18]) svg.appendChild(el("text", { x: X(t), y: M + 10, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, t === 9 ? "after 1 period (on 5)" : "after 2"));
@@ -290,17 +334,18 @@ const roots = (() => {
   const TX = (f, t) => TM + (f - G0) * TS + t * TS / 2, TY = (t) => TH - TM - 16 - t * TS * 0.866;
   const pcOf = (f, t) => md(7 * f + 4 * t, 12);
   for (let t = 0; t <= 3; t++) for (let f = G0; f <= G1; f++) {         // the major triangles, lightly shaded
-    if (t < 3 && f < G1) tz.appendChild(el("polygon", { points: `${TX(f, t)},${TY(t)} ${TX(f + 1, t)},${TY(t)} ${TX(f, t + 1)},${TY(t + 1)}`, fill: "var(--fill)", opacity: 0.55 }));
+    if (t < 3 && f < G1) tz.appendChild(el("polygon", { points: `${TX(f, t)},${TY(t)} ${TX(f + 1, t)},${TY(t)} ${TX(f, t + 1)},${TY(t + 1)}`, fill: "var(--fill)", opacity: 0.35 }));
     const lines = [[f + 1, t], [f, t + 1], [f + 1, t - 1]];
     for (const [g, u] of lines) if (g <= G1 && u >= 0 && u <= 3) tz.appendChild(el("line", { x1: TX(f, t), y1: TY(t), x2: TX(g, u), y2: TY(u), stroke: "var(--rule)", "stroke-width": 1.2, opacity: t === 3 || u === 3 ? 0.4 : 1 }));
   }
   for (let t = 0; t <= 3; t++) for (let f = G0; f <= G1; f++) {
     const home = pcOf(f, t) === 0, dup = t === 3;
-    tz.appendChild(el("circle", { cx: TX(f, t), cy: TY(t), r: 17, fill: home ? "var(--fill)" : "var(--panel)", stroke: home ? "var(--accent3)" : "var(--rule)", "stroke-width": home ? 2.5 : 1.2, opacity: dup ? 0.45 : 1 }));
+    const pc0 = pcOf(f, t);
+    tz.appendChild(el("circle", { cx: TX(f, t), cy: TY(t), r: 17, fill: `var(--p${Math.min(pc0, 12 - pc0)})`, stroke: home ? "var(--ink)" : "var(--rule)", "stroke-width": home ? 2.5 : 1.2, opacity: dup ? 0.45 : 1 }));
     tz.appendChild(el("text", { x: TX(f, t), y: TY(t) + 5, "text-anchor": "middle", "font-size": 15, fill: dup ? "var(--muted)" : "var(--ink)" }, N12T[pcOf(f, t)]));
   }
   tz.appendChild(el("text", { x: TX(G1, 3) + 26, y: TY(3) + 4, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "= the bottom row again"));
-  tz.appendChild(el("text", { x: TM, y: TH - 6, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "→ fifths   ↗ major thirds   ↘ minor thirds   · every C ringed"));
+  tz.appendChild(el("text", { x: TM, y: TH - 6, "font-size": 11, fill: "var(--muted)", style: "font-family:var(--sans)" }, "→ fifths   ↗ major thirds   ↘ minor thirds   · every C ringed · colours: the mirror pairs"));
   const tpath = el("g", {}); tz.appendChild(tpath);
   const tdot = el("circle", { r: 10, fill: "var(--accent3)", opacity: 0.85 }); tz.appendChild(tdot);
   function drawT(upto) {
@@ -315,7 +360,7 @@ const roots = (() => {
     }
     const s = states[upto]; tdot.setAttribute("cx", TX(s.f, md(s.t, 3))); tdot.setAttribute("cy", TY(md(s.t, 3)));
   }
-  function view() { const et = $("rTune").value === "et"; svg.hidden = et; tz.hidden = !et;
+  function view() { const et = $("rTune").value === "et"; svg.style.display = et ? "none" : ""; tz.style.display = et ? "" : "none";
     $("rView").innerHTML = et ? "<b>12-tone: the Tonnetz.</b> Three major thirds make an octave, so the row above the top is the bottom row again (dashed jumps): the lattice rolls up into a tube, and because four fifths are a major third two octaves up, the tube closes into a torus. Every C is ringed: the root keeps landing on C." :
       "<b>Just: Euler's lattice.</b> No number of pure fifths and thirds makes octaves, so every place is a different note: the root that moves by thirds never comes back."; }
   let states = [];
@@ -345,6 +390,69 @@ $("rTune").onchange = () => { roots.view(); };
 $("rCompare").onclick = () => { const s = roots.state(25), c = audio(), t = c.currentTime + 0.02;
   tone(130.81, t, 3, 0.3, "sawtooth"); tone(130.81 * Math.pow(2, (s.just - s.et) / 1200), t, 3, 0.3, "sawtooth");
   $("rInfo").innerHTML = `After one period: 12-tone C and the just root together. Difference ${Pent.fmt(s.just - s.et, 1)}¢${Math.abs(s.just - s.et) < 0.01 ? " — the same note (silence as 0)" : " — the beating you hear is the comma made audible"}.`; };
+
+// ================= 4 · the circles =================
+function circle(id, order) {
+  const svg = $(id), cx = 130, cy = 130, R0 = 98, N12 = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  const pos = (k) => { const a = (k / 12) * 2 * Math.PI - Math.PI / 2; return [cx + R0 * Math.cos(a), cy + R0 * Math.sin(a)]; };
+  svg.appendChild(el("circle", { cx, cy, r: R0, fill: "none", stroke: "var(--rule)" }));
+  const pcAt = (k) => md(order * k, 12), kOf = (pc) => [...Array(12).keys()].find((k) => pcAt(k) === pc);
+  for (let pc = 1; pc < 6; pc++) { const [x1, y1] = pos(kOf(pc)), [x2, y2] = pos(kOf(12 - pc)); svg.appendChild(el("line", { x1, y1, x2, y2, stroke: `var(--p${pc})`, "stroke-width": 2.5, opacity: 0.9 })); }
+  svg.appendChild(el("line", { x1: cx, y1: cy - R0 - 18, x2: cx, y2: cy + R0 + 18, stroke: "var(--ink)", "stroke-width": 1.2, "stroke-dasharray": "5 5" }));
+  for (let k = 0; k < 12; k++) { const pc = pcAt(k), [x, y] = pos(k), p = Math.min(pc, 12 - pc);
+    svg.appendChild(el("circle", { cx: x, cy: y, r: 15, fill: `var(--p${p})`, stroke: pc === 0 ? "var(--ink)" : "none", "stroke-width": 1.5 }));
+    svg.appendChild(el("text", { x, y: y + 5, "text-anchor": "middle", "font-size": 14, fill: "var(--ink)", "font-weight": 600 }, N12[pc])); }
+}
+circle("circChrom", 1); circle("circFifths", 7);
+
+// ---- a Coltrane-style double circle: 60 places (the chromatic scale five times), two rows (the whole-tone scales) ----
+(() => {
+  const svg = $("coltrane"), cx = 310, cy = 318, RO = 254, RI = 216, N12 = ["C", "D♭", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
+  const ang = (p) => (p / 60) * 2 * Math.PI - Math.PI / 2;
+  const rad = (p) => (md(p, 2) === 0 ? RO : RI);                  // even places (C, D, E, F♯, A♭, B♭): outer row
+  const pos = (p, r) => [cx + (r || rad(p)) * Math.cos(ang(p)), cy + (r || rad(p)) * Math.sin(ang(p))];
+  const pcAt = (p) => md(p, 12), pair = (p) => { const c = pcAt(p); return Math.min(c, 12 - c); };
+  const g = (cls) => { const e = el("g", cls ? { class: cls } : {}); svg.appendChild(e); return e; };
+  const back = g(), lines = g(), notes = g(), paths = g(), top = g();
+  // the lines across the circle: each place and the opposite one, a tritone away
+  for (let p = 0; p < 30; p++) { const [x1, y1] = pos(p, RI - 16), [x2, y2] = pos(p + 30, RI - 16); back.appendChild(el("line", { x1, y1, x2, y2, stroke: "var(--rule)", "stroke-width": 0.8 })); }
+  back.appendChild(el("circle", { cx, cy, r: RO + 16, fill: "none", stroke: "var(--rule)", "stroke-width": 1.2 }));
+  back.appendChild(el("circle", { cx, cy, r: RI - 16, fill: "none", stroke: "var(--rule)", "stroke-width": 1.2 }));
+  // the pentagram of the five C's
+  const star = [0, 24, 48, 12, 36, 0].map((p) => pos(p, RI - 16).join(",")).join(" ");
+  lines.appendChild(el("polyline", { points: star, fill: "none", stroke: "var(--muted)", "stroke-width": 1.4, opacity: 0.8 }));
+  // pairs: one note from each row, grouped
+  // every outer note is paired with both inner notes beside it (C with B and with D♭): two groups per outer note, as in the drawing
+  for (let p = 0; p < 60; p += 2) for (const q of [p - 1, p + 1]) { const [x1, y1] = pos(p), [x2, y2] = pos(q), mx = (x1 + x2) / 2, my = (y1 + y2) / 2, a = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+    back.appendChild(el("ellipse", { cx: mx, cy: my, rx: 23, ry: 11, transform: `rotate(${a.toFixed(1)} ${mx.toFixed(1)} ${my.toFixed(1)})`, fill: "none", stroke: "var(--muted)", "stroke-width": 0.9, opacity: 0.6 })); }
+  // the notes; around the top (−6 … 6) in the pair colours, as in Lluis's study
+  for (let p = 0; p < 60; p++) { const [x, y] = pos(p), q = p > 30 ? p - 60 : p, lit = Math.abs(q) <= 6;
+    if (lit) notes.appendChild(el("rect", { x: x - 13, y: y - 11, width: 26, height: 22, rx: 5, fill: `var(--p${pair(p)})` }));
+    notes.appendChild(el("text", { x, y: y + 5, "text-anchor": "middle", "font-size": md(p, 12) === 0 ? 15 : 12.5, "font-weight": md(p, 12) === 0 ? 700 : 400, fill: "var(--ink)", style: "font-family:var(--serif)" }, N12[pcAt(p)])); }
+  // the numbers 1 … 5 at the five C's
+  for (let k = 0; k < 5; k++) { const [x, y] = pos(12 * k, RO + 34); top.appendChild(el("rect", { x: x - 11, y: y - 12, width: 22, height: 24, fill: "var(--panel)", stroke: "var(--ink)", "stroke-width": 1.2 }));
+    top.appendChild(el("text", { x, y: y + 6, "text-anchor": "middle", "font-size": 16, fill: "var(--ink)", style: "font-family:var(--serif)" }, k + 1)); }
+  // the mirror lines across the top: x and −x
+  for (let k = 1; k <= 5; k++) { const [x1, y1] = pos(-k), [x2, y2] = pos(k);
+    top.appendChild(el("line", { x1: x1 + 13, y1, x2: x2 - 13, y2, stroke: "var(--ink)", "stroke-width": 1.3 }));
+    top.appendChild(el("line", { x1: x1 + 13, y1: y1 + 3, x2: x2 - 13, y2: y2 + 3, stroke: `var(--p${k})`, "stroke-width": 2.2 })); }
+  const [vx, vy1] = pos(0, RO + 16); top.appendChild(el("line", { x1: cx, y1: vy1, x2: cx, y2: cy + RO + 16, stroke: "var(--ink)", "stroke-width": 1, "stroke-dasharray": "5 6", opacity: 0.5 }));
+  // the two paths
+  const oct = (r) => { while (r >= 2) r /= 2; while (r < 1) r *= 2; return r; };
+  const RED = [0, 5, 10, 15, 20, 25], BLUE = [0, -5, -10, -15, -20, -25];
+  function drawPath(list, col, upto) { const pts = list.slice(0, upto + 1).map((p) => pos(p, rad(p) - (md(p, 2) ? 12 : -12)));
+    for (let i = 1; i < pts.length; i++) paths.appendChild(el("line", { x1: pts[i - 1][0], y1: pts[i - 1][1], x2: pts[i][0], y2: pts[i][1], stroke: col, "stroke-width": 3.2, "stroke-linecap": "round", opacity: 0.9 }));
+    if (pts.length) { const [x, y] = pts[pts.length - 1]; paths.appendChild(el("circle", { cx: x, cy: y, r: 5, fill: col })); } }
+  let rU = 5, bU = 5; function redraw() { paths.innerHTML = ""; drawPath(RED, "#d23c3c", rU); drawPath(BLUE, "#2f7fd6", bU); } redraw();
+  function play(which) { const c = audio(); let t = c.currentTime + 0.05; const st = { red: [], blue: [] };
+    rU = which === "blue" ? 5 : 0; bU = which === "red" ? 5 : 0; redraw();
+    for (let i = 0; i <= 5; i++) { const at = t + i * 0.55;
+      const red = oct(Math.pow(4 / 3, i)), blue = oct(Math.pow(3 / 2, i));      // pure fourths and fifths, kept within one octave
+      if (which !== "blue") tone(CHZ / 2 * red, at, 0.7, 0.28);
+      if (which !== "red") tone(CHZ / 2 * blue, at, 0.7, 0.28);
+      setTimeout(() => { if (which !== "blue") rU = i; if (which !== "red") bU = i; redraw(); }, (at - c.currentTime) * 1000); } }
+  $("ctRed").onclick = () => play("red"); $("ctBlue").onclick = () => play("blue"); $("ctBoth").onclick = () => play("both");
+})();
 
 // ================= 4 · the fretboard =================
 Fretboard.create($("fb"), { strings: 6, frets: 24, tuning: "fourths", root: 0, compact: true });
