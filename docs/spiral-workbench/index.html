@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spiral Workbench</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font: 13px/1.35 system-ui, sans-serif; color: #1c2128; background: #f4f5f7; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  #toolbar { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding: 5px 8px; background: #fff; border-bottom: 1px solid #d0d4da; }
+  #toolbar .sep { width: 1px; height: 22px; background: #d0d4da; margin: 0 4px; }
+  button { font: inherit; padding: 3px 8px; border: 1px solid #b8bec7; border-radius: 4px; background: #fafbfc; cursor: pointer; }
+  button:hover { background: #eef1f5; }
+  button.on { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+  input[type=text] { font: inherit; width: 56px; padding: 2px 4px; }
+  #main { flex: 1; display: flex; min-height: 0; }
+  #stage { position: relative; flex: 1; min-width: 0; background: #fff; }
+  #svg { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; user-select: none; display: block; }
+  #badge { position: absolute; top: 8px; right: 8px; padding: 2px 8px; border-radius: 10px; font-size: 12px; color: #fff; background: #888; cursor: help; }
+  #badge.pass { background: #1a7f37; } #badge.fail { background: #cf222e; }
+  #tip { position: absolute; display: none; pointer-events: none; padding: 3px 7px; background: rgba(28,33,40,.92); color: #fff; border-radius: 4px; font-size: 12px; white-space: pre; z-index: 5; }
+  #side { width: 350px; overflow-y: auto; padding: 8px; background: #f4f5f7; border-left: 1px solid #d0d4da; }
+  #side h3 { margin: 10px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #57606a; }
+  #side h3:first-child { margin-top: 0; }
+  #layers { border-collapse: collapse; width: 100%; background: #fff; }
+  #layers th, #layers td { padding: 2px 3px; text-align: center; border-bottom: 1px solid #eceff2; }
+  #layers th { font-weight: 600; cursor: pointer; font-size: 10px; padding: 2px 1px; }
+  #layers td.name { text-align: left; white-space: nowrap; }
+  .sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 4px; }
+  .sw.dash { border-top-style: dashed; }
+  .row { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; align-items: center; }
+  .row label { display: inline-flex; align-items: center; gap: 3px; }
+  #info, #measures { background: #fff; border: 1px solid #d0d4da; border-radius: 4px; padding: 6px 8px; min-height: 30px; font-size: 12px; }
+  #measures .m { padding: 3px 0; border-bottom: 1px solid #eceff2; cursor: pointer; }
+  #measures .m:last-child { border: 0; }
+  #measures .m.sel { background: #fff4d6; }
+  .muted { color: #6e7781; }
+  #status { padding: 3px 10px; background: #fff; border-top: 1px solid #d0d4da; font-size: 12px; display: flex; gap: 16px; }
+  #status #coords { margin-left: auto; font-variant-numeric: tabular-nums; }
+  @media (max-width: 900px) { #main { flex-direction: column; } #side { width: auto; max-height: 40%; border-left: 0; border-top: 1px solid #d0d4da; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="toolbar"></div>
+  <div id="main">
+    <div id="stage">
+      <svg id="svg" xmlns="http://www.w3.org/2000/svg"><g id="gmain"></g><g id="gover"></g></svg>
+      <div id="badge">self-test…</div>
+      <div id="tip"></div>
+    </div>
+    <div id="side">
+      <h3>Spirals and layers</h3>
+      <table id="layers"></table>
+      <div class="row" id="quick"></div>
+      <h3>Options</h3>
+      <div class="row" id="options"></div>
+      <h3>Selected</h3>
+      <div id="info"><span class="muted">Nothing selected.</span></div>
+      <h3>Measurements</h3>
+      <div id="measures"><span class="muted">None yet. Use Distance, Angle or Area.</span></div>
+    </div>
+  </div>
+  <div id="status"><span id="hint"></span><span id="coords"></span></div>
+</div>
+<script src="workbench.js"></script>
+</body>
+</html>
