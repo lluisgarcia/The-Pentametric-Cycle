@@ -52,3 +52,31 @@ tangents, the eight spirals):
 | images/face downsipsagain.png | 517c004e1e01ad28e72f7410b6c0fee3c594076966c6d97bd52d54bbaef80108 |
 | images/Fibb - Grid - CLEAN_(no circles).png | 14b18c30aadc36cc7146096ee3e8e8c49fe3c98c5f6c6ef84b6ad84ef707c5ba |
 | images/E__Law of Vibration_1 -MyStudies_FibbTamplate_bothWays.png | 9e068510ed851ed576f4828834fa2754a202df9340428fbc3db66e901eb665d3 |
+
+## 2026-10-21 — The circle of origins in every square; the origins from an empty square
+
+The circle of origins scaled to every square n (areas, diameters, distances of the centres); the two
+squares of area 0.2 (side √0.2) on the origins, constructed from an empty square without any grid,
+and their relation to the Epitetartic Rhombus. (The study folder is now split into Geo/ and images/;
+files listed above keep their hashes.)
+
+| File | SHA-256 |
+|---|---|
+| Geo/Fibb Radious of arc from oposite corner.ggb | 8ae947c7894d59b130ec526bf3dba7bd657b04f93cd5a09c5fb0c60a2a45874d |
+| Geo/Origin of Origins in every square study.ggb | 28afa6546c63d94d4897962c0c1cf08177594254c37e5bf7e6f0c415998fb41d |
+| Geo/Origin at Origin_1!8 Suquare.ggb | 81196f38e466b048ff723f35d8eccdd68555534b9b97468102f1551dc0fcfb59 |
+| Geo/Origin of Origins circle areas.ggb | 73863a6125173ba077b1e3f410d55fb9f89d3cf50a55e1f05db531007ad58146 |
+| Geo/Origin of Origins circles & Squares.ggb | 33d801f44051e1ef15777da45d8300039828bbe57f844d5523572806b5d8fa0f |
+| Geo/Origin of Origins Triangle.ggb | a8f41518c47c5a722d548a8d856ff60ad76812970b09dde853871fa850663942 |
+| Geo/Origin at Origin_Square_1 area_0.2_SQRT(0.2) side lenght_construction.ggb | 6701fdc88b5304c82e3ce0f5f40c39511c51a77bfa6637f0d058d40a64589321 |
+| Geo/Origin at Origin_Square_2 area_0.2_SQRT(0.2) side lenght_construction.ggb | a0d0a5d027a6403b3ac030900e2b17f6e11974069d4a066c86bad063c10256df |
+| Geo/Origin at Origin_Squares_area_0.2_SQRT(0.2) side lenght_construction.ggb | 034cc48cbb8b1f035e3c66bcb74da35e4ede5ae25a935c340ad21f0092e417f7 |
+| Geo/Origin at Origin_Squares_area_0.2_SQRT(0.2) & Epitetardit Rhombus_construction.ggb | 907fabaea9804d56a82fffc713c7ca8e8a81895e75dc2d6958091c8925a6b57c |
+| images/diameter of Origins of Origins.png | 8668e1dc042858edb79a85806f7ab3cd9281dbc4a9fd5c5705877a49455b58ca |
+| images/O of O relations.png | d66504bd34380a062646515d289ee843de0a530eab00ec2eba8566b084311114 |
+| images/O of O at n=25.png | f5eac238dc82b45109d06c4a22b65e50fba727484ad6c9f33e9b99a62794cd0b |
+| images/Fibb Radious of arc from oposite corner.png | cdfcdde1e5bb7af93e74570a317aaf77620a024a2bed0d00da5122c9aadf00be |
+| images/Origin at Origin_Square_1 area_0.2_SQRT(0.2) side lenght_construction.png | fe6cb5fce2d8f9a01fd9f560a0d3b4b88ff7338e63520d7572e15b0afd24b4cf |
+| images/Origin at Origin_Square_2 area_0.2_SQRT(0.2) side lenght_construction.png | fe96f5ce581d3de2bac0fb339c96a878ab845b0720f5b04af2c2f3c2284beb3b |
+| images/Origin at Origin_Squares_area_0.2_SQRT(0.2) side lenght_construction.png | 8e469097bf3a33dc26b2c373447af6512bf798a938515d51fae0fd11578b6c26 |
+| images/Origin at Origin_Squares_area_0.2_SQRT(0.2) & Epitetardit Rhombus_construction.png | 0df132426efdbbb43bf44a3f4600ca4ee1e1ec430c76bc39119ea18adc2b21aa |
