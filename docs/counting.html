@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Counting the Areas · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
+<script src="pent.js?v=fd480162"></script>
+<style>
+  :root { --pink: #c2407a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pink: #e07aa8; } }
+  :root[data-theme="dark"] { --pink: #e07aa8; }
+  .two { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  svg.fig { width: 100%; height: auto; display: block; }
+  .layer { transition: opacity .6s ease; }
+  .layer.off { opacity: 0; pointer-events: none; }
+  .steps { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 0 0 10px; }
+  .steps .dots { display: flex; gap: 5px; margin-left: 6px; }
+  .steps .dots button { width: 14px; height: 14px; min-width: 0; min-height: 0; padding: 0; display: inline-block; border-radius: 50%; border: 1px solid var(--muted); background: transparent; }
+  .steps .dots button.on { background: var(--accent); border-color: var(--accent); }
+  .stepbox h3 { margin: 0 0 4px; font-family: var(--serif); font-weight: 500; font-size: 1.35rem; }
+  .stepbox .num { color: var(--muted); font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; }
+  .stepbox p { margin: 6px 0; }
+  .eq { font-family: var(--serif); font-size: 1.45rem; text-align: center; margin: 6px 0 2px; }
+  .eq .plus { color: var(--ok); } .eq .minus { color: var(--accent2); }
+  .breath-in { color: var(--ok); font-weight: 600; } .breath-out { color: var(--accent2); font-weight: 600; } .rest { color: var(--muted); font-weight: 600; }
+  input[type=range] { width: 220px; vertical-align: middle; }
+  .big { font-family: var(--serif); font-size: 1.6rem; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
+  <h1>Counting the areas</h1>
+  <p class="lede">Start from an empty square and a ruler. Four lines give a square of area 1/5, a circle of origins and Holden's two lines, and with them a grid of cells of area 1/10 that nobody drew. Then every Pentametric area 𝔓(n) is a count of those cells: the blue square of n, with the blue square of 2 added, taken away, or neither. Then the same counting along Holden's lines, in thirds of ρ, and between a square and its mirror. From the note <a href="https://doi.org/10.5281/zenodo.23571087"><i>Counting the Pentametric areas from an empty square</i></a>.</p>
+
+  <h2>1 · From an empty square</h2>
+  <div class="panel">
+    <div class="steps">
+      <button id="back" type="button">◀ back</button>
+      <button id="next" type="button">next ▶</button>
+      <button id="play" type="button">▶ play</button>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="two">
+      <svg id="fig1" class="fig" viewBox="-310 -310 620 620" role="img" aria-label="The unit square, step by step: midpoints, the four lines, the blue square, the circle of origins, the mirror, Holden's lines and the origins grid"></svg>
+      <div class="stepbox" id="stepbox" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <h2>2 · The breath: 𝔓(n) in cells</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>n <input id="n" type="range" min="1" max="20" value="1"> <span id="nval" class="big">1</span></label>
+      <button id="nm" type="button">−</button><button id="np" type="button">+</button>
+      <button id="nplay" type="button">▶ play 1 → 12</button>
+      <label><input id="cells" type="checkbox" checked> show the cells</label>
+    </div>
+    <div class="eq" id="eq"></div>
+    <svg id="fig2" class="fig" viewBox="0 0 900 360" role="img" aria-label="The blue square of n, plus or minus the blue square of 2, equals the Pentametric square"></svg>
+    <div class="two" style="margin-top:10px">
+      <dl class="readout" id="read"></dl>
+      <div class="note" id="why"></div>
+    </div>
+  </div>
+
+  <h2>3 · Counting in thirds along Holden's lines</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>Fibonacci square k <input id="k" type="range" min="1" max="8" value="1"> <span id="kval" class="big">1</span></label>
+      <button id="km" type="button">−</button><button id="kp" type="button">+</button>
+      <label><input id="ticks" type="checkbox" checked> marks every third of ρ</label>
+    </div>
+    <svg id="fig3" class="fig" viewBox="0 0 900 560" role="img" aria-label="The Fibonacci squares, the Holden line through square k, and where the line enters and leaves it, counted in thirds of the origins unit from H"></svg>
+    <div class="two" style="margin-top:10px">
+      <dl class="readout" id="read3"></dl>
+      <div class="note" id="why3"></div>
+    </div>
+  </div>
+
+  <h2>4 · A square and its mirrors</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>mirror
+        <select id="mwhich">
+          <option value="right" selected>on the right side</option>
+          <option value="below">below</option>
+          <option value="both">both ways: the 2 × 2 square</option>
+        </select>
+      </label>
+      <label><input id="m25" type="checkbox" checked> the squares of area 2/5</label>
+      <label><input id="mcirc" type="checkbox"> the circles through F</label>
+      <label><input id="modd" type="checkbox" checked> Holden's lines</label>
+      <label id="mfwrap"><input id="mF" type="checkbox" checked> the circles of origins about F</label>
+      <label id="mrwrap"><input id="mRh" type="checkbox" checked> the two rhombi</label>
+    </div>
+    <div class="two">
+      <svg id="fig4" class="fig" viewBox="0 0 560 560" role="img" aria-label="A unit square and its mirror images, the squares of area 2/5 centred on the crossings, and Holden's lines meeting the neighbours"></svg>
+      <div class="stepbox" id="mtext"></div>
+    </div>
+    <p class="note" style="margin-bottom:0">The full construction holds more relations than fit in one picture: other squares built on the sides of these, meeting further origins and the circles of origins of the quarters. They are in the author's GeoGebra files <i>Origin at Origin_Oposite_relations</i> 1 to 4 and <i>Origin at Origin_relations</i>, in the <a href="geogebra.html#the-origins-from-an-empty-square">GeoGebra gallery</a>, where you can open them, measure, and move things yourself.</p>
+  </div>
+
+  <div class="panel">
+    <p style="margin-top:0"><b>Why cells.</b> The lines 3x − y = whole number and x + 3y = whole number, Holden's two directions repeated every origins unit ρ = √0.1, cut the plane into square cells of side ρ and area 1/10: the <i>origins grid</i>. The unit square holds the area of 10 cells, and along one of its sides one family of lines crosses every third and the other only at the ends: 3 one way, 1 the other, and 3² + 1² = 10. The blue square has its corners and its centre on nodes of this grid, and its two diagonals are grid lines: it is four half-cells, 2 cells. So the square of side n holds 10n² cells, its blue square 2n², and the 2 × 2 square's blue square 8. The Pentametric square has the area of 2n² + 8, 2n² − 8 or 2n² cells, always a whole number of cells, and dividing by 10 gives 𝔓(n).</p>
+    <p class="note" style="margin-bottom:0">The square of area 1/5 cut from a square by four corner-to-midpoint lines is a classical puzzle (cutting a square into five equal squares); the author found it in N. Clarasó, <i>Enciclopedia de la simpatía</i>, 4th ed., Gassó Hnos. (Osa Menor), Barcelona, 1957, pp. 172–173. Holden's lines: H. L. Holden, <i>Fibonacci tiles</i>, Fibonacci Quarterly 13 (1975) 45–49. The reading of the corners as origins, and the areas as counts, are from the note above. Every value on this page is computed exactly.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const pts = (a) => a.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// breath of n, read from its last digit: 1, 4, 6, 9 in (+1); 2, 3, 7, 8 out (−1); 0, 5 rest (0)
+const breath = (n) => [0, 1, -1, -1, 1][n % 5];
+const PA = (n) => (n * n + 4 * breath(n)) / 5;
+const LUC = [2, 1]; while (LUC.length < 40) LUC.push(LUC[LUC.length - 1] + LUC[LUC.length - 2]);
+const FIB = [0, 1]; while (FIB.length < 40) FIB.push(FIB[FIB.length - 1] + FIB[FIB.length - 2]);
+const lucasIndex = (n) => { for (let k = 1; k < 40; k++) if (LUC[k] === n) return k; return n === 2 ? 0 : -1; };
+const sub = (k) => String(k).split("").map((d) => "₀₁₂₃₄₅₆₇₈₉"[d]).join("");
+
+// ======================= 1 · from an empty square =======================
+// frame of the note: unit square centred at O, y up. Screen: 500 px per unit.
+const S = 500, X = (x) => x * S, Y = (y) => -y * S;
+const h = 0.5;
+const CORN = [[-h, -h], [h, -h], [h, h], [-h, h]];
+const MID = [[0, -h], [h, 0], [0, h], [-h, 0]];
+// blue: from each corner to the midpoint of the second side met going anticlockwise
+const BLUE_L = [[CORN[0], MID[1]], [CORN[1], MID[2]], [CORN[2], MID[3]], [CORN[3], MID[0]]];
+const PINK_L = BLUE_L.map(([a, b]) => [[a[0], -a[1]], [b[0], -b[1]]]);
+const BSQ = [[-0.1, -0.3], [0.3, -0.1], [0.1, 0.3], [-0.3, 0.1]];
+const PSQ = BSQ.map(([x, y]) => [x, -y]);
+const HH = [0.3, -0.1];
+const RHO = Math.sqrt(0.1);
+
+const f1 = $("fig1");
+const defs = el(f1, "defs", {});
+const cp = el(defs, "clipPath", { id: "unitclip" }); el(cp, "rect", { x: X(-h), y: Y(h), width: S, height: S });
+const cpb = el(defs, "clipPath", { id: "blueclip" }); el(cpb, "polygon", { points: pts(BSQ.map(([x, y]) => [X(x), Y(y)])) });
+const L = {}; const layer = (name) => (L[name] = el(f1, "g", { class: "layer off" }));
+
+// 0 the square
+const g0 = layer("square");
+el(g0, "rect", { x: X(-h), y: Y(h), width: S, height: S, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.6" });
+el(g0, "circle", { cx: 0, cy: 0, r: 4, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.5" });
+el(g0, "text", { x: -10, y: -10, "text-anchor": "end", style: "font:italic 17px var(--serif);fill:var(--ink)" }, "O");
+// 1 the midpoints (found with a ruler: diagonals give the centre; the lines through it parallel to the sides give the midpoints)
+const g1 = layer("mids");
+for (const [a, b] of [[CORN[0], CORN[2]], [CORN[1], CORN[3]]]) el(g1, "line", { x1: X(a[0]), y1: Y(a[1]), x2: X(b[0]), y2: Y(b[1]), style: "stroke:var(--muted);stroke-width:.8;stroke-dasharray:2 4" });
+for (const [x, y] of MID) el(g1, "circle", { cx: X(x), cy: Y(y), r: 4.5, style: "fill:var(--ink)" });
+// 2 the four blue lines
+const g2 = layer("blines");
+for (const [a, b] of BLUE_L) el(g2, "line", { x1: X(a[0]), y1: Y(a[1]), x2: X(b[0]), y2: Y(b[1]), style: "stroke:var(--accent);stroke-width:1.6;stroke-dasharray:7 4" });
+// 3 the blue square
+const g3 = layer("bsq");
+el(g3, "polygon", { points: pts(BSQ.map(([x, y]) => [X(x), Y(y)])), style: "fill:var(--accent);fill-opacity:.2;stroke:var(--accent);stroke-width:2.2" });
+for (const [x, y] of BSQ) el(g3, "circle", { cx: X(x), cy: Y(y), r: 4.5, style: "fill:var(--accent)" });
+// 4 the circle of origins
+const g4 = layer("circle");
+el(g4, "circle", { cx: 0, cy: 0, r: RHO * S, style: "fill:none;stroke:var(--ink);stroke-width:1.6" });
+el(g4, "text", { x: X(-0.47), y: Y(-0.46), "text-anchor": "start", style: "font:15px var(--sans);fill:var(--muted)" }, "radius ρ = √0.1");
+// 5 the mirror
+const g5 = layer("mirror");
+for (const [a, b] of PINK_L) el(g5, "line", { x1: X(a[0]), y1: Y(a[1]), x2: X(b[0]), y2: Y(b[1]), style: "stroke:var(--pink);stroke-width:1.2;stroke-dasharray:3 4" });
+el(g5, "polygon", { points: pts(PSQ.map(([x, y]) => [X(x), Y(y)])), style: "fill:var(--pink);fill-opacity:.1;stroke:var(--pink);stroke-width:1.6" });
+for (const [x, y] of PSQ) el(g5, "circle", { cx: X(x), cy: Y(y), r: 4.5, style: "fill:var(--pink)" });
+// 6 Holden's lines: the odd line OH (a diagonal of the blue square) and the even line from H to the corner (½, ½), tangent at H
+const g6 = layer("holden");
+const odd = [[-0.5, 1 / 6], [0.5, -1 / 6]], even = [[0.2, -0.4], [0.5, 0.5]];
+el(g6, "line", { x1: X(odd[0][0]), y1: Y(odd[0][1]), x2: X(odd[1][0]), y2: Y(odd[1][1]), style: "stroke:var(--ok);stroke-width:2.4" });
+el(g6, "line", { x1: X(even[0][0]), y1: Y(even[0][1]), x2: X(even[1][0]), y2: Y(even[1][1]), style: "stroke:var(--accent2);stroke-width:2.4" });
+el(g6, "rect", { x: X(HH[0]) - 5, y: Y(HH[1]) - 5, width: 10, height: 10, style: "fill:var(--accent2)" });
+el(g6, "text", { x: X(HH[0]) + 9, y: Y(HH[1]) + 20, style: "font:italic 18px var(--serif);fill:var(--ink)" }, "H");
+el(g6, "text", { x: X(-0.47), y: Y(0.105), transform: `rotate(18.43 ${X(-0.47)} ${Y(0.105)})`, style: "font:14px var(--sans);fill:var(--ok)" }, "odd line");
+el(g6, "text", { x: X(0.405), y: Y(0.33), transform: `rotate(-71.57 ${X(0.405)} ${Y(0.33)})`, style: "font:14px var(--sans);fill:var(--accent2)" }, "even line");
+// 7 the origins grid, and the blue square as four half-cells
+const g7 = layer("grid");
+const gg = el(g7, "g", { "clip-path": "url(#unitclip)" });
+for (let m = -3; m <= 3; m++) {
+  // 3x − y = m  and  x + 3y = m, drawn across the square
+  const a = [[-1, -3 - m], [1, 3 - m]], b = [[-1.2, (m + 1.2) / 3], [1.2, (m - 1.2) / 3]];
+  for (const [p, q] of [a, b]) el(gg, "line", { x1: X(p[0]), y1: Y(p[1]), x2: X(q[0]), y2: Y(q[1]), style: `stroke:var(--muted);stroke-width:${m === 0 ? 1.3 : .8};opacity:.75` });
+}
+const tri = el(g7, "g", { "clip-path": "url(#blueclip)" });
+[[BSQ[0], BSQ[1]], [BSQ[2], BSQ[3]]].forEach(([p, q]) => el(tri, "polygon", { points: pts([[0, 0], p, q].map(([x, y]) => [X(x), Y(y)])), style: "fill:var(--accent);fill-opacity:.28" }));
+
+const STEPS = [
+  { show: ["square"], t: "An empty square",
+    p: ["Nothing but a square of side 1 and a ruler. Its centre O will be the origin of origins: everything that follows is measured from it."] },
+  { show: ["square", "mids"], t: "The midpoints",
+    p: ["The midpoints of the four sides. Even these need only a ruler: the diagonals meet at the centre O, and the lines through O parallel to the sides cut the sides in half."] },
+  { show: ["square", "mids", "blines"], t: "Corner to midpoint",
+    p: ["From each corner, a line to the midpoint of the second side met going anticlockwise round the square. Four lines, each a quarter turn of the one before."] },
+  { show: ["square", "mids", "blines", "bsq"], t: "The blue square: area 1/5",
+    p: ["The four lines cross at right angles in four points, (−1/10, −3/10), (3/10, −1/10), (1/10, 3/10) and (−3/10, 1/10): the corners of a square of side √0.2 and area exactly <b>1/5</b>, turned by arctan(1/2).",
+        "This is the classical way of cutting a square into five equal squares: the blue one in the middle, and the four pieces around it, which fit together into four more."] },
+  { show: ["square", "blines", "bsq", "circle"], t: "The circle of origins",
+    p: ["The circle through the four corners has radius √(1/10² + 3/10²) = √0.1 = <b>ρ</b>, the origins unit, and area exactly <b>π/10</b>: one tenth of the circle of radius 1. The corners of the blue square are four of its origins."] },
+  { show: ["square", "blines", "bsq", "circle", "mirror"], t: "The mirror: eight origins",
+    p: ["The same construction going clockwise gives the pink square, the mirror image of the blue one. Together they mark all eight origins (±3/10, ±1/10), (±1/10, ±3/10): one for each of the eight Fibonacci spirals of the unit square, four and their four mirror images.",
+        "Each origin is a centre to count from. Every distance that follows is measured from an origin in origins units, and each spiral comes out of that counting: for every n, square n sits n origins units from its origin, and at the Lucas numbers it is exactly a Fibonacci square."] },
+  { show: ["square", "bsq", "circle", "holden"], t: "Holden's two lines",
+    p: ["Take the origin <b>H</b> = (3/10, −1/10). The line OH, a diagonal of the blue square, is Holden's <span style='color:var(--ok)'>odd line</span> x + 3y = 0; the line from H to the corner (½, ½) is the tangent of the circle at H, Holden's <span style='color:var(--accent2)'>even line</span> 3x − y = 1. They meet at H at right angles.",
+        "With square 1 the unit square, square 2 below it, square 3 to the right and so on anticlockwise, the centres of the odd Fibonacci squares lie on the odd line and those of the even squares on the even line, each L<sub>k</sub> origins units from H (Holden, 1975). Drawn here with a ruler alone, from an empty square."] },
+  { show: ["square", "bsq", "circle", "holden", "grid"], t: "The origins unit grid: cells of 1/10",
+    p: ["Why <i>origins</i> unit: ρ = √0.1 is the distance from each of the eight origins to the centre O, the origin of origins. Now repeat Holden's two directions every ρ: the lines 3x − y = whole number and x + 3y = whole number. They cut the plane into square <b>cells</b> of side ρ and area <b>1/10</b>: the origins unit grid, which nobody drew. The unit square has the area of 10 cells.",
+        "The blue square has its corners and its centre O on nodes of the grid, and its diagonals are grid lines: it is exactly four half-cells, <b>2 cells</b>. That is all we need to count every Pentametric area: on to part 2."] },
+];
+
+let step = 0, playTimer = null;
+const dots = $("dots");
+STEPS.forEach((s, i) => { const b = dots.appendChild(document.createElement("button")); b.type = "button"; b.title = s.t; b.setAttribute("aria-label", `step ${i + 1}: ${s.t}`); b.onclick = () => { stopPlay(); go(i); }; });
+// draw order fixed: grid under the shapes
+f1.insertBefore(L.grid, L.mids); f1.insertBefore(L.square, L.grid);
+function go(i) {
+  step = Math.max(0, Math.min(STEPS.length - 1, i));
+  const s = STEPS[step];
+  for (const [name, g] of Object.entries(L)) g.classList.toggle("off", !s.show.includes(name));
+  [...dots.children].forEach((b, j) => b.classList.toggle("on", j <= step));
+  $("stepbox").innerHTML = `<div class="num">step ${step + 1} of ${STEPS.length}</div><h3>${s.t}</h3>` + s.p.map((x) => `<p>${x}</p>`).join("");
+  $("back").disabled = step === 0; $("next").disabled = step === STEPS.length - 1;
+}
+function stopPlay() { if (playTimer) { clearInterval(playTimer); playTimer = null; $("play").textContent = "▶ play"; } }
+$("back").onclick = () => { stopPlay(); go(step - 1); };
+$("next").onclick = () => { stopPlay(); go(step + 1); };
+$("play").onclick = () => {
+  if (playTimer) return stopPlay();
+  if (step === STEPS.length - 1) go(0);
+  $("play").textContent = "❚❚ pause";
+  playTimer = setInterval(() => { if (step >= STEPS.length - 1) return stopPlay(); go(step + 1); }, 3200);
+};
+go(0);
+
+// ======================= 2 · the breath =======================
+const f2 = $("fig2");
+// a blue square of side-n square: corners n·BSQ about its own centre; its cells are the origins grid through that centre
+function blueOf(m) { return BSQ.map(([x, y]) => [m * x, m * y]); }
+function drawBlue(g, cx, cy, m, sc, color, withCells, id) {
+  const P = blueOf(m).map(([x, y]) => [cx + x * sc, cy - y * sc]);
+  el(g, "polygon", { points: pts(P), style: `fill:${color};fill-opacity:.2;stroke:${color};stroke-width:2` });
+  if (withCells) {
+    const c = el(f2.querySelector("defs"), "clipPath", { id }); el(c, "polygon", { points: pts(P) });
+    const gg = el(g, "g", { "clip-path": `url(#${id})` });
+    const R = Math.ceil(m * 1.2) + 1;  // grid lines through the blue square: 3x − y = j and x + 3y = j, |j| ≤ m
+    for (let j = -R; j <= R; j++) {
+      const a = [[-m, -3 * m - j], [m, 3 * m - j]], b = [[-m * 1.6, (j + m * 1.6) / 3], [m * 1.6, (j - m * 1.6) / 3]];
+      for (const [p, q] of [a, b]) el(gg, "line", { x1: cx + p[0] * sc, y1: cy - p[1] * sc, x2: cx + q[0] * sc, y2: cy - q[1] * sc, style: `stroke:${color};stroke-width:${sc > 40 ? 1 : .6};opacity:.7` });
+    }
+  }
+}
+function unitGrid(g, cx, cy, m, sc) {
+  const x0 = cx - m * sc / 2, y0 = cy - m * sc / 2;
+  if (m <= 30) for (let k = 1; k < m; k++) {
+    el(g, "line", { x1: x0 + k * sc, y1: y0, x2: x0 + k * sc, y2: y0 + m * sc, style: "stroke:var(--rule);stroke-width:1" });
+    el(g, "line", { x1: x0, y1: y0 + k * sc, x2: x0 + m * sc, y2: y0 + k * sc, style: "stroke:var(--rule);stroke-width:1" });
+  }
+  el(g, "rect", { x: x0, y: y0, width: m * sc, height: m * sc, style: "fill:none;stroke:var(--ink);stroke-width:1.4" });
+}
+function label(g, x, y, s, size = 15, col = "var(--muted)", anchor = "middle") { el(g, "text", { x, y, "text-anchor": anchor, style: `font:${size}px var(--sans);fill:${col}` }, s); }
+
+function drawBreath(n) {
+  f2.innerHTML = ""; el(f2, "defs", {});
+  const b = breath(n), p = PA(n), cells = $("cells").checked;
+  const sideP = Math.sqrt(p);
+  // layout: pieces to the same scale, fixed gaps in px; a title above and the cell count below each piece
+  const GAP = 76, H = 360, top = 52, avail = 250;
+  const wU = n + (b ? 2 : 0) + Math.max(sideP, 0.3);
+  const sc = Math.min((860 - GAP * (b ? 2 : 1) - 40) / wU, avail / Math.max(n, 2));
+  const g = el(f2, "g", {});
+  const cy = top + avail / 2, ty = cy - avail / 2 - 12, by = cy + avail / 2 + 30;
+  const titleY = (half) => Math.min(ty, cy - half - 12), countY = (half) => Math.max(by - 6, cy + half + 26);
+  let x = 20 + n * sc / 2;
+  unitGrid(g, x, cy, n, sc);
+  drawBlue(g, x, cy, n, sc, "var(--accent)", cells, "c1");
+  label(g, x, titleY(n * sc / 2), `blue square of ${n}`, 14);
+  label(g, x, countY(n * sc / 2), `${2 * n * n} cells`, 16, "var(--accent)");
+  x += n * sc / 2;
+  if (b) {
+    const col = b > 0 ? "var(--ok)" : "var(--accent2)";
+    x += GAP / 2; label(g, x, cy + 11, b > 0 ? "+" : "−", 34, col); x += GAP / 2;
+    x += sc;  // centre of the 2×2 square
+    unitGrid(g, x, cy, 2, sc);
+    drawBlue(g, x, cy, 2, sc, col, cells, "c2");
+    label(g, x, titleY(sc), `blue square of 2`, 14, col);
+    label(g, x, countY(sc), `8 cells`, 16, col);
+    x += sc;
+  }
+  x += GAP / 2; label(g, x, cy + 10, "=", 30, "var(--ink)"); x += GAP / 2;
+  if (p > 0) {
+    const hp = sideP * sc / 2;
+    el(g, "rect", { x, y: cy - hp, width: sideP * sc, height: sideP * sc, style: "fill:var(--ink);fill-opacity:.07;stroke:var(--ink);stroke-width:2.2" });
+    const k = lucasIndex(n);
+    if (k >= 1 && FIB[k] > 1 && FIB[k] <= 30) for (let i = 1; i < FIB[k]; i++) {   // a Fibonacci square: F_k × F_k whole squares
+      el(g, "line", { x1: x + i * sc, y1: cy - hp, x2: x + i * sc, y2: cy + hp, style: "stroke:var(--ink);stroke-opacity:.35" });
+      el(g, "line", { x1: x, y1: cy - hp + i * sc, x2: x + sideP * sc, y2: cy - hp + i * sc, style: "stroke:var(--ink);stroke-opacity:.35" });
+    }
+    label(g, x + hp, titleY(hp), `𝔓(${n}) = ${p}`, 14, "var(--ink)");
+    label(g, x + hp, countY(hp), `${10 * p} cells`, 16, "var(--ink)");
+  } else {
+    el(g, "circle", { cx: x + 4, cy, r: 4, style: "fill:var(--ink)" });
+    label(g, x + 4, cy - 16, `𝔓(2) = 0`, 14, "var(--ink)");
+    label(g, x + 4, cy + 30, `0 cells`, 16, "var(--ink)");
+  }
+  label(g, 20, 18, `the square of side ${n} holds ${10 * n * n} cells`, 13, "var(--muted)", "start");
+
+  const d = n % 10;
+  const sign = b > 0 ? `<span class="plus">+ 2²/5</span>` : b < 0 ? `<span class="minus">− 2²/5</span>` : "";
+  $("eq").innerHTML = `𝔓(${n}) = ${n}²/5 ${sign} = ${p}`;
+  const word = b > 0 ? `<span class="breath-in">breathes in (+)</span>` : b < 0 ? `<span class="breath-out">breathes out (−)</span>` : `<span class="rest">rests (0)</span>`;
+  const k = lucasIndex(n);
+  const rows = [
+    ["n", `${n}, last digit ${d}`],
+    ["breath", word],
+    ["blue square of n", `${n}²/5 = ${2 * n * n} cells`],
+    ["blue square of 2", b ? `${b > 0 ? "+" : "−"} 8 cells` : "not used"],
+    ["Pentametric square", `${2 * n * n}${b > 0 ? " + 8" : b < 0 ? " − 8" : ""} = ${10 * p} cells`],
+    ["𝔓(n)", `${10 * p} ÷ 10 = <b>${p}</b>`],
+  ];
+  if (k >= 0) rows.push(["Lucas number", `n = L${sub(k)}: 𝔓 = F${sub(k)}² = ${FIB[k]}² = ${p}`]);
+  $("read").innerHTML = rows.map(([a, v]) => `<dt>${a}</dt><dd>${v}</dd>`).join("");
+  $("why").innerHTML = b === 0
+    ? `When n ends in 0 or 5 the square rests: no blue square of 2 is needed, and 𝔓(${n}) = ${n}²/5 = ${p} exactly.`
+    : n === 2
+      ? `At n = 2 the breath takes away the square's own blue square: 8 − 8 = 0 cells, so 𝔓(2) = 0. The “4” in the formula is 2².`
+      : `The last digit decides the breath: 1, 4, 6, 9 breathe in, 2, 3, 7, 8 breathe out, 0 and 5 rest (in the paper this is the Legendre symbol (n | 5)). Nothing is multiplied or corrected: ${2 * n * n} cells ${b > 0 ? "and" : "less"} 8 cells.` + (k >= 1 ? ` And because ${n} is a Lucas number, the ${10 * p} cells make a whole Fibonacci square, ${FIB[k]} × ${FIB[k]}.` : "");
+}
+let nTimer = null;
+function setN(n) { n = Math.max(1, Math.min(20, n)); $("n").value = n; $("nval").textContent = n; drawBreath(n); }
+function stopN() { if (nTimer) { clearInterval(nTimer); nTimer = null; $("nplay").textContent = "▶ play 1 → 12"; } }
+$("n").oninput = () => { stopN(); setN(+$("n").value); };
+$("nm").onclick = () => { stopN(); setN(+$("n").value - 1); };
+$("np").onclick = () => { stopN(); setN(+$("n").value + 1); };
+$("cells").onchange = () => drawBreath(+$("n").value);
+$("nplay").onclick = () => {
+  if (nTimer) return stopN();
+  setN(1); $("nplay").textContent = "❚❚ pause";
+  nTimer = setInterval(() => { const n = +$("n").value; if (n >= 12) return stopN(); setN(n + 1); }, REDUCED ? 2600 : 1800);
+};
+setN(1);
+
+// ======================= 3 · thirds along Holden's lines =======================
+// the tiling of the note: square 1 the unit square about O, square 2 below, 3 right, 4 up, 5 left, … (anticlockwise)
+const LUCX = (k) => (k === -1 ? -1 : LUC[k]);            // L₋₁ = −1, L₀ = 2, L₁ = 1, …
+const SQ = (() => {
+  const out = [{ k: 1, x0: -0.5, y0: -0.5, s: 1 }]; let bx0 = -0.5, by0 = -0.5, bx1 = 0.5, by1 = 0.5;
+  for (let k = 2; k <= 10; k++) {
+    const s = FIB[k], d = (k - 2) % 4; let q;                  // 0 below, 1 right, 2 up, 3 left
+    if (d === 0) q = { x0: bx0, y0: by0 - s }; else if (d === 1) q = { x0: bx1, y0: by0 };
+    else if (d === 2) q = { x0: bx1 - s, y0: by1 }; else q = { x0: bx0 - s, y0: by1 - s };
+    q.k = k; q.s = s; out.push(q);
+    bx0 = Math.min(bx0, q.x0); by0 = Math.min(by0, q.y0); bx1 = Math.max(bx1, q.x0 + s); by1 = Math.max(by1, q.y0 + s);
+  }
+  return out;
+})();
+const H3 = [0.3, -0.1], T3 = RHO / 3;                         // one third of the origins unit
+function drawThirds(k) {
+  const f = $("fig3"); f.innerHTML = "";
+  const show = SQ.slice(0, Math.max(k + 1, 2));
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const q of show) { x0 = Math.min(x0, q.x0); y0 = Math.min(y0, q.y0); x1 = Math.max(x1, q.x0 + q.s); y1 = Math.max(y1, q.y0 + q.s); }
+  const pad = 0.08 * Math.max(x1 - x0, y1 - y0) + 0.3;
+  x0 -= pad; y0 -= pad; x1 += pad; y1 += pad;
+  const sc = Math.min(880 / (x1 - x0), 540 / (y1 - y0));
+  const ox = 10 + (880 - sc * (x1 - x0)) / 2, oy = 10 + (540 - sc * (y1 - y0)) / 2;
+  const PX = (x) => ox + (x - x0) * sc, PY = (y) => oy + (y1 - y) * sc;
+  const g = el(f, "g", {});
+  for (const q of show) el(g, "rect", { x: PX(q.x0), y: PY(q.y0 + q.s), width: q.s * sc, height: q.s * sc,
+    style: `fill:${q.k === k ? "var(--accent)" : "none"};fill-opacity:.12;stroke:${q.k === k ? "var(--accent)" : "var(--muted)"};stroke-width:${q.k === k ? 2.4 : 1}` });
+  for (const q of show) if (q.s * sc > 22) el(g, "text", { x: PX(q.x0) + 7, y: PY(q.y0 + q.s) + 18, style: `font:14px var(--sans);fill:var(--muted)` }, `square ${q.k}`);
+  const q = SQ[k - 1], C = [q.x0 + q.s / 2, q.y0 + q.s / 2];
+  const odd = k % 2 === 1, col = odd ? "var(--ok)" : "var(--accent2)";
+  const dx = C[0] - H3[0], dy = C[1] - H3[1], len = Math.hypot(dx, dy), u = [dx / len, dy / len];
+  const at = (t) => [H3[0] + t * T3 * u[0], H3[1] + t * T3 * u[1]];
+  const tIn = 2 * LUCX(k - 2), tOut = 2 * LUCX(k + 2), tC = 3 * LUC[k];
+  // the whole line, then the chord inside square k
+  const far = (x1 - x0 + y1 - y0) / T3;
+  const A = at(-far), B = at(far);
+  el(g, "line", { x1: PX(A[0]), y1: PY(A[1]), x2: PX(B[0]), y2: PY(B[1]), style: `stroke:${col};stroke-width:1.2;opacity:.55` });
+  const P = at(tIn), Q = at(tOut);
+  el(g, "line", { x1: PX(P[0]), y1: PY(P[1]), x2: PX(Q[0]), y2: PY(Q[1]), style: `stroke:${col};stroke-width:3.2` });
+  // marks every third of ρ along the chord (and back to H)
+  if ($("ticks").checked && T3 * sc > 3.2) {
+    const n0 = Math.min(0, tIn), n1 = tOut, nx = -u[1], ny = u[0];
+    for (let t = n0; t <= n1; t++) {
+      const [a, b] = at(t), big = t % 3 === 0 ? 7 : 4;
+      el(g, "line", { x1: PX(a) - nx * big, y1: PY(b) + ny * big, x2: PX(a) + nx * big, y2: PY(b) - ny * big, style: `stroke:${col};stroke-width:${t % 3 === 0 ? 1.4 : .9}` });
+    }
+  }
+  const dot = (p, r, fill) => el(g, "circle", { cx: PX(p[0]), cy: PY(p[1]), r, style: `fill:${fill};stroke:var(--panel);stroke-width:1.5` });
+  const tag = (p, s, dyp = -12, anchor = "middle", colr = "var(--ink)") => el(g, "text", { x: PX(p[0]) + (anchor === "start" ? 10 : anchor === "end" ? -10 : 0), y: PY(p[1]) + dyp, "text-anchor": anchor, style: `font:600 14px var(--sans);fill:${colr};paint-order:stroke;stroke:var(--panel);stroke-width:4px` }, s);
+  dot(P, 5.5, col); dot(Q, 5.5, col); dot(C, 4.5, "var(--accent)");
+  el(g, "rect", { x: PX(H3[0]) - 4.5, y: PY(H3[1]) - 4.5, width: 9, height: 9, style: "fill:var(--accent2)" });
+  tag(H3, "H · 0", 22, "start", "var(--ink)");
+  tag(P, `in: ${tIn}`, k === 1 ? 24 : -12, "end", col); tag(Q, `out: ${tOut}`, -12, "start", col);
+  if (q.s * sc > 60) tag(C, `centre: ${tC}`, 22, "middle", "var(--accent)");
+  const rows = [
+    ["square", `k = ${k}, side F${sub(k)} = ${FIB[k]}`],
+    ["line", odd ? `<span style="color:var(--ok)">odd line</span> x + 3y = 0` : `<span style="color:var(--accent2)">even line</span> 3x − y = 1`],
+    ["centre", `L${sub(k)} = ${LUC[k]} origins units from H = ${tC} thirds`],
+    ["half the crossing", `5·F${sub(k)} = ${5 * FIB[k]} thirds`],
+    ["enters at", `${tC} − ${5 * FIB[k]} = <b>${tIn}</b> = 2·L${k - 2 < 0 ? "₋₁" : sub(k - 2)} thirds`],
+    ["leaves at", `${tC} + ${5 * FIB[k]} = <b>${tOut}</b> = 2·L${sub(k + 2)} thirds`],
+    ["whole crossing", `${tOut - tIn} thirds = 10·F${sub(k)}`],
+  ];
+  $("read3").innerHTML = rows.map(([a, v]) => `<dt>${a}</dt><dd>${v}</dd>`).join("");
+  $("why3").innerHTML = `Along Holden's lines the ruler is a <b>third of ρ</b>: the lines have slope ±3 or ±1/3, so a piece of one of them is √10/3 times its longer shadow on the axes, and 1/5 of a side becomes exactly 2/3 of ρ. Half the crossing of a square of side F is then 5F thirds, and the centre sits 3L thirds from H. So the line enters and leaves at 3L<sub>k</sub> − 5F<sub>k</sub> and 3L<sub>k</sub> + 5F<sub>k</sub>, which are always twice a Lucas number: two places back and two places on, 2L<sub>k−2</sub> and 2L<sub>k+2</sub>, because L<sub>k+2</sub> + L<sub>k−2</sub> = 3L<sub>k</sub> and L<sub>k+2</sub> − L<sub>k−2</sub> = 5F<sub>k</sub>.` +
+    (k === 1 ? ` In the unit square the line enters at −2, behind H, so H is inside the square; its four arms from H to the sides are 2, 4, 6 and 8 thirds, and each of Holden's lines crosses it in 10 thirds.` : "");
+}
+function setK(k) { k = Math.max(1, Math.min(8, k)); $("k").value = k; $("kval").textContent = k; drawThirds(k); }
+$("k").oninput = () => setK(+$("k").value);
+$("km").onclick = () => setK(+$("k").value - 1);
+$("kp").onclick = () => setK(+$("k").value + 1);
+$("ticks").onchange = () => drawThirds(+$("k").value);
+setK(1);
+
+// ======================= 4 · a square and its mirrors =======================
+// four unit squares around F = (½, −½): A (centre O), R (mirror in the right side), B (mirror in the bottom side), D (mirrored both ways)
+const MAP = { A: ([x, y]) => [x, y], R: ([x, y]) => [1 - x, y], B: ([x, y]) => [x, -1 - y], D: ([x, y]) => [1 - x, -1 - y] };
+const SETS = { right: ["A", "R"], below: ["A", "B"], both: ["A", "R", "B", "D"] };
+const MCOL = { A: "var(--muted)", R: "var(--accent4)", B: "var(--accent3)", D: "var(--accent5)" };
+const G25 = [[0.1, 0.3], [0.7, 0.1], [0.5, -0.5], [-0.1, -0.3]];
+const O8 = [[0.3, 0.1], [0.3, -0.1], [-0.3, 0.1], [-0.3, -0.1], [0.1, 0.3], [0.1, -0.3], [-0.1, 0.3], [-0.1, -0.3]];
+const MTEXT = {
+  right: `<p style="margin-top:0">Reflect the unit square in its right side. The two share that side and the corner <b>F</b> = (½, −½), and the crossings H = (3/10, −1/10) and H′ = (7/10, −1/10) are mirror images.</p>
+    <p><b>The square of area 2/5.</b> The circle about H through F has radius √0.2 = √2 ρ. It passes through two origins of its own circle, (1/10, 3/10) and (−1/10, −3/10), and one origin of the mirror's circle, (7/10, 1/10). With F they are the corners of a square <span style="color:var(--muted)">(grey)</span> centred on H, of area 2/5: <b>4 cells</b>, twice the blue square, with its sides along Holden's directions. Its mirror <span style="color:var(--accent4)">(gold)</span> is centred on H′; the two share the corner F.</p>
+    <p><b>Side by side, the odd lines touch.</b> The odd line x + 3y = 0 passes through its own centre O and at exactly ρ from the mirror's centre, so it touches the mirror's circle of origins, at its origin (9/10, −3/10); the mirror's odd line passes through its own centre and touches the first circle at (1/10, −3/10).</p>`,
+  below: `<p style="margin-top:0">Now reflect it in its bottom side. The mirror below sits where square 2 of the Fibonacci tiling sits; its crossing is H″ = (3/10, −9/10), and F is still a shared corner.</p>
+    <p><b>The same relation, with the even lines.</b> Side by side, each odd line passes through its own centre and touches the neighbour's circle. One above the other, it is the even lines that do it, mirrored: the even line 3x − y = 1 touches its own circle at H and passes through the centre (0, −1) of the square below; the lower even line 3x + y = 0 touches its own circle at H″ and passes through O. In every pair, two of Holden's lines, each through one centre and touching the other circle at an origin.</p>
+    <p>Each square has its own square of area 2/5 on its crossing, and they share the corner F.</p>`,
+  both: `<p style="margin-top:0">Mirror both ways and four unit squares meet at F: together they are the 2 × 2 square, with F at its centre.</p>
+    <p><b>Four squares of area 2/5, one on each crossing, all share the corner F.</b> In every pair of neighbours two of Holden's lines each pass through one centre and touch the other circle: the odd lines side by side, the even lines one above the other. Across the diagonal, nothing touches.</p>
+    <p><b>A quarter turn about F.</b> Turn this picture a quarter turn and it lands on itself: the odd lines become even lines and the even lines odd ones, each crossing H goes onto a tangent point (open green dot) and each tangent point onto a crossing. Side by side and one above the other are the same relation, mirrored. The four crossings and the four tangent points lie on one circle about F, of radius √0.2 = √2 ρ, and are the corners of a <span style="color:var(--accent)">blue</span> and a <span style="color:var(--pink)">pink</span> square, each of area 2/5 (4 cells), with two crossings and two tangent points as corners.</p>
+    <p><b>Two rhombi.</b> The four odd lines close a rhombus lying across F <span style="color:var(--ok)">(green)</span>, and the four even lines the same rhombus standing up <span style="color:var(--accent2)">(rust)</span>. Each has diagonals 2 and 2/3, in the ratio 3 : 1, and area 2/3; its long diagonal joins the midpoints of two opposite sides of the 2 × 2 square, and each of its sides is one of Holden's lines crossing one unit square: 10 thirds of ρ, or √10/3.</p>
+    <p><b>The 2 × 2 square has its own circle of origins</b>, of radius 2ρ about F, and its eight origins are origins of the four small circles. Its blue and pink squares have area 4/5: <b>8 cells, the blue square of 2</b>, the breath of part 2.</p>
+    <p>Across the diagonal the square is turned half a turn about F, so its spiral turns the same way as the first; side by side and one above the other, it is a mirror image.</p>`,
+};
+function drawMirror() {
+  const f = $("fig4"); f.innerHTML = "";
+  const which = $("mwhich").value, set = SETS[which];
+  const xr = set.includes("R") ? [-0.62, 1.62] : [-0.62, 0.62], yr = set.includes("B") ? [-1.62, 0.62] : [-0.62, 0.62];
+  const sc = Math.min(540 / (xr[1] - xr[0]), 540 / (yr[1] - yr[0]));
+  const W = (xr[1] - xr[0]) * sc + 20, Hh = (yr[1] - yr[0]) * sc + 20;
+  f.setAttribute("viewBox", `0 0 ${W.toFixed(0)} ${Hh.toFixed(0)}`);
+  const PX = (x) => 10 + (x - xr[0]) * sc, PY = (y) => 10 + (yr[1] - y) * sc;
+  const g = el(f, "g", {});
+  const poly = (P, style) => el(g, "polygon", { points: pts(P.map(([x, y]) => [PX(x), PY(y)])), style });
+  const dot = (x, y, style, r = 4) => el(g, "circle", { cx: PX(x), cy: PY(y), r, style });
+  const line = (a, b, c, style) => {   // a x + b y + c = 0 across the view
+    let P;
+    if (Math.abs(b) > Math.abs(a)) P = [xr[0], xr[1]].map((x) => [x, -(a * x + c) / b]);
+    else P = [yr[0], yr[1]].map((y) => [-(b * y + c) / a, y]);
+    el(g, "line", { x1: PX(P[0][0]), y1: PY(P[0][1]), x2: PX(P[1][0]), y2: PY(P[1][1]), style });
+  };
+  const LINES = { odd: [1, 3, 0], even: [3, -1, -1] };
+  const mapLine = (k, [a, b, c]) => k === "A" ? [a, b, c] : k === "R" ? [-a, b, a + c] : k === "B" ? [a, -b, c - b] : [-a, -b, a + c - b];
+  for (const k of set) {
+    const c = MAP[k]([0, 0]);
+    el(g, "rect", { x: PX(c[0] - 0.5), y: PY(c[1] + 0.5), width: sc, height: sc, style: `fill:none;stroke:var(--ink);stroke-width:${k === "A" ? 1.6 : 1.1};${k === "A" ? "" : "stroke-dasharray:6 4"}` });
+    el(g, "circle", { cx: PX(c[0]), cy: PY(c[1]), r: RHO * sc, style: "fill:none;stroke:var(--ink);stroke-width:1.2" });
+    for (const p of O8) { const q = MAP[k](p); dot(q[0], q[1], "fill:var(--muted)", 2.4); }
+    dot(c[0], c[1], "fill:var(--panel);stroke:var(--ink);stroke-width:1.3", 3.2);
+  }
+  if ($("mcirc").checked) for (const k of set) { const h = MAP[k]([0.3, -0.1]); el(g, "circle", { cx: PX(h[0]), cy: PY(h[1]), r: Math.sqrt(0.2) * sc, style: "fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4" }); }
+  if ($("m25").checked) for (const k of set) {
+    const P = G25.map(MAP[k]);
+    poly(P, `fill:${MCOL[k]};fill-opacity:${k === "A" ? .22 : .16};stroke:${k === "A" ? "var(--ink)" : MCOL[k]};stroke-width:1.4`);
+    for (const [x, y] of P) dot(x, y, `fill:${k === "A" ? "var(--ink)" : MCOL[k]}`, 3.6);
+  }
+  if ($("modd").checked) for (const k of set) {
+    const dash = k === "A" ? "" : "stroke-dasharray:7 4;";
+    line(...mapLine(k, LINES.odd), `stroke:var(--ok);stroke-width:${k === "A" ? 2 : 1.4};${dash}`);
+    if (which !== "right") line(...mapLine(k, LINES.even), `stroke:var(--accent2);stroke-width:${k === "A" ? 2 : 1.4};${dash}`);
+  }
+  if ($("modd").checked) {   // where the lines meet the neighbours: tangent points (side by side), centres (one above the other)
+    const tang = { A: [[0.9, -0.3]], R: [[0.1, -0.3]], B: [[0.9, -0.7]], D: [[0.1, -0.7]] };
+    if (set.includes("R")) for (const k of set) for (const [x, y] of tang[k]) dot(x, y, "fill:var(--panel);stroke:var(--ok);stroke-width:2.4", 5.5);
+    if (set.includes("B")) for (const k of set) { const c = MAP[k]([0, 0]); dot(c[0], c[1], "fill:var(--panel);stroke:var(--accent2);stroke-width:2.4", 5.5); }
+  }
+  $("mfwrap").style.display = which === "both" ? "" : "none";
+  if (which === "both" && $("mF").checked) {   // circles about F: radius √2ρ (crossings and tangent points) and 2ρ (the 2 × 2 square's origins)
+    const Fp = [0.5, -0.5], at = ([x, y]) => [Fp[0] + x, Fp[1] + y];
+    const sq1b = [[0.2, -0.4], [0.4, 0.2], [-0.2, 0.4], [-0.4, -0.2]].map(at), sq1p = [[-0.2, -0.4], [0.4, -0.2], [0.2, 0.4], [-0.4, 0.2]].map(at);
+    const sq2b = BSQ.map(([x, y]) => at([2 * x, 2 * y])), sq2p = PSQ.map(([x, y]) => at([2 * x, 2 * y]));
+    for (const [r, w] of [[Math.sqrt(0.2), 2.4], [2 * RHO, 1.6]]) el(g, "circle", { cx: PX(Fp[0]), cy: PY(Fp[1]), r: r * sc, style: `fill:none;stroke:var(--ink);stroke-width:${w};opacity:.8` });
+    poly(sq1b, "fill:none;stroke:var(--accent);stroke-width:2.6"); poly(sq1p, "fill:none;stroke:var(--pink);stroke-width:2.6");
+    poly(sq2b, "fill:none;stroke:var(--accent);stroke-width:1.6;stroke-dasharray:6 3"); poly(sq2p, "fill:none;stroke:var(--pink);stroke-width:1.6;stroke-dasharray:6 3");
+  }
+  $("mrwrap").style.display = which === "both" ? "" : "none";
+  if (which === "both" && $("mRh").checked) {
+    poly([[-0.5, -0.5], [0.5, -1 / 6], [1.5, -0.5], [0.5, -5 / 6]], "fill:var(--ok);fill-opacity:.13;stroke:var(--ok);stroke-width:3");
+    poly([[0.5, 0.5], [5 / 6, -0.5], [0.5, -1.5], [1 / 6, -0.5]], "fill:var(--accent2);fill-opacity:.11;stroke:var(--accent2);stroke-width:3");
+  }
+  const names = { A: "H", R: "H′", B: "H″", D: "H‴" };
+  for (const k of set) {
+    const [x, y] = MAP[k]([0.3, -0.1]);
+    el(g, "rect", { x: PX(x) - 4.5, y: PY(y) - 4.5, width: 9, height: 9, style: "fill:var(--accent2)" });
+    const left = x < 0.5;
+    el(g, "text", { x: PX(x) + (left ? -9 : 9), y: PY(y) + (y > -0.5 ? 19 : -9), "text-anchor": left ? "end" : "start", style: "font:italic 17px var(--serif);fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px" }, names[k]);
+  }
+  el(g, "text", { x: PX(0.5) + 10, y: PY(-0.5) + 20, style: "font:italic 17px var(--serif);fill:var(--ink);paint-order:stroke;stroke:var(--panel);stroke-width:4px" }, "F");
+  $("mtext").innerHTML = MTEXT[which];
+}
+for (const id of ["mwhich", "m25", "mcirc", "modd", "mF", "mRh"]) $(id).onchange = drawMirror;
+drawMirror();
+</script>
+<script src="menu.js?v=392e1caa"></script>
+</body>
+</html>

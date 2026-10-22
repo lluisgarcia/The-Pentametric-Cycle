@@ -45,8 +45,9 @@
 
 <script>
 const flat = [];
-document.getElementById("groups").innerHTML = LIB.ggb.map((g) => `<h2>${esc(g.group)}</h2><div class="libgrid">` +
+document.getElementById("groups").innerHTML = LIB.ggb.map((g) => `<h2 id="${g.group.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}">${esc(g.group)}</h2><div class="libgrid">` +
   g.items.map((it) => { const i = flat.push(it) - 1; return `<button class="libcard" data-i="${i}"><img src="library/thumbs/${it.thumb}" alt="${esc(it.cap)}" loading="lazy"><span class="cap"><b>${esc(nice(it.file))}</b>${esc(it.cap)}</span></button>`; }).join("") + "</div>").join("");
+if (location.hash.length > 1) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) t.scrollIntoView(); }
 document.getElementById("nall").textContent = LIB.allggb.length;
 document.getElementById("all").innerHTML = LIB.allggb.map((f, j) => `<li><a href="#stage" data-j="${j}" title="Open it here">${esc(nice(f.file))}</a> <span class="note">${f.kb} kB · <a href="${CDN("Geometry/" + f.file)}" download title="Download the .ggb file">⤓</a></span></li>`).join("");
 let api = null, loading = null;
@@ -71,6 +72,6 @@ document.getElementById("all").addEventListener("click", (e) => { const a = e.ta
   const f = LIB.allggb[+a.dataset.j], cur = flat.find((x) => x.file === f.file); openGgb(cur || { file: f.file, cap: "" }); });
 document.getElementById("gclose").onclick = () => { document.getElementById("stage").hidden = true; document.getElementById("ggbBox").innerHTML = ""; };
 </script>
-<script src="menu.js?v=4133bcd4"></script>
+<script src="menu.js?v=392e1caa"></script>
 </body>
 </html>
