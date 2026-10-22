@@ -9,8 +9,8 @@ Double-click `index.html`. Files: `index.html`, `workbench.js`, this README.
 ## The frame
 
 - The unit square is centred at the origin, corners (±½, ±½). One drawing unit (u) is the side of the unit square. y points up.
-- Holden unit **h = √0.1 ≈ 0.316228**. Every length is shown in units and in h.
-- Spiral 0 is the Fibonacci tiling (squares attached down, right, up, left, …) with its quarter-circle arcs; its square centres lie alternately on x + 3y = 0 and y = 3x − 1, which cross at Holden's crossing H₀ = (0.3, −0.1). The Holden grid is x + 3y = m and 3x − y = 1 + m (m whole), lines h apart.
+- The origins unit **h = √0.1 ≈ 0.316228** (written ρ in the notes; earlier called the Holden unit). Every length is shown in units and in h.
+- Spiral 0 is the Fibonacci tiling (squares attached down, right, up, left, …) with its quarter-circle arcs; its square centres lie alternately on x + 3y = 0 and y = 3x − 1, which cross at Holden's crossing H₀ = (0.3, −0.1). The origins grid ("Holden grid" in the panel) is x + 3y = m and 3x − y = 1 + m (m whole), lines h apart.
 - The eight spirals are spiral 0 under the 8 symmetries of the unit square: 4 rotations (0°, 90°, 180°, 270°, solid) and 4 mirrors (x-axis, y-axis, y = x, y = −x, dashed).
 
 ## Using it

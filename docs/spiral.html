@@ -19,7 +19,7 @@
 <main>
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The spiral and Holden's lines</h1>
-  <p class="lede">The centres of the Fibonacci squares lie on two perpendicular lines that meet at P&nbsp;=&nbsp;(1/10,&nbsp;3/10), and the centre of the square of side F<sub>k</sub> is exactly L<sub>k</sub> Holden units from P, where the Holden unit is h&nbsp;=&nbsp;√0.1 (Holden, 1975). The square through P centred on each Fibonacci square has area F<sub>k</sub><sup>2</sup>&nbsp;±&nbsp;4/5.</p>
+  <p class="lede">The centres of the Fibonacci squares lie on two perpendicular lines that meet at P&nbsp;=&nbsp;(1/10,&nbsp;3/10), and the centre of the square of side F<sub>k</sub> is exactly L<sub>k</sub>/√10 from P (Holden, 1975): L<sub>k</sub> origins units, with the origins unit ρ&nbsp;=&nbsp;√0.1. The square through P centred on each Fibonacci square has area F<sub>k</sub><sup>2</sup>&nbsp;±&nbsp;4/5.</p>
 
   <div class="controls">
     <label>Square k
@@ -28,7 +28,7 @@
     </label>
     <label><input id="tArc" type="checkbox" checked> spiral</label>
     <label><input id="tLines" type="checkbox" checked> Holden's lines</label>
-    <label><input id="tGrid" type="checkbox"> Holden's grid (h = √0.1)</label>
+    <label><input id="tGrid" type="checkbox"> the origins grid (ρ = √0.1)</label>
     <label><input id="tS" type="checkbox" checked> square S<sub>k</sub> and circle Γ<sub>k</sub> through P</label>
     <label><input id="tO" type="checkbox"> circumcircle Ω<sub>k</sub></label>
   </div>
@@ -47,7 +47,7 @@
       <dl class="readout" id="read"></dl>
       <p class="note" style="margin-top:14px">Odd-numbered centres lie on y&nbsp;=&nbsp;3x, even-numbered on x&nbsp;+&nbsp;3y&nbsp;=&nbsp;1. Every square S<sub>k</sub> is tilted by the same angle arctan(1/2)&nbsp;≈&nbsp;26.57°; with Holden's angle arctan(1/3) it adds up to 45°, and the doubles of the two angles are the angles of the 3–4–5 triangle.</p>
       <p class="note" id="gridNote" style="color:var(--accent)"></p>
-      <p class="note"><strong>Holden's grid</strong> (tick it above): the lines 3x&nbsp;−&nbsp;y&nbsp;=&nbsp;m and x&nbsp;+&nbsp;3y&nbsp;=&nbsp;m for whole m form a tilted grid of squares of side h&nbsp;=&nbsp;√0.1, the <i>Holden unit</i>. Holden's lines are two of its lines, and every corner and centre of the Fibonacci squares, and P, sit on its nodes. More on the <a href="thirds.html">thirds and tenths</a> page.</p>
+      <p class="note"><strong>the origins grid</strong> (tick it above): the lines 3x&nbsp;−&nbsp;y&nbsp;=&nbsp;m and x&nbsp;+&nbsp;3y&nbsp;=&nbsp;m for whole m form a tilted grid of squares of side ρ&nbsp;=&nbsp;√0.1, the <i>origins unit</i>. Holden's lines are two of its lines, and every corner and centre of the Fibonacci squares, and P, sit on its nodes. More on the <a href="thirds.html">thirds and tenths</a> page.</p>
       <p class="note">Lines and distances: H.&nbsp;L.&nbsp;Holden, <em>Fibonacci tiles</em>, Fibonacci Quarterly 13 (1975) 45–49. See also T.&nbsp;Gardiner, Note 68.15, Mathematical Gazette (1984).</p>
     </div>
   </div>
@@ -142,7 +142,7 @@ function draw() {
           el("line", { x1: X(lo), y1: Y((m - a * lo) / b), x2: X(hi), y2: Y((m - a * hi) / b), stroke: "var(--muted)", "stroke-width": 0.6, opacity: 0.35 });
       };
       fam(3, -1); fam(1, 3);
-    } else document.getElementById("gridNote").textContent = "Holden's grid is too fine to draw at this size: choose a smaller k to see it.";
+    } else document.getElementById("gridNote").textContent = "The origins grid is too fine to draw at this size: choose a smaller k to see it.";
   }
   // spiral arcs
   if (show("tArc")) {

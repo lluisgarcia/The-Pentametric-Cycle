@@ -23,13 +23,24 @@ always produces an integer. It is equivalent to $\left(n^{2}+4\left(\frac{n}{5}\
 
 **The Lucas connection.** At every Lucas number the formula returns the area of the matching Fibonacci square, $\mathfrak{P}(L_k)=F_k^2$. Conversely, perfect squares occur *only* at Lucas numbers. This links to H. L. Holden's classical 1975 result: the centres of the Fibonacci squares lie on two perpendicular lines, at distance $L_k\sqrt{0.1}$ from the point where the lines meet. A Lucas number therefore gives both the area of a Fibonacci square and the position of its centre.
 
+## Notes
+
+Shorter studies that grow out of the paper, each archived on Zenodo with its own DOI. Each folder has the PDF, the LaTeX source, the figure scripts and a Python script that checks every statement.
+
+| Note | Folder | DOI (all versions) |
+|---|---|---|
+| *The Epitetartic Rhombus: Holden's line, the Fibonacci arc, and a 5 : 4 rhombus in every square* (version 3, 20 October 2026) | [`Notes/Epitetartic Rhombus/`](Notes/Epitetartic%20Rhombus/) | [10.5281/zenodo.23325442](https://doi.org/10.5281/zenodo.23325442) |
+| *The Origin of Origins: how a circle of area π/10 about the centre of the unit square gives eight origins* (20 October 2026) | [`Notes/The Origin of Origins/`](Notes/The%20Origin%20of%20Origins/) | [10.5281/zenodo.23486276](https://doi.org/10.5281/zenodo.23486276) |
+| *Counting the Pentametric areas from an empty square* (22 October 2026) | [`Notes/Counting the Pentametric areas/`](Notes/Counting%20the%20Pentametric%20areas/) | [10.5281/zenodo.23571087](https://doi.org/10.5281/zenodo.23571087) |
+
 ## Repository contents
 
 | Folder | Contents |
 |---|---|
 | `Paper/` | The manuscript (PDF and LaTeX source), its figures, and Python scripts that independently check every claim. See `Paper/README.md`. |
+| `Notes/` | The notes listed above, one folder each: PDF, LaTeX source, figure scripts and checking scripts. `Notes/timestamps.md` lists SHA-256 fingerprints of unpublished working files. |
 | `docs/` | The interactive website, published with GitHub Pages at [lluisgarcia.github.io/The-Pentametric-Cycle](https://lluisgarcia.github.io/The-Pentametric-Cycle/): the spiral and Holden's lines, the ±0.8 correction, the pentagon clock, the monochord and tetractys, the playable palindrome, the residue tapestry, the formula explorer, the ten forms, a composer with MIDI export, the growing spiral, other primes (exploratory) and the √10/3 curiosity. Each page is a single self-contained HTML file. |
-| `Geometry/` | GeoGebra constructions (`.ggb`): the Fibonacci grid, Lucas distances, the ±0.8 square and ±2π/5 circle differences, angles, rotations and the pentagon study. Open them with [GeoGebra](https://www.geogebra.org/classic) (free). |
+| `Geometry/` | GeoGebra constructions (`.ggb`): the Fibonacci grid, Lucas distances, the ±0.8 square and ±2π/5 circle differences, angles, rotations, the pentagon study, the Epitetartic Rhombus, and the constructions of the note *Counting the Pentametric areas* (the squares of area 0.2 from an empty square, the ratio √10/3, the mirror squares). Open them with [GeoGebra](https://www.geogebra.org/classic) (free). |
 | `Tables/` | The original spreadsheets (`.xlsx`) **with their formulas**. They contain the whole family of Pentametric forms, the cycle, the palindrome, the verification counts and the angle tables. Table 2 of the paper maps each formula to its sheet and columns. |
 | `Csv/` | Plain-text exports of every spreadsheet sheet, readable without Excel. These contain values only; the formulas are in `Tables/`. |
 | `Images/` | Drawings of the constructions: the Fibonacci squares, centre lines, origin, Lucas distances in units of √0.1, and the ±0.8 and ±2π/5 differences. |

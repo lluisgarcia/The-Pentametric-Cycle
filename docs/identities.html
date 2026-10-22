@@ -66,7 +66,7 @@ const CARDS = [
     what: "At every Lucas number the formula returns the square of the Fibonacci number; and only there is P(n) a perfect square.", src: "Proved in the Fibonacci Quarterly paper (converse via Gessel's test).",
     live: (k) => { const p = PsqBig(L[k]); return `P(${big(L[k])}) = ${big(p)} = ${big(F[k])}²  ${ok(p === F[k] * F[k])}`; } },
   { t: "Holden's distance", eq: "|C<sub>k</sub>P| = L<sub>k</sub> / √10 = L<sub>k</sub>·√0.1",
-    what: "The centre of the k-th square is L<sub>k</sub> Holden units (h = √0.1) from the meeting point P of the two lines (the Geometric Lucas Meter).", src: "H. L. Holden, Fibonacci Quarterly 13 (1975).",
+    what: "The centre of the k-th square is L<sub>k</sub> origins units (ρ = √0.1) from the meeting point P of the two lines (the Geometric Lucas Meter).", src: "H. L. Holden, Fibonacci Quarterly 13 (1975).",
     live: (k) => { const Lk = Number(L[k]); return `L<sub>${k}</sub>·√0.1 = ${big(Lk)} × 0.316228 = ${(Lk * Math.sqrt(0.1)).toLocaleString("en-US", { maximumFractionDigits: 4 })}`; } },
   { t: "The square through P", eq: "L<sub>k</sub><sup>2</sup>/5 = F<sub>k</sub><sup>2</sup> ± 4/5",
     what: "The square centred on the k-th Fibonacci square with a corner at P has area L<sub>k</sub>²/5: always 4/5 more or less than the Fibonacci square.", src: "Mathematical Gazette Note.",

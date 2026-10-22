@@ -39,7 +39,7 @@
 <main>
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The Pentametric spiral</h1>
-  <p class="lede">Square n sits at distance n·√0.1 (n Holden units) from Holden's point O and has the Pentametric area P(n). In the <strong>golden rectangle</strong> arrangement every square turns around O step by step: the Lucas squares fall exactly into the Fibonacci tiling, and the steps in between are shadow squares. In the <strong>pentagon</strong> arrangement every square turns 72°, a fifth of a turn, onto the corners of a pentagon. Choose “only the Fibonacci squares” to isolate the Fibonacci spiral contained in it, growing square by square with its golden arcs. Everything starts from nothing, at n = 0.</p>
+  <p class="lede">Square n sits at distance n·√0.1 (n origins units) from Holden's point O and has the Pentametric area P(n). In the <strong>golden rectangle</strong> arrangement every square turns around O step by step: the Lucas squares fall exactly into the Fibonacci tiling, and the steps in between are shadow squares. In the <strong>pentagon</strong> arrangement every square turns 72°, a fifth of a turn, onto the corners of a pentagon. Choose “only the Fibonacci squares” to isolate the Fibonacci spiral contained in it, growing square by square with its golden arcs. Everything starts from nothing, at n = 0.</p>
   <div id="silHost"></div>
 
   <div class="panel">
@@ -52,7 +52,7 @@
       <label>show <select id="trail"><option value="all">all squares up to n</option><option value="5">the last turn (5)</option><option value="1">only n</option></select></label>
       <label><input id="oLine" type="checkbox" checked> spiral line n → n+1</label>
       <label><input id="oRays" type="checkbox" checked> pentagon</label>
-      <label><input id="oGrid" type="checkbox"> Holden's grid (√0.1)</label>
+      <label><input id="oGrid" type="checkbox"> the origins grid (√0.1)</label>
       <label><input id="oLucas" type="checkbox"> mark Lucas numbers</label>
       <label id="oArcsL"><input id="oArcs" type="checkbox" checked> golden spiral arcs</label>
       <label><input id="oSound" type="checkbox" checked> sound</label>
@@ -140,7 +140,7 @@
   <div class="panel">
     <p style="margin-top:0">At a Lucas number n = L<sub>k</sub> the formula gives the area P(L<sub>k</sub>) = F<sub>k</sub>² (the Pentametric–Lucas Theorem), and the distance n·√0.1 = L<sub>k</sub>/√10 is exactly Holden's distance from O to the centre of the k-th Fibonacci square. Size and distance are already right; only the direction differs. So a single turn around O, keeping the distance, carries each Lucas square to its place, and together they tile the golden rectangle: n = 1 and n = 3 give the two squares of side 1, n = 4 the square of side 2, n = 7 the 3, n = 11 the 5, n = 18 the 8, and so on. Switch the arrangement between “pentagon” and “golden rectangle” to watch every square turn around O, with Holden's two lines appearing through O.</p>
     <p>All the other n turn too and stay on the picture, drawn dashed: they are the <em>shadow squares</em> between the Fibonacci squares. Their area is still P(n) and their distance still n·√0.1, but they do not tile: they overlap the golden rectangle between one Fibonacci square and the next.</p>
-    <p class="note" style="margin-bottom:0">Holden's geometry and the formula fix the direction only at the Lucas numbers, a quarter turn per Lucas number. For the shadows the direction is our interpolation: the quarter turn from L<sub>k</sub> to L<sub>k+1</sub> is shared evenly among the steps in between, and each square tilts by the same angle as it turns, as if carried round O (for example n = 5 and 6 sit ⅓ and ⅔ of the way from the direction of L<sub>3</sub> = 4 to that of L<sub>4</sub> = 7). It is exact at every Lucas number; other rules are possible. n = 2 is also a Lucas number (L<sub>0</sub>), with P(2) = F<sub>0</sub>² = 0: it has no square. The pentagon arrangement itself is a way of drawing the paper's results (the pentagonal angle form gives the turn, Holden's unit the distance, the formula the area), not a separate theorem; the golden-rectangle positions are Holden's (1975).</p>
+    <p class="note" style="margin-bottom:0">Holden's geometry and the formula fix the direction only at the Lucas numbers, a quarter turn per Lucas number. For the shadows the direction is our interpolation: the quarter turn from L<sub>k</sub> to L<sub>k+1</sub> is shared evenly among the steps in between, and each square tilts by the same angle as it turns, as if carried round O (for example n = 5 and 6 sit ⅓ and ⅔ of the way from the direction of L<sub>3</sub> = 4 to that of L<sub>4</sub> = 7). It is exact at every Lucas number; other rules are possible. n = 2 is also a Lucas number (L<sub>0</sub>), with P(2) = F<sub>0</sub>² = 0: it has no square. The pentagon arrangement itself is a way of drawing the paper's results (the pentagonal angle form gives the turn, the origins unit the distance, the formula the area), not a separate theorem; the golden-rectangle positions are Holden's (1975).</p>
   </div>
 </main>
 
@@ -296,7 +296,7 @@ function drawScene(cv, R, cx, cy, lensMode) {
     g2.strokeStyle = css("--muted"); g2.lineWidth = lw * 0.6;
     for (const [x1, y1, x2, y2, m] of lines) { g2.globalAlpha = m === 0 ? 0.55 : 0.22; g2.beginPath(); g2.moveTo(X(x1), Y(y1)); g2.lineTo(X(x2), Y(y2)); g2.stroke(); }
     g2.globalAlpha = 1;
-    if (!lensMode) $("hint").dataset.grid = step > 1 ? `Holden's grid is drawn every ${step} lines here, to keep it readable; zoom in with a smaller n to see all of them.` : "";
+    if (!lensMode) $("hint").dataset.grid = step > 1 ? `The origins grid is drawn every ${step} lines here, to keep it readable; zoom in with a smaller n to see all of them.` : "";
   } else if (!lensMode) $("hint").dataset.grid = "";
   const list = shown();
   for (const j of list) {
@@ -463,7 +463,7 @@ function build3() {
   if ($("oGrid").checked) {
     const pts = []; for (const [x1, y1, x2, y2] of gridLines(E).lines) pts.push(new T.Vector3(x1, 0, -y1), new T.Vector3(x2, 0, -y2));
     const grid = new T.LineSegments(new T.BufferGeometry().setFromPoints(pts), new T.LineBasicMaterial({ color: col(css("--muted")), transparent: true, opacity: 0.25 }));
-    grid.scale.set(HM, 1, HM); grid.name = "Holden grid (sqrt 0.1)"; floor.add(grid);
+    grid.scale.set(HM, 1, HM); grid.name = "origins grid (sqrt 0.1)"; floor.add(grid);
   }
   if (gold > 0.001) {
     [[1, 3, "--accent"], [3, -1, "--accent2"]].forEach(([a, b, cc]) => { const m = Math.hypot(a, b), L = E * 1.2;

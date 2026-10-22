@@ -25,7 +25,7 @@
   <div class="panel">
     <p style="margin-top:0">On <a href="angle.html">the angle of 0.8</a>, a search that joins marked points (corners, centres, the Origin) finds arctan(4/5) nowhere special. Lluis found it where that search never looked: where one of <b>Holden's lines crosses an arc</b> of the spiral. In his GeoGebra frame (E at the origin of the axes, the arc of radius 1 centred at (0, −1)), Holden's green line x + 3y = −2 runs through C₂ = (1, −1) on the arc and leaves it again at one more point, Q₅.</p>
     <div class="controls">
-      <label><input id="hGrid" type="checkbox" checked> Holden's grid (h = √0.1)</label>
+      <label><input id="hGrid" type="checkbox" checked> the origins grid (ρ = √0.1)</label>
       <label><input id="hBig" type="checkbox" checked> the rhombus from Q₅</label>
       <label><input id="hHalf" type="checkbox"> the half rhombus on the grid</label>
     </div>
@@ -41,18 +41,18 @@
 
   <h2>2 · The same crossing in every square</h2>
   <div class="panel">
-    <p style="margin-top:0">Q₅ is not alone. Lluis found that in <b>every</b> square of the tiling Holden's lines cross the spiral exactly once, and always at a whole number of <b>Holden units</b> (h = √0.1, the side of Holden's grid) from the Origin: <b>twice the next Fibonacci number</b>. Square 1 crosses at 2h (that is Q₅), then 4h, 6h, 10h, 16h, 26h, 42h, … for ever. And seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by the side of the square and turned a quarter turn from one square to the next: the Epitetartic Rhombus grows with the spiral.</p>
+    <p style="margin-top:0">Q₅ is not alone. Lluis found that in <b>every</b> square of the tiling Holden's lines cross the spiral exactly once, and always at a whole number of <b>origins units</b> (ρ = √0.1, the side of the origins grid) from the Origin: <b>twice the next Fibonacci number</b>. Square 1 crosses at 2h (that is Q₅), then 4h, 6h, 10h, 16h, 26h, 42h, … for ever. And seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by the side of the square and turned a quarter turn from one square to the next: the Epitetartic Rhombus grows with the spiral.</p>
     <div class="controls">
       <label>squares up to <input id="xk" type="range" min="1" max="9" value="5"><output id="xkOut">5</output></label>
       <label><input id="xRh" type="checkbox" checked> rhombus in the last square</label>
-      <label><input id="xGrid" type="checkbox"> Holden's grid</label>
+      <label><input id="xGrid" type="checkbox"> the origins grid</label>
     </div>
     <div class="grid2">
       <div><svg id="xsq" viewBox="0 0 600 600" role="img" aria-label="Fibonacci squares, the spiral, Holden's lines and the crossing in every square"></svg></div>
       <div>
         <dl class="readout" id="xread"></dl>
         <div class="scroll-x"><table class="data" id="xtab"></table></div>
-        <p class="note">This section uses Gardiner's coordinates, as in the note: P = (1/10, 3/10) is the Origin, the first square is centred at (0, 0), and the centre of the square of side F<sub>k</sub> is C<sub>k</sub> = P + i<sup>k−1</sup>L<sub>k</sub>w with w = −(1 + 3i)/10 (Holden's centres, L<sub>k</sub> Holden units from P). The crossing is X<sub>k</sub> = P + 2F<sub>k+1</sub>i<sup>k−1</sup>w: on the same ray as the centre, F<sub>k</sub> units further out (2F<sub>k+1</sub> = L<sub>k</sub> + F<sub>k</sub>). In this frame Q₅ of section 1 is X₁ = −P.</p>
+        <p class="note">This section uses Gardiner's coordinates, as in the note: P = (1/10, 3/10) is the Origin, the first square is centred at (0, 0), and the centre of the square of side F<sub>k</sub> is C<sub>k</sub> = P + i<sup>k−1</sup>L<sub>k</sub>w with w = −(1 + 3i)/10 (Holden's centres, L<sub>k</sub> origins units from P). The crossing is X<sub>k</sub> = P + 2F<sub>k+1</sub>i<sup>k−1</sup>w: on the same ray as the centre, F<sub>k</sub> units further out (2F<sub>k+1</sub> = L<sub>k</sub> + F<sub>k</sub>). In this frame Q₅ of section 1 is X₁ = −P.</p>
       </div>
     </div>
     <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> for every k: with the arc's centre M<sub>k</sub> = C<sub>k</sub> + F<sub>k</sub>i<sup>k−1</sup>(1 + i)/2, X<sub>k</sub> − M<sub>k</sub> = F<sub>k</sub>i<sup>k−1</sup>(w − (1 + i)/2) = F<sub>k</sub>i<sup>k−1</sup>(−3/5 − 4/5·i), of length exactly F<sub>k</sub> and pointing into the arc's quarter. <span class="tag">computed</span> that it is the only crossing in each square, for squares 1 to 28. Found by Lluis Garcia Torcal; see the note for the full proof.</p>
@@ -153,7 +153,7 @@ function drawHol() {
   s += `<polygon points="${star(X(O[0]), Y(O[1]), 8)}" fill="${C.ink}"/>` + T(X(O[0]) + 12, Y(O[1]) + 12, "Origin", C.ink, 13, "start");
   s += `<circle cx="${f1(X(0))}" cy="${f1(Y(0))}" r="3.5" fill="${C.ink}"/>` + T(X(0) + 8, Y(0) - 10, "E", C.ink, 13, "start");
   $("hol").innerHTML = s;
-  const rows = [["Q₅", "(−4/5, −2/5), exactly"], ["from the arc's centre", "(−4/5, 3/5): a 3-4-5 point"], ["Origin → Q₅", "2 Holden units (2·√0.1) along Holden's line"]];
+  const rows = [["Q₅", "(−4/5, −2/5), exactly"], ["from the arc's centre", "(−4/5, 3/5): a 3-4-5 point"], ["Origin → Q₅", "2 origins units (2·√0.1) along Holden's line"]];
   if ($("hBig").checked) rows.push(["rhombus E G₅ J₅ N₅", "diagonals 2 and 1.6 (5 : 4)"], ["side", "√1.64 = 1.28062…"], ["area", "1.6 (each quarter 0.4)"], ["angles", "77.32° and 102.68°"]);
   if ($("hHalf").checked) rows.push(["half rhombus", "Q₅ (−0.8, −0.4), W₆ (−0.3, 0), N₃₀ (0.2, −0.4), E₇ (−0.3, −0.8)"], ["on the grid", "Q₅ and N₃₀ are grid nodes"], ["Origin → N₃₀", "√0.2: one grid cell across"]);
   $("hread").innerHTML = rows.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
@@ -205,8 +205,8 @@ function drawX() {
   s += `<polygon points="${star(X(PG[0]), Y(PG[1]), 8)}" fill="${C.ink}"/>`;
   $("xsq").innerHTML = s;
   const d = cmul(ipow(K - 1), [-3 / 5, -4 / 5]), fr = (v) => (Math.abs(v - Math.round(v)) < 1e-9 ? `${Math.round(v)}` : `${Math.round(v * 5)}/5`);
-  $("xread").innerHTML = [["square", `${K}: side F<sub>${K}</sub> = ${F}, n = L<sub>${K}</sub> = ${LUCS[K]}`], ["centre C<sub>" + K + "</sub>", `${LUCS[K]} Holden unit${LUCS[K] === 1 ? "" : "s"} from P`],
-    ["crossing X<sub>" + K + "</sub>", `<b>${2 * FIBS[K + 1]} Holden units</b> from P = 2 × ${FIBS[K + 1]} (twice F<sub>${K + 1}</sub>)`], ["beyond the centre", `${F} unit${F === 1 ? "" : "s"} (= F<sub>${K}</sub>)`],
+  $("xread").innerHTML = [["square", `${K}: side F<sub>${K}</sub> = ${F}, n = L<sub>${K}</sub> = ${LUCS[K]}`], ["centre C<sub>" + K + "</sub>", `${LUCS[K]} origins unit${LUCS[K] === 1 ? "" : "s"} from P`],
+    ["crossing X<sub>" + K + "</sub>", `<b>${2 * FIBS[K + 1]} origins units</b> from P = 2 × ${FIBS[K + 1]} (twice F<sub>${K + 1}</sub>)`], ["beyond the centre", `${F} unit${F === 1 ? "" : "s"} (= F<sub>${K}</sub>)`],
     ["seen from the arc's centre", `X − M = ${F} × (${fr(d[0])}, ${fr(d[1])}): a 3-4-5 point`], ["rhombus here", `diagonals ${2 * F} and ${+(1.6 * F).toFixed(1)} (5 : 4)`]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   let t = "<tr><th>square</th>" + Array.from({ length: K }, (_, i) => `<th class="num">${i + 1}</th>`).join("") + "</tr>";
   t += "<tr><td>side F<sub>k</sub></td>" + Array.from({ length: K }, (_, i) => `<td class="num">${FIBS[i + 1]}</td>`).join("") + "</tr>";

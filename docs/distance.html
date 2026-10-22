@@ -23,7 +23,7 @@
 <main>
   <span class="kind e">✦ Exploratory · beyond the papers, not peer reviewed</span>
   <h1>Distance to the spiral</h1>
-  <p class="lede">How far is the Fibonacci spiral from the Origin, the point P where Holden's two lines meet? Move along the spiral (drag on the picture, use the slider, or press play) and watch the distance, measured in <b>Holden units</b> (h&nbsp;=&nbsp;√0.1, the side of Holden's grid). It is a whole number of units exactly where the spiral crosses Holden's lines: 2, 4, 6, 10, 16, 26, … twice the Fibonacci numbers. You can also follow the Pentametric spiral, through the centres of all the squares, and see where its squares' corners fall. This page is an exploration beyond the papers.</p>
+  <p class="lede">How far is the Fibonacci spiral from the Origin, the point P where Holden's two lines meet? Move along the spiral (drag on the picture, use the slider, or press play) and watch the distance, measured in <b>origins units</b> (ρ&nbsp;=&nbsp;√0.1, the side of the origins grid). It is a whole number of units exactly where the spiral crosses Holden's lines: 2, 4, 6, 10, 16, 26, … twice the Fibonacci numbers. You can also follow the Pentametric spiral, through the centres of all the squares, and see where its squares' corners fall. This page is an exploration beyond the papers.</p>
 
   <div class="controls panel" style="padding:12px 16px">
     <button id="play" class="primary">▶ Play</button>
@@ -32,7 +32,7 @@
     <label>squares <select id="K"><option>4</option><option>5</option><option selected>6</option><option>7</option><option>8</option><option>9</option></select></label>
     <label><input id="oRing" type="checkbox" checked> circle through the point</label>
     <label><input id="oUnits" type="checkbox"> whole-unit circles</label>
-    <label><input id="oGrid" type="checkbox"> Holden's grid</label>
+    <label><input id="oGrid" type="checkbox"> the origins grid</label>
   </div>
 
   <div class="grid2" style="margin-top:18px">
@@ -49,29 +49,29 @@
   <h2>The distance along the spiral</h2>
   <div class="panel">
     <div class="controls" style="margin-bottom:6px"><label><input id="oLog" type="checkbox" checked> logarithmic scale</label></div>
-    <div class="scroll-x"><svg id="graph" viewBox="0 0 900 330" style="min-width:600px" role="img" aria-label="Distance from the Origin in Holden units along the spiral"></svg></div>
+    <div class="scroll-x"><svg id="graph" viewBox="0 0 900 330" style="min-width:600px" role="img" aria-label="Distance from the Origin in origins units along the spiral"></svg></div>
     <p class="note" style="margin-bottom:0">Gold: the crossings with Holden's lines (whole numbers of units). Blue: the joins, where one quarter-circle meets the next. With the Pentametric spiral chosen, its curve (purple) is drawn over the Fibonacci one (pale): it meets Holden's lines at the Lucas numbers. On the logarithmic scale the curve becomes almost a straight staircase: each quarter turn multiplies the distance by about φ = 1.618…, the golden ratio, as for a true golden spiral.</p>
   </div>
 
   <h2>The squares' corners: the ±0.8 as a distance</h2>
   <div class="panel">
-    <p style="margin-top:0">In the pentagon picture of the <a href="pentaspiral.html">Pentametric spiral</a>, square n sits n Holden units from the Origin with its diagonal along its ray. A square of area n²/5 would touch the Origin exactly with its inner corner. The real square has area 𝔓(n) = (n² + 4χ)/5, where χ = (n | 5) is 0, +1 or −1, so its half-diagonal is √(n² + 4χ) units, and its inner corner <b>misses the Origin by n − √(n² + 4χ) Holden units</b>: past it when χ = +1, short of it when χ = −1, exactly on it when 5 divides n. This is the ±0.8 of the formula, seen as a distance.</p>
+    <p style="margin-top:0">In the pentagon picture of the <a href="pentaspiral.html">Pentametric spiral</a>, square n sits n origins units from the Origin with its diagonal along its ray. A square of area n²/5 would touch the Origin exactly with its inner corner. The real square has area 𝔓(n) = (n² + 4χ)/5, where χ = (n | 5) is 0, +1 or −1, so its half-diagonal is √(n² + 4χ) units, and its inner corner <b>misses the Origin by n − √(n² + 4χ) origins units</b>: past it when χ = +1, short of it when χ = −1, exactly on it when 5 divides n. This is the ±0.8 of the formula, seen as a distance.</p>
     <div class="controls"><label>square n <input id="cn" type="range" min="1" max="60" value="7"><output id="cnOut">7</output></label> <button id="cnL">next Lucas number</button></div>
     <div class="grid2">
       <div><svg id="corner" viewBox="0 0 600 300" role="img" aria-label="The inner corner of square n near the Origin"></svg><dl class="readout" id="cread"></dl></div>
       <div><svg id="gap" viewBox="0 0 600 300" role="img" aria-label="The miss of the inner corner for n = 1 to 60"></svg>
         <p class="note">The miss for every n from 1 to 60 (above the line: short of the Origin; below: past it), with ±2/n dashed. Gold rings: the Lucas numbers.</p></div>
     </div>
-    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> At the Lucas numbers the miss is exactly <b>2ψ<sup>k</sup> = ±2/φ<sup>k</sup></b> Holden units (ψ = (1 − √5)/2): −1.236, +0.764, −0.472, +0.292, −0.180, +0.111, … It changes side every time and shrinks by the golden ratio. Proof: χ(L<sub>k</sub>) = −(−1)<sup>k</sup> and L<sub>k</sub><sup>2</sup> − 4(−1)<sup>k</sup> = 5F<sub>k</sub><sup>2</sup>, so the miss is L<sub>k</sub> − √5·F<sub>k</sub> = (φ<sup>k</sup> + ψ<sup>k</sup>) − (φ<sup>k</sup> − ψ<sup>k</sup>) = 2ψ<sup>k</sup>. For the other n it is close to ∓2/n.</p>
+    <p class="note" style="margin-bottom:0"><span class="tag proved">proved</span> At the Lucas numbers the miss is exactly <b>2ψ<sup>k</sup> = ±2/φ<sup>k</sup></b> origins units (ψ = (1 − √5)/2): −1.236, +0.764, −0.472, +0.292, −0.180, +0.111, … It changes side every time and shrinks by the golden ratio. Proof: χ(L<sub>k</sub>) = −(−1)<sup>k</sup> and L<sub>k</sub><sup>2</sup> − 4(−1)<sup>k</sup> = 5F<sub>k</sub><sup>2</sup>, so the miss is L<sub>k</sub> − √5·F<sub>k</sub> = (φ<sup>k</sup> + ψ<sup>k</sup>) − (φ<sup>k</sup> − ψ<sup>k</sup>) = 2ψ<sup>k</sup>. For the other n it is close to ∓2/n.</p>
   </div>
 
   <h2>What the distance shows</h2>
   <div class="panel">
     <ul style="margin-top:0">
-      <li><b>Crossings: twice the next Fibonacci number.</b> In the square of side F<sub>k</sub> the spiral crosses Holden's line once, at exactly 2F<sub>k+1</sub> Holden units from the Origin: 2, 4, 6, 10, 16, 26, 42, … Each crossing sits at the same place in its quarter turn, <b>53.13° in</b>, the angle arctan(4/3) of the 3-4-5 triangle: seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by F<sub>k</sub> (<a href="rhombus.html">the Epitetartic Rhombus</a>; note <a href="https://doi.org/10.5281/zenodo.23325442">doi:10.5281/zenodo.23325442</a>). <span class="tag proved">proved</span></li>
+      <li><b>Crossings: twice the next Fibonacci number.</b> In the square of side F<sub>k</sub> the spiral crosses Holden's line once, at exactly 2F<sub>k+1</sub> origins units from the Origin: 2, 4, 6, 10, 16, 26, 42, … Each crossing sits at the same place in its quarter turn, <b>53.13° in</b>, the angle arctan(4/3) of the 3-4-5 triangle: seen from the centre of its arc, every crossing is the same 3-4-5 point, scaled by F<sub>k</sub> (<a href="rhombus.html">the Epitetartic Rhombus</a>; note <a href="https://doi.org/10.5281/zenodo.23325442">doi:10.5281/zenodo.23325442</a>). <span class="tag proved">proved</span></li>
       <li><b>Joins: Pythagoras with two crossings.</b> Where the arc of square j meets the arc of square j + 1, the distance is 2√F<sub>2j+1</sub> units: √8, √20, √52, √136, √356, … Since F<sub>2j+1</sub> = F<sub>j</sub><sup>2</sup> + F<sub>j+1</sub><sup>2</sup>, this is √((2F<sub>j</sub>)<sup>2</sup> + (2F<sub>j+1</sub>)<sup>2</sup>): the hypotenuse of a right triangle whose legs are the distances of the crossings in squares j − 1 and j. <span class="tag proved">proved</span> (the join is the arc's end, M<sub>j</sub> − F<sub>j</sub>i<sup>j</sup>; its squared distance is (2F<sub>j</sub>)² + (F<sub>j</sub> + L<sub>j</sub>)² units², and F<sub>j</sub> + L<sub>j</sub> = 2F<sub>j+1</sub>.) Checked for j ≤ 27.</li>
       <li><b>The closest point.</b> The spiral starts 2 units from the Origin, comes in to its closest point, √10 − √2 = 1.748 units, at 29.5% of the first quarter turn (where the line from the arc's centre through the Origin meets the arc), and from there on it only moves away. <span class="tag proved">proved</span> for the minimum; <span class="tag">computed</span> that the distance only grows after it.</li>
-      <li><b>The Pentametric spiral.</b> Through the centres of all the squares n, it is exactly n Holden units from the Origin everywhere, by construction, and it meets Holden's lines at the Lucas numbers (the Fibonacci squares' centres, L<sub>k</sub> units: Holden). In the same square the Fibonacci spiral crosses the line F<sub>k</sub> units further out: 2F<sub>k+1</sub> = L<sub>k</sub> + F<sub>k</sub>. <span class="tag proved">proved</span></li>
+      <li><b>The Pentametric spiral.</b> Through the centres of all the squares n, it is exactly n origins units from the Origin everywhere, by construction, and it meets Holden's lines at the Lucas numbers (the Fibonacci squares' centres, L<sub>k</sub> units: Holden). In the same square the Fibonacci spiral crosses the line F<sub>k</sub> units further out: 2F<sub>k+1</sub> = L<sub>k</sub> + F<sub>k</sub>. <span class="tag proved">proved</span></li>
       <li><b>The corners.</b> The inner corner of square n misses the Origin by n − √(n² + 4χ) units, exactly 2ψ<sup>k</sup> = ±2/φ<sup>k</sup> at the Lucas numbers. <span class="tag proved">proved</span></li>
       <li><b>Growth by φ.</b> Distances at the same place of successive quarter turns grow in the ratio F<sub>k+2</sub>/F<sub>k+1</sub> → φ: the Fibonacci spiral, made of circle arcs, approaches the golden logarithmic spiral around the Origin.</li>
     </ul>
@@ -99,12 +99,12 @@ const Mc = (k) => { const c = Cc(k), v = cm(ip(k - 1), [FIB[k] / 2, FIB[k] / 2])
 const Xc = (k) => { const v = cm(ip(k - 1), [W[0] * 2 * FIB[k + 1], W[1] * 2 * FIB[k + 1]]); return [P[0] + v[0], P[1] + v[1]]; };
 // a point of the spiral: t in [0, K]; square k = floor(t) + 1, fraction f of its quarter turn
 function atF(t) { const k = Math.min(Math.floor(t) + 1, 39), f = t - (k - 1), m = Mc(k), a = Math.PI * (1 + (k - 1) / 2) + f * Math.PI / 2; return { k, f, p: [m[0] + FIB[k] * Math.cos(a), m[1] + FIB[k] * Math.sin(a)] }; }
-// the Pentametric spiral (golden arrangement): square n at n Holden units from P; between L_k and L_(k+1) the quarter turn is shared evenly
+// the Pentametric spiral (golden arrangement): square n at n origins units from P; between L_k and L_(k+1) the quarter turn is shared evenly
 const UW = Math.atan2(W[1], W[0]);
 function atP(t) { const k = Math.min(Math.floor(t) + 1, 38), f = t - (k - 1), sN = LUC[k] + f * (LUC[k + 1] - LUC[k]), a = UW + (k - 1 + f) * Math.PI / 2; return { k, f, n: sN, p: [P[0] + sN * H * Math.cos(a), P[1] + sN * H * Math.sin(a)] }; }
 const MODE = () => $("mode").value;
 const at = (t) => (MODE() === "pent" ? atP(t) : atF(t));
-const dist = (p) => Math.hypot(p[0] - P[0], p[1] - P[1]) / H;      // in Holden units
+const dist = (p) => Math.hypot(p[0] - P[0], p[1] - P[1]) / H;      // in origins units
 const T45 = Math.atan2(4, 3) / (Math.PI / 2);                         // 53.13° of 90°: where every crossing sits
 let view = null, playing = false, raf = 0;
 function el(svg, n, a, txt) { const e = document.createElementNS("http://www.w3.org/2000/svg", n); for (const k in a) e.setAttribute(k, a[k]); if (txt !== undefined) e.textContent = txt; svg.appendChild(e); return e; }
@@ -159,13 +159,13 @@ function draw() {
   if (MODE() === "pent") {
     const n = Math.round(cur.n), chi = Pent.leg(n), onL = Math.abs(cur.f) < 1e-9;
     $("read").innerHTML = [["along the spiral", `n = ${cur.n.toFixed(3)} (between L<sub>${cur.k}</sub> = ${LUC[cur.k]} and L<sub>${cur.k + 1}</sub> = ${LUC[cur.k + 1]})`],
-      ["distance", `${d.toFixed(4)} Holden units = n, exactly`], ["nearest square", `n = ${n}: area 𝔓(${n}) = ${Pent.P(n)}, distance ${n} units`],
+      ["distance", `${d.toFixed(4)} origins units = n, exactly`], ["nearest square", `n = ${n}: area 𝔓(${n}) = ${Pent.P(n)}, distance ${n} units`],
       ["turned", `${(cur.f * 90).toFixed(1)}° past Holden's line`]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
     $("say").innerHTML = onL ? `<b style="color:var(--c4)">On Holden's line:</b> the Fibonacci square n = L<sub>${cur.k}</sub> = ${LUC[cur.k]}, exactly ${LUC[cur.k]} units from the Origin (Holden). In the same square the Fibonacci spiral crosses the line at 2F<sub>${cur.k + 1}</sub> = ${2 * FIB[cur.k + 1]} units = L<sub>${cur.k}</sub> + F<sub>${cur.k}</sub>: the centre spiral is always F<sub>${cur.k}</sub> = ${FIB[cur.k]} units inside.` : "";
     drawGraph(K, t); return;
   }
   $("read").innerHTML = [["square", `${cur.k} (side F<sub>${cur.k}</sub> = ${FIB[cur.k]})`], ["through its quarter turn", `${(cur.f * 90).toFixed(1)}° of 90°`],
-    ["distance", `${d.toFixed(4)} Holden units = ${(d * H).toFixed(4)}`], ["squared", `${(d * d).toFixed(3)} units²`],
+    ["distance", `${d.toFixed(4)} origins units = ${(d * H).toFixed(4)}`], ["squared", `${(d * d).toFixed(3)} units²`],
     ["growth", cur.k > 1 ? `× ${(d / dist(at(t - 1).p)).toFixed(4)} since the same place one quarter earlier (φ = 1.6180)` : "—"]].map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   $("say").innerHTML = atCross ? `<b style="color:var(--c4)">On Holden's line:</b> exactly ${2 * FIB[cur.k + 1]} units = 2 × F<sub>${cur.k + 1}</sub>, at 53.13° into the quarter turn.`
     : atJoin ? (Math.round(t) === 0 ? "The start of the spiral: exactly 2 units (a corner of the first square, on Holden's other line)." : `<b style="color:var(--accent)">A join:</b> exactly 2√${FIB[2 * Math.round(t) + 1]} = √(${2 * FIB[Math.round(t)]}² + ${2 * FIB[Math.round(t) + 1]}²) units.`)
@@ -182,7 +182,7 @@ function drawGraph(K, t) {
   const ticks = log ? (pent ? [1, 3, 4, 7, 11, 18, 29, 47, 76, 123] : [2, 4, 6, 10, 16, 26, 42, 68, 110, 178, 288]).filter((v) => v <= dmax * 1.1) : Array.from({ length: 6 }, (_, i) => Math.round(dmax * i / 5));
   for (const v of ticks) { if (!(v > 0) && log) continue; el(g, "line", { x1: L, y1: fy(v), x2: R, y2: fy(v), stroke: C.rule }); el(g, "text", { x: L - 6, y: fy(v) + 4, "text-anchor": "end", "font-size": 11, fill: C.muted }, v); }
   for (let k = 0; k <= K; k++) { el(g, "line", { x1: fx(k), y1: T, x2: fx(k), y2: B, stroke: C.rule, "stroke-dasharray": "2 4" }); if (k < K) el(g, "text", { x: fx(k + 0.5), y: B + 18, "text-anchor": "middle", "font-size": 11, fill: C.muted }, `square ${k + 1}`); }
-  el(g, "text", { x: 14, y: (T + B) / 2, "font-size": 11, fill: C.muted, transform: `rotate(-90 14 ${(T + B) / 2})`, "text-anchor": "middle" }, "distance (Holden units)");
+  el(g, "text", { x: 14, y: (T + B) / 2, "font-size": 11, fill: C.muted, transform: `rotate(-90 14 ${(T + B) / 2})`, "text-anchor": "middle" }, "distance (origins units)");
   const pts = []; for (let i = 0; i <= K * 120; i++) { const u = i / 120; pts.push(`${f1(fx(u))},${f1(fy(dist(atF(u).p)))}`); }
   el(g, "polyline", { points: pts.join(" "), fill: "none", stroke: C.adj, "stroke-width": pent ? 1.2 : 2, opacity: pent ? 0.45 : 1 });
   if (!pent) {
