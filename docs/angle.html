@@ -38,7 +38,7 @@
   <h2>1 · The ±0.8 triangle</h2>
   <div class="grid2">
     <div class="panel">
-      <svg id="fan" viewBox="0 0 540 330" role="img" aria-label="Triangle from O to (1, 0.8) and (1, −0.8)"></svg>
+      <svg id="fan" viewBox="0 0 540 330" role="img" aria-label="Triangle from P to (1, 0.8) and (1, −0.8)"></svg>
     </div>
     <div class="panel">
       <div class="controls" style="margin-bottom:8px">
@@ -46,7 +46,7 @@
         <button id="nm">−1</button><button id="np">+1</button>
       </div>
       <dl class="readout" id="nread"></dl>
-      <p class="note">From O, one step to the right, then up 0.8 when (n|5) = +1 (n ends in 1, 4, 6, 9), down 0.8 when it is −1 (2, 3, 7, 8), and straight on when n is a multiple of 5. The correction itself is explained on <a href="defects.html">The ±0.8 correction</a>.</p>
+      <p class="note">From P, one step to the right, then up 0.8 when (n|5) = +1 (n ends in 1, 4, 6, 9), down 0.8 when it is −1 (2, 3, 7, 8), and straight on when n is a multiple of 5. The correction itself is explained on <a href="defects.html">The ±0.8 correction</a>.</p>
     </div>
   </div>
   <div class="panel" style="margin-top:14px">
@@ -128,7 +128,7 @@
     </div>
     <ul style="margin-bottom:0">
       <li><b>Golden-rectangle tiling</b> (all corners up to square 40): two segments have slope 4/5, from the corner of squares 1|2 to the corner of 5|8 (length √41) and from 3|4 to 6|9 (length 2√41), and none further out. Slope 3/4 also has exactly two, while the Fibonacci slopes 1/2, 2/3, 3/5, 5/8, … have 36 to 41 each.</li>
-      <li><b>The Pentametric spiral</b> (squares 1 to 60 around the pentagon): fourteen segments make the angle with a spoke or with the line across it, for example from the centre of square 5 to the side corners of square 25 (ratio 20/25). All of them lie on the silent ray. From the centre of square 5, the side corners of square 5(k+1) are seen at exactly θ<sub>k</sub> = arctan(k/(k+1)) from the line across the spoke (they are 5k steps of √0.1 further along it and 5(k+1) steps to the side), so the whole family of section 4 appears there, but so do other slopes. A multiple of 5 has 𝔓(n) = n²/5 exactly, so its square has its inner corner at O, and along that ray every rational slope appears; 1/2 and 1/3 appear even more often.</li>
+      <li><b>The Pentametric spiral</b> (squares 1 to 60 around the pentagon): fourteen segments make the angle with a spoke or with the line across it, for example from the centre of square 5 to the side corners of square 25 (ratio 20/25). All of them lie on the silent ray. From the centre of square 5, the side corners of square 5(k+1) are seen at exactly θ<sub>k</sub> = arctan(k/(k+1)) from the line across the spoke (they are 5k steps of √0.1 further along it and 5(k+1) steps to the side), so the whole family of section 4 appears there, but so do other slopes. A multiple of 5 has 𝔓(n) = n²/5 exactly, so its square has its inner corner at P, and along that ray every rational slope appears; 1/2 and 1/3 appear even more often.</li>
     </ul>
   </div>
   <p class="note">The 0.8 lives in the arithmetic, in the correction, in the doubled angle of the paper's θ₂ and in the family of triangles whose primes give square silences, and, as Lluis found, in the geometry too: where Holden's line meets an arc of the spiral, and in <a href="rhombus.html">the Epitetartic Rhombus</a> that every square holds.</p>
@@ -173,7 +173,7 @@ function drawFan() {
   h += T(O.x + 78, O.y - 24, "θ", C.th, 17) + T(O.x + 68, O.y + 20, "θ", C.th, 17);
   h += ARC(O.x, O.y, 30, -th, th, C.ph, 2, 'stroke-dasharray="3 3"');
   h += T(O.x - 52, O.y + 74, "2θ = 77.32°", C.ph, 14, "start");
-  h += T(O.x - 10, O.y + 3, "O", C.ink, 15, "end");
+  h += T(O.x - 10, O.y + 3, "P", C.ink, 15, "end");
   h += T((O.x + mid.x) / 2, O.y + 14, "1", C.adj, 16);
   h += T(top.x + 12, (top.y + O.y) / 2, "+0.8", C.opp, 16, "start") + T(bot.x + 12, (bot.y + O.y) / 2, "−0.8", C.opp, 16, "start");
   h += T(top.x + 70, O.y - 14, "span 1.6", C.opp, 14, "start");
@@ -186,7 +186,7 @@ function drawFan() {
   $("fan").innerHTML = h;
   const corr = chi > 0 ? "+0.8" : chi < 0 ? "−0.8" : "0";
   const iv = ["silence", "unison", "octave", "fifth", "fourth"][Pent.H(n)];
-  $("nread").innerHTML = [["n", n], ["(n|5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"], ["n²/5", (n * n / 5).toFixed(1)], ["correction", corr], ["𝔓(n)", Pent.P(n)], ["slope from O", chi === 0 ? "0 (straight on)" : `${corr} → ${chi > 0 ? "+" : "−"}38.66°`], ["♪(n)", iv]]
+  $("nread").innerHTML = [["n", n], ["(n|5)", chi > 0 ? "+1" : chi < 0 ? "−1" : "0"], ["n²/5", (n * n / 5).toFixed(1)], ["correction", corr], ["𝔓(n)", Pent.P(n)], ["slope from P", chi === 0 ? "0 (straight on)" : `${corr} → ${chi > 0 ? "+" : "−"}38.66°`], ["♪(n)", iv]]
     .map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
 }
 $("n").addEventListener("input", drawFan);
@@ -249,7 +249,7 @@ $("pre").addEventListener("change", () => { const v = $("pre").value; if (!v) re
 // ---------- 3 · 0.8 three ways ----------
 function drawThree() {
   const C = COL(), u = 46; let s = "";
-  // tri(ox, oy, adj, opp, labels, angle at O, which two sides in gold, caption)
+  // tri(ox, oy, adj, opp, labels, angle at P, which two sides in gold, caption)
   const tri = (ox, oy, adj, opp, lab, gold, cap1, cap2) => {
     const Q = { x: ox + adj * u, y: oy }, R = { x: ox + adj * u, y: oy - opp * u }, th = Math.atan2(opp, adj);
     let t = `<polygon points="${ox},${oy} ${Q.x},${Q.y} ${R.x},${R.y}" fill="${C.fill}" opacity=".6"/>`;
@@ -333,7 +333,7 @@ $("tab").addEventListener("click", (e) => { const tr = e.target.closest("tr[data
 const FIB = [0, 1], LUC = [2, 1];
 for (let i = 2; i < 64; i++) { FIB.push(FIB[i - 1] + FIB[i - 2]); LUC.push(LUC[i - 1] + LUC[i - 2]); }
 function pentPoints(N) {         // the pentagon arrangement of the Pentametric spiral (y up)
-  const pts = [{ x: 0, y: 0, name: "O", n: 0 }], sq = [];
+  const pts = [{ x: 0, y: 0, name: "P", n: 0 }], sq = [];
   for (let n = 1; n <= N; n++) {
     const a = 72 * n / DEG, u = { x: Math.sin(a), y: Math.cos(a) }, v = { x: u.y, y: -u.x };
     const d = n * Math.sqrt(0.1), h = Math.sqrt(Pent.P(n) / 2), c = { x: u.x * d, y: u.y * d };
@@ -391,7 +391,7 @@ function drawGeo() {
   }
   // view box from the drawn squares
   let xs = [], ys = []; G.sq.forEach((q) => q.poly.forEach((p) => { xs.push(p.x); ys.push(p.y); }));
-  // the spiral is drawn with O fixed at the centre, so changing the range only zooms; the tiling is fitted to its squares
+  // the spiral is drawn with P fixed at the centre, so changing the range only zooms; the tiling is fitted to its squares
   const R = Math.max(...xs.map(Math.abs), ...ys.map(Math.abs)), yTop = Math.max(...ys);
   const [x0, x1, y0, y1] = pic === "pent" ? [-R, R, -R, R] : [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)], W = 600, pad = 24;
   const sc = (W - 2 * pad) / Math.max(x1 - x0, y1 - y0), ox = pad + ((W - 2 * pad) - (x1 - x0) * sc) / 2, oy = pad + ((W - 2 * pad) - (y1 - y0) * sc) / 2;
@@ -411,14 +411,14 @@ function drawGeo() {
   G.sq.forEach((q) => { if ((show || q.silent) && (q.silent || pic === "tile" || q.n <= 10)) { const c = q.poly.reduce((m, p) => ({ x: m.x + p.x / 4, y: m.y + p.y / 4 }), { x: 0, y: 0 }); if (q.silent && pic === "pent") { if ((q.n / 5) % labStep === 0) s += T(X(q.poly[0].x) + 7, Y(q.poly[0].y) + 2, q.n, C.ph, 12, "start"); } else s += T(X(c.x), Y(c.y), q.n, C.muted, Math.max(9, Math.min(14, 6 + q.n / 3)), "middle"); } });
   hits.forEach(([p, q]) => { s += LN(X(p.x), Y(p.y), X(q.x), Y(q.y), C.th, 2.5); s += `<circle cx="${f1(X(p.x))}" cy="${f1(Y(p.y))}" r="3" fill="${C.th}"/><circle cx="${f1(X(q.x))}" cy="${f1(Y(q.y))}" r="3" fill="${C.th}"/>`; });
   const o = pic === "pent" ? { x: 0, y: 0 } : { x: 0.1, y: 0.3 };
-  s += `<circle cx="${f1(X(o.x))}" cy="${f1(Y(o.y))}" r="3.5" fill="${C.ink}"/>` + T(X(o.x) - 6, Y(o.y) + 10, pic === "pent" ? "O" : "P", C.ink, 13, "end");
+  s += `<circle cx="${f1(X(o.x))}" cy="${f1(Y(o.y))}" r="3.5" fill="${C.ink}"/>` + T(X(o.x) - 6, Y(o.y) + 10, "P", C.ink, 13, "end");
   $("geo").innerHTML = s;
   const onSilent = (p) => p.ns.every((n) => n === 0 || n % 5 === 0);
   const silentAll = pic === "pent" && hits.length > 0 && hits.every(([p, q]) => onSilent(p) && onSilent(q));
   $("gread").innerHTML = [["segments", hits.length], ["points tested", P.length], ...(pic === "pent" ? [["all on the silent ray", hits.length ? (silentAll ? '<span class="ok">yes</span>' : "no") : "—"]] : [])].map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("");
   const list = hits.slice(0, 8).map(([p, q]) => `${p.names.join(" = ")} → ${q.names.join(" = ")}`).join("<br>");
   $("gnote").innerHTML = (pic === "pent"
-    ? "In the pentagon picture the angle is measured from the five spokes and the lines across them (every multiple of 18°). A square whose n is a multiple of 5 has area n²/5 exactly, so its half-diagonal equals its distance n·√0.1 from O: its inner corner sits on O, and all the silent squares grow from that one point along one spoke. Measured along that spoke, their corners and centres are whole origins units (√0.1), so every simple slope turns up there, each from a certain size on: 1/2 and 1/3 from square 10, 2/3 from 15, 3/4 and 3/5 from 20, 4/5 from 25. Seen from the centre of square 5, the side corners of squares 10, 15, 20, 25, … lie at exactly arctan(1/2), arctan(2/3), arctan(3/4), arctan(4/5), … from the line across the spoke: the whole family of section 4, one member per silent square, with the angle of 0.8 at square 25."
+    ? "In the pentagon picture the angle is measured from the five spokes and the lines across them (every multiple of 18°). A square whose n is a multiple of 5 has area n²/5 exactly, so its half-diagonal equals its distance n·√0.1 from P: its inner corner sits on P, and all the silent squares grow from that one point along one spoke. Measured along that spoke, their corners and centres are whole origins units (√0.1), so every simple slope turns up there, each from a certain size on: 1/2 and 1/3 from square 10, 2/3 from 15, 3/4 and 3/5 from 20, 4/5 from 25. Seen from the centre of square 5, the side corners of squares 10, 15, 20, 25, … lie at exactly arctan(1/2), arctan(2/3), arctan(3/4), arctan(4/5), … from the line across the spoke: the whole family of section 4, one member per silent square, with the angle of 0.8 at square 25."
     : "In the tiling the angle is measured from the axes, so slopes a/b and b/a are the same angle. The Fibonacci slopes (1/2, 2/3, 3/5, …) are built into the tiling and appear many times; the others appear only near the centre, or not at all.")
     + (!hits.length ? `<br><br><b>No segment with this slope up to square ${N}.</b>${pic === "pent" ? " The first ones need a larger silent square: try a larger range." : ""}` : "")
     + (hits.length ? `<br><br><b>Segments${hits.length > 8 ? " (first 8)" : ""}:</b><br>${list}` : "");

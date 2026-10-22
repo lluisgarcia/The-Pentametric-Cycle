@@ -39,7 +39,7 @@
 <main>
   <span class="kind u">◆ Understand · explore the ideas interactively</span>
   <h1>The Pentametric spiral</h1>
-  <p class="lede">Square n sits at distance n·√0.1 (n origins units) from Holden's point O and has the Pentametric area P(n). In the <strong>golden rectangle</strong> arrangement every square turns around O step by step: the Lucas squares fall exactly into the Fibonacci tiling, and the steps in between are shadow squares. In the <strong>pentagon</strong> arrangement every square turns 72°, a fifth of a turn, onto the corners of a pentagon. Choose “only the Fibonacci squares” to isolate the Fibonacci spiral contained in it, growing square by square with its golden arcs. Everything starts from nothing, at n = 0.</p>
+  <p class="lede">Square n sits at distance n·√0.1 (n origins units) from the Origin P (Holden's point) and has the Pentametric area 𝔓(n). In the <strong>golden rectangle</strong> arrangement every square turns around P step by step: the Lucas squares fall exactly into the Fibonacci tiling, and the steps in between are shadow squares. In the <strong>pentagon</strong> arrangement every square turns 72°, a fifth of a turn, onto the corners of a pentagon. Choose “only the Fibonacci squares” to isolate the Fibonacci spiral contained in it, growing square by square with its golden arcs. Everything starts from nothing, at n = 0.</p>
   <div id="silHost"></div>
 
   <div class="panel">
@@ -60,7 +60,7 @@
     <div class="row">
       <span>arrangement</span>
       <span class="seg-btn" role="group" aria-label="arrangement">
-        <button id="arGold" aria-pressed="true" title="every square turns around O; the Lucas squares fall exactly into the golden rectangle">golden rectangle</button><button id="arPent" aria-pressed="false" title="every square turns 72°, onto the corners of a pentagon">pentagon</button>
+        <button id="arGold" aria-pressed="true" title="every square turns around P; the Lucas squares fall exactly into the golden rectangle">golden rectangle</button><button id="arPent" aria-pressed="false" title="every square turns 72°, onto the corners of a pentagon">pentagon</button>
       </span>
     </div>
     <div class="row">
@@ -115,7 +115,7 @@
       <div id="stage">
         <canvas id="c2" aria-label="The Pentametric spiral in the plane"></canvas>
         <canvas id="c3" class="hidden" aria-label="The Pentametric spiral in three dimensions"></canvas>
-        <canvas id="lens" aria-label="Magnified view of the centre O"></canvas>
+        <canvas id="lens" aria-label="Magnified view of the Origin P"></canvas>
         <span id="lensCap"></span>
       </div>
       <p class="note" id="hint" style="margin-bottom:0"></p>
@@ -131,16 +131,16 @@
 
   <h2>Why the ±0.8 shows at the centre</h2>
   <div class="panel">
-    <p style="margin-top:0">Take a square of area n²/5. Its side is n/√5 and half its diagonal is n/√10 = n·√0.1, which is exactly its distance from O. So when its diagonal points along the ray, <strong>its inner corner lands exactly on O</strong>, for every n. That is the square S<sub>k</sub> of the paper (a vertex on Holden's point), now for every n and turned by 72° each step.</p>
-    <p>The Pentametric square has area P(n) = n²/5 ± 0.8 instead. On the corners n ≡ 1, 4 (mod 5) it is a little larger, so its corner passes just beyond O; on the corners n ≡ 2, 3 it is a little smaller and stops just short; on the corner n ≡ 0 it touches O exactly. The gap is about 0.63/n: large for the first steps, where the magnifier shows it (n = 1 to 3), and soon too small to see.</p>
-    <p style="margin-bottom:0">With circles, the circle around the square (radius √(P(n)/2)) would pass exactly through O for the area n²/5; the Pentametric circle's area differs from that one by exactly 2π/5, 0 or −2π/5, the circle law of the paper. In 3D the squares become cubes and the circles spheres, each centred at height h(n): the cubes all lean on the vertical axis, and the spheres all brush against it.</p>
+    <p style="margin-top:0">Take a square of area n²/5. Its side is n/√5 and half its diagonal is n/√10 = n·√0.1, which is exactly its distance from O. So when its diagonal points along the ray, <strong>its inner corner lands exactly on P</strong>, for every n. That is the square S<sub>k</sub> of the paper (a vertex on the Origin P), now for every n and turned by 72° each step.</p>
+    <p>The Pentametric square has area 𝔓(n) = n²/5 ± 0.8 instead. On the corners n ≡ 1, 4 (mod 5) it is a little larger, so its corner passes just beyond P; on the corners n ≡ 2, 3 it is a little smaller and stops just short; on the corner n ≡ 0 it touches P exactly. The gap is about 0.63/n: large for the first steps, where the magnifier shows it (n = 1 to 3), and soon too small to see.</p>
+    <p style="margin-bottom:0">With circles, the circle around the square (radius √(𝔓(n)/2)) would pass exactly through P for the area n²/5; the Pentametric circle's area differs from that one by exactly 2π/5, 0 or −2π/5, the circle law of the paper. In 3D the squares become cubes and the circles spheres, each centred at height h(n): the cubes all lean on the vertical axis, and the spheres all brush against it.</p>
   </div>
 
   <h2>From the pentagon to the golden rectangle</h2>
   <div class="panel">
-    <p style="margin-top:0">At a Lucas number n = L<sub>k</sub> the formula gives the area P(L<sub>k</sub>) = F<sub>k</sub>² (the Pentametric–Lucas Theorem), and the distance n·√0.1 = L<sub>k</sub>/√10 is exactly Holden's distance from O to the centre of the k-th Fibonacci square. Size and distance are already right; only the direction differs. So a single turn around O, keeping the distance, carries each Lucas square to its place, and together they tile the golden rectangle: n = 1 and n = 3 give the two squares of side 1, n = 4 the square of side 2, n = 7 the 3, n = 11 the 5, n = 18 the 8, and so on. Switch the arrangement between “pentagon” and “golden rectangle” to watch every square turn around O, with Holden's two lines appearing through O.</p>
-    <p>All the other n turn too and stay on the picture, drawn dashed: they are the <em>shadow squares</em> between the Fibonacci squares. Their area is still P(n) and their distance still n·√0.1, but they do not tile: they overlap the golden rectangle between one Fibonacci square and the next.</p>
-    <p class="note" style="margin-bottom:0">Holden's geometry and the formula fix the direction only at the Lucas numbers, a quarter turn per Lucas number. For the shadows the direction is our interpolation: the quarter turn from L<sub>k</sub> to L<sub>k+1</sub> is shared evenly among the steps in between, and each square tilts by the same angle as it turns, as if carried round O (for example n = 5 and 6 sit ⅓ and ⅔ of the way from the direction of L<sub>3</sub> = 4 to that of L<sub>4</sub> = 7). It is exact at every Lucas number; other rules are possible. n = 2 is also a Lucas number (L<sub>0</sub>), with P(2) = F<sub>0</sub>² = 0: it has no square. The pentagon arrangement itself is a way of drawing the paper's results (the pentagonal angle form gives the turn, the origins unit the distance, the formula the area), not a separate theorem; the golden-rectangle positions are Holden's (1975).</p>
+    <p style="margin-top:0">At a Lucas number n = L<sub>k</sub> the formula gives the area 𝔓(L<sub>k</sub>) = F<sub>k</sub>² (the Pentametric–Lucas Theorem), and the distance n·√0.1 = L<sub>k</sub>/√10 is exactly Holden's distance from the Origin P to the centre of the k-th Fibonacci square. Size and distance are already right; only the direction differs. So a single turn around P, keeping the distance, carries each Lucas square to its place, and together they tile the golden rectangle: n = 1 and n = 3 give the two squares of side 1, n = 4 the square of side 2, n = 7 the 3, n = 11 the 5, n = 18 the 8, and so on. Switch the arrangement between “pentagon” and “golden rectangle” to watch every square turn around P, with Holden's two lines appearing through O.</p>
+    <p>All the other n turn too and stay on the picture, drawn dashed: they are the <em>shadow squares</em> between the Fibonacci squares. Their area is still 𝔓(n) and their distance still n·√0.1, but they do not tile: they overlap the golden rectangle between one Fibonacci square and the next.</p>
+    <p class="note" style="margin-bottom:0">Holden's geometry and the formula fix the direction only at the Lucas numbers, a quarter turn per Lucas number. For the shadows the direction is our interpolation: the quarter turn from L<sub>k</sub> to L<sub>k+1</sub> is shared evenly among the steps in between, and each square tilts by the same angle as it turns, as if carried round P (for example n = 5 and 6 sit ⅓ and ⅔ of the way from the direction of L<sub>3</sub> = 4 to that of L<sub>4</sub> = 7). It is exact at every Lucas number; other rules are possible. n = 2 is also a Lucas number (L<sub>0</sub>), with 𝔓(2) = F<sub>0</sub>² = 0: it has no square. The pentagon arrangement itself is a way of drawing the paper's results (the pentagonal angle form gives the turn, the origins unit the distance, the formula the area), not a separate theorem; the golden-rectangle positions are Holden's (1975).</p>
   </div>
 </main>
 
@@ -165,7 +165,7 @@ function geo(n) {
   const corners = [[1, 0], [0, 1], [-1, 0], [0, -1]].map(([p, q]) => ({ x: c.x + half * (p * u.x + q * v.x), y: c.y + half * (p * u.y + q * v.y) }));
   return { n, a, u, v, d, area, side, half, c, corners, chi: Pent.leg(n), gap: d - half, h: Pent.V(n) };   // h: H(n), or 5 for a silence with the switch on 5
 }
-// where square n is drawn: on the pentagon (gold = 0) or, for a Lucas number, swung round O into the golden rectangle (gold = 1)
+// where square n is drawn: on the pentagon (gold = 0) or, for a Lucas number, swung round P into the golden rectangle (gold = 1)
 let gold = 1, goldAnim = null;           // the golden-rectangle arrangement is the default
 const wrapA = (a) => { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; };
 function holden(k) {                         // C_k - P = i^(k-1) L_k w, w = -(1+3i)/10 (Holden 1975, Gardiner's coordinates)
@@ -195,7 +195,7 @@ function place(n) {
   const corners = [0, 1, 2, 3].map((j) => ({ x: c.x + g.half * Math.cos(om + j * Math.PI / 2), y: c.y + g.half * Math.sin(om + j * Math.PI / 2) }));
   return { ...g, c, om, corners, fade: 1, swing: dth, k, isL, shadow: !isL && gold > 0.001 };
 }
-// the √0.1 grid, with O at Holden's point: the lines 3x − y = m and x + 3y = m for whole m, √0.1 apart.
+// the √0.1 grid, with P at Holden's point: the lines 3x − y = m and x + 3y = m for whole m, √0.1 apart.
 // Holden's two lines are m = 0; every corner and centre of the golden-rectangle squares is a grid point.
 function gridLines(R) {
   const lim = Math.ceil(R * Math.SQRT2 * Math.sqrt(10)), step = [1, 2, 5, 10, 20, 50, 100, 200, 500].find((k) => (2 * lim) / k <= 160) || 1000, out = [];
@@ -203,7 +203,7 @@ function gridLines(R) {
   for (const [nx, ny] of [[3, -1], [1, 3]]) {               // normal of each family, length √10
     const dx = -ny / r10, dy = nx / r10;
     for (let m = -Math.floor(lim / step) * step; m <= lim; m += step) {
-      const px = nx * m / 10, py = ny * m / 10;             // foot of the perpendicular from O: distance |m|/√10
+      const px = nx * m / 10, py = ny * m / 10;             // foot of the perpendicular from P: distance |m|/√10
       out.push([px - dx * L, py - dy * L, px + dx * L, py + dy * L, m]);
     }
   }
@@ -230,7 +230,7 @@ function colourOf(g) {
   if ($("colour").value === "h") return css(`--c${g.h}`);
   return g.chi > 0 ? css("--accent") : g.chi < 0 ? css("--accent2") : css("--muted");
 }
-// "only the Fibonacci squares": the Lucas numbers n = L_k (k ≥ 1), where P(n) = F_k²; the growing Fibonacci spiral inside the Pentametric one
+// "only the Fibonacci squares": the Lucas numbers n = L_k (k ≥ 1), where 𝔓(n) = F_k²; the growing Fibonacci spiral inside the Pentametric one
 const fibOnly = () => $("squares").value === "fib";
 const LUC_LIST = [...LUCAS].filter(([v, k]) => k >= 1).map(([v]) => v).sort((a, b) => a - b);
 // In the Fibonacci view every step still sounds (the time between squares is real); "only the Lucas steps" skips it
@@ -239,12 +239,12 @@ const prevLucas = (m) => [...LUC_LIST].reverse().find((v) => v < m) ?? 0;
 const skipping = () => fibOnly() && $("oSkip").checked;
 const nextStep = (m) => (skipping() ? nextLucas(m) : m + 1);
 const prevStep = (m) => (skipping() ? prevLucas(m) : m - 1);
-// golden-spiral arcs (as in Holden's tiling): a quarter circle of radius F_k in each Fibonacci square, coordinates with O at the origin
+// golden-spiral arcs (as in Holden's tiling): a quarter circle of radius F_k in each Fibonacci square, coordinates with P at the origin
 const ARC = (() => {
   const Fk = (k) => Number(Pent.F[k]), out = [];
   const corners = (k) => { const c = holden(k), h = Fk(k) / 2; return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => ({ x: c.x + a * h, y: c.y + b * h })); };
   const same = (p, q) => Math.abs(p.x - q.x) < 1e-6 && Math.abs(p.y - q.y) < 1e-6, dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y);
-  const A = [{ x: -0.6, y: 0.2 }];                     // the outer corner of the first square, in O-coordinates
+  const A = [{ x: -0.6, y: 0.2 }];                     // the outer corner of the first square, in P-coordinates
   for (let k = 1; k <= 26; k++) {
     A.push(corners(k).find((c) => Math.abs(dist(c, A[k - 1]) - Fk(k) * Math.SQRT2) < 1e-6));
     const C = corners(k).filter((c) => !same(c, A[k - 1]) && !same(c, A[k])).reduce((m, c) => (dist(c, { x: 0, y: 0 }) < dist(m, { x: 0, y: 0 }) ? c : m));
@@ -262,7 +262,7 @@ function shown() {
 function legend() {
   const items = $("colour").value === "h"
     ? Pent.INTERVALS5.filter((iv) => (Pent.silence5() ? iv.h : iv.h !== 5)).map((iv) => [`var(--c${iv.h})`, iv.ratio ? `${iv.name} ${iv.ratio}` : "silence"])
-    : [["var(--accent)", "+0.8 (n ≡ 1, 4): corner passes beyond O"], ["var(--accent2)", "−0.8 (n ≡ 2, 3): corner stops short"], ["var(--muted)", "0 (n ≡ 0): exact"]];
+    : [["var(--accent)", "+0.8 (n ≡ 1, 4): corner passes beyond P"], ["var(--accent2)", "−0.8 (n ≡ 2, 3): corner stops short"], ["var(--muted)", "0 (n ≡ 0): exact"]];
   $("legend").innerHTML = items.map(([c, t]) => `<span><i class="sw" style="background:${c}"></i>${t}</span>`).join("");
 }
 
@@ -326,7 +326,7 @@ function drawScene(cv, R, cx, cy, lensMode) {
       g2.beginPath(); for (let i = 0; i <= 40; i++) { const t = a.t0 + a.dt * i / 40, x = a.c.x + a.r * Math.cos(t), y = a.c.y + a.r * Math.sin(t); i ? g2.lineTo(X(x), Y(y)) : g2.moveTo(X(x), Y(y)); } g2.stroke(); }
     g2.globalAlpha = 1;
   }
-  // Holden's two perpendicular lines through O, on which the centres of the golden rectangle's squares lie
+  // Holden's two perpendicular lines through P, on which the centres of the golden rectangle's squares lie
   if (gold > 0.001) {
     g2.globalAlpha = gold; g2.setLineDash([6 * dpr, 4 * dpr]); g2.lineWidth = lw * 1.2;
     [[1, 3, "--accent"], [3, -1, "--accent2"]].forEach(([a, b, c]) => { const m = Math.hypot(a, b), L = R * 3; g2.strokeStyle = css(c); g2.beginPath(); g2.moveTo(X(-a / m * L), Y(-b / m * L)); g2.lineTo(X(a / m * L), Y(b / m * L)); g2.stroke(); });
@@ -338,9 +338,9 @@ function drawScene(cv, R, cx, cy, lensMode) {
     g2.strokeStyle = css("--ink"); g2.lineWidth = dpr * 1.2; g2.stroke();
     g2.font = `600 ${11 * dpr}px ${css("--sans")}`; g2.fillStyle = css("--ink"); g2.textAlign = "left"; g2.fillText(`n = ${n}`, X(g.c.x) + 8 * dpr, Y(g.c.y) - 6 * dpr);
   }
-  // the centre O, and in the magnifier the inner corner of the current square
+  // the Origin P, and in the magnifier the inner corner of the current square
   g2.beginPath(); g2.arc(X(0), Y(0), dpr * (lensMode ? 3.5 : 3.5), 0, 2 * Math.PI); g2.fillStyle = css("--ink"); g2.fill();
-  if (!lensMode) { g2.font = `600 ${12 * dpr}px ${css("--sans")}`; g2.textAlign = "left"; g2.fillText("O", X(0) + 6 * dpr, Y(0) - 6 * dpr); }
+  if (!lensMode) { g2.font = `600 ${12 * dpr}px ${css("--sans")}`; g2.textAlign = "left"; g2.fillText("P", X(0) + 6 * dpr, Y(0) - 6 * dpr); }
   if (lensMode && n > 0 && shape === "sq") {
     const g = geo(n), p = g.corners[2];
     g2.beginPath(); g2.arc(X(p.x), Y(p.y), dpr * 4, 0, 2 * Math.PI); g2.strokeStyle = colourOf(g); g2.lineWidth = 2 * dpr; g2.stroke();
@@ -355,7 +355,7 @@ function draw2() {
   if (show) {
     const g = geo(n), w = Math.max(0.15, Math.abs(g.gap) * 1.9);
     drawScene(lens, w, 0, 0, true);
-    $("lensCap").textContent = `O magnified ×${Math.round(extent / w)}`;
+    $("lensCap").textContent = `P magnified ×${Math.round(extent / w)}`;
   }
 }
 function animateExtent(target) {
@@ -476,7 +476,7 @@ function build3() {
     const dotM = new T.MeshBasicMaterial({ color: ink });
     pts.slice(1).forEach((p, i) => { const d = new T.Mesh(dotG, dotM); d.position.copy(p); if (i + 1 === n) d.scale.setScalar(1.8); gr.add(d); });
   }
-  const o = new T.Mesh(new T.SphereGeometry(E * 0.012, 12, 10), new T.MeshBasicMaterial({ color: ink })); o.name = "O (Holden's point)"; gr.add(o);
+  const o = new T.Mesh(new T.SphereGeometry(E * 0.012, 12, 10), new T.MeshBasicMaterial({ color: ink })); o.name = "P (the Origin, Holden's point)"; gr.add(o);
   // mirrors below: (x, y, z) -> (x, -y, z) like a mirror on the floor; (x, y, z) -> (-x, -y, z) also left-right, so it turns the other way
   const mirrored = $("mFloor").checked || $("mFlip").checked;
   if ($("mFloor").checked) { const c = gr.clone(); c.scale.set(1, -1, 1); c.name = "mirror in the floor"; top.add(c); }
@@ -507,11 +507,11 @@ function readout() {
   const rows = [
     ["angle 72n", `${(72 * n) % 360}° (corner n ≡ ${n % 5})`],
     ["distance n·√0.1", f(g.d)],
-    ["P(n)", `${g.area.toLocaleString("en-US")} = n²/5 ${sgn === "0" ? "exactly" : sgn}`],
-    [shape === "sq" ? "side √P(n)" : "radius √(P(n)/2)", f(shape === "sq" ? g.side : g.half)],
-    [shape === "sq" ? "inner corner" : "circle", g.area === 0 ? "area 0: no square, just a point" : g.chi === 0 ? "exactly on O" : g.chi > 0 ? `passes ${f(-g.gap, 5)} beyond O` : `stops ${f(g.gap, 5)} short of O`],
+    ["𝔓(n)", `${g.area.toLocaleString("en-US")} = n²/5 ${sgn === "0" ? "exactly" : sgn}`],
+    [shape === "sq" ? "side √𝔓(n)" : "radius √(𝔓(n)/2)", f(shape === "sq" ? g.side : g.half)],
+    [shape === "sq" ? "inner corner" : "circle", g.area === 0 ? "area 0: no square, just a point" : g.chi === 0 ? "exactly on P" : g.chi > 0 ? `passes ${f(-g.gap, 5)} beyond P` : `stops ${f(g.gap, 5)} short of P`],
   ];
-  if (shape !== "sq") rows.push(["area − circle through O", g.chi === 0 ? "0" : `${g.chi > 0 ? "+" : "−"}2π/5`]);
+  if (shape !== "sq") rows.push(["area − circle through P", g.chi === 0 ? "0" : `${g.chi > 0 ? "+" : "−"}2π/5`]);
   if (view3 && $("axis").value !== "off") rows.push(["height", ($("axis").value === "t" ? `${f(height(n))} · time ${timeLabel(n)}` : f(height(n))) + (vmult() !== 1 ? ` (stretched ×${vmult()})` : "")]);
   if (view3 && hmult() !== 1) rows.push(["distance shown", `${f(g.d * hmult())} (stretched ×${hmult()})`]);
   if (fibOnly() && n >= 1) { const nx = nextLucas(n), pv = LUCAS.get(n) >= 1 ? n : prevLucas(n);
@@ -519,10 +519,10 @@ function readout() {
   if (LUCAS.has(n)) { const k = LUCAS.get(n); rows.push(["Lucas number", `L${toSub(k)}: P = F${toSub(k)}² = ${Number(Pent.F[k])}²`]);
   }
   if (n >= 1) { const b = between(n), sw = Pent.fmt(+(place(n).swing / DEG).toFixed(1));
-    rows.push(["to the golden rectangle", LUCAS.get(n) >= 1 ? `turn ${sw}° around O: fits exactly` : b ? `turn ${sw}° around O: a shadow between L${toSub(b[0])} and L${toSub(b[1])}` : `turn ${sw}° around O`]);
+    rows.push(["to the golden rectangle", LUCAS.get(n) >= 1 ? `turn ${sw}° around P: fits exactly` : b ? `turn ${sw}° around P: a shadow between L${toSub(b[0])} and L${toSub(b[1])}` : `turn ${sw}° around P`]);
     const t = tiltOf(n);
     rows.push(["tilt in the rectangle", t.step === 0 ? "0°: level, a Fibonacci square" : `${Pent.fmt(+t.deg.toFixed(4))}° (step ${t.step} of ${t.steps}, 90°/${t.steps} each)`]); }
-  rows.push(["H(n) = P(n) mod 5", String(Pent.H(n))]);
+  rows.push(["H(n) = 𝔓(n) mod 5", String(Pent.H(n))]);
   if (Pent.silence5()) rows.push(["1 + MOD(P(n) − 1; 5)", `<span style="color:var(--accent3)">${Pent.I5(n)}</span>`]);
   $("read").innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
   $("iv").style.background = g.h ? `color-mix(in srgb, var(--c${g.h}) 16%, transparent)` : "transparent";
@@ -551,7 +551,7 @@ function update(animate) {
   if (view3) { build3(); }
   else { const t = fitExtent(Math.max(n, 3)); if (animate) animateExtent(t); else { cancelAnimationFrame(extentAnim); extent = extentTarget = t; draw2(); } }
   if (fibOnly() && !view3) { $("hint").textContent = $("oSkip").checked ? "Only the Lucas steps: the Fibonacci squares one after another, without the time in between." : "Every step still sounds, but only the Fibonacci squares are drawn; the dot is the step in between. The wait between two squares is itself a Lucas number (2, 1, 3, 4, 7, 11, 18, 29 … steps), so it grows by about φ each time; at large n use ⏭ to jump to the next square."; return; }
-  $("hint").textContent = (view3 ? "Drag to turn the view; scroll or pinch to zoom." : gold < 0.5 && n <= 3 ? "The magnifier shows the centre O: watch the corner of each new square pass beyond O (+0.8), stop short (−0.8) or land on it (0)." : "") + ($("hint").dataset.grid ? " " + $("hint").dataset.grid : "");
+  $("hint").textContent = (view3 ? "Drag to turn the view; scroll or pinch to zoom." : gold < 0.5 && n <= 3 ? "The magnifier shows the Origin P: watch the corner of each new square pass beyond P (+0.8), stop short (−0.8) or land on it (0)." : "") + ($("hint").dataset.grid ? " " + $("hint").dataset.grid : "");
 }
 function go(m, animate = true, withSound = false) { const was = n; n = Math.max(0, Math.min(nmax, m)); update(animate); if (withSound && n !== was) sound(n); }
 
