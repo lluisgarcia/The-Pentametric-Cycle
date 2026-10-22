@@ -80,3 +80,30 @@ files listed above keep their hashes.)
 | images/Origin at Origin_Square_2 area_0.2_SQRT(0.2) side lenght_construction.png | fe96f5ce581d3de2bac0fb339c96a878ab845b0720f5b04af2c2f3c2284beb3b |
 | images/Origin at Origin_Squares_area_0.2_SQRT(0.2) side lenght_construction.png | 8e469097bf3a33dc26b2c373447af6512bf798a938515d51fae0fd11578b6c26 |
 | images/Origin at Origin_Squares_area_0.2_SQRT(0.2) & Epitetardit Rhombus_construction.png | 0df132426efdbbb43bf44a3f4600ca4ee1e1ec430c76bc39119ea18adc2b21aa |
+
+## 2026-10-22 — The ratio, the opposite squares and the 2 × 2 square
+
+The ratio √10/3 along the lines through the crossing; distances from the crossing to the borders of the
+unit square; relations between a unit square and its mirror squares (squares and circles through the
+crossings and origins of both); the four Epitetartic rhombi with the two squares of area 0.2; the 2 × 2
+square and its origins. (The file "…& Epitetardit Rhombus_construction.ggb" listed on 21 Oct was renamed
+"…& Epitetartic Rhombus_construction.ggb"; its hash is unchanged.)
+
+| File | SHA-256 |
+|---|---|
+| Geo/Origin at Origin_Squares_area_0.2_SQRT(0.2) & Epitetartics Rhombus_construction.ggb | a4241c287ed99d4d4f1e2e194be88fb3cbede668e76a1f1a2afd198163640b3e |
+| Geo/Origin at Origin_8 Epitetardits Rhombus_construction.ggb | 42d5b13a78207bdbb8a21a4187c859190d2b6b171f330214c6cb7989480d3a34 |
+| Geo/Origin at Origin_Oposite_relations.ggb | 9e2ff95d0b561a1cb0fa133e1c73183800fce00ef29c7a8f74e6ab12b69ab6a9 |
+| Geo/Origin at Origin_Oposite_relations2.ggb | e7e881453b8b3e223c877628f953a012d1a6c914bfa6369ac77795e38ef6cf4c |
+| Geo/Origin at Origin_Oposite_relations3.ggb | bcfcc9ff485da28f048ce8537150ee5dfd52a17bd37b6c5a13dfa4d3b5187c73 |
+| Geo/Origin at Origin_Oposite_relations4.ggb | 7c556b6dcc1b4c255e8ff8a97526d51441ccfd08132fb67dd9180ffec75377ef |
+| Geo/Origin at Origin_relations.ggb | a5ba6cd1ef3162a81f8b19b170ef460ddb171f84551c024f0f34adfc4d5a6be1 |
+| Geo/The ratio.ggb | 90d74527c1896d6afcf15bfa597973a44570b5c2910932d570302266477711a8 |
+| images/Enciclopedia de la simpatia_cuarta edicion_Noel Claraso_Editorial Osa Menor_ 1957.jpg | faf3eee425d265174702768b6d0a5e818e9973989547f3180e222969d3915934 |
+| images/From holden cross to unit square border.png | 50c6eca85c35351af6252541c0a08a9091bb9f809a86862359f378218dd2f183 |
+| images/Origin at Origin_Oposite_relations.png | 6f4f14de3b2806ff19c8fba1f7af3383bc32c583fdc9c03168bc2ba8636da8b6 |
+| images/Origin at Origin_Oposite_relations3.png | 403e2c42d63ee73e0e5f4a24b4f96013e4e5bff5405f11946d49757bac3fd019 |
+| images/Origin at Origin_Oposite_relations4.png | c6c1ec2517a237a3b5944e33386f0c3bb9cb3abe037b9b19cf8e8b9e9b68c8a9 |
+| images/Origin at Origin_Oposite_relations5.png | edb820497fffa8dd293de08b49e1ff6632cab543684cfe66af3e412ff9f9ef73 |
+| images/Origin at Origin_relations.png | 81234ee46843a77e264a4be40f0daa54c9c72b9ca982709903ad5766db73f7a2 |
+| images/The ratio.png | 5a8c015266e5f9a133049ccef001c7a6a2ee9b5963a4902c8d6f2563a5fb6085 |
