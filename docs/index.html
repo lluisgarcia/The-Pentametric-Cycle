@@ -76,6 +76,7 @@
     <a class="card" href="origins.html"><span class="k">Note · origins</span><h3>The origin of origins</h3><p>Of all the circles about the centre of the unit square, only one has a tangent through a corner where it crosses a curved diagonal: area π/10. Its eight crossings are the origins of eight Fibonacci spirals, and Holden's lines are its tangent and radius there.</p></a>
     <a class="card" href="counting.html"><span class="k">Note · cells</span><h3>Counting the areas</h3><p>From an empty square and a ruler: the square of area 1/5, the circle of origins, Holden's lines and a grid of cells of 1/10 nobody drew. Then 𝔓(n) is a count of cells: the blue square of n, plus or minus the blue square of 2.</p></a>
     <a class="card" href="landing.html"><span class="k">Note · landing</span><h3>Where the origin lands</h3><p>Step Holden's crossing out, H, 2H, 3H, … and it always lands exactly on an origin of a unit square, turned 0, ¾, ¼, ½ of a turn, or on a corner every fifth step: the breath as a place, and a quarter turn per Fibonacci square.</p></a>
+    <a class="card" href="hidden.html"><span class="k">Note · hidden origin</span><h3>The hidden origin</h3><p>Run the Fibonacci spiral backwards with squares of half the size: it leads in smoothly from H′ = (7/10, −1/10), the mirror of Holden's crossing and an origin of the next square. Other ratios, the lines of slopes 7 and −1/7, and the golden pole.</p></a>
   </div>
 
   <h2 style="color:var(--accent3)">✦ Exploratory</h2>
@@ -153,6 +154,6 @@ for (let n = 0; n <= 50; n++) {
 document.getElementById("legend").innerHTML = Pent.INTERVALS.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("")
   + `<span>· n = 0 … 50, mirrored at n = 25</span>`;
 </script>
-<script src="menu.js?v=31656b35"></script>
+<script src="menu.js?v=5afb6d7f"></script>
 </body>
 </html>

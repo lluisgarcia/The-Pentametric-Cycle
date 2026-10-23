@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hidden Origin · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
+<script src="pent.js?v=fd480162"></script>
+<style>
+  .two { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  svg.fig { width: 100%; height: auto; display: block; background: var(--panel); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .chips button { padding: 4px 10px; font-size: .9rem; }
+  .chips button.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  input[type=range] { width: 240px; vertical-align: middle; }
+  .big { font-family: var(--serif); font-size: 1.35rem; }
+  .ok { color: var(--ok); font-weight: 600; } .miss { color: var(--accent2); font-weight: 600; }
+  .key span { display: inline-block; margin-right: 14px; font-size: .9rem; color: var(--muted); }
+  .key i { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 5px; }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind u">◆ Understand · explore the ideas interactively</span>
+  <h1>The hidden origin</h1>
+  <p class="lede">The Fibonacci spiral starts abruptly, at a corner of its first square. Run the rule that draws it backwards from that corner, with squares of half the size each time, and the spiral leads in smoothly from an exact point, H′ = (7/10, −1/10). The point is hidden: it is not in the unit square but in the square next to it, where it is the mirror image of Holden's crossing, one of that square's eight origins. From the note <a href="https://doi.org/10.5281/zenodo.23592255"><i>The Hidden Origin: halving squares and the start of the Fibonacci spiral</i></a>.</p>
+
+  <h2>1 · Running the spiral backwards</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>steps back <input id="m" type="range" min="0" max="16" step="1" value="6"> <span id="mval" class="big"></span></label>
+      <label><input id="follow" type="checkbox"> zoom with the steps</label>
+      <button id="play" type="button">▶ play</button>
+    </div>
+    <div class="two">
+      <div><svg id="fig1" class="fig" viewBox="0 0 520 470" role="img" aria-label="The first Fibonacci arcs, the halving squares leading into the corner E, and their limit H′ in the neighbouring square"></svg>
+        <div class="key"><span><i style="border-color:var(--accent)"></i>Fibonacci spiral</span><span><i style="border-color:var(--accent2)"></i>halving squares</span><span><i style="border-color:var(--accent4)"></i>circle of origins of the next square</span></div></div>
+      <div>
+        <dl class="readout" id="read1"></dl>
+        <p>Before 1, 1 the Fibonacci sides go 0, 1, −1, …: a square of side 0 ends the spiral at the corner E. To go on, the same rule draws a square of side ½ against the right side of the unit square, then ¼, ⅛, … Each arc meets the next with the same tangent, so there is no corner anywhere; only the radius changes, as at every Fibonacci junction.</p>
+        <p>Each step back is a quarter turn and a halving about one point, so the ends close in on it geometrically: H′ = (7/10, −1/10), exactly. The whole lead-in, all the halving arcs together, is π/2 long: the length of the spiral's own first arc. <span class="tag">proved</span></p>
+        <p style="margin-bottom:0">H′ is the mirror image of Holden's crossing H₀ = (3/10, −1/10) in the side shared with the next square. It lies on that square's circle of origins, so it is one of <i>its</i> eight origins, the origin of the mirror-image tiling that starts there, and it also lies on the circle through the four corners of the unit square. <span class="tag">proved</span></p>
+      </div>
+    </div>
+  </div>
+
+  <h2>2 · One turn, one halving: the centres and two lines</h2>
+  <div class="panel">
+    <div class="controls">
+      <label><input id="tc" type="checkbox" checked> centres</label>
+      <label><input id="tl" type="checkbox" checked> the two lines</label>
+      <label><input id="tcc" type="checkbox"> circles through the corners</label>
+      <label><input id="th" type="checkbox"> Holden's lines</label>
+    </div>
+    <div class="two">
+      <div><svg id="fig2" class="fig" viewBox="0 0 520 430" role="img" aria-label="The centres of the unit square and the halving squares on two perpendicular lines through H′ of slopes 7 and −1/7"></svg></div>
+      <div>
+        <p style="margin-top:0">One move does it all: turn a quarter turn clockwise about H′ and halve, z ↦ H′ − (i/2)(z − H′). It carries the unit square, with its arc, onto the first halving square, and each halving square onto the next. So the unit square and the halving squares are one geometric sequence, with H′ as its centre.</p>
+        <p>As for any such sequence, the centres alternate between two perpendicular lines through the centre. Here they have <b>slopes 7 and −1/7</b>, and the second one, x + 7y = 0, passes through O, the centre of the unit square. Holden's lines, for the Fibonacci squares themselves, have slopes 3 and −1/3. <span class="tag">proved</span></p>
+        <p>Every centre is s/√2 from H′, half the diagonal of its square: H′ lies on the circle through the corners of every square of the sequence, the unit square included.</p>
+        <p class="note" style="margin-bottom:0">In Gaussian integers: Holden's direction 1 + 3i = (1 + i)(2 + i); the new direction 1 + 7i = (1 + i)(4 + 3i), the diagonal turned by the angle of the 3-4-5 triangle, arctan ¾ = 36.87°.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>3 · Any ratio: where does it end?</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>ratio q <input id="q" type="range" min="0.02" max="0.98" step="0.001" value="0.5"> <span id="qval" class="big"></span></label>
+    </div>
+    <div class="chips" id="qchips"></div>
+    <div class="two">
+      <div><svg id="fig3" class="fig" viewBox="0 0 520 430" role="img" aria-label="The limits of lead-ins of every ratio q run along the circle through the corners; only q = 1/3 and q = 1/2 end on origins of the next square"></svg>
+        <div class="key"><span><i style="border-color:var(--accent2)"></i>all the limits, 0 &lt; q &lt; 1</span><span><i style="border-color:var(--ok)"></i>Holden's line through O</span></div></div>
+      <div>
+        <dl class="readout" id="read3"></dl>
+        <p>With squares shrinking by any ratio q, the spiral ends at the corner E turned clockwise about O by 2·arctan q: always on the circle through the corners of the unit square, which was known (Silveira 2013). <span class="tag">proved</span></p>
+        <p style="margin-bottom:0">That circle meets the next square's circle of origins in just two points, and so <b>only two ratios end at an origin</b>: q = ½ (H′, a turn of 53.13°, the mirror of H₀) and q = ⅓ ((7/10, 1/10), a turn of 36.87°, the half turn of H₀ about the middle of the shared side). The two angles are the acute angles of the 3-4-5 triangle that separate the origins. The golden ratio, q = 1/φ, ends at the classical golden pole, √5·H₀, on Holden's line through O. <span class="tag">proved</span></p>
+      </div>
+    </div>
+  </div>
+
+  <h2>What is known and what is new</h2>
+  <div class="panel">
+    <p style="margin-top:0">Squares shrinking by a constant ratio and their pole are classical (for the golden rectangle, the "eye" of the golden spiral). C. Silveira (2013, <a href="https://arxiv.org/abs/1308.5941">arXiv:1308.5941</a>) proved, for any ratio, that the pole lies on the circle through the corners of every square and of the first square, and gave its position; for ratio 2 his formula gives H′. Hoggatt and Alladi (<i>The Fibonacci Quarterly</i> 14, 1976) showed for in-winding golden squares that the centres lie on two perpendicular lines through the pole.</p>
+    <p>We have not found in the literature: the reading of H′ as an origin of the next square, the mirror image of Holden's crossing; the ratio ⅓ and the half turn; the lines of slopes 7 and −1/7 through O; or the golden pole on Holden's line. The idea of continuing the spiral by halving, and the observation that it ends at the origin of the neighbouring mirror square, are the author's, found in the <a href="spiral-workbench/">Spiral Workbench</a>, where the halving lead-in is drawn for all eight spirals and H′ is a centre to turn them about.</p>
+    <p class="note" style="margin-bottom:0">Every value on this page is computed from the exact formulas of the note; its script checks them in exact arithmetic.</p>
+  </div>
+</main>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const PHI = (1 + Math.sqrt(5)) / 2;
+const E = [0.5, 0.5], HP = [0.7, -0.1], H0 = [0.3, -0.1];
+// complex helpers on [x, y]
+const cmul = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]];
+const ipow = (k) => [[1, 0], [0, 1], [-1, 0], [0, -1]][((k % 4) + 4) % 4];
+// the lead-in of ratio q: squares k = 0, -1, -2, ... of sides q, q^2, ...; arc rule c_k = P_k - s i^{k+1}, P_{k-1} = P_k - s i^k (i - 1)
+function leadIn(q, n) {
+  const out = []; let P = E, s = q;
+  for (let j = 0; j < n; j++) {
+    const ik = ipow(-j), c = [P[0] - s * cmul(ik, [0, 1])[0], P[1] - s * cmul(ik, [0, 1])[1]];
+    const st = cmul(ik, [-1, 1]), Pn = [P[0] - s * st[0], P[1] - s * st[1]];
+    out.push({ s, c, P, Pn, F: [P[0] + Pn[0] - c[0], P[1] + Pn[1] - c[1]] }); P = Pn; s *= q;
+  }
+  return out;
+}
+const limit = (q) => { const a = [1, -q], b = [1, q], d = b[0] * b[0] + b[1] * b[1], r = [(a[0] * b[0] + a[1] * b[1]) / d, (a[1] * b[0] - a[0] * b[1]) / d]; return cmul(E, r); };
+function view(svg, cx, cy, sc) { const W = +svg.viewBox.baseVal.width, Hh = +svg.viewBox.baseVal.height; return { X: (x) => W / 2 + (x - cx) * sc, Y: (y) => Hh / 2 - (y - cy) * sc, sc }; }
+function arcD(V, c, r, a0, a1, N = 40) { let d = ""; for (let i = 0; i <= N; i++) { const a = a0 + (a1 - a0) * i / N; d += (i ? " L " : "M ") + V.X(c[0] + r * Math.cos(a)).toFixed(2) + " " + V.Y(c[1] + r * Math.sin(a)).toFixed(2); } return d; }
+function quarter(V, c, P0, P1) { const a0 = Math.atan2(P0[1] - c[1], P0[0] - c[0]); let a1 = Math.atan2(P1[1] - c[1], P1[0] - c[0]); if (a1 - a0 > Math.PI) a1 -= 2 * Math.PI; if (a0 - a1 > Math.PI) a1 += 2 * Math.PI; return arcD(V, c, Math.hypot(P0[0] - c[0], P0[1] - c[1]), a0, a1); }
+const sq = (g, V, P, style) => el(g, "polygon", { points: P.map(([x, y]) => `${V.X(x).toFixed(2)},${V.Y(y).toFixed(2)}`).join(" "), style });
+const rect = (g, V, x0, y0, s, style) => sq(g, V, [[x0, y0], [x0 + s, y0], [x0 + s, y0 + s], [x0, y0 + s]], style);
+const circ = (g, V, c, r, style) => el(g, "circle", { cx: V.X(c[0]), cy: V.Y(c[1]), r: r * V.sc, style });
+function dot(g, V, p, lab, col = "var(--ink)", dx = 7, dy = -7, rr = 4) {
+  el(g, "circle", { cx: V.X(p[0]), cy: V.Y(p[1]), r: rr, style: `fill:${col};stroke:var(--panel);stroke-width:1.3` });
+  if (lab) el(g, "text", { x: V.X(p[0]) + dx, y: V.Y(p[1]) + dy, "text-anchor": dx < 0 ? "end" : "start", style: `font:italic 16px var(--serif);fill:${col}` }, lab);
+}
+function line(g, V, p, dir, style, L = 4) { el(g, "line", { x1: V.X(p[0] - L * dir[0]), y1: V.Y(p[1] - L * dir[1]), x2: V.X(p[0] + L * dir[0]), y2: V.Y(p[1] + L * dir[1]), style }); }
+function background(g, V, opts = {}) {
+  rect(g, V, -0.5, -1.5, 1, "fill:none;stroke:var(--rule);stroke-width:1");              // second Fibonacci square
+  rect(g, V, 0.5, -0.5, 1, "fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:5 4");   // the next square
+  rect(g, V, -0.5, -0.5, 1, "fill:none;stroke:var(--ink);stroke-width:1.6");             // unit square
+  if (opts.corners !== false) circ(g, V, [0, 0], Math.SQRT1_2, "fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3");
+  circ(g, V, [1, 0], Math.sqrt(0.1), "fill:none;stroke:var(--accent4);stroke-width:1.6");
+  circ(g, V, [0, 0], Math.sqrt(0.1), "fill:none;stroke:var(--accent4);stroke-width:1;opacity:.6");
+  el(g, "path", { d: quarter(V, [0.5, -0.5], E, [-0.5, -0.5]) + " " + quarter(V, [0.5, -0.5], [-0.5, -0.5], [0.5, -1.5]), style: "fill:none;stroke:var(--accent);stroke-width:2.4" });
+}
+
+// ---------------- 1 · running the spiral backwards ----------------
+const LI = leadIn(0.5, 40);
+let playing = null;
+function draw1() {
+  const m = +$("m").value, f = $("fig1"); f.innerHTML = "";
+  const z = $("follow").checked ? Math.pow(2, Math.max(0, m - 2)) : 1, w = 1 - 1 / z;
+  const V = view(f, 0.35 * (1 - w) + HP[0] * w, -0.3 * (1 - w) + HP[1] * w, 205 * z);
+  const g = el(f, "g", {});
+  background(g, V);
+  el(g, "line", { x1: V.X(0.5), y1: V.Y(0.75), x2: V.X(0.5), y2: V.Y(-0.75), style: "stroke:var(--accent3);stroke-width:1;stroke-dasharray:6 3 1 3" });
+  LI.slice(0, m).forEach((L, j) => {
+    sq(g, V, [L.c, L.P, L.F, L.Pn], `fill:var(--accent2);fill-opacity:${j === m - 1 ? .12 : 0};stroke:var(--accent2);stroke-width:1`);
+    el(g, "path", { d: quarter(V, L.c, L.Pn, L.P), style: "fill:none;stroke:var(--accent2);stroke-width:2.2" });
+  });
+  dot(g, V, [0, 0], "O", "var(--ink)", -8, -8, 3); dot(g, V, H0, "H₀", "var(--ink)", -8, 18, 3.5);
+  dot(g, V, E, "E", "var(--accent)", -8, -8); dot(g, V, HP, "H′", "var(--accent2)", 8, 18, 4.5);
+  if (m) dot(g, V, LI[m - 1].Pn, "", "var(--accent2)", 0, 0, 3);
+  const s = Math.pow(2, -m), d = Math.sqrt(0.4) * s, len = (Math.PI / 2) * (1 - s);
+  $("mval").textContent = m;
+  $("read1").innerHTML = `<dt>smallest square</dt><dd>${m ? "side 1/" + Math.pow(2, m) : "none yet"}</dd><dt>spiral's start to H′</dt><dd>${d.toPrecision(4)}  (halves each step)</dd><dt>lead-in length</dt><dd>${len.toFixed(5)}  →  π/2 = ${(Math.PI / 2).toFixed(5)}</dd><dt>limit</dt><dd>H′ = (7/10, −1/10), exactly</dd><dt>zoom</dt><dd>×${z >= 1 ? z : 1}</dd>`;
+}
+$("m").oninput = $("follow").onchange = draw1;
+$("play").onclick = () => {
+  if (playing) { clearInterval(playing); playing = null; $("play").textContent = "▶ play"; return; }
+  $("play").textContent = "❚❚ pause"; $("follow").checked = true; if (+$("m").value >= 16) $("m").value = 0;
+  if (REDUCED) { $("m").value = 16; draw1(); $("play").textContent = "▶ play"; return; }
+  playing = setInterval(() => { const v = +$("m").value + 1; $("m").value = v; draw1(); if (v >= 16) { clearInterval(playing); playing = null; $("play").textContent = "▶ play"; } }, 700);
+};
+draw1();
+
+// ---------------- 2 · centres and lines ----------------
+function draw2() {
+  const f = $("fig2"); f.innerHTML = "";
+  const V = view(f, 0.25, -0.05, 300), g = el(f, "g", {});
+  background(g, V, { corners: false });
+  const C = [[0, 0], ...LI.map((L) => [(L.c[0] + L.F[0]) / 2, (L.c[1] + L.F[1]) / 2])], S = [1, ...LI.map((L) => L.s)];
+  for (const L of LI.slice(0, 12)) {
+    sq(g, V, [L.c, L.P, L.F, L.Pn], "fill:none;stroke:var(--accent2);stroke-width:.9;opacity:.8");
+    el(g, "path", { d: quarter(V, L.c, L.Pn, L.P), style: "fill:none;stroke:var(--accent2);stroke-width:2" });
+  }
+  if ($("th").checked) { line(g, V, H0, [3 / Math.sqrt(10), -1 / Math.sqrt(10)], "stroke:var(--accent3);stroke-width:1.2;opacity:.7"); line(g, V, H0, [1 / Math.sqrt(10), 3 / Math.sqrt(10)], "stroke:var(--accent3);stroke-width:1.2;opacity:.7"); dot(g, V, H0, "H₀", "var(--accent3)", -8, 18, 3.5); }
+  if ($("tl").checked) {
+    const n = Math.sqrt(50);
+    line(g, V, HP, [1 / n, 7 / n], "stroke:var(--ok);stroke-width:1.6;stroke-dasharray:7 4");
+    line(g, V, HP, [7 / n, -1 / n], "stroke:var(--ok);stroke-width:1.6");
+    el(g, "text", { x: V.X(0.86), y: V.Y(0.5), style: "font:600 13px var(--sans);fill:var(--ok)" }, "slope 7");
+    el(g, "text", { x: V.X(-0.45), y: V.Y(0.09), style: "font:600 13px var(--sans);fill:var(--ok)" }, "slope −1/7: x + 7y = 0");
+  }
+  if ($("tcc").checked) C.slice(0, 5).forEach((c, j) => circ(g, V, c, S[j] / Math.SQRT2, "fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:2 3"));
+  if ($("tc").checked) C.slice(0, 12).forEach((c, j) => el(g, "rect", { x: V.X(c[0]) - 3.5, y: V.Y(c[1]) - 3.5, width: 7, height: 7, style: `fill:${j % 2 ? "var(--ok)" : "var(--panel)"};stroke:var(--ok);stroke-width:1.6` }));
+  dot(g, V, [0, 0], "O", "var(--ink)", -8, -8, 3); dot(g, V, E, "E", "var(--accent)", -8, -8); dot(g, V, HP, "H′", "var(--accent2)", 9, 16, 4.5);
+}
+for (const id of ["tc", "tl", "tcc", "th"]) $(id).onchange = draw2;
+draw2();
+
+// ---------------- 3 · any ratio ----------------
+const QCH = [["⅓", 1 / 3], ["½", 0.5], ["1/φ", 1 / PHI], ["0.8", 0.8]];
+for (const [t, v] of QCH) { const b = $("qchips").appendChild(document.createElement("button")); b.type = "button"; b.textContent = "q = " + t; b.onclick = () => { $("q").value = v; draw3(); }; b.dataset.v = v; }
+function draw3() {
+  const q = +$("q").value, f = $("fig3"); f.innerHTML = "";
+  const V = view(f, 0.45, -0.1, 255), g = el(f, "g", {});
+  background(g, V);
+  line(g, V, [0, 0], [3 / Math.sqrt(10), -1 / Math.sqrt(10)], "stroke:var(--ok);stroke-width:1.1", 1.0);
+  let d = ""; for (let i = 1; i < 200; i++) { const L = limit(i / 200); d += (i > 1 ? " L " : "M ") + V.X(L[0]).toFixed(2) + " " + V.Y(L[1]).toFixed(2); }
+  el(g, "path", { d, style: "fill:none;stroke:var(--accent2);stroke-width:3.5;opacity:.45" });
+  const LQ = leadIn(q, Math.min(200, Math.ceil(Math.log(1e-4) / Math.log(q))));
+  for (const L of LQ.slice(0, 30)) { sq(g, V, [L.c, L.P, L.F, L.Pn], "fill:none;stroke:var(--accent2);stroke-width:.8;opacity:.55"); }
+  for (const L of LQ) el(g, "path", { d: quarter(V, L.c, L.Pn, L.P), style: "fill:none;stroke:var(--accent2);stroke-width:1.8" });
+  const Lq = limit(q);
+  dot(g, V, [0, 0], "O", "var(--ink)", -8, -8, 3); dot(g, V, H0, "H₀", "var(--ink)", -8, 18, 3.5); dot(g, V, E, "E", "var(--accent)", -8, -8);
+  for (const [x, y] of [[0.7, 0.1], [0.7, -0.1]]) el(g, "circle", { cx: V.X(x), cy: V.Y(y), r: 4, style: "fill:none;stroke:var(--accent4);stroke-width:2" });
+  dot(g, V, Lq, "L(q)", "var(--accent2)", 9, Lq[1] > 0 ? -8 : 18, 5);
+  const turn = 2 * Math.atan(q) * 180 / Math.PI, len = (Math.PI / 2) * q / (1 - q);
+  const is = (v) => Math.abs(q - v) < 6e-4, exact = is(0.5) ? "H′ = (7/10, −1/10): an origin of the next square" : is(1 / 3) ? "(7/10, 1/10): an origin of the next square" : is(1 / PHI) ? "√5·H₀ = (3√5/10, −√5/10): the golden pole, on Holden's line" : null;
+  $("qval").textContent = q.toFixed(3);
+  $("read3").innerHTML = `<dt>turn of E about O</dt><dd>${turn.toFixed(2)}°  (2·arctan q)</dd><dt>limit L(q)</dt><dd>(${Lq[0].toFixed(4)}, ${Lq[1].toFixed(4)})</dd><dt>distance from O</dt><dd>${Math.hypot(Lq[0], Lq[1]).toFixed(4)} = √2/2, always</dd><dt>lead-in length</dt><dd>${len.toFixed(4)} ${is(0.5) ? "= π/2, the first arc" : len < Math.PI / 2 ? "&lt; π/2" : "&gt; π/2"}</dd><dt>an origin?</dt><dd>${exact ? `<span class="${is(1 / PHI) ? "" : "ok"}">${exact}</span>` : '<span class="miss">no</span>'}</dd>${q > 1 / PHI + 1e-9 ? '<dt>note</dt><dd>for q &gt; 1/φ the squares overlap; only the curve and its limit are shown</dd>' : ""}`;
+  for (const b of $("qchips").children) b.classList.toggle("on", Math.abs(q - +b.dataset.v) < 6e-4);
+}
+$("q").oninput = draw3;
+draw3();
+</script>
+<script src="menu.js?v=5afb6d7f"></script>
+</body>
+</html>
