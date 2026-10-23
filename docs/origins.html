@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Origin of Origins · The Pentametric Cycle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=7165cfaa">
+<script src="pent.js?v=fd480162"></script>
+<style>
+  :root { --pink: #c2407a; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pink: #e07aa8; } }
+  :root[data-theme="dark"] { --pink: #e07aa8; }
+  .two { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; } }
+  svg.fig { width: 100%; height: auto; display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+  .chips button { padding: 4px 10px; font-size: .9rem; }
+  .chips button.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .chips .sw { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+  .chips .sw.d { border-top-style: dashed; }
+  .ok { color: var(--ok); font-weight: 600; } .miss { color: var(--accent2); font-weight: 600; }
+  input[type=range] { width: 260px; vertical-align: middle; }
+  .big { font-family: var(--serif); font-size: 1.5rem; }
+  .greek { font-family: var(--serif); }
+</style>
+</head>
+<body>
+<header class="site"><div class="inner">
+  <a class="brand" href="index.html"><span class="greek">Ὁ Πενταμετρικὸς Κύκλος</span><span class="brand-sep"> – </span><span class="brand-en">The Pentametric Cycle</span></a>
+  <nav></nav>
+</div></header>
+
+<main>
+  <span class="kind u">◆ Understand · explore the ideas interactively</span>
+  <h1>The origin of origins</h1>
+  <p class="lede">Start from one point: the centre O of the unit square, the <i>origin of origins</i> <span class="greek" style="white-space:nowrap">(ἡ ἀρχὴ τῶν ἀρχῶν)</span>. Of all the circles about O, exactly one has a tangent, where it crosses a curved diagonal of the square, that runs through a corner. It is the circle of radius √0.1 and area exactly π/10, one tenth of the circle the diagonals come from: the <i>circle of origins</i>. It crosses the diagonals in eight points, the <i>eight origins</i>, one for each of eight Fibonacci spirals, and Holden's two lines are its tangent and its radius there. From the note <a href="https://doi.org/10.5281/zenodo.23486276"><i>The Origin of Origins</i></a>.</p>
+
+  <h2>1 · One circle among many</h2>
+  <div class="panel">
+    <div class="controls">
+      <label>radius r <input id="r" type="range" min="0.2929" max="0.7071" step="0.0001" value="0.45"> <span id="rval" class="big"></span></label>
+    </div>
+    <div class="chips">
+      <button id="b10" type="button">r² = 1/10</button>
+      <button id="b6" type="button">r² = 1/6</button>
+      <button id="b2" type="button">r² = 1/2</button>
+      <button id="bsweep" type="button">▶ sweep</button>
+    </div>
+    <div class="two">
+      <div><svg id="fig1" class="fig" viewBox="0 0 460 460" role="img" aria-label="The unit square, its four diagonal arcs, a circle about the centre, its crossing with one arc and the tangent there"></svg></div>
+      <div>
+        <dl class="readout" id="read1"></dl>
+        <svg id="plot" class="fig" viewBox="0 0 400 210" role="img" aria-label="The polynomial 20t² − 12t + 1, which is zero only at t = 1/10 and t = 1/2" style="margin-top:12px"></svg>
+        <div class="note" id="why1"></div>
+        <p style="margin-bottom:0"><b>Only this circle gives Holden's lines.</b> At r² = 1/10 the tangent has slope 3 and the radius slope −1/3: exactly Holden's two lines, which carry the centres of all the Fibonacci squares of the tiling, at L<sub>k</sub> origins units from the crossing. The other two solutions do not: at r² = 1/2 the tangents have slope ±1, and at r² = 1/6, where the tangent reaches the far corner instead, its slope is −(3 + 2√2) and the crossing is not even a rational point. Of all the circles about O, the circle of origins is the only one whose tangent and radius at the crossing are the lines of the Fibonacci tiling.</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>2 · Eight origins, eight spirals</h2>
+  <div class="panel">
+    <div class="chips" id="symchips"></div>
+    <div class="controls">
+      <label>squares <input id="nsq" type="range" min="1" max="8" value="5" style="width:160px"> <span id="nsqv">5</span></label>
+      <label><input id="tsq" type="checkbox" checked> squares</label>
+      <label><input id="thl" type="checkbox" checked> Holden's lines</label>
+      <label><input id="tgrid" type="checkbox"> origins grid</label>
+    </div>
+    <div class="two">
+      <div><svg id="fig2" class="fig" viewBox="0 0 520 520" role="img" aria-label="The Fibonacci tiling under one of the eight symmetries of the unit square, its spiral, its origin and Holden's lines"></svg></div>
+      <div class="stepbox" id="text2"></div>
+    </div>
+    <p class="note" style="margin-bottom:0">To draw, measure and build on all eight spirals yourself, open the <a href="spiral-workbench/">Spiral Workbench</a>, the interactive page this study was made with.</p>
+  </div>
+
+  <h2>3 · Angles, areas and squares</h2>
+  <div class="panel">
+    <div class="controls">
+      <label><input id="tang" type="checkbox" checked> the 3-4-5 angles</label>
+      <label><input id="ttri" type="checkbox" checked> the triangles of 3/100 and 4/100</label>
+      <label><input id="t5" type="checkbox" checked> the two squares of area 1/5</label>
+      <label><input id="t89" type="checkbox" checked> the squares of 1/8 and 1/9</label>
+      <label><input id="ttan" type="checkbox"> the tangent square of 9/25</label>
+    </div>
+    <div class="two">
+      <div><svg id="fig3" class="fig" viewBox="0 0 460 460" role="img" aria-label="The circle of origins, the angles and triangles between consecutive origins, the squares of area 1/5, 1/8 and 1/9"></svg></div>
+      <div class="stepbox">
+        <p style="margin-top:0"><b>The 3-4-5 angles.</b> Seen from O, consecutive origins are alternately arctan(4/3) = 53.13° and arctan(3/4) = 36.87° apart: the two acute angles of the 3-4-5 triangle. The triangles they make with O have areas exactly <b>4/100</b> and <b>3/100</b>; two consecutive gaps together make a right angle and enclose 5/100. The chords between consecutive origins are √0.08 and 1/5, in the ratio √2.</p>
+        <p><b>The two squares of area 1/5.</b> Alternate origins make two squares, the <span style="color:var(--accent)">blue</span> one and its <span style="color:var(--pink)">pink</span> mirror image, each of side √0.2 and area 1/5: the square on the diagonal of one cell of the origins grid, 2 cells. They are the squares of the <a href="counting.html">empty-square construction</a>.</p>
+        <p><b>Their eight crossings</b> lie at exact 45° steps around O, at distances 1/4 and √2/6 in turn. They are the corners of a square of area <b>1/8</b>, turned 45° (corners (±1/4, 0), (0, ±1/4)), and an upright square of area <b>1/9</b> (corners (±1/6, ±1/6)): a third of the side of the unit square, which it tiles nine times.</p>
+        <p class="note">The tangents to the diagonal arcs at the four corners of each blue or pink square are 3/10 from O and make a square of side 3/5, area 9/25.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <p style="margin-top:0"><b>What is Holden's and what is new.</b> H. L. Holden (1975) proved that the centres of the Fibonacci squares lie on two perpendicular lines and gave their distances from the crossing, which for the Fibonacci tiling are the Lucas numbers 1, 3, 4, 7, 11, … times √0.1; T. Gardiner (1984) gave the lines in coordinates. That the crossing lies on a diagonal arc of the first square, that the tangent there runs through an end of the arc, that the circle of area π/10 is the only circle about the centre with this property, and the eight origins and eight spirals that follow, are from the author's note above, found in GeoGebra and the Spiral Workbench. Every value on this page is computed exactly or from the exact formulas of the note.</p>
+  </div>
+</main>
+
+<footer class="site"><div class="inner">
+  Lluis Garcia Torcal · <a href="https://orcid.org/0009-0007-8570-2536">ORCID 0009-0007-8570-2536</a> ·
+  preprint <a href="https://doi.org/10.5281/zenodo.23183108">doi:10.5281/zenodo.23183108</a> ·
+  <a href="https://github.com/lluisgarcia/The-Pentametric-Cycle">source on GitHub</a>
+</div></footer>
+
+<script>
+"use strict";
+const NS = "http://www.w3.org/2000/svg";
+const $ = (id) => document.getElementById(id);
+function el(parent, name, attrs, text) {
+  const e = document.createElementNS(NS, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  parent.appendChild(e); return e;
+}
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const RHO2 = 0.1, RHO = Math.sqrt(0.1);
+const ORIG = [[3, 1], [1, 3], [-1, 3], [-3, 1], [-3, -1], [-1, -3], [1, -3], [3, -1]].map(([a, b]) => [a / 10, b / 10]);   // in angle order
+const CORN = [[0.5, 0.5], [-0.5, 0.5], [-0.5, -0.5], [0.5, -0.5]];
+// a quarter arc about centre c, radius r, from angle a0 to a1 (anticlockwise, plane), as an SVG path in a frame
+const arcPath = (PX, PY, c, r, a0, a1, N = 48) => {
+  let d = "";
+  for (let i = 0; i <= N; i++) { const a = a0 + (a1 - a0) * i / N; d += (i ? " L " : "M ") + PX(c[0] + r * Math.cos(a)).toFixed(1) + " " + PY(c[1] + r * Math.sin(a)).toFixed(1); }
+  return d;
+};
+// the diagonal arc about corner K: the quarter of the circle of radius 1 about K joining the two corners next to K (it bends towards O)
+function diagArc(PX, PY, K) { const a = Math.atan2(-K[1], -K[0]); return arcPath(PX, PY, K, 1, a - Math.PI / 4, a + Math.PI / 4); }
+
+// ---------------- 1 · one circle among many ----------------
+const K1 = [-0.5, 0.5], E1 = [0.5, 0.5];   // the arc about K1, with its end E1 = E
+function crossing(t) {   // the crossing of |p|² = t with the arc about K1 near its end E: p = 2(p·K)K + 2(p·E)E
+  const pK = 0.5 * (t - 0.5), q = (t - 2 * pK * pK) / 2;
+  if (q < 0) return null;
+  const pE = Math.sqrt(q);
+  return { p: [2 * pK * K1[0] + 2 * pE * E1[0], 2 * pK * K1[1] + 2 * pE * E1[1]], pK, pE };
+}
+function draw1(r) {
+  const t = r * r, f = $("fig1"); f.innerHTML = "";
+  const sc = 330, PX = (x) => 230 + x * sc, PY = (y) => 230 - y * sc;
+  const g = el(f, "g", {});
+  el(g, "rect", { x: PX(-0.5), y: PY(0.5), width: sc, height: sc, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.6" });
+  for (const K of CORN) el(g, "path", { d: diagArc(PX, PY, K), style: `fill:none;stroke:var(--muted);stroke-width:${K === CORN[1] ? 2 : 1};opacity:${K === CORN[1] ? .9 : .45}` });
+  const hit = Math.abs(t - 0.1) < 2e-4, hit6 = Math.abs(t - 1 / 6) < 2e-4, hit2 = Math.abs(t - 0.5) < 2e-4;
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: r * sc, style: `fill:${hit ? "var(--ok)" : "none"};fill-opacity:.08;stroke:${hit ? "var(--ok)" : "var(--accent)"};stroke-width:2` });
+  const c = crossing(t);
+  if (c) {
+    const [px, py] = c.p, L = 1.2;
+    // tangent at p: the line through p perpendicular to Op
+    const d = [-py, px], n = Math.hypot(d[0], d[1]), u = [d[0] / n, d[1] / n];
+    el(g, "line", { x1: PX(px - L * u[0]), y1: PY(py - L * u[1]), x2: PX(px + L * u[0]), y2: PY(py + L * u[1]), style: `stroke:${hit ? "var(--accent2)" : "var(--accent4)"};stroke-width:2` });
+    el(g, "line", { x1: PX(0), y1: PY(0), x2: PX(px), y2: PY(py), style: "stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3" });
+    el(g, "circle", { cx: PX(px), cy: PY(py), r: 5.5, style: "fill:var(--accent2);stroke:var(--panel);stroke-width:1.5" });
+    el(g, "text", { x: PX(px) + 9, y: PY(py) + 18, style: "font:italic 16px var(--serif);fill:var(--ink)" }, hit ? "H₀" : "p");
+  }
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: 3.5, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.4" });
+  el(g, "text", { x: PX(0) - 8, y: PY(0) - 8, "text-anchor": "end", style: "font:italic 16px var(--serif);fill:var(--ink)" }, "O");
+  for (const [P, s, anc] of [[E1, "E", "start"], [K1, "K", "end"], [[0.5, -0.5], "−K", "start"]])
+    el(g, "text", { x: PX(P[0]) + (anc === "start" ? 7 : -7), y: PY(P[1]) + (P[1] > 0 ? -6 : 18), "text-anchor": anc, style: "font:italic 16px var(--serif);fill:var(--ink)" }, s);
+  el(g, "circle", { cx: PX(E1[0]), cy: PY(E1[1]), r: 5, style: `fill:${hit ? "var(--ok)" : "var(--ink)"}` });
+  // readout
+  const rows = [["r", `${r.toFixed(4)}`], ["r² = t", hit ? "1/10 exactly" : hit6 ? "1/6 exactly" : hit2 ? "1/2 exactly" : t.toFixed(4)]];
+  if (c) {
+    const dE = Math.abs(c.pE - t) / Math.sqrt(t), dFar = Math.abs(-c.pK - t) / Math.sqrt(t);
+    rows.push(["crossing p", hit ? "(3/10, −1/10)" : `(${c.p[0].toFixed(4)}, ${c.p[1].toFixed(4)})`]);
+    rows.push(["tangent misses E by", hit || hit2 ? `<span class="ok">0: it runs through E</span>` : `<span class="miss">${dE.toFixed(4)}</span>`]);
+    rows.push(["tangent misses −K by", hit6 ? `<span class="ok">0: it runs through the far corner</span>` : dFar.toFixed(4)]);
+    rows.push(["20t² − 12t + 1", hit || hit2 ? "0" : (20 * t * t - 12 * t + 1).toFixed(4)]);
+    const slope = -c.p[0] / c.p[1];
+    rows.push(["slope of the tangent", hit ? `<span class="ok">3: Holden's even line</span>` : hit2 ? "±1" : hit6 ? "−(3 + 2√2) ≈ −5.83" : Math.abs(c.p[1]) < 1e-9 ? "vertical" : slope.toFixed(4)]);
+    rows.push(["slope of the radius", hit ? `<span class="ok">−1/3: Holden's odd line</span>` : Math.abs(c.p[0]) < 1e-9 ? "vertical" : (c.p[1] / c.p[0]).toFixed(4)]);
+  }
+  $("read1").innerHTML = rows.map(([a, v]) => `<dt>${a}</dt><dd>${v}</dd>`).join("");
+  $("rval").textContent = r.toFixed(4);
+  $("why1").innerHTML = hit
+    ? `<b>The circle of origins.</b> r = √0.1 = ρ, area π/10. The tangent at the crossing H₀ = (3/10, −1/10) runs exactly through the corner E: it is Holden's <b>even line</b> 3x − y = 1. The radius OH₀, extended, is Holden's <b>odd line</b> x + 3y = 0, through the opposite origin.`
+    : hit2 ? `r² = 1/2 is the circle through the four corners: the crossing is the end E itself, so the tangent passes through it only trivially. It meets the arcs in four points, not eight, and its tangents have slopes ±1, not Holden's ±3 and ±1/3.`
+    : hit6 ? `At r² = 1/6 the tangent runs through the far corner −K instead, which is not an end of this arc; and the crossing has irrational coordinates, so it is not a node of the origins grid.`
+    : `Move the radius: the tangent at the crossing (gold) misses the end E of the arc for every circle but one. The condition comes out as one equation, 20t² − 12t + 1 = 0 with t = r², whose roots are 1/10 and 1/2 (its discriminant is 64 = 8²).`;
+  drawPlot(t);
+}
+function drawPlot(t) {
+  const f = $("plot"); f.innerHTML = "";
+  const t0 = (1 - Math.SQRT1_2) ** 2, t1 = 0.5, X = (u) => 40 + (u - t0) / (t1 - t0) * 340, Y = (v) => 50 + (0.15 - v) / 0.97 * 140;
+  el(f, "line", { x1: X(t0), y1: Y(0), x2: X(t1), y2: Y(0), style: "stroke:var(--muted);stroke-width:1" });
+  let d = ""; for (let i = 0; i <= 120; i++) { const u = t0 + (t1 - t0) * i / 120, v = 20 * u * u - 12 * u + 1; d += (i ? " L " : "M ") + X(u).toFixed(1) + " " + Y(v).toFixed(1); }
+  el(f, "path", { d, style: "fill:none;stroke:var(--accent);stroke-width:2" });
+  for (const [u, s] of [[0.1, "1/10"], [0.5, "1/2"]]) {
+    el(f, "circle", { cx: X(u), cy: Y(0), r: 4.5, style: "fill:var(--ok)" });
+    el(f, "text", { x: X(u), y: Y(0) + 20, "text-anchor": "middle", style: "font:13px var(--sans);fill:var(--ok)" }, s);
+  }
+  el(f, "circle", { cx: X(t), cy: Y(20 * t * t - 12 * t + 1), r: 5, style: "fill:var(--accent2)" });
+  el(f, "text", { x: 40, y: 18, style: "font:13px var(--sans);fill:var(--muted)" }, "20t² − 12t + 1, for t = r² across the possible circles");
+  el(f, "text", { x: X(t1), y: 200, "text-anchor": "end", style: "font:12px var(--sans);fill:var(--muted)" }, "t");
+}
+let sweep = null;
+const setR = (r) => { $("r").value = r; draw1(r); };
+$("r").oninput = () => { stopSweep(); draw1(+$("r").value); };
+$("b10").onclick = () => { stopSweep(); setR(Math.sqrt(0.1)); };
+$("b6").onclick = () => { stopSweep(); setR(Math.sqrt(1 / 6)); };
+$("b2").onclick = () => { stopSweep(); setR(Math.SQRT1_2); };
+function stopSweep() { if (sweep) { cancelAnimationFrame(sweep); sweep = null; $("bsweep").textContent = "▶ sweep"; } }
+$("bsweep").onclick = () => {
+  if (sweep) return stopSweep();
+  $("bsweep").textContent = "❚❚ stop";
+  const r0 = 1 - Math.SQRT1_2 + 0.001, r1 = Math.SQRT1_2 - 0.001, T = 9000; let st = null;
+  const step = (ts) => {
+    if (st === null) st = ts; const u = ((ts - st) % T) / T, w = 0.5 - 0.5 * Math.cos(2 * Math.PI * u);
+    let r = r0 + (r1 - r0) * w; if (Math.abs(r * r - 0.1) < 0.004) r = Math.sqrt(0.1);   // linger on the circle of origins
+    setR(r); sweep = requestAnimationFrame(step);
+  };
+  sweep = requestAnimationFrame(step);
+};
+setR(0.45);
+
+// ---------------- 2 · eight origins, eight spirals (the Workbench's construction) ----------------
+const FIB = [0, 1]; while (FIB.length < 20) FIB.push(FIB[FIB.length - 1] + FIB[FIB.length - 2]);
+const SYMS = [
+  { name: "Rotation 0°", M: [1, 0, 0, 1] }, { name: "Rotation 90°", M: [0, -1, 1, 0] },
+  { name: "Rotation 180°", M: [-1, 0, 0, -1] }, { name: "Rotation 270°", M: [0, 1, -1, 0] },
+  { name: "Mirror in the x-axis", M: [1, 0, 0, -1] }, { name: "Mirror in the y-axis", M: [-1, 0, 0, 1] },
+  { name: "Mirror in y = x", M: [0, 1, 1, 0] }, { name: "Mirror in y = −x", M: [0, -1, -1, 0] },
+];
+const COLS = ["var(--accent)", "var(--accent2)", "var(--pink)", "var(--accent4)"];
+const applyM = (M, p) => [M[0] * p[0] + M[1] * p[1] + 0, M[2] * p[0] + M[3] * p[1] + 0];
+function buildBase(n) {   // squares attached down, right, up, left; one quarter arc per square, anticlockwise
+  const squares = [], arcs = [], dirs = ["down", "right", "up", "left"];
+  let x0 = -.5, x1 = .5, y0 = -.5, y1 = .5;
+  squares.push({ side: 1, ll: [-.5, -.5] });
+  for (let k = 2; k <= n; k++) {
+    const w = x1 - x0, h = y1 - y0;
+    switch (dirs[(k - 2) % 4]) {
+      case "down": squares.push({ side: w, ll: [x0, y0 - w] }); y0 -= w; break;
+      case "right": squares.push({ side: h, ll: [x1, y0] }); x1 += h; break;
+      case "up": squares.push({ side: w, ll: [x0, y1] }); y1 += w; break;
+      default: squares.push({ side: h, ll: [x0 - h, y0] }); x0 -= h;
+    }
+  }
+  for (const q of squares) q.c = [q.ll[0] + q.side / 2, q.ll[1] + q.side / 2];
+  const u = (t) => [Math.round(Math.cos(t)), Math.round(Math.sin(t))];
+  let P = [.5, .5];
+  squares.forEach((q, i) => {
+    const ak = (Math.PI / 2) * (i + 1), c = [P[0] - q.side * u(ak)[0], P[1] - q.side * u(ak)[1]];
+    const E = [c[0] + q.side * u(ak + Math.PI / 2)[0], c[1] + q.side * u(ak + Math.PI / 2)[1]];
+    arcs.push({ c, r: q.side, p0: P, p1: E }); P = E;
+  });
+  return { squares, arcs };
+}
+const BASE = buildBase(8);
+const SP = SYMS.map((s, i) => {
+  const T = (p) => applyM(s.M, p), flip = s.M[0] * s.M[3] - s.M[1] * s.M[2] < 0;
+  return {
+    i, name: s.name, mirror: flip, col: COLS[i % 4], M: s.M,
+    squares: BASE.squares.map((q) => ({ side: q.side, c: T(q.c), corners: [[0, 0], [1, 0], [1, 1], [0, 1]].map(([a, b]) => T([q.ll[0] + a * q.side, q.ll[1] + b * q.side])) })),
+    arcs: BASE.arcs.map((a) => ({ c: T(a.c), r: a.r, p0: T(a.p0), p1: T(a.p1) })),
+    H: T([0.3, -0.1]),
+  };
+});
+let sel = 0;   // 0..7, or 8 for all eight
+const chips = $("symchips");
+[...SYMS.map((s, i) => [s.name, i]), ["all eight", 8]].forEach(([name, i]) => {
+  const b = chips.appendChild(document.createElement("button")); b.type = "button";
+  b.innerHTML = i < 8 ? `<span class="sw${SP[i].mirror ? " d" : ""}" style="border-color:${SP[i].col}"></span>${name}` : name;
+  b.onclick = () => { sel = i; draw2(); };
+});
+function arcD(PX, PY, a) {   // the arc from p0 to p1 about c, the short way
+  const a0 = Math.atan2(a.p0[1] - a.c[1], a.p0[0] - a.c[0]); let a1 = Math.atan2(a.p1[1] - a.c[1], a.p1[0] - a.c[0]);
+  let dA = a1 - a0; while (dA > Math.PI) dA -= 2 * Math.PI; while (dA < -Math.PI) dA += 2 * Math.PI;
+  return arcPath(PX, PY, a.c, a.r, a0, a0 + dA, 24);
+}
+function draw2() {
+  const n = +$("nsq").value; $("nsqv").textContent = n;
+  [...chips.children].forEach((b, i) => b.classList.toggle("on", i === sel));
+  const show = sel === 8 ? SP : [SP[sel]];
+  let x0 = -0.6, y0 = -0.6, x1 = 0.6, y1 = 0.6;
+  for (const S of show) for (const q of S.squares.slice(0, n)) for (const [x, y] of q.corners) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const span = Math.max(x1 - x0, y1 - y0) * 1.06, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, sc = 500 / span;
+  const PX = (x) => 260 + (x - cx) * sc, PY = (y) => 260 - (y - cy) * sc;
+  const f = $("fig2"); f.innerHTML = "";
+  const g = el(f, "g", {});
+  if ($("tgrid").checked && sel < 8) {   // the origins grid of this tiling: images of 3x − y = 1 + m and x + 3y = m
+    const S = SP[sel], nA = applyM(S.M, [1, 3]), nB = applyM(S.M, [3, -1]), R = Math.ceil(span * 4);
+    const cl = el(el(f, "defs", {}), "clipPath", { id: "c2" }); el(cl, "rect", { x: 0, y: 0, width: 520, height: 520 });
+    const gg = el(g, "g", { "clip-path": "url(#c2)" });
+    for (const [nv, off] of [[nA, 0], [nB, 1]]) for (let m = -R; m <= R; m++) {
+      const c0 = off + m, l2 = nv[0] * nv[0] + nv[1] * nv[1], p = [nv[0] * c0 / l2 + cx * 0, nv[1] * c0 / l2], dir = [-nv[1], nv[0]], L = span * 2;
+      el(gg, "line", { x1: PX(p[0] - L * dir[0]), y1: PY(p[1] - L * dir[1]), x2: PX(p[0] + L * dir[0]), y2: PY(p[1] + L * dir[1]), style: "stroke:var(--muted);stroke-width:.6;opacity:.4" });
+    }
+  }
+  for (const S of show) {
+    const dash = S.mirror ? "stroke-dasharray:7 4;" : "";
+    if ($("tsq").checked) for (const q of S.squares.slice(0, n)) el(g, "polygon", { points: q.corners.map(([x, y]) => `${PX(x).toFixed(1)},${PY(y).toFixed(1)}`).join(" "), style: `fill:none;stroke:${sel === 8 ? S.col : "var(--muted)"};stroke-width:1;opacity:${sel === 8 ? .35 : .8}` });
+    el(g, "path", { d: S.arcs.slice(0, n).map((a, j) => (j ? arcD(PX, PY, a).replace(/^M/, "L") : arcD(PX, PY, a))).join(" "), style: `fill:none;stroke:${S.col};stroke-width:2.6;${dash}stroke-linecap:round` });
+    if ($("thl").checked && sel < 8) {
+      const odd = [S.H, [0, 0]], tanDir = [-S.H[1], S.H[0]], L = span * 1.5, Hh = S.H;
+      el(g, "line", { x1: PX(Hh[0] - L * Hh[0] / RHO), y1: PY(Hh[1] - L * Hh[1] / RHO), x2: PX(Hh[0] + L * Hh[0] / RHO), y2: PY(Hh[1] + L * Hh[1] / RHO), style: "stroke:var(--ok);stroke-width:1.8" });
+      el(g, "line", { x1: PX(Hh[0] - L * tanDir[0] / RHO), y1: PY(Hh[1] - L * tanDir[1] / RHO), x2: PX(Hh[0] + L * tanDir[0] / RHO), y2: PY(Hh[1] + L * tanDir[1] / RHO), style: "stroke:var(--accent2);stroke-width:1.8" });
+      for (const q of S.squares.slice(0, n)) el(g, "circle", { cx: PX(q.c[0]), cy: PY(q.c[1]), r: 3.2, style: "fill:var(--ink)" });
+    }
+  }
+  // the circle of origins and the eight origins, always
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: RHO * sc, style: "fill:none;stroke:var(--ink);stroke-width:1.4" });
+  for (const S of SP) {
+    const on = sel === 8 || S.i === sel;
+    el(g, "circle", { cx: PX(S.H[0]), cy: PY(S.H[1]), r: on ? 5 : 3, style: `fill:${on ? S.col : "var(--muted)"};stroke:var(--panel);stroke-width:1.2` });
+  }
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: 3, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.3" });
+  const S = SP[Math.min(sel, 7)];
+  const fr = (v) => { const t = Math.round(v * 10); return t === 0 ? "0" : `${t < 0 ? "−" : ""}${Math.abs(t)}/10`; };
+  $("text2").innerHTML = sel === 8
+    ? `<p style="margin-top:0"><b>All eight.</b> The eight symmetries of the unit square, four turns about O (solid) and four mirrors (dashed), carry the Fibonacci tiling to eight tilings, each with its own spiral, all growing out of the same unit square. Each carries Holden's crossing to a different point of the circle of origins: the eight origins (±3/10, ±1/10), (±1/10, ±3/10), one for each spiral.</p><p>Opposite spirals (a half turn apart) share their odd line, the line through both their origins and O; their even lines are the two parallel tangents of the circle at those origins.</p>`
+    : `<p style="margin-top:0"><b>${S.name}.</b> Its origin is (${fr(S.H[0])}, ${fr(S.H[1])}), one of the eight. There the tangent of the circle of origins is its <span style="color:var(--accent2)">even line</span>, through the centres of its even squares, and the radius through O, on to the opposite origin, is its <span style="color:var(--ok)">odd line</span>, through the centres of its odd squares. The centre of square k is L<sub>k</sub> origins units from its origin: 1, 3, 4, 7, 11, …</p><p>Every arc of the spiral is the diagonal arc of its own square, so each spiral is built, at every size, from the same exact shape. ${S.mirror ? "A mirror image: its spiral turns the other way." : ""}</p>`;
+}
+for (const id of ["nsq", "tsq", "thl", "tgrid"]) $(id).oninput = $(id).onchange = draw2;
+draw2();
+
+// ---------------- 3 · angles, areas and squares ----------------
+function draw3() {
+  const f = $("fig3"); f.innerHTML = "";
+  const sc = 600, PX = (x) => 230 + x * sc, PY = (y) => 230 - y * sc;
+  const g = el(f, "g", {});
+  const poly = (P, style) => el(g, "polygon", { points: P.map(([x, y]) => `${PX(x).toFixed(1)},${PY(y).toFixed(1)}`).join(" "), style });
+  el(g, "rect", { x: PX(-0.36), y: PY(0.36), width: 0.72 * sc, height: 0.72 * sc, style: "fill:none;stroke:none" });
+  if ($("ttri").checked) ORIG.forEach((p, i) => { const q = ORIG[(i + 1) % 8]; poly([[0, 0], p, q], `fill:${i % 2 ? "var(--accent4)" : "var(--accent3)"};fill-opacity:.16;stroke:none`); });
+  if ($("ttan").checked) poly([[0.3, 0.3], [-0.3, 0.3], [-0.3, -0.3], [0.3, -0.3]], "fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:2 3");
+  if ($("t5").checked) {
+    poly([[0.3, 0.1], [-0.1, 0.3], [-0.3, -0.1], [0.1, -0.3]], "fill:var(--accent);fill-opacity:.1;stroke:var(--accent);stroke-width:2");
+    poly([[0.3, -0.1], [0.1, 0.3], [-0.3, 0.1], [-0.1, -0.3]], "fill:var(--pink);fill-opacity:.08;stroke:var(--pink);stroke-width:2");
+  }
+  if ($("t89").checked) {
+    poly([[0.25, 0], [0, 0.25], [-0.25, 0], [0, -0.25]], "fill:none;stroke:var(--accent4);stroke-width:2;stroke-dasharray:6 4");
+    poly([[1 / 6, 1 / 6], [-1 / 6, 1 / 6], [-1 / 6, -1 / 6], [1 / 6, -1 / 6]], "fill:none;stroke:var(--ink);stroke-width:1.6;stroke-dasharray:2 3");
+    for (const [x, y] of [[0.25, 0], [0, 0.25], [-0.25, 0], [0, -0.25], [1 / 6, 1 / 6], [-1 / 6, 1 / 6], [-1 / 6, -1 / 6], [1 / 6, -1 / 6]]) el(g, "circle", { cx: PX(x), cy: PY(y), r: 3.4, style: "fill:var(--accent4)" });
+  }
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: RHO * sc, style: "fill:none;stroke:var(--ink);stroke-width:1.6" });
+  if ($("tang").checked) ORIG.forEach((p, i) => {
+    const q = ORIG[(i + 1) % 8], a0 = Math.atan2(p[1], p[0]); let a1 = Math.atan2(q[1], q[0]); if (a1 < a0) a1 += 2 * Math.PI;
+    const r = i % 2 ? 0.085 : 0.11;
+    el(g, "path", { d: arcPath(PX, PY, [0, 0], r, a0, a1, 20), style: `fill:none;stroke:${i % 2 ? "var(--accent4)" : "var(--accent3)"};stroke-width:1.6` });
+    if (i < 2) { const am = (a0 + a1) / 2, rr = r + 0.045; el(g, "text", { x: PX(rr * Math.cos(am)), y: PY(rr * Math.sin(am)) + 5, "text-anchor": "middle", style: `font:600 13px var(--sans);fill:${i % 2 ? "var(--accent4)" : "var(--accent3)"}` }, i % 2 ? "36.87°" : "53.13°"); }
+  });
+  for (const [x, y] of ORIG) el(g, "circle", { cx: PX(x), cy: PY(y), r: 5, style: "fill:var(--ink);stroke:var(--panel);stroke-width:1.4" });
+  el(g, "circle", { cx: PX(0), cy: PY(0), r: 3, style: "fill:var(--panel);stroke:var(--ink);stroke-width:1.3" });
+  el(g, "text", { x: PX(0) - 6, y: PY(0) - 6, "text-anchor": "end", style: "font:italic 15px var(--serif);fill:var(--ink)" }, "O");
+}
+for (const id of ["tang", "ttri", "t5", "t89", "ttan"]) $(id).onchange = draw3;
+draw3();
+</script>
+<script src="menu.js?v=4abfc177"></script>
+</body>
+</html>
