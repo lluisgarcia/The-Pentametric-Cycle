@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=7165cfaa">
 <script src="pent.js?v=fd480162"></script>
-<script src="library.js?v=ec3672f5"></script>
+<script src="library.js?v=ad829688"></script>
 </head>
 <body>
 <header class="site"><div class="inner">
@@ -20,7 +20,7 @@
 <main>
   <span class="kind l">◇ Library · the papers, images and GeoGebra files</span>
   <h1>The papers</h1>
-  <p class="lede">The written work behind the site: the preprint, three notes (the Epitetartic Rhombus, the Origin of Origins and Counting the Pentametric areas) and the palindrome data sheet. Read them here, download them, or follow the DOI to their permanent record on Zenodo.</p>
+  <p class="lede">The written work behind the site: the preprint, four notes (the Epitetartic Rhombus, the Origin of Origins, Counting the Pentametric areas and the Hidden Origin) and the palindrome data sheet. Read them here, download them, or follow the DOI to their permanent record on Zenodo.</p>
   <div id="viewer" class="panel" hidden style="margin:0 0 18px">
     <div class="controls" style="margin-top:0"><strong id="vtitle" style="font-family:var(--serif);font-size:1.15rem;font-weight:500"></strong><button id="vclose">✕ Close</button></div>
     <iframe id="vframe" class="pdfview" title="PDF viewer"></iframe>
@@ -53,6 +53,6 @@ box.addEventListener("click", (e) => { const b = e.target.closest("[data-read]")
   v.hidden = false; v.scrollIntoView({ behavior: "smooth", block: "start" }); });
 document.getElementById("vclose").onclick = () => { document.getElementById("viewer").hidden = true; document.getElementById("vframe").src = "about:blank"; };
 </script>
-<script src="menu.js?v=4abfc177"></script>
+<script src="menu.js?v=31656b35"></script>
 </body>
 </html>

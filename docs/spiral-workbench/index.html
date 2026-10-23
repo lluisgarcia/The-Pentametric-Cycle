@@ -36,6 +36,11 @@
   #measures .m:last-child { border: 0; }
   #measures .m.sel { background: #fff4d6; }
   .muted { color: #6e7781; }
+  #layers button.turn { padding: 0 6px; min-width: 26px; font-size: 13px; line-height: 18px; }
+  #rotation, #graph { background: #fff; border: 1px solid #d0d4da; border-radius: 4px; padding: 6px 8px; font-size: 12px; }
+  #rotation .row { margin: 3px 0; }
+  #bigGraph { position: absolute; left: 16px; right: 16px; top: 44px; background: #fff; border: 1px solid #b8bec7; border-radius: 6px; box-shadow: 0 6px 24px rgba(0,0,0,.18); padding: 8px 10px; z-index: 6; }
+  #bigGraph .row { gap: 8px; }
   #status { padding: 3px 10px; background: #fff; border-top: 1px solid #d0d4da; font-size: 12px; display: flex; gap: 16px; }
   #status #coords { margin-left: auto; font-variant-numeric: tabular-nums; }
   @media (max-width: 900px) { #main { flex-direction: column; } #side { width: auto; max-height: 40%; border-left: 0; border-top: 1px solid #d0d4da; } }
@@ -54,12 +59,16 @@
       <h3>Spirals and layers</h3>
       <table id="layers"></table>
       <div class="row" id="quick"></div>
+      <h3>Rotation</h3>
+      <div id="rotation"></div>
       <h3>Options</h3>
       <div class="row" id="options"></div>
       <h3>Selected</h3>
       <div id="info"><span class="muted">Nothing selected.</span></div>
       <h3>Measurements</h3>
       <div id="measures"><span class="muted">None yet. Use Distance, Angle or Area.</span></div>
+      <h3>Measurement against θ</h3>
+      <div id="graph"></div>
     </div>
   </div>
   <div id="status"><span id="hint"></span><span id="coords"></span></div>

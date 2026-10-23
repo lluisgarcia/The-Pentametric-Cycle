@@ -104,6 +104,7 @@
   <h2 style="color:var(--accent2)">⤓ Use it</h2>
   <p class="note" style="margin-top:0">Tools that make something you can take away: music as MIDI files, and images to print or share.</p>
   <div class="cards">
+    <a class="card" href="spiral-workbench/"><span class="k">Tool</span><h3>Spiral Workbench</h3><p>The eight Fibonacci spirals with their squares, Holden's lines and grids, and tools to draw and measure. Turn the spirals about their origins and watch where they cross, with trails and a graph of any measurement against the angle.</p></a>
     <a class="card" href="composer.html"><span class="k">Make music</span><h3>Composer and MIDI export</h3><p>Turn any list of numbers into a piece of consonances, listen, and download it as a MIDI file.</p></a>
     <a class="card" href="tapestry.html"><span class="k">Pattern</span><h3>The residue tapestry</h3><p>Weave the sequence into rows of any length and download the pattern as a high-resolution image.</p></a>
     <a class="card" href="signature.html"><span class="k">Personal</span><h3>Name and date signature</h3><p>Every name and date has its own short piece in the cycle. Listen, then download it as MIDI or as a card to share.</p></a>
@@ -152,6 +153,6 @@ for (let n = 0; n <= 50; n++) {
 document.getElementById("legend").innerHTML = Pent.INTERVALS.map((iv) => `<span><i class="sw" style="background:var(--c${iv.h})"></i>${iv.name}${iv.ratio ? " " + iv.ratio : ""}</span>`).join("")
   + `<span>· n = 0 … 50, mirrored at n = 25</span>`;
 </script>
-<script src="menu.js?v=4abfc177"></script>
+<script src="menu.js?v=31656b35"></script>
 </body>
 </html>
