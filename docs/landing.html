@@ -78,13 +78,21 @@
     <div class="controls">
       <button id="aplay" type="button">❚❚ pause</button>
       <button id="aprev" type="button">◀</button><button id="anext" type="button">▶</button>
-      <label><input id="aall" type="checkbox"> every n, with the Pentametric squares in between</label>
+      <label><input id="aall" type="checkbox"> every n, with the Pentametric areas in between</label>
+      <label id="ashapew">shape <select id="ashape"><option value="sq">squares</option><option value="ci" selected>circles</option></select></label>
       <span id="ak" class="big"></span>
     </div>
     <div class="three">
       <div><h3>The landing <span style="color:var(--accent2)">↻ clockwise</span></h3><svg id="an1" class="fig" viewBox="0 0 300 300" role="img" aria-label="The landing of L_k H in its unit square, turning clockwise"></svg></div>
       <div><h3>Holden's centres <span style="color:var(--ok)">↺ anticlockwise</span></h3><svg id="an2" class="fig" viewBox="0 0 300 300" role="img" aria-label="Holden's tiling growing, with the line from H to the centre of square k turning anticlockwise"></svg></div>
       <div><h3>Both on one dial</h3><svg id="an3" class="fig" viewBox="0 0 300 300" role="img" aria-label="Both directions on one dial: mirror images in the even line"></svg></div>
+    </div>
+    <div id="a4wrap" style="display:none;margin-top:14px">
+      <div class="two">
+        <div><h3 style="font-family:var(--serif);font-weight:500;font-size:1.1rem;margin:0 0 4px;text-align:center">From one centre: the breath</h3>
+          <svg id="an4" class="fig" viewBox="0 0 300 300" role="img" aria-label="All the circles grown from one centre: the circle of 𝔓(n) is the circle of n²/5 plus or minus a ring of area π/5"></svg></div>
+        <div class="stepbox" id="a4text"></div>
+      </div>
     </div>
     <p class="note" id="anote"></p>
     <table class="luc" id="luc"></table>
@@ -419,9 +427,15 @@ function drawAll(v) {
     const reached = i < k;
     el(g, "rect", { x: PX(q.x0), y: PY(q.y0 + q.s), width: q.s * sc, height: q.s * sc, style: `fill:none;stroke:var(--muted);stroke-width:1;${reached ? "" : "stroke-dasharray:3 3;opacity:.6"}` });
   });
+  const circles = $("ashape").value === "ci";
+  if (circles) SQ.slice(0, k).forEach((q) => el(g, "circle", { cx: PX(q.x0 + q.s / 2), cy: PY(q.y0 + q.s / 2), r: q.s / 2 * sc, style: "fill:none;stroke:var(--muted);stroke-width:1;opacity:.7" }));
   const shadow = (n, op) => {
     const A = PAn(n), [cx, cy] = tipN(n), kk = kOf(n), lucas = LUC[kk] === n;
     if (A === 0) { el(g, "circle", { cx: PX(cx), cy: PY(cy), r: 3, style: `fill:var(--ink);opacity:${op}` }); return; }
+    if (circles) {   // the circle inside the Pentametric square: radius half its side, √𝔓(n)/2; no tilt to choose
+      el(g, "circle", { cx: PX(cx), cy: PY(cy), r: Math.sqrt(A) / 2 * sc, style: `fill:${lucas ? "var(--ok)" : "var(--accent3)"};fill-opacity:${lucas ? .22 : .1};stroke:${lucas ? "var(--ok)" : "var(--accent3)"};stroke-width:${lucas ? 2.4 : 1.4};${lucas ? "" : "stroke-dasharray:5 3;"}opacity:${op}` });
+      return;
+    }
     const sd = Math.sqrt(A), rot = thetaN(n) - (AZ + Math.PI + (kk - 1) * Math.PI / 2);   // tilts as it turns, upright on a tile
     const P = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => {
       const x = a * sd / 2, y = b * sd / 2;
@@ -441,7 +455,7 @@ function drawAll(v) {
   el(g, "circle", { cx: PX(tx), cy: PY(ty), r: 4.5, style: "fill:var(--ok)" });
   el(g, "rect", { x: PX(0.3) - 4, y: PY(-0.1) - 4, width: 8, height: 8, style: "fill:var(--accent2)" });
   el(s2, "text", { x: 150, y: 290, "text-anchor": "middle", style: `font:600 15px var(--sans);fill:${kN > 0 && at ? "var(--ok)" : "var(--accent3)"}` },
-    at ? (kN > 0 ? `𝔓(${N0}) = ${PAn(N0)} = F${sub(kN)}²: it lands on square ${kN}` : `𝔓(${N0}) = ${PAn(N0)}, ${N0} units from H: between tiles`) : "…");
+    at ? (kN > 0 ? `𝔓(${N0}) = ${PAn(N0)} = F${sub(kN)}²: it lands in square ${kN}` : `𝔓(${N0}) = ${PAn(N0)}, ${N0} units from H: between tiles`) : "…");
   // 3 · both on one dial
   d = dial(s3);
   const ev = Math.atan2(3, 1);
@@ -450,8 +464,25 @@ function drawAll(v) {
   landHand(s3, d, N0, 1 - fe); if (f > 0.02) landHand(s3, d, N1, fe);
   el(s3, "text", { x: 150, y: 290, "text-anchor": "middle", style: "font:600 15px var(--sans);fill:var(--ink)" },
     at ? (kN > 0 ? (kN % 2 === 0 ? "a Lucas number: they meet" : "a Lucas number: opposite") : "between: not mirror images") : "…");
+  // 4 · from one centre: the circle of 𝔓(n) is the circle of n²/5 plus or minus a ring of area π/5 (two circles of origins)
+  const s4 = $("an4"); s4.innerHTML = "";
+  const rRef = (w) => w / (2 * Math.sqrt(5)), rP = (m) => Math.sqrt(PAn(m)) / 2;   // radii: half the side of each square
+  const zs = 112 / rRef(Math.max(v, 1)), C4 = 150;
+  for (let m = 1; m < N0; m++) { const lu = lucasIndex(m) > 0; el(s4, "circle", { cx: C4, cy: C4, r: rP(m) * zs, style: `fill:none;stroke:${lu ? "var(--ok)" : "var(--muted)"};stroke-width:${lu ? 1.4 : .7};opacity:${lu ? .7 : .35}` }); }
+  const ring = (m, op) => {
+    const b = [0, 1, -1, -1, 1][m % 5], r0 = rRef(m) * zs, r1 = rP(m) * zs, col = b > 0 ? "var(--ok)" : "var(--accent2)";
+    if (b !== 0) el(s4, "path", { d: `M ${C4 - Math.max(r0, r1)} ${C4} a ${Math.max(r0, r1)} ${Math.max(r0, r1)} 0 1 0 ${2 * Math.max(r0, r1)} 0 a ${Math.max(r0, r1)} ${Math.max(r0, r1)} 0 1 0 ${-2 * Math.max(r0, r1)} 0 M ${C4 - Math.min(r0, r1)} ${C4} a ${Math.min(r0, r1)} ${Math.min(r0, r1)} 0 1 1 ${2 * Math.min(r0, r1)} 0 a ${Math.min(r0, r1)} ${Math.min(r0, r1)} 0 1 1 ${-2 * Math.min(r0, r1)} 0`, style: `fill:${col};fill-opacity:.6;fill-rule:evenodd;opacity:${op}` });
+    el(s4, "circle", { cx: C4, cy: C4, r: r0, style: `fill:none;stroke:var(--accent);stroke-width:1.4;stroke-dasharray:5 4;opacity:${op}` });
+    if (r1 > 0) el(s4, "circle", { cx: C4, cy: C4, r: r1, style: `fill:none;stroke:${lucasIndex(m) > 0 ? "var(--ok)" : "var(--accent3)"};stroke-width:2.4;opacity:${op}` });
+  };
+  ring(N0, 1 - fe); if (f > 0.02) ring(N1, fe);
+  el(s4, "rect", { x: C4 - 3.5, y: C4 - 3.5, width: 7, height: 7, style: "fill:var(--accent2)" });
+  const b4 = [0, 1, -1, -1, 1][N0 % 5];
+  $("a4text").innerHTML = `<p style="margin-top:0">Grow every n from one centre, with no direction to choose. Draw the circle inside the Pentametric square, of radius half its side, √𝔓(n)/2 (solid), and the circle inside the blue square of n, radius n/(2√5) (blue, dashed). The Pentametric circle is the blue one <b>plus or minus a ring of area exactly π/5</b>, two circles of origins, for every n: ${b4 > 0 ? `<span class="in">${N0} breathes in, the ring is added</span>` : b4 < 0 ? `<span class="out">${N0} breathes out, the ring is taken away</span>` : `<span class="rest">${N0} rests: no ring</span>`}.</p>
+    <p class="note">n = ${N0}: the blue circle has area π·${N0}²/20 = ${(N0 * N0 / 20).toFixed(2)}π; the Pentametric circle π·𝔓(${N0})/4 = π·${PAn(N0)}/4 = ${(PAn(N0) / 4).toFixed(2)}π; the difference ${b4 > 0 ? "+0.20π = +π/5" : b4 < 0 ? "−0.20π = −π/5" : "0"}.</p>
+    <p>The faint rings are all the circles before, grown from the same centre; the green ones are the Lucas numbers, the circles inside the Fibonacci squares. The view zooms out as n grows, so the same ring of π/5 looks thinner and thinner: the breath stays the same size while everything around it grows.</p>`;
   $("ak").textContent = `n = ${N0}${at ? "" : " → " + N1}`;
-  $("anote").innerHTML = `Every whole n from 1 to ${NMAX}. Drawn at the whole numbers, the landing (rust) steps from origin to origin in its rhythm of five, no turn, ¾, ¼, ½, rest, and at the Lucas numbers (green ring) the steps line up into one steady quarter turn per Fibonacci square. In Holden's tiling each n has its Pentametric square, of area 𝔓(n), at n origins units from H (purple, dashed): it fits the tiling exactly, as Fibonacci square k, only when n is the Lucas number L<sub>k</sub> (green). Between the Lucas numbers the distance n and the area 𝔓(n) are exact; the direction and tilt of the purple squares are a drawing choice, sharing the quarter turn evenly among the steps, as on <a href="pentaspiral.html">the Pentametric spiral</a>. At the Lucas numbers the two hands are mirror images in the even line.`;
+  $("anote").innerHTML = `Every whole n from 1 to ${NMAX}. Drawn at the whole numbers, the landing (rust) steps from origin to origin in its rhythm of five, no turn, ¾, ¼, ½, rest, and at the Lucas numbers (green ring) the steps line up into one steady quarter turn per Fibonacci square. In Holden's tiling each n has its Pentametric square, of area 𝔓(n), at n origins units from H, or the circle inside it (purple, dashed): it fits the tiling exactly, in Fibonacci square k, only when n is the Lucas number L<sub>k</sub> (green). Between the Lucas numbers the distance n and the area 𝔓(n) are exact; ${$("ashape").value === "ci" ? "only the direction of the purple circles is a drawing choice, sharing the quarter turn evenly among the steps" : "the direction and tilt of the purple squares are a drawing choice, sharing the quarter turn evenly among the steps"}, as on <a href="pentaspiral.html">the Pentametric spiral</a>. At the Lucas numbers the two hands are mirror images in the even line.`;
 }
 
 // ---------- timing: a list of stops, with a pause at each ----------
@@ -479,7 +510,10 @@ function aPause() { aplaying = false; $("aplay").textContent = "▶ play"; }
 $("aplay").onclick = () => { if (aplaying) aPause(); else { aplaying = true; $("aplay").textContent = "❚❚ pause"; ai = Math.round(apos); apos = ai; aclock = 0; requestAnimationFrame(aframe); } };
 $("aprev").onclick = () => { aPause(); ai = apos = Math.max(0, Math.round(apos) - 1); render(); };
 $("anext").onclick = () => { aPause(); ai = apos = Math.min(stops().length - 1, Math.round(apos) + 1); render(); };
-$("aall").onchange = () => { ai = apos = 0; aclock = 0; render(); };
+const syncMode = () => { $("a4wrap").style.display = allMode() ? "" : "none"; $("ashapew").style.display = allMode() ? "" : "none"; };
+$("aall").onchange = () => { syncMode(); ai = apos = 0; aclock = 0; render(); };
+$("ashape").onchange = () => render();
+syncMode();
 render();
 if (aplaying) { $("aplay").textContent = "❚❚ pause"; requestAnimationFrame(aframe); } else $("aplay").textContent = "▶ play";
 
