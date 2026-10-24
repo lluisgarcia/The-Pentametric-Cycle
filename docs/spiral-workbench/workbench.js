@@ -31,8 +31,8 @@ const SYMS = [
   { name: 'Rotation 180°', short: '180°', M: [-1, 0, 0, -1] },
   { name: 'Rotation 270°', short: '270°', M: [0, 1, -1, 0] },
   { name: 'Mirror in the x-axis', short: 'mirror x', M: [1, 0, 0, -1] },
-  { name: 'Mirror in the y-axis', short: 'mirror y', M: [-1, 0, 0, 1] },
   { name: 'Mirror in the diagonal y = x', short: 'mirror y=x', M: [0, 1, 1, 0] },
+  { name: 'Mirror in the y-axis', short: 'mirror y', M: [-1, 0, 0, 1] },
   { name: 'Mirror in the diagonal y = -x', short: 'mirror y=-x', M: [0, -1, -1, 0] },
 ];
 const HUES = ['#1f6feb', '#e5484d', '#e060a8', '#d99a00'];   // rotations: blue, red, pink, yellow; mirrors reuse them dashed
@@ -141,6 +141,12 @@ function ccInt(a, b) {
 }
 /* Intersection points of two line / segment / circle / arc objects (in a stable order). */
 function intersect(g1, g2) {
+  if (g1.k === 'arc' && g2.k === 'arc' && near(g1.c, g2.c, 1e-9) && Math.abs(g1.r - g2.r) < 1e-9) {   // two arcs of one circle: they meet where one ends on the other
+    const out = [], end = (g, t) => [g.c[0] + g.r * Math.cos(t), g.c[1] + g.r * Math.sin(t)];
+    for (const p of [end(g1, g1.a0), end(g1, g1.a1), end(g2, g2.a0), end(g2, g2.a1)])
+      if (inRange(g1, p) && inRange(g2, p) && !out.some(q => near(q, p, 1e-9))) out.push(p);
+    return out;
+  }
   const a = carrier(g1), b = carrier(g2);
   const pts = a.k === 'line' ? (b.k === 'line' ? llInt(a, b) : lcInt(a, b)) : (b.k === 'line' ? lcInt(b, a) : ccInt(a, b));
   return pts.filter(p => inRange(g1, p) && inRange(g2, p));
@@ -179,18 +185,25 @@ const BASE = buildSpiral0(FIB_MAX);
 /* Inward continuation by halving squares (sides 1/2, 1/4, ...): the same arc rule run backwards from the start (1/2, 1/2).
  * The steps form a geometric series and converge exactly to (7/10, -1/10), the origin of the neighbouring mirror square. */
 function buildInward(n = 16) {
-  const pts = [], squares = [], u = t => [Math.round(Math.cos(t)), Math.round(Math.sin(t))];
+  const pts = [], squares = [], arcs = [], u = t => [Math.round(Math.cos(t)), Math.round(Math.sin(t))];
   let P = [.5, .5], s = .5;
   for (let k = 0; k > -n; k--) {
     const a = (Math.PI / 2) * k, c = [P[0] - s * u(a + Math.PI / 2)[0], P[1] - s * u(a + Math.PI / 2)[1]];
     for (let j = 0; j <= 16; j++) { const t = a + Math.PI / 2 - (Math.PI / 2) * j / 16; pts.push([c[0] + s * Math.cos(t), c[1] + s * Math.sin(t)]); }
     const P2 = [c[0] + s * u(a)[0], c[1] + s * u(a)[1]], F = [P[0] + P2[0] - c[0], P[1] + P2[1] - c[1]];
+    arcs.push({ k: 'arc', c, r: s, a0: a, a1: a + Math.PI / 2, p0: P, p1: P2, rev: true, inward: true });   // drawn from P (angle a + 90deg) back to P2 (angle a)
     squares.push({ side: s, corners: [c, P, F, P2], c: [(c[0] + F[0]) / 2, (c[1] + F[1]) / 2] });
     P = P2; s /= 2;
   }
-  return { pts, squares };                                 // from the start inwards
+  return { pts, squares, arcs };                           // from the start inwards
 }
 const INW = buildInward(), INWARD = INW.pts, HSTART = [.7, -.1];   // the halving squares end at (7/10, -1/10)
+/* An arc moved by a rigid map T: a turn keeps its sense, a reflection (det = -1) reverses it. */
+function xfArc(g, T, det) {
+  const c = T(g.c), span = g.a1 - g.a0, at = t => T([g.c[0] + g.r * Math.cos(t), g.c[1] + g.r * Math.sin(t)]);
+  const st = det > 0 ? at(g.a0) : at(g.a1), a0 = Math.atan2(st[1] - c[1], st[0] - c[0]);
+  return Object.assign({}, g, { c, a0, a1: a0 + span, p0: T(g.p0), p1: T(g.p1), rev: det > 0 ? g.rev : !g.rev });
+}
 
 /* Every spiral = the base images under one of the symmetries. */
 const SP = SYMS.map((sym, i) => {
@@ -206,7 +219,7 @@ const SP = SYMS.map((sym, i) => {
   });
   const lines = [lineThru(squares[0].c, squares[2].c), lineThru(squares[1].c, squares[3].c)];   // centres 1,3,5.. and 2,4,6..
   const H = intersect(lines[0], lines[1])[0];            // Holden's crossing, computed, not hard-coded
-  return { i, name: sym.name, short: sym.short, M, mirror: flip, col: HUES[i % 4], squares, arcs, lines, H, inward: INWARD.map(T), inSq: INW.squares.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })), Hs: T(HSTART),
+  return { i, name: sym.name, short: sym.short, M, mirror: flip, col: HUES[i % 4],   /* spiral 4 + k is the mirror of spiral k in an axis through O (4 of 0, 5 of 1, 6 of 2, 7 of 3), so it takes its colour */ squares, arcs, lines, H, inward: INWARD.map(T), inArcs: INW.arcs.map(g => xfArc(g, T, flip ? -1 : 1)), inSq: INW.squares.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })), Hs: T(HSTART),
            nA: applyM(M, [1, 3]), nB: applyM(M, [3, -1]) };   // Holden grid: nA.p = m, nB.p = 1 + m  (m whole)
 });
 
@@ -226,7 +239,7 @@ function liveSpiral(S, phi, C) {
     squares: S.squares.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })),
     arcs: S.arcs.map(a => Object.assign({}, a, { c: T(a.c), p0: T(a.p0), p1: T(a.p1), a0: a.a0 + phi, a1: a.a1 + phi })),
     lines: S.lines.map(l => ({ k: 'line', p: T(l.p), d: Rv(l.d) })),
-    H: T(S.H), nA, nB, inward: S.inward.map(T), Hs: T(S.Hs),
+    H: T(S.H), nA, nB, inward: S.inward.map(T), inArcs: S.inArcs.map(g => xfArc(g, T, 1)), Hs: T(S.Hs),
     inSq: S.inSq.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })),
     offA: dot(nA, C) - dot(S.nA, C), offB: 1 + dot(nB, C) - dot(S.nB, C),   // grid lines nA.p = m + offA, nB.p = m + offB
   });
@@ -234,7 +247,54 @@ function liveSpiral(S, phi, C) {
 let LV = SP.map(S => liveSpiral(S, 0, S.H));   // replaced by updateLive() once the state exists
 function spinOf(i) { const r = state.layers[i].rot || 0; return r * state.theta * Math.PI / 180; }   // rot: 0 off, -1 clockwise, +1 anticlockwise
 const centreOf = S => state.rotCentre === 'O' ? [0, 0] : state.rotCentre === 'start' ? S.Hs : S.H;
-function updateLive() { LV = SP.map((S, i) => liveSpiral(S, spinOf(i), centreOf(S))); dirty.snap = dirty.dyn = true; }
+/* Flip a live spiral about its own centre C (0 none, 1 left-right, 2 up-down, 3 both = half turn),
+ * and flip everything through the circle of origins about O (inversion z -> 0.1 z/|z|^2: outside <-> inside, the eight origins stay put). */
+const FLIPSYM = ['·', '↔', '↕', '✣'], FLIPNAME = ['not flipped', 'flipped left-right about its centre', 'flipped up-down about its centre', 'flipped both ways (a half turn about its centre)'];
+function flipSpiral(S, C, mode) {
+  if (!mode) return S;
+  const M = mode === 1 ? [-1, 0, 0, 1] : mode === 2 ? [1, 0, 0, -1] : [-1, 0, 0, -1], refl = mode !== 3;
+  const Lm = v => [M[0] * v[0] + M[1] * v[1], M[2] * v[0] + M[3] * v[1]], T = p => { const d = Lm([p[0] - C[0], p[1] - C[1]]); return [C[0] + d[0], C[1] + d[1]]; };
+  const ang = a => mode === 1 ? Math.PI - a : mode === 2 ? -a : a + Math.PI;
+  const nA = Lm(S.nA), nB = Lm(S.nB);
+  return Object.assign({}, S, {
+    flip: mode,
+    squares: S.squares.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })),
+    arcs: S.arcs.map(a => { const span = a.a1 - a.a0, a0 = refl ? ang(a.a1) : ang(a.a0); return Object.assign({}, a, { c: T(a.c), p0: T(a.p0), p1: T(a.p1), a0, a1: a0 + span, rev: refl ? !a.rev : a.rev }); }),
+    lines: S.lines.map(l => ({ k: 'line', p: T(l.p), d: Lm(l.d) })),
+    H: T(S.H), nA, nB, inward: S.inward.map(T), inArcs: S.inArcs.map(g => xfArc(g, T, refl ? -1 : 1)), Hs: T(S.Hs),
+    inSq: S.inSq.map(q => ({ side: q.side, c: T(q.c), corners: q.corners.map(T) })),
+    offA: S.offA + dot(nA, C) - dot(S.nA, C), offB: S.offB + dot(nB, C) - dot(S.nB, C),
+  });
+}
+const INV = p => { const d = p[0] * p[0] + p[1] * p[1]; return d < 1e-18 ? [1e9, 1e9] : [0.1 * p[0] / d, 0.1 * p[1] / d]; };
+function invEdges(corners, k = 12) {                      // a square's sides become circular arcs: sample them
+  const out = [];
+  for (let j = 0; j < corners.length; j++) { const a = corners[j], b = corners[(j + 1) % corners.length]; for (let t = 0; t < k; t++) out.push(INV([a[0] + (b[0] - a[0]) * t / k, a[1] + (b[1] - a[1]) * t / k])); }
+  return out;
+}
+function invArc(a) {
+    const den = a.c[0] * a.c[0] + a.c[1] * a.c[1] - a.r * a.r;
+    if (Math.abs(den) < 1e-12) return Object.assign({}, a, { r: 0, c: INV(a.p0), a0: 0, a1: 0, dead: true });   // a circle through O would become a line
+    const c = [0.1 * a.c[0] / den, 0.1 * a.c[1] / den], r = 0.1 * a.r / Math.abs(den);
+    const at = t => [a.c[0] + a.r * Math.cos(t), a.c[1] + a.r * Math.sin(t)], th = p => Math.atan2(p[1] - c[1], p[0] - c[0]);
+    const sP = INV(at(a.rev ? a.a1 : a.a0)), eP = INV(at(a.rev ? a.a0 : a.a1)), mP = INV(at((a.a0 + a.a1) / 2));
+    const as = th(sP), ae = th(eP), am = th(mP), span = normAng(ae - as);
+    const fwd = normAng(am - as) <= span + 1e-12;
+    const a0 = fwd ? as : ae, a1 = a0 + (fwd ? span : normAng(as - ae));
+    return Object.assign({}, a, { c, r, a0, a1, rev: !fwd, p0: INV(a.p0), p1: INV(a.p1) });
+}
+function invertSpiral(S) {
+  return Object.assign({}, S, {
+    inverted: true, arcs: S.arcs.map(invArc), inArcs: S.inArcs.map(invArc),
+    squares: S.squares.map(q => ({ side: q.side, c: INV(q.c), corners: invEdges(q.corners) })),
+    lines: [], H: INV(S.H), Hs: INV(S.Hs), inward: S.inward.map(INV),
+    inSq: S.inSq.map(q => ({ side: q.side, c: INV(q.c), corners: invEdges(q.corners) })),
+  });
+}
+function updateLive() {
+  LV = SP.map((S, i) => { const C = centreOf(S); let L = flipSpiral(liveSpiral(S, spinOf(i), C), C, state.layers[i].flip || 0); if (state.invert) L = invertSpiral(L); return L; });
+  dirty.snap = dirty.dyn = true;
+}
 
 /* ============================== 5. Self-test ============================== */
 function selfTest() {
@@ -302,8 +362,9 @@ function redo() { if (!redoStack.length) return; undoStack.push(ser()); restore(
 
 function builtinGeom(key) {
   const [t, a, b] = key.split(':');
-  if (t === 'hl') return LV[+a].lines[+b];
+  if (t === 'hl') return LV[+a].lines[+b] || null;
   if (t === 'arc') return LV[+a].arcs[+b];
+  if (t === 'ina') return LV[+a].inArcs[+b] || null;
   if (t === 'usq') { const c = [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]]; return { k: 'seg', p: c[+a], q: c[(+a + 1) % 4] }; }
   if (t === 'circh') return { k: 'circ', c: [0, 0], r: HOLDEN };
   return null;
@@ -317,6 +378,10 @@ function builtinPoint(key) {
   if (t === 'hs') return S.Hs;
   return null;
 }
+/* The curves of a live spiral that are drawn: its arcs and, when it turns about where it starts, the halving arcs leading in. */
+const N_IN = 12;
+const spiralCurves = S => S.arcs.slice(0, state.nFib).concat(state.rotCentre === 'start' ? S.inArcs.slice(0, N_IN) : []).filter(g => !g.dead);
+const allCurves = S => S.arcs.concat(state.rotCentre === 'start' ? S.inArcs.slice(0, N_IN) : []).filter(g => !g.dead);
 const G = ref => (typeof ref === 'string' ? builtinGeom(ref) : (byId.get(ref) || {}).g || null);
 const P = id => { const g = (byId.get(id) || {}).g; return Array.isArray(g) ? g : null; };
 
@@ -329,14 +394,15 @@ function compute(o) {
       }
       if (o.inter) {                                     // follow the same crossing: the one nearest to where it was
         // an arc ref stands for its whole spiral, so the crossing is followed from one arc to the next as the spirals turn
-        const curves = r => (typeof r === 'string' && r.startsWith('arc:')) ? LV[+r.split(':')[1]].arcs : [G(r)];
+        const curves = r => (typeof r === 'string' && /^(arc|ina):/.test(r)) ? allCurves(LV[+r.split(':')[1]]) : [G(r)];
         const A = curves(o.inter[0]), B = curves(o.inter[1]); if (!A[0] || !B[0]) return null;
-        const pts = []; for (const a of A) for (const b of B) for (const p of intersect(a, b)) pts.push(p);
-        if (!pts.length) return null;
+        const pts = []; let same = false;
+        for (const a of A) for (const b of B) { if (a.k === 'arc' && b.k === 'arc' && near(a.c, b.c, 1e-9) && Math.abs(a.r - b.r) < 1e-9) same = true; for (const p of intersect(a, b)) pts.push(p); }
+        if (!pts.length) return same && o._last ? o._last : null;
         const target = o._last || o.seed;
         let q = target ? null : pts[o.inter[2]] || pts[0], bd = Infinity;
         if (target) for (const p of pts) { const d = dist(p, target); if (d < bd) { bd = d; q = p; } }
-        if (target && bd > 0.4 * (1 + len(target))) return null;   // it ran off the drawn spirals: lost here, picked up again if it comes back
+        if (target && bd > 0.4 * (1 + len(target))) return same ? o._last : null;   // it ran off the drawn spirals: lost here, picked up again if it comes back
         o._last = q; return q;
       }
       if (o.at) return builtinPoint(o.at);
@@ -391,7 +457,8 @@ function builtinList() {
   const out = [];
   state.layers.forEach((L, i) => {
     if (L.hl) LV[i].lines.forEach((g, j) => out.push({ ref: `hl:${i}:${j}`, g }));
-    if (L.arc) LV[i].arcs.slice(0, state.nFib).forEach((g, j) => out.push({ ref: `arc:${i}:${j}`, g }));
+    if (L.arc) LV[i].arcs.slice(0, state.nFib).forEach((g, j) => { if (!g.dead) out.push({ ref: `arc:${i}:${j}`, g }); });
+    if (L.arc && state.rotCentre === 'start') LV[i].inArcs.slice(0, N_IN).forEach((g, j) => { if (!g.dead) out.push({ ref: `ina:${i}:${j}`, g }); });
   });
   if (state.showUnit) for (let j = 0; j < 4; j++) out.push({ ref: `usq:${j}`, g: builtinGeom(`usq:${j}`) });
   if (state.showCircH) out.push({ ref: 'circh', g: builtinGeom('circh') });
@@ -430,7 +497,7 @@ function snapAt(w, r = 10) {
   for (const c of staticCands) tryP(c.p, c.src);
   for (const c of dynCands) tryP(c.p, c.src);
   state.layers.forEach((L, i) => {                        // Holden grid nodes of spirals whose grid is shown
-    if (!L.grid) return;
+    if (!L.grid || LV[i].flip || LV[i].inverted) return;
     const S = LV[i], back = rotAbout(S.C, -S.phi), fwd = rotAbout(S.C, S.phi);
     const q = applyM([S.M[0], S.M[2], S.M[1], S.M[3]], back(w));   // undo the turn, then the symmetry (transpose)
     const m = Math.round(q[0] + 3 * q[1]), m2 = Math.round(3 * q[0] - q[1] - 1);
@@ -486,22 +553,72 @@ function pickUserPoint(w, maxPx = 10) {
 const n2 = v => v.toFixed(2);
 function geomSVG(g, st, fill = 'none') {
   switch (g.k) {
-    case 'line': { const a = w2s(g.p), L = (VW + VH) * 2; return `<line x1="${n2(a[0] - g.d[0] * L)}" y1="${n2(a[1] + g.d[1] * L)}" x2="${n2(a[0] + g.d[0] * L)}" y2="${n2(a[1] - g.d[1] * L)}" ${st}/>`; }
+    case 'line': { const [a, b] = lineEnds(g.p, g.d); return `<line x1="${n2(a[0])}" y1="${n2(a[1])}" x2="${n2(b[0])}" y2="${n2(b[1])}" ${st}/>`; }
     case 'seg': { const a = w2s(g.p), b = w2s(g.q); return `<line x1="${n2(a[0])}" y1="${n2(a[1])}" x2="${n2(b[0])}" y2="${n2(b[1])}" ${st}/>`; }
-    case 'circ': { const c = w2s(g.c); return `<circle cx="${n2(c[0])}" cy="${n2(c[1])}" r="${n2(g.r * view.s)}" fill="${fill}" ${st}/>`; }
-    case 'arc': return `<path d="${polyD(arcPts(g))}" fill="none" ${st}/>`;
-    case 'poly': return `<polygon points="${g.v.map(p => w2s(p).map(n2).join(',')).join(' ')}" fill="${fill}" ${st}/>`;
+    case 'circ': {
+      if (g.r * view.s > 3000) { const d = arcD({ c: g.c, r: g.r, a0: 0, a1: TAU }); return d ? `<path d="${d}" fill="none" ${st}/>` : ''; }   // huge: only the part in the frame
+      const c = w2s(g.c); return `<circle cx="${n2(c[0])}" cy="${n2(c[1])}" r="${n2(g.r * view.s)}" fill="${fill}" ${st}/>`;
+    }
+    case 'arc': { const d = arcD(g); return d ? `<path d="${d}" fill="none" ${st}/>` : ''; }
+    case 'poly': return polyPath(g.v, `fill="${fill}" ${st}`);
     case 'mark': { const c = w2s(g.c); return `<circle cx="${n2(c[0])}" cy="${n2(c[1])}" r="17" fill="none" ${st}/>`; }
   }
   return '';
 }
-function arcPts(g, n = 48) {                              // polyline in screen coords, in spiral order (start -> end)
-  const pts = [];
-  for (let i = 0; i <= n; i++) {
-    const t = g.rev ? g.a1 - (g.a1 - g.a0) * i / n : g.a0 + (g.a1 - g.a0) * i / n;
-    pts.push(w2s([g.c[0] + g.r * Math.cos(t), g.c[1] + g.r * Math.sin(t)]));
+/* Only what is in the frame is drawn: every curve is cut to the window (plus a margin), so a deep zoom stays fast
+ * (a huge dashed arc off screen would otherwise cost millions of dashes). */
+function viewBox(mPx = 40) { const a = s2w(-mPx, VH + mPx), b = s2w(VW + mPx, -mPx); return [a[0], a[1], b[0], b[1]]; }   // xmin, ymin, xmax, ymax
+const inBox = (p, B) => p[0] >= B[0] && p[0] <= B[2] && p[1] >= B[1] && p[1] <= B[3];
+function arcPieces(g, B) {                                // visible angle ranges [t0, t1] of an arc, in spiral order
+  const span = g.a1 - g.a0, cx = g.c[0], cy = g.c[1], r = g.r;
+  if (cx + r < B[0] || cx - r > B[2] || cy + r < B[1] || cy - r > B[3]) return [];
+  const us = [0, span], add = t => { const u = normAng(t - g.a0); if (u > 0 && u < span) us.push(u); };
+  for (const X of [B[0], B[2]]) { const v = (X - cx) / r; if (Math.abs(v) <= 1) { const t = Math.acos(v); add(t); add(-t); } }
+  for (const Y of [B[1], B[3]]) { const v = (Y - cy) / r; if (Math.abs(v) <= 1) { const t = Math.asin(v); add(t); add(Math.PI - t); } }
+  us.sort((a, b) => a - b);
+  const out = [];
+  for (let i = 0; i + 1 < us.length; i++) {
+    const u0 = us[i], u1 = us[i + 1]; if (u1 - u0 < 1e-15) continue;
+    const m = g.a0 + (u0 + u1) / 2;
+    if (!inBox([cx + r * Math.cos(m), cy + r * Math.sin(m)], B)) continue;
+    if (out.length && Math.abs(out[out.length - 1][1] - (g.a0 + u0)) < 1e-15) out[out.length - 1][1] = g.a0 + u1; else out.push([g.a0 + u0, g.a0 + u1]);
   }
-  return pts;
+  return g.rev ? out.reverse().map(([a, b]) => [b, a]) : out;
+}
+function arcD(g, ctx = { last: null }, B = viewBox()) {   // SVG path of the visible parts of an arc; ctx.last joins consecutive arcs
+  let d = '';
+  for (const [t0, t1] of arcPieces(g, B)) {
+    const n = Math.max(2, Math.min(4000, Math.ceil(g.r * view.s * Math.abs(t1 - t0) / 3)));   // a point every ~3 px of the visible part
+    for (let i = 0; i <= n; i++) {
+      const t = t0 + (t1 - t0) * i / n, q = w2s([g.c[0] + g.r * Math.cos(t), g.c[1] + g.r * Math.sin(t)]);
+      const join = i > 0 || (ctx.last && Math.abs(ctx.last[0] - q[0]) + Math.abs(ctx.last[1] - q[1]) < 0.75);
+      d += (join ? 'L' : 'M') + n2(q[0]) + ' ' + n2(q[1]); ctx.last = q;
+    }
+  }
+  return d;
+}
+function clipPoly(v, B) {                                 // Sutherland-Hodgman: a polygon cut to the window
+  let out = v;
+  const edges = [[p => p[0] >= B[0], (p, q) => (B[0] - p[0]) / (q[0] - p[0])], [p => p[0] <= B[2], (p, q) => (B[2] - p[0]) / (q[0] - p[0])],
+                 [p => p[1] >= B[1], (p, q) => (B[1] - p[1]) / (q[1] - p[1])], [p => p[1] <= B[3], (p, q) => (B[3] - p[1]) / (q[1] - p[1])]];
+  for (const [ins, tAt] of edges) {
+    const inp = out; out = [];
+    for (let i = 0; i < inp.length; i++) {
+      const p = inp[i], q = inp[(i + 1) % inp.length], pi = ins(p), qi = ins(q);
+      if (pi) out.push(p);
+      if (pi !== qi) { const t = tAt(p, q); out.push([p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]); }
+    }
+    if (!out.length) break;
+  }
+  return out;
+}
+function polyPath(v, attrs) {                             // a filled polygon, cut to the window
+  const c = clipPoly(v, viewBox());
+  return c.length < 3 ? '' : `<path d="${c.map((p, i) => (i ? 'L' : 'M') + w2s(p).map(n2).join(' ')).join('')}Z" ${attrs}/>`;
+}
+function lineEnds(p, d) {                                 // a long-enough piece of a line, centred on the point nearest the window centre
+  const vc = s2w(VW / 2, VH / 2), t = dot(sub(vc, p), d), L = (VW + VH) * 2 / view.s, m = [p[0] + t * d[0], p[1] + t * d[1]];
+  return [w2s([m[0] - L * d[0], m[1] - L * d[1]]), w2s([m[0] + L * d[0], m[1] + L * d[1]])];
 }
 const polyD = (pts, move = true) => pts.map((p, i) => (i || !move ? 'L' : 'M') + n2(p[0]) + ' ' + n2(p[1])).join('');
 const text = (p, t, o = {}) => `<text x="${n2(p[0])}" y="${n2(p[1])}" font-family="system-ui,sans-serif" font-size="${o.size || 12}" fill="${o.fill || '#222'}" text-anchor="${o.anchor || 'start'}" stroke="#fff" stroke-width="3" paint-order="stroke" stroke-linejoin="round">${t}</text>`;
@@ -522,14 +639,15 @@ function bgSVG() {
   return o;
 }
 function gridSVG(S) {                                     // Holden grid: nA.p = m, nB.p = 1 + m
+  if (S.inverted) return '';
   const cs = [s2w(0, 0), s2w(VW, 0), s2w(0, VH), s2w(VW, VH)];
   if (view.s / Math.sqrt(10) < 6) return '';
   let d = '';
   for (const [n, off] of [[S.nA, S.offA], [S.nB, S.offB]]) {
     const vals = cs.map(c => dot(n, c)), lo = Math.ceil(Math.min(...vals) - off), hi = Math.floor(Math.max(...vals) - off), nn = dot(n, n), L = (VW + VH) * 2;
     for (let m = lo; m <= hi && m - lo < 1500; m++) {
-      const c = m + off, p = w2s([n[0] * c / nn, n[1] * c / nn]), dd = [-n[1] / Math.sqrt(nn), -n[0] / Math.sqrt(nn)];   // screen direction (dx, -dy) with d = (-ny, nx)/|n|
-      d += `M${n2(p[0] - dd[0] * L)} ${n2(p[1] - dd[1] * L)}L${n2(p[0] + dd[0] * L)} ${n2(p[1] + dd[1] * L)}`;
+      const c = m + off, [a, b] = lineEnds([n[0] * c / nn, n[1] * c / nn], [-n[1] / Math.sqrt(nn), n[0] / Math.sqrt(nn)]);
+      d += `M${n2(a[0])} ${n2(a[1])}L${n2(b[0])} ${n2(b[1])}`;
     }
   }
   return `<path d="${d}" stroke="${S.col}" stroke-opacity=".28" stroke-width="1" fill="none"/>`;
@@ -537,18 +655,19 @@ function gridSVG(S) {                                     // Holden grid: nA.p =
 function spiralSVG(S) {
   const L = state.layers[S.i], n = state.nFib, dash = S.mirror ? 'stroke-dasharray="7 4"' : '';
   let o = '';
-  if (L.sq) for (const q of S.squares.slice(0, n)) o += `<polygon points="${q.corners.map(p => w2s(p).map(n2).join(',')).join(' ')}" fill="${S.col}" fill-opacity=".06" stroke="${S.col}" stroke-opacity=".7" stroke-width="1" ${dash}/>`;
+  if (L.sq) for (const q of S.squares.slice(0, n)) o += polyPath(q.corners, `fill="${S.col}" fill-opacity=".06" stroke="${S.col}" stroke-opacity=".7" stroke-width="1" ${dash}`);
   if (L.hl) S.lines.forEach((g, j) => { const c = state.lineColour === 'role' ? (j === 0 ? ROLE.odd : ROLE.even) : S.col;
     o += geomSVG(g, `stroke="${c}" stroke-width="${state.lineColour === 'role' ? 1.6 : 1.3}" stroke-opacity=".85" stroke-dasharray="${S.mirror ? '6 4' : '2 3'}"`); });
   const start = state.rotCentre === 'start';
-  if (start && L.sq) for (const q of S.inSq.slice(0, 10)) o += `<polygon points="${q.corners.map(p => w2s(p).map(n2).join(',')).join(' ')}" fill="${S.col}" fill-opacity=".05" stroke="${S.col}" stroke-opacity=".55" stroke-width="1" ${dash}/>`;
-  if (start && L.arc) o += `<path d="${polyD(S.inward.map(w2s))}" fill="none" stroke="${S.col}" stroke-width="2.4" ${dash} stroke-linecap="round"/>`;
+  if (start && L.sq) for (const q of S.inSq.slice(0, 10)) o += polyPath(q.corners, `fill="${S.col}" fill-opacity=".05" stroke="${S.col}" stroke-opacity=".55" stroke-width="1" ${dash}`);
+  if (start && L.arc) { const B = viewBox(), ctx = { last: null }, d = S.inArcs.slice(0, N_IN).filter(g => !g.dead).map(g => arcD(g, ctx, B)).join(''); if (d) o += `<path d="${d}" fill="none" stroke="${S.col}" stroke-width="2.4" ${dash} stroke-linecap="round" stroke-linejoin="round"/>`; }
   if (start && L.cross) { const p = w2s(S.Hs); o += `<circle cx="${n2(p[0])}" cy="${n2(p[1])}" r="4" fill="${S.col}" stroke="#fff" stroke-width="1.2"/>` + text([p[0] + 6, p[1] + 13], `H′${S.i}`, { fill: S.col, size: 10 }); }
-  if (L.arc) o += `<path d="${S.arcs.slice(0, n).map((g, i) => polyD(arcPts(g), i === 0)).join('')}" fill="none" stroke="${S.col}" stroke-width="2.4" ${dash} stroke-linecap="round" stroke-linejoin="round"/>`;
+  if (L.arc) { const B = viewBox(), ctx = { last: null }, d = S.arcs.slice(0, n).filter(g => !g.dead).map(g => arcD(g, ctx, B)).join(''); if (d) o += `<path d="${d}" fill="none" stroke="${S.col}" stroke-width="2.4" ${dash} stroke-linecap="round" stroke-linejoin="round"/>`; }
   if (L.ctr) S.squares.slice(0, n).forEach((q, k) => { const p = w2s(q.c); o += `<circle cx="${n2(p[0])}" cy="${n2(p[1])}" r="3" fill="${S.col}"/>` + text([p[0] + 5, p[1] - 5], k + 1, { size: 10, fill: S.col }); });
   if (L.cross) { const p = w2s(S.H); o += `<circle cx="${n2(p[0])}" cy="${n2(p[1])}" r="5.5" fill="#fff" stroke="${S.col}" stroke-width="2"/>` + text([p[0] + 8, p[1] + 14], `H${S.i}`, { fill: S.col, size: 11 }); }
   return o;
 }
+const POLY_COL = '#5b3fd0', PALETTE = ['#5b3fd0', '#1f6feb', '#e5484d', '#e060a8', '#d99a00', '#2e7d4f', '#b4532a', '#0f9fb0', '#2b2f36'];
 function userSVG() {
   let o = '';
   const selG = sel !== null ? G(sel) : null;
@@ -556,11 +675,12 @@ function userSVG() {
   for (const o2 of objs) {
     const g = o2.g; if (g === null || g === undefined) continue;
     const hov = hoverRef === o2.id ? 'stroke-width="3"' : 'stroke-width="1.8"';
-    if (o2.t === 'seg' || o2.t === 'line' || o2.t === 'par' || o2.t === 'perp' || o2.t === 'circ') o += geomSVG(g, `stroke="#2b2f36" ${hov}`);
+    if (o2.t === 'seg' || o2.t === 'line' || o2.t === 'par' || o2.t === 'perp' || o2.t === 'circ') o += geomSVG(g, `stroke="${o2.col || '#2b2f36'}" ${hov}`);
     else if (o2.t === 'poly') {
-      o += geomSVG(g, `stroke="#5b3fd0" ${hov}`, 'rgba(91,63,208,.09)');
+      const col = o2.col || POLY_COL;
+      o += geomSVG(g, `stroke="${col}" fill-opacity="${o2.col ? .16 : .09}" ${hov}`, col);
       const c = [g.v.reduce((s, p) => s + p[0], 0) / g.v.length, g.v.reduce((s, p) => s + p[1], 0) / g.v.length];
-      o += text(w2s(c), `A = ${fx(polyArea(g.v))}`, { anchor: 'middle', fill: '#5b3fd0', size: 11 });
+      o += text(w2s(c), `A = ${fx(polyArea(g.v))}`, { anchor: 'middle', fill: col, size: 11 });
     } else if (o2.t === 'dist') {
       const a = P(o2.a), b = P(o2.b), e = exactStr(g), m = w2s(mid(a, b));
       o += geomSVG({ k: 'seg', p: a, q: b }, 'stroke="#c2410c" stroke-width="1.6" stroke-dasharray="5 3"') + text([m[0] + 6, m[1] - 6], fx(g) + (e ? ` (${e})` : ''), { fill: '#c2410c', size: 11 });
@@ -732,7 +852,7 @@ function onClick(w) {
 function finishClick(before, changed) { if (changed) pushUndo(before); req(); }
 function closePoly() {
   if (pending.length < 3) return;
-  const ids = pending.map(mkPoint); pending = []; sel = addObj({ t: 'poly', pts: ids });
+  const ids = pending.map(mkPoint); pending = []; sel = addObj(Object.assign({ t: 'poly', pts: ids }, state.polyCol ? { col: state.polyCol } : {}));
 }
 
 /* Pointer events: a short click acts with the tool; a drag pans (or moves a free point in Select). */
@@ -827,7 +947,12 @@ function describe(ref) {
   return '';
 }
 function updatePanels() {
-  const info = sel === null ? '<span class="muted">Nothing selected.</span>' : describe(sel);
+  let info = sel === null ? '<span class="muted">Nothing selected.</span>' : describe(sel);
+  const so = typeof sel === 'number' ? byId.get(sel) : null;
+  if (so && ['poly', 'seg', 'line', 'par', 'perp', 'circ'].includes(so.t)) {
+    const cur = so.col || (so.t === 'poly' ? POLY_COL : '#2b2f36');
+    info += `<div class="cols">colour ${PALETTE.map(c => `<button class="csw${c === cur ? ' on' : ''}" data-col="${c}" style="background:${c}" title="${c}"></button>`).join('')}<input type="color" class="cpick" value="${cur}" title="any colour"></div>`;
+  }
   if (info !== lastInfo) { $('info').innerHTML = info; lastInfo = info; }
   const ms = objs.filter(o => ['dist', 'ang', 'area'].includes(o.t));
   const mh = ms.length ? ms.map(o => `<div class="m ${sel === o.id ? 'sel' : ''}" data-id="${o.id}">${describe(o.id)}</div>`).join('') : '<span class="muted">None yet. Use Distance, Angle or Area.</span>';
@@ -835,6 +960,10 @@ function updatePanels() {
   const tl = TOOLS.find(t => t.id === tool);
   $('hint').textContent = msg || (tl ? `${tl.label}: ${tl.hint}` : '');
   $('undoB').disabled = !undoStack.length; $('redoB').disabled = !redoStack.length;
+}
+function setSelCol(c) {                                  // colour of the selected drawing; new polygons keep the last colour picked
+  const o = typeof sel === 'number' ? byId.get(sel) : null; if (!o) return;
+  const b = ser(); o.col = c; if (o.t === 'poly') state.polyCol = c; pushUndo(b); req();
 }
 function render() {
   raf = 0;
@@ -858,13 +987,19 @@ function exportPNG() {
   img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText());
 }
 function saveJSON() {
-  const data = { app: 'spiral-workbench', version: 1, objects: JSON.parse(ser()), settings: state, view };
+  const data = { app: 'spiral-workbench', version: 2, objects: JSON.parse(ser()), settings: state, view };
   download('spiral-workbench.json', new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' }));
 }
 function loadJSON(file) {
   file.text().then(t => {
     const d = JSON.parse(t); if (d.app !== 'spiral-workbench') throw new Error('not a Spiral Workbench file');
     const before = ser();
+    if (!(d.version >= 2)) {                               // files from before 24 Oct 2026 numbered mirror y as 5 and mirror y=x as 6: swap them
+      const sw = v => typeof v === 'string' ? v.replace(/^(arc|ina|hl|ctr|cnr|hx|hs):([56])(?=:|$)/, (m, t, k) => `${t}:${k === '5' ? 6 : 5}`)
+        : Array.isArray(v) ? v.map(sw) : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, sw(x)])) : v;
+      d.objects.objs = sw(d.objects.objs);
+      if (d.settings && d.settings.layers && d.settings.layers.length === 8) { const L = d.settings.layers; [L[5], L[6]] = [L[6], L[5]]; }
+    }
     objs = d.objects.objs; nextId = d.objects.nextId; labelN = d.objects.labelN; sel = null; pending = [];
     Object.assign(state, d.settings); if (d.view) view = d.view;
     objs.forEach(o => delete o._last); if (state.total === undefined) state.total = state.theta; pushUndo(before); updateLive(); trails = []; samples.clear(); buildUI(); req();
@@ -885,13 +1020,15 @@ function buildUI() {
 
   const T = $('layers'); T.textContent = '';
   const head = el('tr', {}, [el('th', { textContent: 'Spiral', style: 'text-align:left;cursor:default' })]);
+  head.append(el('th', { textContent: 'Flip', title: 'Flip this spiral about its centre: left-right, up-down, or both (a half turn); click to set all', onclick: () => { const f = ((state.layers[0].flip || 0) + 1) % 4; state.layers.forEach(L => (L.flip = f)); buildUI(); updateLive(); req(); } }));
   head.append(el('th', { textContent: 'Turn', title: 'Turn this spiral: off, clockwise or anticlockwise (click to set all)', onclick: () => { const r = state.layers[0].rot === -1 ? 1 : state.layers[0].rot === 1 ? 0 : -1; state.layers.forEach(L => (L.rot = r)); buildUI(); touchRot(); } }));
   LAYER_KEYS.forEach(([k, name]) => head.append(el('th', { textContent: { hl: 'Lines', grid: 'Grid', cross: 'Cross' }[k] || name, title: `${name}: click to toggle for all eight`, onclick: () => { const on = !state.layers.every(L => L[k]); state.layers.forEach(L => (L[k] = on)); touch(); } })));
   T.append(head);
   SYMS.forEach((s, i) => {
     const row = el('tr', {}, [el('td', { className: 'name', title: s.name, innerHTML: `<span class="sw ${SP[i].mirror ? 'dash' : ''}" style="border-color:${SP[i].col}"></span>${i} · ${s.short}` })]);
     const rb = btn(ROTSYM[state.layers[i].rot || 0], () => { const r = state.layers[i].rot || 0; state.layers[i].rot = r === 0 ? -1 : r === -1 ? 1 : 0; rb.textContent = ROTSYM[state.layers[i].rot]; rb.title = ROTNAME[state.layers[i].rot]; touchRot(); }, { className: 'turn', title: ROTNAME[state.layers[i].rot || 0] });
-    row.append(el('td', {}, [rb]));
+    const fb = btn(FLIPSYM[state.layers[i].flip || 0], () => { state.layers[i].flip = ((state.layers[i].flip || 0) + 1) % 4; fb.textContent = FLIPSYM[state.layers[i].flip]; fb.title = FLIPNAME[state.layers[i].flip]; updateLive(); req(); }, { className: 'turn', title: FLIPNAME[state.layers[i].flip || 0] });
+    row.append(el('td', {}, [fb]), el('td', {}, [rb]));
     LAYER_KEYS.forEach(([k]) => row.append(el('td', {}, [el('input', { type: 'checkbox', checked: state.layers[i][k], onchange: e => { state.layers[i][k] = e.target.checked; touch(); } })])));
     T.append(row);
   });
@@ -900,7 +1037,7 @@ function buildUI() {
   q.append(btn('all on', setAll(() => true)), btn('all off', setAll(() => false)), btn('rotations only', setAll(i => i < 4)), btn('mirrors only', setAll(i => i >= 4)));
   const o = $('options'); o.textContent = '';
   const chk = (label, key) => el('label', {}, [el('input', { type: 'checkbox', checked: state[key], onchange: e => { state[key] = e.target.checked; touch(); } }), label]);
-  o.append(chk('unit square', 'showUnit'), chk('circle r = h', 'showCircH'), chk('plain grid', 'bgGrid'), chk('snap', 'snap'),
+  o.append(el('label', { title: 'Flip everything through the circle of origins (inversion about O): outside goes inside, the spirals wind into O, the eight origins stay where they are' }, [el('input', { type: 'checkbox', checked: !!state.invert, onchange: e => { state.invert = e.target.checked; updateLive(); fit(); req(); } }), 'flip through the circle of origins']), chk('unit square', 'showUnit'), chk('circle r = h', 'showCircH'), chk('plain grid', 'bgGrid'), chk('snap', 'snap'),
     el('label', { title: 'Colour Holden\'s lines by their role (odd green, even rust) or by their spiral' }, ['lines by', el('select', { onchange: e => { state.lineColour = e.target.value; touch(); } }, [el('option', { value: 'role', textContent: 'odd / even', selected: state.lineColour === 'role' }), el('option', { value: 'spiral', textContent: 'spiral', selected: state.lineColour === 'spiral' })])]),
     el('label', {}, ['squares', el('input', { type: 'range', min: 1, max: FIB_MAX, value: state.nFib, oninput: e => { state.nFib = +e.target.value; $('nfibv').textContent = state.nFib; touch(); } }), el('span', { id: 'nfibv', textContent: state.nFib })]));
   buildRotUI();
@@ -908,6 +1045,8 @@ function buildUI() {
 }
 function touch() { dirty.snap = dirty.dyn = true; req(); }
 $('measures').addEventListener('click', e => { const m = e.target.closest('.m'); if (m) { sel = +m.dataset.id; req(); } });
+$('info').addEventListener('click', e => { const b = e.target.closest('.csw'); if (b) setSelCol(b.dataset.col); });
+$('info').addEventListener('change', e => { if (e.target.classList.contains('cpick')) setSelCol(e.target.value); });
 window.addEventListener('resize', req);
 
 /* ===================== 11. Rotation, crossings, trails, graph ===================== */
@@ -919,7 +1058,7 @@ const thetaMax = () => 360 * (state.turns || 1);
 function thetaLabel(t) { const k = Math.floor(t / 360 + 1e-9); return `${t.toFixed(1)}°` + (state.turns > 1 ? ` (${k} turn${k === 1 ? '' : 's'} + ${(t - 360 * k).toFixed(1)}°)` : ''); }
 /* The total angle turned (across loops) is kept, and every move is taken in steps of at most half a degree,
  * so a pinned point follows its own crossing (the nearest one at each step) and can be rewound to where it was made. */
-const modM = t => { const M = thetaMax(); return ((t % M) + M) % M; };
+const modM = t => { const M = thetaMax(), r = ((t % M) + M) % M; return r < 1e-9 && t > 1e-9 ? M : r; };   // a full turn shows as 360, not 0
 function goTotal(target) {
   const from = state.total || 0, d = target - from, n = Math.max(1, Math.ceil(Math.abs(d) / 0.5));
   for (let k = 1; k < n; k++) { state.total = from + d * k / n; state.theta = modM(state.total); updateLive(); resolveAll(); recordSamples(); }
@@ -931,16 +1070,18 @@ function backToStart() { goTotal(0); }
 function spinning() { return state.layers.some(L => L.rot); }
 /* Where the shown spirals cross each other (arcs of different spirals; each spiral never crosses itself). */
 function spiralCrossings() {
-  const shown = LV.filter(S => state.layers[S.i].arc), out = [], n = state.nFib;
+  const shown = LV.filter(S => state.layers[S.i].arc).map(spiralCurves), out = [];
   for (let a = 0; a < shown.length; a++) for (let b = a + 1; b < shown.length; b++)
-    for (const g1 of shown[a].arcs.slice(0, n)) for (const g2 of shown[b].arcs.slice(0, n))
-      for (const p of intersect(g1, g2)) out.push(p);
+    for (const g1 of shown[a]) for (const g2 of shown[b])
+      for (const p of intersect(g1, g2)) if (!out.some(q => near(q, p, 1e-12))) out.push(p);
   return out;
 }
 function crossSVG() {
   let o = '';
-  if (state.trails && trails.length) o += `<path d="${trails.map(p => { const q = w2s(p); return `M${n2(q[0])} ${n2(q[1])}h.01`; }).join('')}" stroke="#6b5a9e" stroke-opacity=".55" stroke-width="2.2" stroke-linecap="round" fill="none"/>`;
-  if (state.showX) for (const p of spiralCrossings()) { const q = w2s(p); o += `<circle cx="${n2(q[0])}" cy="${n2(q[1])}" r="3.6" fill="#6b5a9e" stroke="#fff" stroke-width="1.1"/>`; }
+  const TB = viewBox(10);
+  if (state.trails && trails.length) o += `<path d="${trails.filter(p => inBox(p, TB)).map(p => { const q = w2s(p); return `M${n2(q[0])} ${n2(q[1])}h.01`; }).join('')}" stroke="#6b5a9e" stroke-opacity=".55" stroke-width="2.2" stroke-linecap="round" fill="none"/>`;
+  const B = viewBox(10);
+  if (state.showX) for (const p of spiralCrossings()) { if (!inBox(p, B)) continue; const q = w2s(p); o += `<circle cx="${n2(q[0])}" cy="${n2(q[1])}" r="3.6" fill="#6b5a9e" stroke="#fff" stroke-width="1.1"/>`; }
   return o;
 }
 function recordSamples() {
@@ -1142,7 +1283,10 @@ function buildRotUI() {
   r.append(el('div', { className: 'row' }, [el('label', {}, ['speed', sp]), el('label', {}, ['about', ce])]));
   const setRot = v => () => { state.layers.forEach((L, i) => { L.rot = L.arc ? v : 0; }); buildUI(); touchRot(); };
   r.append(el('div', { className: 'row' }, [btn('shown ↻', setRot(-1), { title: 'all shown spirals clockwise' }), btn('shown ↺', setRot(1), { title: 'all shown spirals anticlockwise' }), btn('none', setRot(0)),
-    btn('⏮ back to start', backToStart, { title: 'rewind every turn made so far, so the pinned points go back along their own paths to where they were made' }), btn('−1°', () => goTotal((state.total || 0) - 1)), btn('+1°', () => goTotal((state.total || 0) + 1))]));
+    btn('⏮ back to start', backToStart, { title: 'rewind every turn made so far, so the pinned points go back along their own paths to where they were made' })]));
+  const step = d => () => goTotal((state.total || 0) + d);
+  const goIn = el('input', { id: 'thetaIn', type: 'text', placeholder: 'e.g. 296.988353', title: 'type an exact angle in degrees and press Enter', style: 'width:130px', onkeydown: e => { if (e.key === 'Enter') { const v = parseFloat(e.target.value.replace(',', '.')); if (isFinite(v)) setTheta(v); } } });
+  r.append(el('div', { className: 'row' }, [btn('−1°', step(-1)), btn('+1°', step(1)), btn('−0.01°', step(-0.01)), btn('+0.01°', step(0.01)), el('label', {}, ['go to θ =', goIn])]));
   const cbx = (label, key, title) => el('label', { title }, [el('input', { type: 'checkbox', checked: state[key], onchange: e => { state[key] = e.target.checked; touch(); } }), label]);
   r.append(el('div', { className: 'row' }, [cbx('pin to the spirals', 'pin', 'points clicked on a crossing, centre, corner or origin are pinned to it and follow the turn')]));
   const cb = (label, key, title) => el('label', { title }, [el('input', { type: 'checkbox', checked: state[key], onchange: e => { state[key] = e.target.checked; if (key === 'trails' && !e.target.checked) trails = []; req(); } }), label]);

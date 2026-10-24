@@ -107,3 +107,15 @@ square and its origins. (The file "…& Epitetardit Rhombus_construction.ggb" li
 | images/Origin at Origin_Oposite_relations5.png | edb820497fffa8dd293de08b49e1ff6632cab543684cfe66af3e412ff9f9ef73 |
 | images/Origin at Origin_relations.png | 81234ee46843a77e264a4be40f0daa54c9c72b9ca982709903ad5766db73f7a2 |
 | images/The ratio.png | 5a8c015266e5f9a133049ccef001c7a6a2ee9b5963a4902c8d6f2563a5fb6085 |
+
+## 2026-10-24 — "The knot of the eight spirals"
+
+The eight spirals turned about where they start and flipped about it: an exact instant of the turn and
+the shapes that form around the origin of origins, with an independent check and a table. Inspired by
+the Akan Adinkra symbol *Mpatapo* (a resemblance, not a claim about the symbol).
+
+| File | SHA-256 |
+|---|---|
+| The knot of the eight spirals - findings 2026-10-24.md | 18bb518003b0863c64016f41a61a79789139f9f7de1e3b85744ac7a2599aa454 |
+| verify_heart_tips.py | dbfaea24a2a29c5dd6f76708b84178b1a73ca8c0149bc350ed8893cf1910cade |
+| Tables/Heart tips at O.xlsx | 27f81d7c47f0897d2fe3ef8819ac6eaab5e43301992236d747a1883bb92fdbd2 |

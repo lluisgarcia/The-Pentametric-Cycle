@@ -221,8 +221,8 @@ const FIB = [0, 1]; while (FIB.length < 20) FIB.push(FIB[FIB.length - 1] + FIB[F
 const SYMS = [
   { name: "Rotation 0°", M: [1, 0, 0, 1] }, { name: "Rotation 90°", M: [0, -1, 1, 0] },
   { name: "Rotation 180°", M: [-1, 0, 0, -1] }, { name: "Rotation 270°", M: [0, 1, -1, 0] },
-  { name: "Mirror in the x-axis", M: [1, 0, 0, -1] }, { name: "Mirror in the y-axis", M: [-1, 0, 0, 1] },
-  { name: "Mirror in y = x", M: [0, 1, 1, 0] }, { name: "Mirror in y = −x", M: [0, -1, -1, 0] },
+  { name: "Mirror in the x-axis", M: [1, 0, 0, -1] }, { name: "Mirror in y = x", M: [0, 1, 1, 0] },
+  { name: "Mirror in the y-axis", M: [-1, 0, 0, 1] }, { name: "Mirror in y = −x", M: [0, -1, -1, 0] },
 ];
 const COLS = ["var(--accent)", "var(--accent2)", "var(--pink)", "var(--accent4)"];
 const applyM = (M, p) => [M[0] * p[0] + M[1] * p[1] + 0, M[2] * p[0] + M[3] * p[1] + 0];
