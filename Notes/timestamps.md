@@ -119,3 +119,21 @@ the Akan Adinkra symbol *Mpatapo* (a resemblance, not a claim about the symbol).
 | The knot of the eight spirals - findings 2026-10-24.md | 18bb518003b0863c64016f41a61a79789139f9f7de1e3b85744ac7a2599aa454 |
 | verify_heart_tips.py | dbfaea24a2a29c5dd6f76708b84178b1a73ca8c0149bc350ed8893cf1910cade |
 | Tables/Heart tips at O.xlsx | 27f81d7c47f0897d2fe3ef8819ac6eaab5e43301992236d747a1883bb92fdbd2 |
+
+## 2026-10-26 — Working files from 20–23 October, and two older studies
+
+Study files not listed before: spreadsheets on the squares of the circle of origins, the scaling of the
+origins cells, the Pentametric areas and two squares for n = 1–3; the GeoGebra experiment behind the
+halving squares; an image of the relations between a square and its mirror squares; and two older
+GeoGebra studies (dated December 2023 and January 2024).
+
+| File | SHA-256 |
+|---|---|
+| Tables/Squares of the circle of origins.xlsx | a99455406ceea07104c88ff0acad12b6ce1cc42a1b41f8d44287bfc89c9b326e |
+| Tables/Scaling in origins cells.xlsx | cd772c7ec871dccaaba03c8bf6eb6593944aaf87e2df80db7f4120621ce2e981 |
+| Tables/Pentametric Areas Study.xlsx | e278cd21b1136ade1994b892ba803bdb1a4718b574f1a93567b5d6172aed018e |
+| Tables/Two squares n=1-3.xlsx | 49ff2ce6946d08037220017cd7fadf310d843d57d24210b0267275f74df07220 |
+| Geo/Fibb Backward Experiment.ggb | 66d22a97049f42d0d5aeb7cd3194c01f71e9ec3e44e58f298ef9f2ddf8ab0806 |
+| images/Origin at Origin_Oposite_relations6.png | bb752a920cd87e8a817c9b39b5774139bfe3fc3859b406acbb1f3ad56fc9427f |
+| Geo/circles.ggb | 361b481d58828bc895b585ef361b50087498ea5533d20885e584703717b54e84 |
+| Geo/Notes+.ggb | 3ed82f938ad0cc02394bab05db9a9977173d7e14bea1ab37dadd3b5c156d83e9 |
