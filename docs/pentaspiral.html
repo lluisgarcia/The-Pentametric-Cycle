@@ -55,6 +55,7 @@
       <label><input id="oGrid" type="checkbox"> the origins grid (√0.1)</label>
       <label><input id="oLucas" type="checkbox"> mark Lucas numbers</label>
       <label id="oArcsL"><input id="oArcs" type="checkbox" checked> golden spiral arcs</label>
+      <label title="in every square, a quarter circle about its corner nearest the Origin P, of radius the side √𝔓(n)"><input id="oPArcs" type="checkbox"> Pentametric squares arcs</label>
       <label><input id="oSound" type="checkbox" checked> sound</label>
     </div>
     <div class="row">
@@ -254,6 +255,14 @@ const ARC = (() => {
   }
   return out;
 })();
+// the arc of a square: centre = its corner nearest the Origin P, from one neighbouring corner to the other (a quarter turn)
+function pArc(g) {
+  let j = 0; for (let i = 1; i < 4; i++) if (Math.hypot(g.corners[i].x, g.corners[i].y) < Math.hypot(g.corners[j].x, g.corners[j].y)) j = i;
+  const C = g.corners[j], A = g.corners[(j + 1) % 4], B = g.corners[(j + 3) % 4];
+  const t0 = Math.atan2(A.y - C.y, A.x - C.x); let dt = Math.atan2(B.y - C.y, B.x - C.x) - t0;
+  while (dt > Math.PI) dt -= 2 * Math.PI; while (dt < -Math.PI) dt += 2 * Math.PI;
+  return { c: C, r: g.side, t0, dt, corner: j };
+}
 function shown() {
   const t = $("trail").value, lo = t === "all" ? 1 : Math.max(1, n - +t + 1), out = [];
   for (let j = lo; j <= n; j++) if (!fibOnly() || LUCAS.get(j) >= 1) out.push(j);
@@ -319,6 +328,18 @@ function drawScene(cv, R, cx, cy, lensMode) {
     for (const j of pts) { const g = place(j); g2.lineTo(X(g.c.x), Y(g.c.y)); }
     g2.strokeStyle = css("--ink"); g2.lineWidth = lw * 1.3; g2.globalAlpha = 0.7; g2.stroke(); g2.globalAlpha = 1;
     for (const j of pts) { const g = place(j); g2.beginPath(); g2.arc(X(g.c.x), Y(g.c.y), dpr * (j === n ? 3.5 : g.isL ? 3 : 2), 0, 2 * Math.PI); g2.fillStyle = css("--ink"); g2.fill(); }
+  }
+  // Pentametric squares arcs: in every square a quarter circle about its corner nearest P, radius the side √𝔓(n).
+  // At every Lucas number this is exactly the Fibonacci arc (checked k = 1–24); for the shadows it is the arc carried round P.
+  if ($("oPArcs").checked) {
+    for (const j of list) {
+      const g = place(j); if (g.area === 0) continue;
+      const a = pArc(g), col = colourOf(g);
+      if (g.shadow) g2.setLineDash([4 * dpr, 3 * dpr]);
+      g2.strokeStyle = col; g2.lineWidth = lw * (g.isL ? 2.6 : 1.4); g2.globalAlpha = g.shadow ? 1 - 0.3 * gold : 1;
+      g2.beginPath(); for (let i = 0; i <= 48; i++) { const t = a.t0 + a.dt * i / 48, x = a.c.x + a.r * Math.cos(t), y = a.c.y + a.r * Math.sin(t); i ? g2.lineTo(X(x), Y(y)) : g2.moveTo(X(x), Y(y)); }
+      g2.stroke(); g2.setLineDash([]); g2.globalAlpha = 1;
+    }
   }
   if ($("oArcs").checked && gold > 0.5 && !lensMode) {
     g2.globalAlpha = (gold - 0.5) * 2; g2.strokeStyle = css("--accent2"); g2.lineWidth = lw * 2.4;
@@ -568,7 +589,7 @@ $("back").onclick = () => { pause(); go(prevStep(n), true, true); };
 function fibUI() { $("fibCtl").classList.toggle("hidden", !fibOnly()); update(false); }
 $("squares").addEventListener("change", fibUI);
 $("jump").onclick = () => { pause(); const nx = nextLucas(n); if (nx > n && nx <= nmax) go(nx, true, true); };
-for (const id of ["oArcs", "oSkip"]) $(id).addEventListener("change", () => update(false));
+for (const id of ["oArcs", "oPArcs", "oSkip"]) $(id).addEventListener("change", () => update(false));
 if (new URLSearchParams(location.search).get("view") === "fib") { $("squares").value = "fib"; fibUI(); }     // the old "growing spiral" address lands here
 $("reset").onclick = () => { pause(); userZoom = false; go(0, false); };
 $("nslider").addEventListener("input", () => { pause(); go(+$("nslider").value, false); });
